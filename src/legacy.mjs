@@ -5,8 +5,6 @@ import {news} from './content.mjs';
 import {matchesSearch} from './search.mjs';
 
 const snapshotNewsIds=['20120401','20120903','20161003','20170714'];
-archiveNotes.find(n=>n.id==='0002').updated='2017.09.11';
-archiveNotes.find(n=>n.id==='0005').updated='2021.01.22';
 export const archivePublicPaths=['/','/collections/','/snapshots/','/snapshots/2009/','/snapshots/2011/','/snapshots/2017/',...archiveItems.map(i=>`/collections/items/${i.id}/`),...snapshotNewsIds.map(id=>`/snapshots/2017/news/${id}/`)];
 
 const linked=(url,text)=>`<a href="${esc(url)}">${esc(text)}</a>`;

@@ -11,7 +11,7 @@ import {pageRegistry,pagePosition,experienceSettings,growthStages} from '../src/
 import {hintPlan} from '../docs/hint-plan.mjs';
 import {seoFamily} from '../src/world/people.mjs';
 import {siteQueries,catalogQueries} from '../docs/critical-queries.mjs';
-import {archiveItems} from '../src/world/archive-data.mjs';
+import {archiveItems,archiveNotes} from '../src/world/archive-data.mjs';
 import {normalizeSearch,matchesSearch} from '../src/search.mjs';
 import {hostingOrigins,providerRoute,rewriteHostedHtml} from '../src/hosting.mjs';
 import {classifyEvidence} from '../src/evidence.mjs';
@@ -87,6 +87,17 @@ test('document references to later records have a sufficiently late update date'
  for(const d of documents){const latest=numeric(d.updated||d.date);assert.ok(latest>=numeric(d.date),d.id);
   const text=d.sections.map(s=>s.join(' ')).join(' ');
   for(const related of documents)if(related.id!==d.id&&text.includes(related.id))assert.ok(latest>=numeric(related.date),d.id+' references '+related.id+' before creation');
+ }
+});
+
+test('dated archive receipt notes do not cite documents or receipts before they exist',()=>{
+ const dateValue=value=>Number(value.replace(/年|月/g,'.').replace('日','').split('.').map((part,i)=>i?part.padStart(2,'0'):part).join(''));
+ for(const note of archiveNotes){
+  const latest=dateValue(note.updated||note.date);assert.ok(latest>=dateValue(note.date),note.id);
+  for(const d of documents)if(note.body.includes(d.id))assert.ok(latest>=dateValue(d.date),`receipt ${note.id} cites ${d.id} too early`);
+  for(const match of note.body.matchAll(/受領簿(\d{4})/g)){
+   const referenced=archiveNotes.find(n=>n.id===match[1]);assert.ok(referenced,match[0]);assert.ok(latest>=dateValue(referenced.date),`receipt ${note.id} cites ${referenced.id} too early`);
+  }
  }
 });
 
