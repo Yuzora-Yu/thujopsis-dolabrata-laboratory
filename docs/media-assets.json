@@ -1,0 +1,474 @@
+[
+  {
+    "key": "g-planter",
+    "year": 2012,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-ce2bb7af-5983-4404-8129-31e341559eed.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A small muted terracotta single-piece FDM-printed faceted planter with a separate thin round drip tray. Visible 0.25mm horizontal layer lines, a tiny seam, one small succulent. On a gray office workbench beside an old metal ruler. No hardware fasteners. Photograph as taken in 2012 using an ordinary compact digital camera: slightly cool fluorescent white balance, deep focus, mild sensor noise and JPEG softness, restrained saturation, a little on-camera flash. This is a record kept by staff, not a studio product shoot.",
+    "references": [],
+    "asset": "public/assets/media/g-planter.webp"
+  },
+  {
+    "key": "g-boat",
+    "year": 2012,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-9a14cc4b-a0c2-47e1-8379-8d15bbfef72f.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A modest laser-cut thin plywood boat model assembled from transverse tab-and-slot ribs and two long hull pieces, a simple triangular plywood sail, all physically connected. A few flat offcuts beside it on a scratched wood desk. This is a hand-sized workshop commemorative model, not a luxury yacht. Photograph as taken in 2012 using an ordinary compact digital camera: slightly cool fluorescent white balance, deep focus, mild sensor noise and JPEG softness, restrained saturation, a little on-camera flash. This is a record kept by staff, not a studio product shoot.",
+    "references": [
+      "https://filescnc.com/models/open-box/"
+    ],
+    "asset": "public/assets/media/g-boat.webp"
+  },
+  {
+    "key": "g-cable",
+    "year": 2013,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-79942709-3fcb-4cff-8b12-8b913b862475.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. Three small single-piece 3D printed blue cable clips, simple C-shaped snap-fit channels, one holding a thin black USB cable at the edge of a desk. Fine layer lines and a slight printing brim on one unfinished spare. No screws or metal parts. Photograph as taken in 2013 using an ordinary compact digital camera: slightly cool fluorescent white balance, deep focus, mild sensor noise and JPEG softness, restrained saturation, a little on-camera flash. This is a record kept by staff, not a studio product shoot.",
+    "references": [],
+    "asset": "public/assets/media/g-cable.webp"
+  },
+  {
+    "key": "g-water",
+    "year": 2013,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-f8dcf251-884a-4803-9040-cfa958ce09b2.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A small translucent natural PETG 3D printed hose-barb connector and two separated size trials, photographed next to clear flexible tubing. Continuous credible bore through the part, ordinary modest prototype finish. Macro-ish documentation without advertising polish. Photograph as taken in 2013 using an ordinary compact digital camera: slightly cool fluorescent white balance, deep focus, mild sensor noise and JPEG softness, restrained saturation, a little on-camera flash. This is a record kept by staff, not a studio product shoot.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-water.webp"
+  },
+  {
+    "key": "g-cup",
+    "year": 2014,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-ebebfca3-60fa-4b85-9462-a862fe4c574d.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A blue single-piece FDM printed adaptive mug holder, a large open oval handle with integral top-rim hook and integral bottom support cradling an ordinary white handleless cup. The printed geometry alone supports the cup. There are no bolts, screws, metal bands or separate attached handles. Show whole object and cup together at a natural table angle. Credible thick polymer walls and layer lines. Photograph as taken in 2014 using an ordinary compact digital camera: ordinary mixed fluorescent/daylight, imperfect white balance, deep focus, moderate JPEG compression, naturally flat lighting. This is a record kept by staff, not a studio product shoot.",
+    "references": [
+      "https://openassistive.org/item/customizableuniversalcuffutensilholder-04i/"
+    ],
+    "asset": "public/assets/media/g-cup.webp"
+  },
+  {
+    "key": "g-nameplate",
+    "year": 2014,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-ac65591a-0478-4131-9d61-8966c18e302c.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A small plain laser-cut birch plywood desk nameplate with two perpendicular slotted feet and a simple leaf silhouette cutout, no names or lettering. Light edge scorching and genuine plywood thickness, offcuts lying behind. Ordinary hobby project. Photograph as taken in 2014 using an ordinary compact digital camera: ordinary mixed fluorescent/daylight, imperfect white balance, deep focus, moderate JPEG compression, naturally flat lighting. This is a record kept by staff, not a studio product shoot.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-nameplate.webp"
+  },
+  {
+    "key": "g-box",
+    "year": 2015,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-60da8f41-603d-41f9-b487-9afe0df4f369.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A small open laser-cut birch plywood box with clear alternating interlocking finger joints, five planar panels, no metal fasteners. One divider and a few craft tools inside. Real warm wood grain and lightly charred cut edges, photographed on an office cutting mat. Photograph as taken in 2015 using an ordinary compact digital camera: ordinary mixed fluorescent/daylight, imperfect white balance, deep focus, moderate JPEG compression, naturally flat lighting. This is a record kept by staff, not a studio product shoot.",
+    "references": [
+      "https://filescnc.com/models/open-box/"
+    ],
+    "asset": "public/assets/media/g-box.webp"
+  },
+  {
+    "key": "g-map",
+    "year": 2016,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-a0deb0b1-530a-4e47-a5d0-d317eae8b158.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A cream FDM-printed tactile floor model, elongated footprint with offices on left, central core and large open space with tapered right end. Low raised walls and broad pathways, no impossible fine architectural details, printed in a single piece, a pencil for scale. Casual overhead documentation. Photograph as taken in 2016 using an ordinary compact digital camera: ordinary mixed fluorescent/daylight, imperfect white balance, deep focus, moderate JPEG compression, naturally flat lighting. This is a record kept by staff, not a studio product shoot.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-map.webp"
+  },
+  {
+    "key": "g-wall",
+    "year": 2016,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-15eb2df3-5584-45ec-880b-49c06d12525d.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A small laser-cut plywood model of two modular room wall units with a removable inspection panel and a cable channel, standing on a small baseboard. Simple realistic tab-and-slot construction, one panel laid beside it, a pen and notebook nearby. Nothing floating or mechanically impossible. Photograph as taken in 2016 using an ordinary compact digital camera: ordinary mixed fluorescent/daylight, imperfect white balance, deep focus, moderate JPEG compression, naturally flat lighting. This is a record kept by staff, not a studio product shoot.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-wall.webp"
+  },
+  {
+    "key": "g-guide",
+    "year": 2015,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-ec16983c-fe61-4a9a-973d-3696785d365e.png",
+    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. An unbranded tactile guide prototype for an instrument control panel: flat layered laser-cut acrylic sheet with three circular cutouts, a raised strip, and tactile edge notches. A matching simple control panel beneath it. Precise but modest workshop build, no mysterious writing, no human subject. Photograph as taken in 2015 using an ordinary compact digital camera: ordinary mixed fluorescent/daylight, imperfect white balance, deep focus, moderate JPEG compression, naturally flat lighting. This is a record kept by staff, not a studio product shoot.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-guide.webp"
+  },
+  {
+    "key": "g-knob",
+    "year": 2017,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-b2078419-adac-4822-948f-a0599ab3856f.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A single orange FDM-printed large tri-lobed knob cover press-fitted over a small plain round control knob on a gray appliance corner. A spare cover lies beside it showing its flexible inner socket. Visible printed layers, hand-sized scale. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with a 2010s compact digital camera, cool fluorescent illumination mixed with window light, deep focus, mild sensor noise, slight JPEG softness and imperfect white balance. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://github.com/makersmakingchange/Key-Turner"
+    ],
+    "asset": "public/assets/media/g-knob.webp"
+  },
+  {
+    "key": "g-grip",
+    "year": 2017,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-6d8f31f3-de42-4104-87a2-762a835268d0.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. Two off-white FDM printed cylindrical sensor grips with flat bases and cable channels, identical fixed dimensions. Printed trial parts on a ruled inspection mat, loose caliper nearby, no medical subjects. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with a 2010s compact digital camera, cool fluorescent illumination mixed with window light, deep focus, mild sensor noise, slight JPEG softness and imperfect white balance. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [],
+    "asset": "public/assets/media/g-grip.webp"
+  },
+  {
+    "key": "g-tray",
+    "year": 2018,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-06a37be0-9b98-4857-9280-57986cc417b3.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A small shallow laser-cut birch plywood organizer tray with honest finger-jointed corners and removable plywood dividers, one spool of thread inside, cutting mat. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with a 2010s compact digital camera, cool fluorescent illumination mixed with window light, deep focus, mild sensor noise, slight JPEG softness and imperfect white balance. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://filescnc.com/models/open-box/"
+    ],
+    "asset": "public/assets/media/g-tray.webp"
+  },
+  {
+    "key": "g-amplifier",
+    "year": 2018,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-e5dcf29d-b225-4d2f-8e76-d17d62e9a3de.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A green FDM printed passive smartphone acoustic amplifier, broad hollow horn integrated with a phone slot, a plain black phone upright. A spare unpainted print shows layer lines. On a workbench, realistic hollow geometry. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with a 2010s compact digital camera, cool fluorescent illumination mixed with window light, deep focus, mild sensor noise, slight JPEG softness and imperfect white balance. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-amplifier.webp"
+  },
+  {
+    "key": "g-posture",
+    "year": 2019,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-9d322d08-4676-4de9-b2e4-d7e2760aa6b2.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A desktop-size rigid gray FDM printed U-shaped support fixture with a flat bolted mounting base and padded contact strip, a steel ruler for scale. No human or body part. Utilitarian fixed-angle inspection jig photographed for a workshop delivery record. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with an ordinary 2019-era phone camera, flat office lighting, slight compressed detail and mundane exposure. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-posture.webp"
+  },
+  {
+    "key": "g-benchy",
+    "year": 2019,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-a033ba4a-4f24-4d8b-b757-59282fce82a5.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. Two small FDM printed calibration tugboat models like the reference geometry, one matte red and one pale gray, approximately six centimeters long, with cabin arches, smokestack and unmistakable horizontal print layers. On a worn makerspace workbench. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with an ordinary 2019-era phone camera, flat office lighting, slight compressed detail and mundane exposure. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.3dbenchy.com/"
+    ],
+    "asset": "public/assets/media/g-benchy.webp"
+  },
+  {
+    "key": "g-stand",
+    "year": 2020,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-371218e6-c8a0-4774-a793-63f1af8424a7.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A simple physically buildable smartphone stand assembled from two flat laser-cut plywood pieces with interlocking slots. A plain black smartphone leaning securely, spare flat pieces lie next to it. Warm scorched edges, tabletop record. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with an ordinary 2019-era phone camera, flat office lighting, slight compressed detail and mundane exposure. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-stand.webp"
+  },
+  {
+    "key": "g-pencil",
+    "year": 2022,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-4d9939df-5a4f-475d-9ce6-4abb660713f1.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A thick triangular pale blue FDM printed adaptive pencil grip surrounding a normal wooden pencil, plus one empty grip showing a simple central hole. All single-piece plastic geometry, classroom worktable and pencil marks. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with an ordinary 2019-era phone camera, flat office lighting, slight compressed detail and mundane exposure. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://openassistive.org/item/customizableuniversalcuffutensilholder-04i/"
+    ],
+    "asset": "public/assets/media/g-pencil.webp"
+  },
+  {
+    "key": "g-coaster",
+    "year": 2020,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-685e0b1d-13c1-4cd8-a3ba-cc6599e732a3.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. Three thin plywood coasters laser cut with different simple geometric perforations, flat and intact outer rims, brown cut edges and visible woodgrain, arranged casually beside a plain tea cup. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with an ordinary 2019-era phone camera, flat office lighting, slight compressed detail and mundane exposure. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://filescnc.com/models/heart-box/"
+    ],
+    "asset": "public/assets/media/g-coaster.webp"
+  },
+  {
+    "key": "g-response",
+    "year": 2023,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-34eb26b1-a0ac-4165-9f88-6d457d45245e.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A flat rectangular laser-cut white acrylic instrument face plate holding four large plain circular pushbuttons in a fixed straight row, dark enclosure underneath with credible cable outlet. No writing. Staff test documentation on a gray mat. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-response.webp"
+  },
+  {
+    "key": "g-retrofit",
+    "year": 2021,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-1cede010-5710-4786-88b6-5b325fdf53b4.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A small gray 3D printed fixed-angle equipment mounting bracket placed next to an older bracket that has a long adjustment slot. Scale ruler and handwritten illegible workshop checklist, restrained technical delivery photograph. Both brackets buildable, thick layered plastic. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with an ordinary 2019-era phone camera, flat office lighting, slight compressed detail and mundane exposure. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-retrofit.webp"
+  },
+  {
+    "key": "g-owl",
+    "year": 2024,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-f72db794-f215-47a4-b04b-2b273d3a9cb4.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A little faceted low-poly owl printed in matte ochre PLA, about seven centimeters tall, standing on a bookshelf between ordinary unbranded notebooks. Obvious delicate layer lines, ordinary hobby documentation, not a ceramic sculpture. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [],
+    "asset": "public/assets/media/g-owl.webp"
+  },
+  {
+    "key": "g-puzzle",
+    "year": 2021,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-4c93183e-ec19-45f2-9df9-8458fa04db79.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A bright but modest 3D printed tangram puzzle: seven solid flat orange polygon pieces arranged within a shallow white square tray. Two pieces removed to show gaps. Clear FDM layer lines, rounded outer corners, ordinary desk. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with an ordinary 2019-era phone camera, flat office lighting, slight compressed detail and mundane exposure. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-puzzle.webp"
+  },
+  {
+    "key": "g-standard",
+    "year": 2023,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-a3291534-1068-4262-a8e8-e79f948ae78c.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. Four identical ivory FDM printed ergonomic hand-rest blanks arranged in a straight row on a gray inspection bench. Fixed repeated contour, visible layer lines and support-removal traces. No people, no body horror. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://openassistive.org/item/customizableuniversalcuffutensilholder-04i/"
+    ],
+    "asset": "public/assets/media/g-standard.webp"
+  },
+  {
+    "key": "g-judgment",
+    "year": 2024,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-371f8dd1-87a0-403f-9da7-54afcbd4ad75.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A laser-cut smoked acrylic rectangular board with a regular arrangement of shallow circular sockets, three identical white tokens in sockets, a paper configuration sheet face down nearby. Purpose not obvious, plain research-office desk. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-judgment.webp"
+  },
+  {
+    "key": "g-hinge",
+    "year": 2024,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-f5817bfe-9948-4692-97b2-c1a6831f3803.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. An orange FDM print-in-place rectangular pocket case open with its lid connected by an actual integrated barrel hinge with small printed clearance gaps. Two halves intact and connected, plainly visible layer lines. Hand-sized on cutting mat. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://filescnc.com/models/heart-box/"
+    ],
+    "asset": "public/assets/media/g-hinge.webp"
+  },
+  {
+    "key": "g-cat",
+    "year": 2025,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-acd26822-f707-4173-bcac-4a3a49a09098.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. Three tiny laser-cut maple plywood keyring blanks in different sitting-cat silhouettes, one with simple metal keyring through a small hole. Plain shapes without faces or text, charred edges and actual woodgrain on a worktable. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [],
+    "asset": "public/assets/media/g-cat.webp"
+  },
+  {
+    "key": "g-stored",
+    "year": 2025,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-5eac54cf-99b6-4409-a3a6-f67954e35bb4.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A shallow storage tray holding eight identical pale gray FDM printed support inserts, repeated smooth anatomical-like but abstract contours, layered plastic and plain divider compartments. Believable small workshop inventory photograph. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-stored.webp"
+  },
+  {
+    "key": "g-spares",
+    "year": 2026,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-4bddfea6-2699-479f-85d6-aaf5fe78362f.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A row of six utilitarian dark gray FDM printed cable guards and fixed brackets prepared for equipment maintenance, each different mechanically credible simple geometry, caliper and blank packing slips on workshop desk. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [
+      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+    ],
+    "asset": "public/assets/media/g-spares.webp"
+  },
+  {
+    "key": "g-lizard",
+    "year": 2026,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-fe4a816f-fb34-470e-9199-fcbe43e42fba.png",
+    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A small green FDM printed articulated gecko with linked interlocking body segments, four short legs and a tapered segmented tail, laying flat on a maker desk. Print-in-place joints physically connected, visible fine layers. Ordinary hobby snapshot. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
+    "references": [],
+    "asset": "public/assets/media/g-lizard.webp"
+  },
+  {
+    "key": "c-0011",
+    "year": 2014,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. Close ordinary record photograph of a pair of hands comparing differently shaped unpainted polymer adaptive handles at a welfare-design worktable. Only hands and sleeves visible, ruler, foam samples and graph paper. A modest Japanese design studio, everyday fluorescent light. A single original landscape 3:2 photograph plausibly taken in 2014, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-042aba10-aa20-4100-bf01-ec1364a3d083.png",
+    "asset": "public/assets/media/c-0011.webp"
+  },
+  {
+    "key": "c-0017",
+    "year": 2013,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A practical benchtop water circulation trial: small stainless pump, correctly connected clear hoses, two modest reservoir tanks and pressure gauges, on a metal lab bench in a small rented Japanese office. Scattered plain check sheets. Medium wide shot of working equipment rather than computer desks. A single original landscape 3:2 photograph plausibly taken in 2013, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-7bdeadd1-b7cc-42a9-9912-dd2144d74ed6.png",
+    "asset": "public/assets/media/c-0017.webp"
+  },
+  {
+    "key": "c-0023",
+    "year": 2015,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A sensory-signage test corner, with a low tactile raised-line acrylic panel, small plain speaker and three unlabelled indicator lamps on a plywood stand. A modest Japanese research workshop, no people, everyday clutter, practical credible electronics. A single original landscape 3:2 photograph plausibly taken in 2015, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-dad006af-b054-418b-8240-8ae4509de259.png",
+    "asset": "public/assets/media/c-0023.webp"
+  },
+  {
+    "key": "c-0025",
+    "year": 2014,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A small Japanese food engineering company testing two insulated meal trays and a compact data logger on a stainless preparation table. Plain rice bowl, stainless covered food container, thermometer, practical cramped testing space, no commercial labels. A single original landscape 3:2 photograph plausibly taken in 2014, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-7fac39e1-28ec-48e3-956a-fa30a8065c82.png",
+    "asset": "public/assets/media/c-0025.webp"
+  },
+  {
+    "key": "c-0038",
+    "year": 2017,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A Japanese archive digitization operation: an open archival folder of aging papers on a copy stand beneath a basic DSLR, gray archival boxes and an older small laptop off to one side. Plain labels too small to read. Practical record-preservation work, no luxury interiors. A single original landscape 3:2 photograph plausibly taken in 2017, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-5fc5185c-aeb5-4984-b7dc-6ca86d727161.png",
+    "asset": "public/assets/media/c-0038.webp"
+  },
+  {
+    "key": "c-0027",
+    "year": 2016,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A seed research firm product/work record: simple plastic plug trays of small seedlings under ordinary white grow lights, handwritten illegible paper plant tags, seed envelopes and a cheap scale. A compact Japanese rented lab room, modest equipment. A single original landscape 3:2 photograph plausibly taken in 2016, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-d0a0082f-79a2-4894-a415-32b6ffc6974b.png",
+    "asset": "public/assets/media/c-0027.webp"
+  },
+  {
+    "key": "c-0040",
+    "year": 2018,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A product/work photograph of a small plain audio recorder, headphones, interview transcript papers with illegible marks and neatly spooled cables on a wooden editing desk. One old monitor out of focus behind, mundane Japanese record-preservation office. A single original landscape 3:2 photograph plausibly taken in 2018, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-c8aae31e-c2dc-4aa8-8b33-b30f86790208.png",
+    "asset": "public/assets/media/c-0040.webp"
+  },
+  {
+    "key": "c-0029",
+    "year": 2015,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. Very close work record of calipers measuring an old broken plastic appliance knob beside three gray FDM-printed replacement trials on a green cutting mat. A scratched surface, old ruler and a simple technical sketch with no legible words. Original repair engineering workshop. A single original landscape 3:2 photograph plausibly taken in 2015, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-fd7e7649-01bc-44db-815a-a7176e637b11.png",
+    "asset": "public/assets/media/c-0029.webp"
+  },
+  {
+    "key": "c-0045",
+    "year": 2018,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A materials-testing company showing several identical dogbone-shaped polymer tensile test specimens, a caliper and a compact mechanical testing frame behind. On an ordinary gray lab bench with practical lighting, no branding. The samples are physically plausible molded or printed parts. A single original landscape 3:2 photograph plausibly taken in 2018, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-54aaad67-46b7-4362-bb87-f7ab8ad5061c.png",
+    "asset": "public/assets/media/c-0045.webp"
+  },
+  {
+    "key": "c-0047",
+    "year": 2019,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A bench research snapshot of two inertial motion sensor units strapped to a plain articulated wooden mannequin used as a calibration object, data logger and cables on a table. One older laptop behind with unreadable plots. Ordinary Japanese small company workplace. A single original landscape 3:2 photograph plausibly taken in 2019, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-bc0869a5-0212-4960-948c-a98e0611ba6a.png",
+    "asset": "public/assets/media/c-0047.webp"
+  },
+  {
+    "key": "c-0032",
+    "year": 2017,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A Japanese instrumentation firm workbench with a few plain wired environmental sensor boxes, thermohygrometer, solderless breadboard and an older oscilloscope, cables routed credibly. Modest fluorescent-lit small research office, practical wider documentary framing. A single original landscape 3:2 photograph plausibly taken in 2017, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-5367cfb3-c7a0-4ef1-bbcc-e531d9fef44b.png",
+    "asset": "public/assets/media/c-0032.webp"
+  },
+  {
+    "key": "c-0046",
+    "year": 2018,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. An empty Japanese cognitive evaluation room, plain beige desks with four large-button response pads, simple unbranded monitor showing abstract gray shapes, chair tucked in, wires neatly clipped. Clinical ordinary practical space, small rented lab, closed blind, no people. A single original landscape 3:2 photograph plausibly taken in 2018, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-8ed28c82-4c51-4e88-9049-73bb291f82e8.png",
+    "asset": "public/assets/media/c-0046.webp"
+  },
+  {
+    "key": "c-0049",
+    "year": 2019,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A food resource planning test: rows of plain stainless meal trays and small sealed clear ingredient containers on metal shelving, a simple clipboard and digital scale in an institutional supply preparation room. Flat fluorescent light, pragmatic documentary angle. A single original landscape 3:2 photograph plausibly taken in 2019, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-77a123ec-3c79-4da0-95de-549b7515dbc6.png",
+    "asset": "public/assets/media/c-0049.webp"
+  },
+  {
+    "key": "c-0054",
+    "year": 2021,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A plain physical architectural study model of a compact residential floor on a design office table, simple removable white partitions and two alternative corridor configurations beside it. An older laptop and worn metal ruler, compact Japanese office, not a luxury architectural advertisement. A single original landscape 3:2 photograph plausibly taken in 2019, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-c6067f86-4131-493f-ba6c-4437970517b6.png",
+    "asset": "public/assets/media/c-0054.webp"
+  },
+  {
+    "key": "c-0051",
+    "year": 2020,
+    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. A small equipment-network maintenance room with a half-height server rack, orderly Ethernet patch cables, an older monitor and a simple paper maintenance sheet. Modest Japanese building, ordinary gray painted wall and flat fluorescent light, a practical service photo rather than a server megacenter. A single original landscape 3:2 photograph plausibly taken in 2019, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-ca8a8315-1582-4e89-8a16-75ff1d5d4faa.png",
+    "asset": "public/assets/media/c-0051.webp"
+  },
+  {
+    "key": "f-meeting",
+    "year": 2018,
+    "prompt": "Use case: photorealistic-natural. Original fictional facility website record photo. A modest Japanese shared business facility meeting room for twenty people, plain modular tables in a U layout, navy stackable chairs, whiteboard and a plain monitor trolley, daylight through blinds, practical clean room. Photograph as taken in 2018 with an ordinary compact camera, late-Heisei image quality: landscape 3:2, deep focus, moderate JPEG softness, slightly cool fluorescent/window mixed lighting, natural mundane exposure, restrained colors. Empty facility. Buildable believable architecture, no dramatic luxury lighting or text overlays, no brands.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-20e2fc9b-32b2-464e-a9d7-47e69a3e3b93.png",
+    "asset": "public/assets/media/f-meeting.webp"
+  },
+  {
+    "key": "f-office",
+    "year": 2018,
+    "prompt": "Use case: photorealistic-natural. Original fictional facility website record photo. A compact private office unit in a Japanese business incubation building, two simple desks, older laptops and office chairs, low storage shelves with plain files, modest window. Everyday actual tenant space rather than an expensive interior design showroom. Photograph as taken in 2018 with an ordinary compact camera, late-Heisei image quality: landscape 3:2, deep focus, moderate JPEG softness, slightly cool fluorescent/window mixed lighting, natural mundane exposure, restrained colors. Empty facility. Buildable believable architecture, no dramatic luxury lighting or text overlays, no brands.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-6943646f-591b-4256-aad8-b4ed26cd3e0e.png",
+    "asset": "public/assets/media/f-office.webp"
+  },
+  {
+    "key": "f-presentation",
+    "year": 2018,
+    "prompt": "Use case: photorealistic-natural. Original fictional facility website record photo. A Japanese community industry exchange facility presentation space, a wide flat open room with approximately sixty movable chairs facing a plain white screen, folding lectern, modest windows at the right and a few stacked chairs behind. No stage theatrics. Photograph as taken in 2018 with an ordinary compact camera, late-Heisei image quality: landscape 3:2, deep focus, moderate JPEG softness, slightly cool fluorescent/window mixed lighting, natural mundane exposure, restrained colors. Empty facility. Buildable believable architecture, no dramatic luxury lighting or text overlays, no brands.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-d07feed4-f222-4dd8-9818-a17eb47a1f4b.png",
+    "asset": "public/assets/media/f-presentation.webp"
+  },
+  {
+    "key": "f-hall",
+    "year": 2018,
+    "prompt": "Use case: photorealistic-natural. Original fictional facility website record photo. Wide rear-of-room documentary photograph of a Japanese multipurpose community hall accommodating about five hundred people, rows of plain dark stackable chairs across a broad floor, modest elevated stage and blank screen at the far end, simple acoustic wall panels and fluorescent ceiling. Practical public event facility. Photograph as taken in 2018 with an ordinary compact camera, late-Heisei image quality: landscape 3:2, deep focus, moderate JPEG softness, slightly cool fluorescent/window mixed lighting, natural mundane exposure, restrained colors. Empty facility. Buildable believable architecture, no dramatic luxury lighting or text overlays, no brands.",
+    "references": [],
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-73b3610d-d6a0-4ce5-8af2-e00752993112.png",
+    "asset": "public/assets/media/f-hall.webp"
+  },
+  {
+    "key": "p-asakura",
+    "year": 2017,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-16737dea-d4f9-4c9b-87bb-54f4cab06574.png",
+    "prompt": "Use case: photorealistic-natural. Asset: fictional facility historical activity photograph. A candid work-record photograph in a modest Japanese community makerspace. A young Japanese woman about twenty-four, dark hair tied back, plain gray work shirt, seated at a small bench inspecting a simple blue 3D-printed adaptive handle with calipers. Her attention stays on the object, no posing, practical tool storage, only a few ordinary projects around her. Medium-wide portrait in landscape framing. A single original landscape 3:2 image. Shot in 2017 on an ordinary consumer compact digital camera, slightly cool fluorescent illumination mixed with window light, deep focus, mild high-ISO noise, modest JPEG softness, imperfect exposure and white balance. Late-Heisei documentary quality, restrained colors and practical framing. Plain unbranded objects, no captions or added lettering.",
+    "references": [],
+    "asset": "public/assets/media/p-asakura.webp"
+  },
+  {
+    "key": "p-inaba",
+    "year": 2016,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-c671b3a3-04af-480f-ba2f-6a569b60a09a.png",
+    "prompt": "Use case: photorealistic-natural. Asset: fictional facility historical activity photograph. A close, mundane record photograph of an illustrator’s hands drawing a simple raised-line wayfinding diagram on tracing paper at a Japanese shared workshop desk. Beside the drawing are a small cream printed tactile route sample and soft pencils. The diagram is an original abstract route with no readable text and no complete building floor plan. Natural working hands and honest materials. A single original landscape 3:2 image. Shot in 2016 on an ordinary consumer compact digital camera, slightly cool fluorescent illumination mixed with window light, deep focus, mild high-ISO noise, modest JPEG softness, imperfect exposure and white balance. Late-Heisei documentary quality, restrained colors and practical framing. Plain unbranded objects, no captions or added lettering.",
+    "references": [],
+    "asset": "public/assets/media/p-inaba.webp"
+  },
+  {
+    "key": "p-founder",
+    "year": 2012,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-79d098af-4a53-4f8b-aa24-8b6fac81cda7.png",
+    "prompt": "Use case: photorealistic-natural. Asset: fictional facility historical activity photograph. A candid Japanese business-incubator opening-day photograph. A thoughtful Japanese man aged about sixty-one with ordinary thin glasses, slightly gray short hair, modest dark jacket without a necktie, explaining a hand-sized tab-and-slot plywood boat to two participants seated at a practical communal table. Warm attentive expression, humble surroundings, different shaped wooden pieces on the table. Everyday event documentation, not a staged corporate executive portrait. A single original landscape 3:2 image. Shot in 2012 on an ordinary consumer compact digital camera, slightly cool fluorescent illumination mixed with window light, deep focus, mild high-ISO noise, modest JPEG softness, imperfect exposure and white balance. Late-Heisei documentary quality, restrained colors and practical framing. Plain unbranded objects, no captions or added lettering.",
+    "references": [],
+    "asset": "public/assets/media/p-founder.webp"
+  },
+  {
+    "key": "r-flow-test",
+    "year": 2013,
+    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-3895aaf9-6f46-4db7-92b6-4713b868138f.png",
+    "prompt": "Use case: photorealistic-natural. Asset: fictional facility historical activity photograph. An ordinary Japanese engineering work-record photograph of a compact clear water-loop rig on a scratched workbench. Correctly connected transparent tubes and a small pump with an open clear measuring vessel, pale red colored water used as a visible flow tracer. A metal ruler and a simple blank checklist nearby, credible plumbing with distinct in/out lines. No human subject, no graphic distress, no text. A single original landscape 3:2 image. Shot in 2013 on an ordinary consumer compact digital camera, slightly cool fluorescent illumination mixed with window light, deep focus, mild high-ISO noise, modest JPEG softness, imperfect exposure and white balance. Late-Heisei documentary quality, restrained colors and practical framing. Plain unbranded objects, no captions or added lettering.",
+    "references": [],
+    "asset": "public/assets/media/r-flow-test.webp"
+  }
+]

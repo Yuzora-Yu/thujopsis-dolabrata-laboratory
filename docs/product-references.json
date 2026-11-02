@@ -1,0 +1,37 @@
+[
+  {
+    "key": "benchy",
+    "page": "https://www.3dbenchy.com/",
+    "image": "https://www.3dbenchy.com/wp-content/uploads/2025/04/3DBenchy-CAD-screenshot-image-570x350.webp"
+  },
+  {
+    "key": "finger-box",
+    "page": "https://filescnc.com/models/open-box/",
+    "image": "https://filescnc.com/img/models/open-box.jpg?v=bd215b2e"
+  },
+  {
+    "key": "key-turner",
+    "page": "https://github.com/makersmakingchange/Key-Turner",
+    "image": "https://raw.githubusercontent.com/makersmakingchange/Key-Turner/main/Photos/Key_Turner.jpg"
+  },
+  {
+    "key": "crate",
+    "page": "https://filescnc.com/models/crate/",
+    "image": "https://filescnc.com/img/models/crate.jpg?v=38600dd5"
+  },
+  {
+    "key": "heart-box",
+    "page": "https://filescnc.com/models/heart-box/",
+    "image": "https://filescnc.com/img/models/heart-box.jpg?v=6f5bd28b"
+  },
+  {
+    "key": "cuff",
+    "page": "https://openassistive.org/item/customizableuniversalcuffutensilholder-04i/",
+    "image": "https://openassistive.org/items/CustomizableUniversalCuffUtensilHolder-04i.png"
+  },
+  {
+    "key": "scu-maker-lab",
+    "page": "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf",
+    "figures": "PDF pp. 2, 7, 11, 13, 15。機器の組立、自助具、レーザー加工の筐体、仕切り、スタンドの構造を参照。"
+  }
+]

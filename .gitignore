@@ -1,0 +1,9 @@
+node_modules/
+.work/
+.env
+*.log
+test-results/
+playwright-report/
+.DS_Store
+private/runtime-state.json
+private/runtime-state.json.tmp
