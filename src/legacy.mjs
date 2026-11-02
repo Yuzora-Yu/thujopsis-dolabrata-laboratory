@@ -1,3 +1,4 @@
+import {fictionFooter,decoratePage} from './experience.mjs';
 import {archiveItems,archiveNotes} from './world/archive-data.mjs';
 import {esc} from './render.mjs';
 import {news} from './content.mjs';
@@ -10,13 +11,13 @@ export const archivePublicPaths=['/','/collections/','/snapshots/','/snapshots/2
 
 const linked=(url,text)=>`<a href="${esc(url)}">${esc(text)}</a>`;
 export function legacyLayout(title,body,{privateRoom=false}={}){
- return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}｜産業継続研究資料 保存室</title><link rel="stylesheet" href="/styles.css"></head><body class="legacy-body"><a class="skip" href="#legacy-main">本文へ移動</a><header class="legacy-header"><p>INDUSTRIAL CONTINUITY RECORDS</p><a href="/">産業継続研究資料 保存室</a><small>旧産業継続研究準備室・部分保存資料</small></header><nav class="legacy-nav" aria-label="資料保存室"><a href="/collections/">収蔵目録</a><a href="/snapshots/">公開画面の保存</a><a href="/room/">資料照会室</a></nav><main id="legacy-main" class="legacy-main">${privateRoom?'<p class="legacy-classification">資料照会室 ／ 移管・保守</p>':''}<h1>${esc(title)}</h1>${body}</main><footer class="legacy-footer">資料管理：旧基盤保存担当 ／ 公開保存資料と継続照会の更新日は各資料に記載</footer></body></html>`;
+ return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}｜産業継続研究資料 保存室</title><link rel="stylesheet" href="/styles.css"></head><body class="legacy-body"><a class="skip" href="#legacy-main">本文へ移動</a><header class="legacy-header"><p>INDUSTRIAL CONTINUITY RECORDS</p><a href="/">産業継続研究資料 保存室</a><small>旧産業継続研究準備室・部分保存資料</small></header><nav class="legacy-nav" aria-label="資料保存室"><a href="/collections/">収蔵目録</a><a href="/snapshots/">公開画面の保存</a><a href="/room/">資料照会室</a></nav><main id="legacy-main" class="legacy-main">${privateRoom?'<p class="legacy-classification">資料照会室 ／ 移管・保守</p>':''}<h1>${esc(title)}</h1>${body}</main><footer class="legacy-footer">資料管理：旧基盤保存担当 ／ 公開保存資料と継続照会の更新日は各資料に記載</footer><!--PAGE_INDEX-->${fictionFooter()}</body></html>`;
 }
 const noteRow=n=>`<a class="legacy-row" href="/room/records/${n.id}/"><span>No.${n.id}</span><time>${n.date}</time><strong>${esc(n.title)}</strong></a>`;
 export function legacyLogin(csrf,{error=''}={}){
- return legacyLayout('資料照会室',`<p>移管・保守契約に基づく資料の照会を受け付けております。</p>${error?`<p class="form-error" role="alert">${esc(error)}</p>`:''}<form method="post" action="/room/login/" class="form-stack legacy-login"><input type="hidden" name="csrf" value="${esc(csrf)}"><label for="ticket">閲覧票番号</label><input id="ticket" name="ticket" autocomplete="username" required maxlength="40"><label for="inquiry-code">照会符号</label><input id="inquiry-code" name="code" type="password" autocomplete="current-password" required maxlength="40"><button type="submit" class="button dark">照会室へ</button></form>`);
+ return decoratePage(legacyLayout('資料照会室',`<p>移管・保守契約に基づく資料の照会を受け付けております。</p>${error?`<p class="form-error" role="alert">${esc(error)}</p>`:''}<form method="post" action="/room/login/" class="form-stack legacy-login"><input type="hidden" name="csrf" value="${esc(csrf)}"><label for="ticket">閲覧票番号</label><input id="ticket" name="ticket" autocomplete="username" required maxlength="40"><label for="inquiry-code">照会符号</label><input id="inquiry-code" name="code" type="password" autocomplete="current-password" required maxlength="40"><button type="submit" class="button dark">照会室へ</button></form>`),{kind:'archive',path:'/room/'});
 }
-export function renderLegacy(path,ctx){
+function renderLegacyPage(path,ctx){
  const {origins,session,csrf}=ctx;
  if(path==='/')return legacyLayout('資料の保存について','<p>当保存室は、旧産業継続研究準備室が管理していた資料の一部を保存しております。収蔵目録は保存単位ごとに掲載しています。</p><dl class="legacy-info"><dt>公開画面の保存</dt><dd>取得時点の固定記録です。現在の事業案内とは異なる場合がございます。</dd><dt>資料照会室</dt><dd>移管・保守契約に基づく継続業務の窓口です。公開保存画面とは別に管理しております。</dd></dl><p><a href="/collections/">収蔵目録</a></p><p><a href="/snapshots/">公開画面の保存</a></p>');
  if(path==='/collections/'){
@@ -48,3 +49,5 @@ export function renderLegacy(path,ctx){
  }
  return null;
 }
+
+export function renderLegacy(path,ctx){return decoratePage(renderLegacyPage(path,ctx),{kind:'archive',path});}

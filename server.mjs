@@ -15,7 +15,7 @@ import {reservationSpaces} from './src/world/editorial.mjs';
 import {readFileSync} from 'node:fs';
 import {writeFile,rename,mkdir} from 'node:fs/promises';
 
-const root=path.dirname(fileURLToPath(import.meta.url));
+const root=import.meta.url?path.dirname(fileURLToPath(import.meta.url)):'/';
 const publicRoot=path.join(root,'public');
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.pdf':'application/pdf','.json':'application/json; charset=utf-8','.zip':'application/zip'};
 const MAX_BODY=25*1024*1024;
@@ -33,17 +33,21 @@ const evidenceZip=f=>looksZip(f)&&classifyEvidence(f.data);
 const safeEqual=(a,b)=>{const x=Buffer.from(a||''),y=Buffer.from(b||'');return x.length===y.length&&timingSafeEqual(x,y);};
 const safeNext=n=>/^\/members\/(?!\/)/.test(n||'')?n:'/members/';
 
+/**
+ * @param {{port?:number,hozenPort?:number,auditPort?:number,archivePort?:number,stateFile?:string|null,originOverrides?:Record<string,string>,caseIdFactory?:()=>string,archiveFactory?:((complete:boolean)=>Uint8Array|Promise<Uint8Array>)|null,privateFileLoader?:((name:string)=>Uint8Array|Promise<Uint8Array>)|null}} [options]
+ */
 export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,archivePort=port+3,stateFile=null,originOverrides={},caseIdFactory=token,archiveFactory=null,privateFileLoader=null}={}){
  const sessions=new Map(),cases=new Map();let archive,complete;
  const origins={main:process.env.ASUNARO_ORIGIN||`http://127.0.0.1:${port}`,hozen:process.env.HOZEN_ORIGIN||`http://127.0.0.1:${hozenPort}`,audit:process.env.AUDIT_ORIGIN||`http://127.0.0.1:${auditPort}`,archive:process.env.ARCHIVE_ORIGIN||`http://127.0.0.1:${archivePort}`,...originOverrides};
- if(stateFile){try{const data=JSON.parse(readFileSync(stateFile,'utf8'));for(const [id,s] of data.sessions||[])if(Date.now()-s.created<28800000)sessions.set(id,s);for(const [id,c] of data.cases||[])if([...sessions.values()].some(s=>s.caseId===id))cases.set(id,c);}catch(e){if(e.code!=='ENOENT')throw e;}}
+ if(stateFile){try{const data=JSON.parse(readFileSync(stateFile,'utf8'));for(const [id,s] of data.sessions||[])sessions.set(id,s);for(const [id,c] of data.cases||[])cases.set(id,c);}catch(e){if(e.code!=='ENOENT')throw e;}}
  let persistence=Promise.resolve();
  function persist(){if(stateFile){const data=JSON.stringify({sessions:[...sessions],cases:[...cases]});persistence=persistence.then(async()=>{await mkdir(path.dirname(stateFile),{recursive:true});await writeFile(stateFile+'.tmp',data);await rename(stateFile+'.tmp',stateFile);}).catch(e=>console.error('State persistence failed:',e.message));}}
  function send(res,status,body,type='text/html; charset=utf-8'){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','Content-Security-Policy':"default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"});res.end(body);}
  function redirect(res,url){res.writeHead(303,{'Location':url,'Cache-Control':'no-store'});res.end();}
  function sessionFor(req,res){
   const cookie=req.headers.cookie?.split(';').map(s=>s.trim()).find(s=>s.startsWith('asunaro_session='))?.split('=')[1];let session=cookie&&sessions.get(cookie);
-  if(!session){const id=token(),caseId=caseIdFactory();session={id,csrf:token(),caseId,accountId:null,created:Date.now()};sessions.set(id,session);if(!cases.has(caseId))cases.set(caseId,{contact:false,downloaded:false,ending:'',truth:false});res.setHeader('Set-Cookie',`asunaro_session=${id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=28800${process.env.COOKIE_SECURE==='1'?'; Secure':''}`);}
+  if(!session){const id=token(),caseId=caseIdFactory();session={id,csrf:token(),caseId,accountId:null,created:Date.now()};sessions.set(id,session);if(!cases.has(caseId))cases.set(caseId,{contact:false,downloaded:false,ending:'',truth:false});}
+  res.setHeader('Set-Cookie',`asunaro_session=${session.id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000${process.env.COOKIE_SECURE==='1'?'; Secure':''}`);
   persist();return session;
  }
  async function handler(req,res,kind='main'){
@@ -83,14 +87,14 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     }
     const caseId=url.searchParams.get('case')||'';const state=cases.get(caseId);return send(res,200,agencyPage(kind,pathname,{caseId,origins,received:pathname==='/received/'&&!!(state?.ending||state?.auditPending),pending:!!state?.auditPending&&state?.ending!=='end3',ending:state?.ending||''}));
    }
-   const session=sessionFor(req,res),caseState=cases.get(session.caseId),account=accounts[session.accountId];const ctx={account,csrf:session.csrf,caseState,caseId:session.caseId,query:url.searchParams,origins};
+   const session=sessionFor(req,res),caseState=cases.get(session.caseId),account=Date.now()-(session.authenticatedAt||session.created)<28800000?accounts[session.accountId]:null;const ctx={account,csrf:session.csrf,caseState,caseId:session.caseId,query:url.searchParams,origins};
    if(req.method==='POST'){
     if(!pathname.startsWith('/members/'))return send(res,405,notFound());
     const {fields,files}=await readBody(req);if(!safeEqual(fields.csrf,session.csrf))return send(res,403,memberLayout('受付できませんでした','<h1>受付できませんでした。</h1><p>ページを開き直して再度お手続きください。</p>',ctx));
     if(pathname==='/members/login/'){
      const id=String(fields.id||'').trim(),candidate=accounts[id];
      if(!candidate||(candidate.role==='asakura'&&caseState.ending==='end2')||!safeEqual(candidate.password,String(fields.password||'')))return send(res,401,loginPage(session.csrf,{error:'会員IDまたはパスワードをご確認ください。',next:safeNext(fields.next)}));
-     session.accountId=id;session.csrf=token();if(candidate.role==='asakura')caseState.truth=true;persist();return redirect(res,safeNext(fields.next));
+     session.accountId=id;session.authenticatedAt=Date.now();session.csrf=token();if(candidate.role==='asakura')caseState.truth=true;persist();return redirect(res,safeNext(fields.next));
     }
     if(!account)return redirect(res,'/members/login/');
     if(account.role==='asakura'&&caseState.ending==='end2')return send(res,403,memberLayout('登録終了','<h1>この登録は終了しました。</h1><p>運営事務局にお問い合わせください。</p>',ctx));
@@ -144,7 +148,7 @@ export async function startServers({port=Number(process.env.PORT||4173),hozenPor
  }
  return {...app,servers,close:async()=>{await Promise.all(servers.map(s=>new Promise(resolve=>s.close(resolve))));await app.flush();}};
 }
-if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+if(import.meta.url&&process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  const app=await startServers({stateFile:process.env.STATE_FILE||path.join(root,'private','runtime-state.json')});console.log(`ASUNARO ${app.origins.main}\nRecords ${app.origins.hozen}\nReview  ${app.origins.audit}\nArchive ${app.origins.archive}`);
  const shutdown=()=>{app.close().finally(()=>process.exit(0));};process.on('SIGINT',shutdown);process.on('SIGTERM',shutdown);
 }

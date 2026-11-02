@@ -7,3 +7,7 @@ playwright-report/
 .DS_Store
 private/runtime-state.json
 private/runtime-state.json.tmp
+.wrangler/
+dist/
+.dev.vars
+worker/evidence.generated.mjs

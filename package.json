@@ -7,13 +7,20 @@
     "start": "node server.mjs",
     "dev": "node --watch server.mjs",
     "build": "node scripts/build.mjs",
-    "test": "node --test tests/site.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "build:worker": "node scripts/build-worker.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
+    "preview:pages": "node scripts/serve-pages.mjs",
+    "dev:cloudflare": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "build:hints": "node scripts/build-hint-plan.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261102.1",
+    "@types/node": "^26.6.6",
     "typescript": "^7.0.2",
     "wrangler": "^4.156.1"
   }

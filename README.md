@@ -23,7 +23,7 @@ powershell -ExecutionPolicy Bypass -File .\start-local.ps1
 
 4つのWebサイトは同じNode.jsプロセスで起動し、別オリジンとして動作します。フォームはこのアプリケーション内で処理し、外部サービスへメールや通報を送信しません。
 
-認証と各プレイヤーの分岐状態は、通常起動では非公開の`private/runtime-state.json`へ保存します。再起動後も、有効期間内（8時間）の状態を保持します。別ブラウザ・別コンテキストの状態は分離しています。テストサーバーの状態は本番側から分離します。
+認証と各プレイヤーの分岐状態は、通常起動では非公開の`private/runtime-state.json`へ保存します。認証の有効期間は8時間ですが、進行と結末は別に保持し、再起動や認証期限で消去しません。別ブラウザ・別コンテキストの状態は分離しています。テストサーバーの状態は本番側から分離します。
 
 ## ファイル構成
 
@@ -50,7 +50,7 @@ npm run build
 npm test
 ```
 
-公開側は103ページのHTMLとして出力します。会員認証、権限ごとの文書照会、ファイル受領と分岐にはNode.jsサーバーを使用します。`public`のみを静的ホスティングした場合、会員側の機能は動作しません。
+公開側は90ページのHTMLとして出力します。会員認証、権限ごとの文書照会、ファイル受領と分岐にはNode.jsサーバーを使用します。`public`のみを静的ホスティングした場合、会員側の機能は動作しません。
 
 `src`、`private`、`docs`を静的配信する設定にしないでください。アプリのHTTPサーバーは、画像等の静的ファイルを`public/assets`に限定し、研究本文は認証したアカウントごとにサーバー側で生成しています。
 
@@ -62,6 +62,22 @@ npm test
 
 画像はすべてリポジトリ内に収録済みです。サイトの起動・ビルドに画像生成APIキーは不要です。
 
-旧新聞記事・研究概要の生成は`scripts/create-history-documents.py`。図面と告発書の生成は`scripts/create-documents.py`（ReportLabと日本語フォントを使用）。Web画像への書き出しは`scripts/prepare-images.cjs`（Sharpを使用）。施設共通画像の生成元一覧は`docs/generated-assets.json`、制作物・企業・貸館写真49点のプロンプトと採用先は`docs/media-assets.json`です。個別写真の書き出しは`scripts/prepare-media.cjs`を使用します。
+旧新聞記事・研究概要の生成は`scripts/create-history-documents.py`。図面と告発書の生成は`scripts/create-documents.py`（ReportLabと日本語フォントを使用）。Web画像への書き出しは`scripts/prepare-images.cjs`（Sharpを使用）。施設共通画像の生成元一覧は`docs/generated-assets.json`、制作物・企業・貸館・人物・試験写真53点のプロンプトと採用先は`docs/media-assets.json`です。個別写真の書き出しは`scripts/prepare-media.cjs`を使用します。
 
 付箋は画像生成した手書きのビットマップと写真を、`minamo-desk.svg`内に埋め込んで表示します。小さく表示したときの自然な配置と、写真ビューアで拡大したときの文字の判読性を両立させています。認証情報をHTML本文・altテキスト・検索インデックスには記載していません。
+
+## 公開版とCloudflare
+
+[GitHub Pages確認版](https://yuzora-yu.github.io/thujopsis-dolabrata-laboratory/)はmainへのPushで自動更新します。会員資料も含めた探索を確認できます。
+
+`npm run build:pages`で177ページの静的確認版を生成します。`npm run preview:pages`でプロジェクト配下のURLもローカル検証できます。公開版は架空会員の資料を認証情報で復号し、進行をブラウザー内へ保存します。
+
+Cloudflare公開用の入口は`worker/index.ts`、設定は`wrangler.jsonc`。`npm run build:worker`、`npm run typecheck`、`npm run dev:cloudflare`で準備・検証します。プレイヤーごとのDurable Objectsで進行を保存します。yu-zora.comのドメイン設定は変更していません。詳細は[公開先の運用](docs/publishing.md)を参照してください。
+
+## ページ番号と攻略設計
+
+`src/experience.mjs`でページ番号・総数・秘匿LVの表示を一括管理します。現在の登録は174ページ。`showPageIndex`と`showSecrecyLevel`で表示を切り替えられます。
+
+作者用の[攻略・ヒント設計](docs/hint-plan.md)は20段階。必要情報、根拠ページ、段階別ヒント、解答、次の接続を整理しています。`npm run build:hints`でページ番号を同期します。
+
+`tests/editorial.test.mjs`はヒントの根拠、時系列、公開期限、番号とLV、保存状態を検証します。`scripts/playtest.cjs`はブラウザー操作で最初の入口から3つの結末まで進みます。

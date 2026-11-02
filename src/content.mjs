@@ -139,6 +139,8 @@ export const searchEntries = [
  {title:'料金のご案内',url:'/price/',text:'利用料金 月額 会議室 工房'},
  {title:'月額会員・入会のご案内',url:'/membership/',text:'入会 会員 新規受付'},
  {title:'4階フロアマップ',url:'/floor-map/',text:'フロアマップ 案内図 会議室 ラウンジ'},
+ {title:'入居者紹介',url:'/tenants/',text:'入居企業 過去入居 企業紹介 活動報告'},
+ ...tenants.filter(t=>t.listed).map(t=>({title:t.name,url:`/tenants/${t.page}/`,text:t.business+' '+t.description})),
  ...news.filter(n=>n.listed||n.searchable).map(n=>({title:n.title,url:`/news/${n.id}/`,text:n.restored?n.keywords:n.body})),
  ...gallery.filter(g=>g.listed).map(g=>({title:g.title,url:`/gallery/${g.id}/`,text:g.body+' '+g.tag})),
  {title:'朝倉 紬｜制作と活動の記録',url:'/people/asakura-tsumugi/',text:'朝倉 紬 あさくら つむぎ 制作 プロフィール'},
