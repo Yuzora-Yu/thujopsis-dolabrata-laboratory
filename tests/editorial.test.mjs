@@ -67,7 +67,7 @@ test('every planned hint has in-world evidence and the prerequisite graph reache
   for(const witness of h.evidence){
    if(witness.kind==='private'){assert.equal((await readFile('private/expose.pdf')).subarray(0,5).toString(),'%PDF-');continue;}
    const ctx=context(witness.role);Object.assign(ctx.caseState,witness.state||{});
-   const html=witness.kind==='main'?renderPublic(witness.path)||notFound():witness.kind==='member'?renderMember(witness.path,ctx):renderLegacy(witness.path,{origins,session:{archiveAccess:witness.role==='ticket'?'H17-0038':null}});
+   const html=witness.kind==='main'?(witness.path==='/guide/access/'?notFound():renderPublic(witness.path)):witness.kind==='member'?renderMember(witness.path,ctx):renderLegacy(witness.path,{origins,session:{archiveAccess:witness.role==='ticket'?'H17-0038':null}});
    assert.ok(html,h.id+' missing '+witness.path);
    for(const word of witness.words)assert.ok(normalizeSearch(html).includes(normalizeSearch(word)),h.id+': '+witness.path+' lacks '+word);
   }

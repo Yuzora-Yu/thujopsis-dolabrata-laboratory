@@ -11,3 +11,4 @@ private/runtime-state.json.tmp
 dist/
 .dev.vars
 worker/evidence.generated.mjs
+private/*.zip

@@ -49,7 +49,7 @@ async function submit(p,file){await p.locator('#title').fill('資料の保全に
  const ticket=handover.match(/閲覧票番号\s+(\S+)/)[1],code=handover.match(/照会符号\s+(\S+)/)[1];
  const archivePopup=p.waitForEvent('popup');await p.getByRole('link',{name:/旧基盤・資料照会室/}).click();const archive=await archivePopup;archive.on('pageerror',e=>errors.push(e.message));
  await archive.locator('#ticket').fill(ticket);await archive.locator('#inquiry-code').fill(code);await archive.getByRole('button',{name:'照会室へ'}).click();await until(archive,'移管・保守受領簿');
- await archive.goto(provider('archive','/room/records/0005/'));assert.match(await body(archive),/0006/);await archive.goto(provider('archive','/room/records/0006/'));await until(archive,'機関台帳');const registry=await body(archive);
+ await archive.goto(provider('archive','/room/records/0005/'));await until(archive,'端末と資料更新の整理');assert.match(await body(archive),/0006/);await archive.goto(provider('archive','/room/records/0006/'));await until(archive,'機関台帳');const registry=await body(archive);
  const institution={id:ymd(registry.match(/加入日([^。]+)/)[1])+registry.match(/台帳番号は(\d{4})/)[1],password:ymd(registry.match(/法人設立日([^。]+)/)[1])};await archive.close();
  await login(p,institution.id,institution.password);await document(p,'RG-2007-011');assert.match(await document(p,'YH-2022-017'),/旧継舟/);await document(p,'HC-2021-031-R');await document(p,'CH-2021-003');await document(p,'OPS-2026-084');await document(p,'FAB-2026-018');
  await p.getByRole('link',{name:'記録についての照会',exact:true}).click();await p.getByRole('button',{name:/照会を送信/}).click();await p.locator('a[href$="hozen.zip"]').waitFor();
