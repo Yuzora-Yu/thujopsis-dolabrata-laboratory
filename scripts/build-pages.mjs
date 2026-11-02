@@ -21,10 +21,16 @@ function hosted(html,kind='main'){
  const result=rewriteHostedHtml(html,{kind,origins,basePath:base});
  return result.replace('</head>',`<meta name="asunaro-base" content="${base}"><script type="module" src="${base}/static-runtime.js"></script></head>`);
 }
+function initialShell(html){
+ // The static login shell is replaced after its data has loaded. Keep it inert
+ // until then so a slow connection cannot submit GitHub Pages' fallback form.
+ return html.replace(/<form\b([^>]*\bmethod="post"[^>]*)>([\s\S]*?)<\/form>/gi,(_,attributes,body)=>
+  `<form${attributes} aria-busy="true">${body.replace(/<(input|button|select|textarea)\b/gi,'<$1 disabled')}</form>`);
+}
 const generated=[];
 async function page(route,html,kind='main'){
  const prefix=kind==='main'?'':new URL(origins[kind],'https://static.invalid').pathname.slice(base.length);
- const file=path.join(out,(prefix+route).replace(/^\//,''),'index.html');await mkdir(path.dirname(file),{recursive:true});await writeFile(file,hosted(html,kind));generated.push(path.relative(out,file).replaceAll(path.sep,'/'));
+ const file=path.join(out,(prefix+route).replace(/^\//,''),'index.html');await mkdir(path.dirname(file),{recursive:true});await writeFile(file,initialShell(hosted(html,kind)));generated.push(path.relative(out,file).replaceAll(path.sep,'/'));
 }
 for(const route of publicPaths)await page(route,route==='/404/'?notFound():renderPublic(route,{origins}));
 await page('/search/',renderPublic('/search/',{origins}));

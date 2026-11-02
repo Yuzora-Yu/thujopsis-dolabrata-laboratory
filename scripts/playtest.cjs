@@ -6,7 +6,7 @@ const provider=(kind,p)=>mode==='node'?new URL(base).origin.replace(/:\d+$/,':'+
 let browser;const errors=[];const ymd=text=>{const m=text.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);assert.ok(m,text);return m[1]+m[2].padStart(2,'0')+m[3].padStart(2,'0');};
 async function body(p){return p.locator('main').innerText();}
 async function until(p,text){await p.getByRole('heading',{level:1}).filter({hasText:text}).waitFor();}
-async function login(p,id,password){await p.goto(main('/members/login/'));await p.locator('#member-id').fill(id);await p.locator('#member-password').fill(password);await p.getByRole('button',{name:/ログイン/}).click();await until(p,'会員トップ');}
+async function login(p,id,password){await p.goto(main('/members/login/'));await p.locator('#member-id').fill(id);await p.locator('#member-password').fill(password);await p.getByRole('button',{name:/ログイン/}).click();try{await until(p,'会員トップ');}catch(error){await p.screenshot({path:'.work/qa/'+mode+'-login-failure.png',fullPage:true});throw error;}}
 async function document(p,id){
  if(await p.locator('#next-document-id').count()){
   await p.locator('#next-document-id').fill(id);await p.locator('.record-lookup button').click();
@@ -24,6 +24,13 @@ async function submit(p,file){await p.locator('#title').fill('資料の保全に
 (async()=>{
  await fs.mkdir('.work/qa',{recursive:true});browser=await chromium.launch({headless:true,channel:'msedge'});
  const context=await browser.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});let p=await context.newPage();p.on('pageerror',e=>errors.push(e.message));
+ if(mode==='pages'){
+  let resume,requested;const gate=new Promise(resolve=>resume=resolve),started=new Promise(resolve=>requested=resolve);
+  await p.route('**/assets/site-index.json',async route=>{requested();await gate;await route.continue();});
+  const navigation=p.goto(main('/members/login/'),{waitUntil:'domcontentloaded'});await started;
+  assert.equal(await p.locator('#member-id').isDisabled(),true);resume();await navigation;
+  await p.locator('#member-id:enabled').waitFor();await p.unroute('**/assets/site-index.json');
+ }
  await p.goto(main('/news/20120401/'));assert.equal(await p.locator('a[href*="20120903"]').count(),0);await p.getByRole('link',{name:'施設名に込めた願い',exact:true}).click();assert.match(await body(p),/アスナロは、アスナロとして育つ/);await p.screenshot({path:'.work/qa/'+mode+'-identity.png',fullPage:true});
  await p.goto(main('/'));assert.equal(await p.locator('a[href*="floor-4f-2012"],img[src*="floor-4f-2012"]').count(),0);
  await p.goto(main('/gallery/0005/'));assert.match(await body(p),/入居者紹介/);
