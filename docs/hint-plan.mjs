@@ -22,5 +22,3 @@ export const hintPlan=[
  {id:'prototype',goal:'告発者の救済像が設立者の思想と一致するかを見極める',requires:['informant'],evidence:[evidence('member','/members/records/AS-2024-002/',['原型から除外','私は全員を乗せる'],'asakura'),evidence('member','/members/records/AS-2026-021/',['続く留保','採用しない'],'asakura'),evidence('member','/members/records/TR-2026-011/',['榎本航','EA-2026-009'],'asakura')],hints:['告発が正しいことと、告発者の望む未来が正しいことは別に確かめられる。','施設名・ロゴの説明や講演原文と、原型資料の採否を比べる。','朝倉は榊原自身の拒否を除き、全員を同じ判断へ揃えようとしている。移送先は榎本。'],answer:'現理事会の選別を止める一方、原型への強制的な一致を新事業へ引き継ぐ計画。',leads:['independent']},
  {id:'independent',goal:'施設と研究の移送先を、独立した相手へ伝える',requires:['prototype'],evidence:[evidence('member','/members/records/EA-2026-009/',['東都研究監査室'],'asakura'),evidence('member','/members/personal/',['原本および移送関係資料一式'],'asakura')],hints:['受領先自身も移送計画の当事者ではないかを確認する。','個人保存資料には、未返信の独立調査からの照会がある。','EA-2026-009の窓口へ、移送記録も入った完全版ZIPを提出する。'],answer:'End3。対象者の保護に加え、施設外へ移った研究の再開計画も調査される。',leads:[]},
 ];
-
-
