@@ -25,8 +25,8 @@ async function imagesReady(page){await page.locator('img[src]').evaluateAll(asyn
  await mobile.goto(archive.origin+'/collections/');assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+1),false);await mobile.screenshot({path:'.work/qa/archive-mobile.png',fullPage:true});
  await desktop.goto(base+'/news/');await desktop.screenshot({path:'.work/qa/news-desktop.png',fullPage:true});
  await desktop.goto(base+'/tenants/0003/');await imagesReady(desktop);await desktop.screenshot({path:'.work/qa/tenant-desktop.png',fullPage:true});
- const photo=await browser.newPage({viewport:{width:1536,height:1024},deviceScaleFactor:1});await photo.goto(base+'/assets/minamo-desk.svg');await photo.screenshot({path:'docs/previews/activity-photo.png'});await photo.close();
- const detail=await browser.newPage({viewport:{width:1536,height:1024},deviceScaleFactor:8});await detail.goto(base+'/assets/minamo-desk.svg');await detail.screenshot({path:'docs/previews/credential-detail.png',clip:{x:1170,y:525,width:135,height:65}});await detail.close();
+ const photo=await browser.newPage({viewport:{width:1536,height:1024},deviceScaleFactor:1});await photo.goto(base+'/assets/minamo-desk.webp');await photo.screenshot({path:'.work/qa/activity-photo-browser.png'});await photo.close();
+ const detail=await browser.newPage({viewport:{width:1536,height:1024},deviceScaleFactor:8});await detail.goto(base+'/assets/minamo-desk.webp');await detail.screenshot({path:'.work/qa/credential-detail-browser.png',clip:{x:1170,y:525,width:135,height:65}});await detail.close();
 
  assert.deepEqual(errors,[]);await browser.close();console.log('Browser checks passed: desktop, mobile, search, photo dialog, permissions, navigation, assets.');
 })().catch(async e=>{console.error(e);await browser?.close();process.exit(1)});

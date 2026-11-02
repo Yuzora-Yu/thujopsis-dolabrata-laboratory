@@ -26,7 +26,7 @@
 - `media/f-*.webp`：会議室、個室オフィス、プレゼンテーションスペース、3階ホールを個別に新規生成。
 - `media/p-*.webp`：設立者、工房担当者、元入居者の活動写真をそれぞれの掲載年代に合わせて新規生成。
 - `media/r-flow-test.webp`：2013年の設備試験記録として、新規生成の試験装置・着色水の写真を使用。
-- `minamo-desk.svg`：新規生成の事務机写真と、画像生成した手書き付箋を内包。文字の判読性を保つため、写真と付箋の解像度を別に保持している。紙面は写真内で横向き・遠景に配置。
+- `minamo-desk.webp`：PC周辺を画像生成で仕上げ、写真全体を一枚のラスターへ統合。小さな付箋の紙色、接地影、書字方向とPC利用者の位置を確認。採用原本はdocs/source-images/minamo-desk.png、生成プロンプトと統合方法はdocs/photo-integration.json。
 
 元写真の所在：`\\192.168.10.101\01_ship共有\04_オープンデータ\02_写真\☆カメラマン撮影素材\補正済`。
 
@@ -34,7 +34,7 @@
 
 ## 制作物の構造参照
 
-実物写真の参照先はproduct-references.json、採用した53点のプロンプト・撮影年代・生成元・最終ファイルはmedia-assets.jsonに記録。参考写真そのものはWebへ掲載しない。
+実物写真の参照先はproduct-references.json、採用した54点のプロンプト・撮影年代・生成元・最終ファイルはmedia-assets.jsonに記録。参考写真そのものはWebへ掲載しない。
 
 参照対象は、3DBenchyの試験舟、Makers Making Changeのキー回転補助具、OpenAssistiveのユニバーサルカフ、FilesCNCの箱・曲げ構造、Santa Clara University Maker Labの実制作例。形状、接合、材料の厚みを参考とし、画像生成で別の試作品と撮影構図を作成した。
 

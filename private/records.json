@@ -8,6 +8,15 @@
       "last_measurement": "2026-10-26",
       "location": "B1-B04",
       "consent": "退出申出を保留扱いとして継続"
+    },
+    {
+      "id": "P-034",
+      "name": "瀬尾 灯",
+      "exit_record": "2022-08-31",
+      "last_measurement": "2026-10-26",
+      "location": "B1-B07",
+      "consent": "短期の補助具試用として説明。退出申出は運用上保留。",
+      "source": "YH-2022-034 / P034-2026-102"
     }
   ],
   "health_record": {
@@ -24,5 +33,13 @@
       "久世圭"
     ]
   },
-  "production": "FAB-2020-026 / 個別調整を廃止し同一寸法へ統合"
+  "production": "FAB-2020-026 / 個別調整を廃止し同一寸法へ統合",
+  "staff_case": {
+    "name": "三枝 律",
+    "support_request": "SA-2023-012",
+    "public_status": "2023-06-15 業務終了",
+    "original_status": "2023-06-14 施設内で死亡。外部診療照会は未承認。",
+    "recipient": "倉橋真紀への退出支援申出は未送信"
+  },
+  "founding_origin": "OR-2006-004 / 瀬尾灯と家族の生活用具を聞き取り、旧研究再開を中止した経緯"
 }

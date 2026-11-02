@@ -1,5 +1,5 @@
 from pathlib import Path
-import json, math, html
+import json, math, html, sys
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, A3, landscape
 from reportlab.pdfbase import pdfmetrics
@@ -136,27 +136,28 @@ def write_plan_pdf(primitives,target,old):
             else:c.drawString(X(x),Y(y),value)
     c.showPage();c.save()
 
-old=create_plan(True);current=create_plan(False)
-write_svg(old,OUT/'floor-4f-2012.svg');write_svg(current,OUT/'floor-4f.svg')
-write_plan_pdf(old,OUT/'asunaro-4f-2012.pdf',True);write_plan_pdf(current,OUT/'asunaro-4f.pdf',False)
+if '--statement-only' not in sys.argv:
+    old=create_plan(True);current=create_plan(False)
+    write_svg(old,OUT/'floor-4f-2012.svg');write_svg(current,OUT/'floor-4f.svg')
+    write_plan_pdf(old,OUT/'asunaro-4f-2012.pdf',True);write_plan_pdf(current,OUT/'asunaro-4f.pdf',False)
 
-normal=ParagraphStyle('JP',fontName='JP',fontSize=10.2,leading=19,textColor=colors.HexColor(INK),wordWrap='CJK')
+normal=ParagraphStyle('JP',fontName='JP',fontSize=9.8,leading=18,textColor=colors.HexColor(INK),wordWrap='CJK')
 title=ParagraphStyle('Title',parent=normal,fontSize=19,leading=29,spaceAfter=22)
-sub=ParagraphStyle('Sub',parent=normal,fontSize=12,leading=22,spaceBefore=20,spaceAfter=10)
+sub=ParagraphStyle('Sub',parent=normal,fontSize=12,leading=22,spaceBefore=16,spaceAfter=8)
 story=[]
-def p(t,style=normal):story.append(Paragraph(t,style));story.append(Spacer(1,10))
+def p(t,style=normal):story.append(Paragraph(t,style));story.append(Spacer(1,8))
 p('あすなろ産業支援交流施設における<br/>研究運用および記録の保全に関する申出',title)
 p('2026年11月2日')
 table=Table([[Paragraph('申出者',normal),Paragraph('朝倉 紬',normal)],[Paragraph('所属',normal),Paragraph('工房・技術支援',normal)],[Paragraph('会員ID',normal),Paragraph('20120901P0083',normal)]],colWidths=[80,390])
-table.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('LINEBELOW',(0,0),(-1,-1),.4,colors.HexColor('#ccd3ce')),('TOPPADDING',(0,0),(-1,-1),10),('BOTTOMPADDING',(0,0),(-1,-1),10)]));story.append(table);story.append(Spacer(1,24))
+table.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('LINEBELOW',(0,0),(-1,-1),.4,colors.HexColor('#ccd3ce')),('TOPPADDING',(0,0),(-1,-1),10),('BOTTOMPADDING',(0,0),(-1,-1),10)]));story.append(table);story.append(Spacer(1,20))
 p('1　保全を求める記録',sub)
-p('翌檜計画の参加者のうち、施設利用を終了したとされる人々について、その後も測定・観察が継続されています。原本には、対象者からの退出の申出と、運営側の継続承認が併記されています。P-026を含む対象者の所在確認を求めます。')
+p('翌檜計画の参加者のうち、施設利用を終了したとされる人々について、その後も測定・観察が継続されています。P-026稲葉澪、P-034瀬尾灯を含む対象者の所在確認を求めます。瀬尾氏の一般制作活動終了後も測定と退出の申出があり、本人の意思による退去を確認できません。')
 p('2　前理事長の記録',sub)
 p('榊原恒一前理事長の手控えと、健康管理の決裁原本に不一致があります。本人が承認していない投与変更、外部連絡の制限、照会の保留が記録されています。手控えのみでは確認できない経緯を、添付の原本から照合できます。')
 p('3　資料の構成',sub)
 p('本書とともに、実験記録および継承資料を同梱しています。原本の構成を保持するため、受領した圧縮ファイル全体を保全してください。閲覧に必要な情報は受領先で管理するものとします。')
 p('4　申出',sub)
-p('現在の運営体制の下では、施設内部で調査を完結できません。対象者の保護と、記録の改変を防ぐ措置を求めます。')
+p('現在の運営体制の下では、施設内部で調査を完結できません。対象者の保護と、記録の改変を防ぐ措置を求めます。瀬尾氏の退出を支援していた元職員・三枝律の処理記録SA-2023-012についても、公開台帳と原本を照合してください。')
 def page_footer(c,doc):
     c.setFont('JP',8);c.setFillColor(colors.HexColor('#77847d'));c.drawString(48,28,'記録保全資料 / 2026.11.02');c.drawRightString(A4[0]-48,28,str(doc.page))
 if story and isinstance(story[-1],Spacer):story.pop()
@@ -164,6 +165,10 @@ SimpleDocTemplate(str(PRIVATE/'expose.pdf'),pagesize=A4,rightMargin=48,leftMargi
 
 records={'record':'YH / 原本照合','subjects':[{'id':'P-026','name':'稲葉 澪','exit_record':'2019-03-31','last_measurement':'2026-10-26','location':'B1-B04','consent':'退出申出を保留扱いとして継続'}], 'health_record':{'id':'HC-2021-031','subject':'榊原恒一','findings':['本人署名のない投与変更の承認','外部診療照会の保留','事務局による通信先制限','原本と公開管理表の不一致'],'approval':['深町玲司','久世圭']},'production':'FAB-2020-026 / 個別調整を廃止し同一寸法へ統合'}
 continuity={'project':'原型継承試験','owner':'朝倉紬','receiver':'災害技術記録保全センター 榎本航','source':'榊原恒一の判断記録','exclusions':'2021年手控えを病状による変化として除外','method':'基準回答と異なる応答を再評価・再訓練へ戻す','handover':['評価モデル','装置図面','応答位置データ','原型資料採否一覧']}
+records['subjects'].append({'id':'P-034','name':'瀬尾 灯','exit_record':'2022-08-31','last_measurement':'2026-10-26','location':'B1-B07','consent':'短期の補助具試用として説明。退出申出は運用上保留。','source':'YH-2022-034 / P034-2026-102'})
+records['staff_case']={'name':'三枝 律','support_request':'SA-2023-012','public_status':'2023-06-15 業務終了','original_status':'2023-06-14 施設内で死亡。外部診療照会は未承認。','recipient':'倉橋真紀への退出支援申出は未送信'}
+records['founding_origin']='OR-2006-004 / 瀬尾灯と家族の生活用具を聞き取り、旧研究再開を中止した経緯'
+continuity['subject_transfer']={'subject':'P-034 瀬尾灯','condition':'本人の退出希望ではなく、基準判断への一致を受渡し条件とする','source':'AS-2023-008 / P034-2026-102'}
 (PRIVATE/'records.json').write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding='utf-8')
 (PRIVATE/'continuity.json').write_text(json.dumps(continuity,ensure_ascii=False,indent=2),encoding='utf-8')
-print('Created 3 PDFs, 2 SVG floor plans and private archive sources.')
+print('Updated statement PDF and archive sources.' if '--statement-only' in sys.argv else 'Created 3 PDFs, 2 SVG floor plans and private archive sources.')

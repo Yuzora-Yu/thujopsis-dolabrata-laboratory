@@ -13,7 +13,8 @@
     "preview:pages": "node scripts/serve-pages.mjs",
     "dev:cloudflare": "wrangler dev",
     "typecheck": "tsc --noEmit",
-    "build:hints": "node scripts/build-hint-plan.mjs"
+    "build:hints": "node scripts/build-hint-plan.mjs",
+    "build:cloudflare-pages": "node scripts/build-cloudflare-pages.mjs"
   },
   "engines": {
     "node": ">=20"

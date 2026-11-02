@@ -24,21 +24,7 @@
     "prompt": "Use case: photorealistic-natural. Completely new documentary architectural photo of a Japanese public makerspace in a fictional industry support facility. Original layout: two long parallel birch workbenches running diagonally toward tall frosted windows at the rear, low sage-green storage cabinets along the left wall, an unbranded gray laser cutter under extraction duct at the far left, three enclosed black desktop 3D printers on a wall shelf to the right, hanging hand tools, polished concrete floor, exposed dark ceiling with linear lights. A few hobby models, a cup handle and a plywood boat on worktable. Small practical 45-square-meter fabrication studio, realistic proportions, bright everyday lighting, no people, no readable machine brands or text. Wide landscape."
   },
   {
-    "asset": "minamo-desk/base",
-    "prompt": "Use case: photorealistic-natural. A very natural casual 2012 activity-report photograph of a small Japanese engineering startup's office just after moving in. Wide horizontal high-resolution photo. Camera stands at the LEFT END of a long ordinary desk looking obliquely across the room; water pump prototype, clear tubing, moving boxes, folders and a mug are the main subject. Toward the BACK RIGHT of the desk is a small open laptop facing the seated engineer's position, turned almost 90 degrees relative to the camera. On its palm rest beside the touchpad is ONE SMALL worn pale-yellow handwritten sticky note, about 6 percent of photograph width. Because of the side viewpoint its handwriting is sideways relative to the photograph and perspective-foreshortened. Tiny handwritten black-pen content on this note must be exactly two lines: 'ID 201204010017' and 'PW 20080519'. Correct digits are important, but the note should only become readable when the high-resolution photo is enlarged and turned. The note is an incidental background detail, not the focal subject; do not enlarge or center it. Natural office light, slight ordinary digital-camera imperfections, no people, no giant paperwork or captions. Photo should look unposed, not an advertisement. Output a large detailed landscape image, ideally 3072 by 2048 pixels."
-  },
-  {
-    "asset": "minamo-desk/finish",
-    "prompt": "Use case: precise-object-edit. Edit this exact office photograph. Preserve the full composition, camera perspective, all water pumps and tubing, laptop, desk, shelves, lighting and room. Make EVERY moving box in the room plain unprinted brown corrugated cardboard with natural seams, tape and slight wear. All visible cardboard faces must have plain paper texture. Make the mug plain white ceramic. On the laptop palm rest keep a small blank pale-yellow sticky note at its current position; this is the base photograph for a separate handwritten note layer. Everything else stays unchanged, photorealistic, no added graphic overlays or captions.",
-    "result": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-8a041d11-0a76-4810-9201-a3ea417ccafe.png"
-  },
-  {
-    "asset": "credential-note",
-    "prompt": "Use case: product-mockup. A single pale-yellow square sticky note seen straight on, isolated on a transparent background. Fine ordinary black ballpoint handwriting, slightly uneven but entirely readable. The note has exactly four handwritten lines, left aligned, with generous margins: first line 'ID', second line '201204010017', third line 'PW', fourth line '20080519'. Copy every digit exactly. The note has a slight natural curl at one corner and a very faint paper texture, no other marks or text. This is a source insert for a small note in an office photo. High resolution, crisp black ink, realistic handwriting rather than a printed font.",
-    "transparent_background": true
-  },
-  {
-    "asset": "minamo-desk.svg",
-    "composition": "Embed the generated office photo and generated handwritten note as raster layers in an SVG photo, with the note at its real palm-rest position. Keep the handwritten raster resolution for zooming. No plaintext credentials in the HTML, alt text or search index."
+    "asset": "minamo-desk.webp",
+    "record": "docs/photo-integration.json"
   }
 ]

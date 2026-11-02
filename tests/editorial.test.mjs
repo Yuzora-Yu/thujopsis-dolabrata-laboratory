@@ -7,7 +7,7 @@ import {publicPaths,renderPublic,notFound} from '../src/render.mjs';
 import {renderMember,agencyPage} from '../src/member.mjs';
 import {renderLegacy} from '../src/legacy.mjs';
 import {newsIsAvailable,newsIsListed} from '../src/world/editorial.mjs';
-import {pageRegistry,pagePosition,experienceSettings} from '../src/experience.mjs';
+import {pageRegistry,pagePosition,experienceSettings,growthStages} from '../src/experience.mjs';
 import {hintPlan} from '../docs/hint-plan.mjs';
 import {normalizeSearch,matchesSearch} from '../src/search.mjs';
 import {hostingOrigins,providerRoute,rewriteHostedHtml} from '../src/hosting.mjs';
@@ -41,16 +41,21 @@ test('published navigation does not directly expose nonlisted gallery objects',(
  for(const p of publicPaths.filter(p=>!/^\/gallery\/\d/.test(p)&&!/^\/tenants\/\d/.test(p))){const html=renderPublic(p)||'';for(const m of html.matchAll(/href="\/gallery\/(\d+)\//g))assert.ok(!hidden.has(m[1]),p+' -> '+m[1]);}
 });
 
-test('page numbering, total and secrecy levels derive from one registry and can be toggled',()=>{
+test('page numbering and growth stages share a registry and sit beside the copyright',()=>{
  assert.equal(new Set(pageRegistry.map(p=>p.kind+':'+p.path)).size,pageRegistry.length);
  assert.deepEqual(pageRegistry.map(p=>p.number),Array.from({length:pageRegistry.length},(_,i)=>i+1));
  assert.ok(pageRegistry.every(p=>Number.isInteger(p.level)&&p.level>=0));
  for(const p of publicPaths)assert.ok(pagePosition('main',p),p);
  for(const html of [renderPublic('/'),renderMember('/members/',context('institution')),renderLegacy('/collections/',{origins,session:{}}),agencyPage('hozen','/receive/',{origins})]){
   assert.match(html,new RegExp('data-page-total="'+pageRegistry.length+'"'));assert.match(html,/このWebサイトの内容は考察コンテンツ/);assert.match(html,/ⓒYU-ZORA/);
+  assert.match(html,/ⓒYU-ZORA<\/small><span class="page-index"/);assert.doesNotMatch(html,/\(LV\d|情報秘匿レベル/);
  }
+ assert.deepEqual(growthStages.map(s=>s.name),['SEED','ROOT','SPROUT','SAPLING','BRANCH','CANOPY','HEARTWOOD']);
+ assert.match(renderPublic('/'),/class="index-growth">SEED</);
+ assert.match(renderMember('/members/personal/',context('asakura')),/class="index-growth">HEARTWOOD</);
  assert.equal(pagePosition('main','/members/records/AS-2024-002/').level,6);
  const previous=experienceSettings.showPageIndex;try{experienceSettings.showPageIndex=false;assert.doesNotMatch(renderPublic('/'),/class="page-index"/);}finally{experienceSettings.showPageIndex=previous;}
+ const previousGrowth=experienceSettings.showGrowthStage;try{experienceSettings.showGrowthStage=false;const html=renderPublic('/');assert.doesNotMatch(html,/class="index-growth"/);assert.match(html,/class="index-number">001/);}finally{experienceSettings.showGrowthStage=previousGrowth;}
 });
 
 test('document references to later records have a sufficiently late update date',()=>{

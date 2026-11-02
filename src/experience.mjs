@@ -3,7 +3,16 @@ import {editorialPages} from './world/editorial.mjs';
 import {archiveItems,archiveNotes} from './world/archive-data.mjs';
 import {projects} from './world/projects.mjs';
 
-export const experienceSettings={showPageIndex:true,showSecrecyLevel:true,showDisclaimer:true,copyright:'ⓒYU-ZORA'};
+export const experienceSettings={showPageIndex:true,showGrowthStage:true,showDisclaimer:true,copyright:'ⓒYU-ZORA'};
+export const growthStages=[
+ {name:'SEED',label:'種子'},
+ {name:'ROOT',label:'根'},
+ {name:'SPROUT',label:'芽'},
+ {name:'SAPLING',label:'若木'},
+ {name:'BRANCH',label:'枝'},
+ {name:'CANOPY',label:'樹冠'},
+ {name:'HEARTWOOD',label:'木の芯'},
+];
 const roleLevels={minamo:2,ordis:3,ashita:4,institution:5,asakura:6};
 const mainPages=['/','/about/','/facilities/','/facilities/coworking/','/facilities/meeting/','/facilities/office/','/facilities/cafe/','/facilities/presentation/','/facilities/hall/','/workshop/','/gallery/','/floor-map/','/membership/','/price/','/visit/','/news/','/privacy/','/search/','/404/',...Object.keys(editorialPages),'/tenants/','/people/asakura-tsumugi/','/people/inaba-mio/'];
 const memberPages=['/members/login/','/members/','/members/reservations/','/members/records/','/members/messages/','/members/projects/','/members/organization/','/members/contact/','/members/contact/received/','/members/inquiry/','/members/personal/'];
@@ -27,9 +36,10 @@ export function pagePosition(kind,path,role){
  const entry=byKey.get(kind+':'+canonical);if(!entry)return null;
  return {...entry,total:pageRegistry.length,level:entry.accountScoped&&canonical!=='/members/login/'?Math.max(entry.level,roleLevels[role]||0):entry.level};
 }
-export function fictionFooter(){return `<div class="fiction-footer">${experienceSettings.showDisclaimer?'<p>このWebサイトの内容は考察コンテンツのために作られたフィクションであり、実在の人物・団体とは一切関係がありません。</p>':''}<small>${experienceSettings.copyright}</small></div>`;}
+export function fictionFooter(){return `<div class="fiction-footer">${experienceSettings.showDisclaimer?'<p>このWebサイトの内容は考察コンテンツのために作られたフィクションであり、実在の人物・団体とは一切関係がありません。</p>':''}<div class="fiction-footer-meta"><small>${experienceSettings.copyright}</small><!--PAGE_INDEX--></div></div>`;}
 export function decoratePage(html,{kind='main',path='/',role}={}){
  if(!html)return html;const position=pagePosition(kind,path,role);
- const counter=experienceSettings.showPageIndex&&position?`<div class="page-index" data-page-number="${position.number}" data-page-total="${position.total}" data-secrecy-level="${position.level}" aria-label="ページ${position.number}、全${position.total}ページ${experienceSettings.showSecrecyLevel?'、情報秘匿レベル'+position.level:''}">${position.number}/${position.total}${experienceSettings.showSecrecyLevel?' (LV'+position.level+')':''}</div>`:'';
+ const growth=growthStages[position?.level]||growthStages[0];
+ const counter=experienceSettings.showPageIndex&&position?`<span class="page-index" data-page-number="${position.number}" data-page-total="${position.total}" data-growth-stage="${growth.name.toLowerCase()}" aria-label="ページ${position.number}、全${position.total}ページ${experienceSettings.showGrowthStage?'、探索段階 '+growth.name+'（'+growth.label+'）':''}">${experienceSettings.showGrowthStage?`<span class="index-growth">${growth.name}</span>`:''}<span class="index-number">${String(position.number).padStart(3,'0')} <span>/</span> ${position.total}</span></span>`:'';
  return html.replace('<!--PAGE_INDEX-->',counter);
 }

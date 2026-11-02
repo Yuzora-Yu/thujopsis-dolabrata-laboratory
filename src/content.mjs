@@ -3,6 +3,7 @@ import {additionalTenants,tenantDetails} from './world/tenants.mjs';
 import {expandNews} from './world/news.mjs';
 import {extraAccounts,refineDocuments} from './world/research.mjs';
 import {deepenDocuments} from './world/investigation.mjs';
+import {enrichHumanStory,humanSearchEntries} from './world/people.mjs';
 export const facility = {
   name: 'あすなろ産業支援交流施設',
   en: 'ASUNARO INDUSTRY & EXCHANGE',
@@ -132,8 +133,10 @@ tenants.forEach((t,i)=>Object.assign(t,tenantDetails[t.id],{page:String(i+1).pad
 Object.assign(accounts,extraAccounts);
 refineDocuments(documents);
 deepenDocuments(documents);
+enrichHumanStory({gallery,tenants,documents});
 
 export const searchEntries = [
+ ...humanSearchEntries,
  {title:'施設・サービス',url:'/facilities/',text:'会議室 オフィス コワーキング 食堂 プレゼンテーションホール フロアマップ'},
  {title:'工房のご案内',url:'/workshop/',text:'3Dプリンター レーザーカッター 試作 ものづくり'},
  {title:'料金のご案内',url:'/price/',text:'利用料金 月額 会議室 工房'},
