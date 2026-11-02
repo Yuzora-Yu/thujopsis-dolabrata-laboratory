@@ -34,7 +34,7 @@
 
 ## 制作物の構造参照
 
-実物写真の参照先はproduct-references.json、採用した54点のプロンプト・撮影年代・生成元・最終ファイルはmedia-assets.jsonに記録。参考写真そのものはWebへ掲載しない。
+実物写真の参照先はproduct-references.json、採用した55点のプロンプト・撮影年代・生成元・最終ファイルはmedia-assets.jsonに記録。参考写真そのものはWebへ掲載しない。
 
 参照対象は、3DBenchyの試験舟、Makers Making Changeのキー回転補助具、OpenAssistiveのユニバーサルカフ、FilesCNCの箱・曲げ構造、Santa Clara University Maker Labの実制作例。形状、接合、材料の厚みを参考とし、画像生成で別の試作品と撮影構図を作成した。
 
@@ -43,3 +43,7 @@
 ## 作中の史料
 
 夕凪日報の記事、継舟計画の研究概要は架空の史料。正確な日本語の手がかりを保持するため、PDFは画像生成文字ではなくReportLabで組版。生成元はscripts/create-history-documents.py、採用先はpublic/assets/archive/。実在の新聞社・研究機関の史料を加工したものではない。
+
+## SEEDの異常表示
+
+演出専用の写真2点はdocs/effect-assets.jsonに生成条件と採用先を記録。通常の制作物写真とは別の素材。30回以上SEEDを閲覧した場合だけ、制作物0021と0024で表示する。

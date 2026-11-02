@@ -15,7 +15,7 @@ if(base&&!/^\/[a-zA-Z0-9_-]+$/.test(base))throw new Error('Invalid Pages base pa
 const out=path.resolve('dist/pages'),origins=hostingOrigins(base||''),stageValues={initial:{contact:false,ending:''},contact:{contact:true,ending:''},end1:{contact:true,ending:'end1'},end2:{contact:true,ending:'end2'},end3:{contact:true,ending:'end3'}};
 await mkdir(path.join(out,'assets/portal'),{recursive:true});
 await cp('public/assets',path.join(out,'assets'),{recursive:true});
-for(const name of ['styles.css','app.js'])await cp('public/'+name,path.join(out,name));
+for(const name of ['styles.css','app.js','seed-drift.js'])await cp('public/'+name,path.join(out,name));
 await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));await cp('scripts/static-runtime.js',path.join(out,'static-runtime.js'));
 function hosted(html,kind='main'){
  const result=rewriteHostedHtml(html,{kind,origins,basePath:base});

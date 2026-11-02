@@ -1,18 +1,41 @@
 {
   "mode": "built-in image_gen",
   "use_case": "precise-object-edit",
-  "prompt": "Use case: precise-object-edit / photographic integration. Edit target is the supplied close-up crop of a laptop in an ordinary 2012 workshop activity photo. Return the SAME composition and aspect ratio, at the maximum native raster resolution. Keep laptop shape, screen, keys, wires, pens, white mug, background, camera position and window light. The existing pale yellow paper is the sole edit area. Make it a small, worn, low-saturation cream-yellow sticky note, HALF the present paper's area, lying flat fully inside the right-hand palm rest with a slight edge curl, a tiny soft contact shadow and the same exposure and focus as the laptop. Its writing faces the normal laptop user; the top of each digit points toward the keyboard hinge. Keep all digits upright to that user and perspectively aligned with the paper, sideways to the photograph where physically appropriate. Fine ordinary ballpoint handwriting, not a font. On the paper there must be EXACTLY these TWO lines, with no labels, decorations or other words:\n201204010017\n20080519\nCopy every digit accurately. First row has twelve digits: 2 0 1 2 0 4 0 1 0 0 1 7. Second row has eight digits: 2 0 0 8 0 5 1 9. Make each digit distinguishable at this close-up resolution, with modest ordinary handwriting weight, subtle ink softness and compact spacing. Preserve the casual camera texture and realistic blur of the surrounding photograph. This crop will be reduced into a wider photograph, so preserve precise text here while integrating paper material, lighting, perspective and shadows photographically in one raster. Preserve all details outside the note as closely as possible. No graphic labels or callouts.",
-  "generated_detail": "C:/Users/ship2/.codex/generated_images/01a18b44-efea-75a3-a872-2f78fc077219/exec-caf0d28c-324e-4dd4-9906-3274ee5f0c7b.png",
+  "prompt": "Use case: precise-object-edit. Preserve the laptop close-up and all room details. The small cream sticky note is blank worn paper with its original texture, curl, focus and contact shadow. Keep the camera, laptop and lighting unchanged.",
   "master": "docs/source-images/minamo-desk.png",
   "web_asset": "public/assets/minamo-desk.webp",
   "master_dimensions": [
-    4608,
-    3072
+    6144,
+    4096
   ],
-  "integration": "AI regenerated the paper, handwriting, palm-rest lighting and contact shadow together. The photographic region was feathered into the full scene, then the complete photograph was exported with uniform JPEG/WebP compression. The website serves one flattened raster photograph.",
-  "orientation": "The tops of the digits face the keyboard; the baselines face the laptop's front edge and seated user.",
+  "integration": "AI-generated paper, lighting and handwritten raster strokes. Projective mapping aligns the writing to the laptop user plane; the photographed region is feathered into a single flattened full-scene raster.",
+  "orientation": "Text baselines follow the keyboard rows from camera lower-left toward upper-right. Glyph tops face the screen to camera-left, matching the seated user at camera-right. USB-port edge is a side edge, not the laptop front.",
   "copy_verification": [
     "201204010017",
     "20080519"
-  ]
+  ],
+  "sources": {
+    "base": "docs/source-images/minamo-office-base.webp",
+    "blank": "docs/source-images/minamo-laptop-blank.png",
+    "handwriting": "docs/source-images/minamo-handwriting.png"
+  },
+  "paperCornersUserOrder": [
+    [
+      827,
+      914
+    ],
+    [
+      866,
+      861
+    ],
+    [
+      1052,
+      874
+    ],
+    [
+      1015,
+      937
+    ]
+  ],
+  "handwritingSource": "Built-in image generation: pale-yellow note with fine handwritten ID, 201204010017, PW, 20080519 on four separate lines. Only the two number rows are used."
 }

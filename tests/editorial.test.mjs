@@ -9,6 +9,9 @@ import {renderLegacy} from '../src/legacy.mjs';
 import {newsIsAvailable,newsIsListed} from '../src/world/editorial.mjs';
 import {pageRegistry,pagePosition,experienceSettings,growthStages} from '../src/experience.mjs';
 import {hintPlan} from '../docs/hint-plan.mjs';
+import {seoFamily} from '../src/world/people.mjs';
+import {siteQueries,catalogQueries} from '../docs/critical-queries.mjs';
+import {archiveItems} from '../src/world/archive-data.mjs';
 import {normalizeSearch,matchesSearch} from '../src/search.mjs';
 import {hostingOrigins,providerRoute,rewriteHostedHtml} from '../src/hosting.mjs';
 import {classifyEvidence} from '../src/evidence.mjs';
@@ -16,6 +19,27 @@ import {makeArchive} from '../src/archive.mjs';
 import {startServers} from '../server.mjs';
 const origins=hostingOrigins('https://asunaro.example');
 const context=role=>({account:Object.values(accounts).find(a=>a.role===role),csrf:'test',caseId:'case',caseState:{contact:false,ending:''},query:new URLSearchParams(),origins});
+
+test('the mother anchors the founding while her daughter qualifies and disappears at 28',()=>{
+ const ageAt=(birth,date)=>{const b=new Date(birth),d=new Date(date);return d.getUTCFullYear()-b.getUTCFullYear()-(d.getUTCMonth()<b.getUTCMonth()||d.getUTCMonth()===b.getUTCMonth()&&d.getUTCDate()<b.getUTCDate()?1:0);};
+ assert.equal(ageAt(seoFamily.akari.birthDate,'2022-07-08'),28);assert.equal(ageAt(seoFamily.akari.birthDate,'2020-04-01'),26);assert.equal(ageAt(seoFamily.akari.birthDate,seoFamily.akari.workshopStart),27);
+ assert.equal(ageAt(seoFamily.fumino.birthDate,seoFamily.fumino.founderMeeting),43);
+ assert.match(renderPublic('/people/seo-akari/'),/1994年生まれ/);assert.match(renderPublic('/people/seo-akari/'),/夜間3年制/);assert.match(renderPublic('/people/seo-fumino/'),/図書館/);
+ const original=documents.find(d=>d.id==='OR-2006-004').sections.map(s=>s[1]).join(' ');assert.match(original,/瀬尾文乃/);assert.doesNotMatch(original,/瀬尾灯氏/);
+ assert.ok(documents.find(d=>d.id==='CO-2010-001').sections.some(s=>s[1].includes('FUM-2010-002')));
+});
+
+test('public facility routes do not announce the old archive and the first clipping is a direct PDF',()=>{
+ for(const route of publicPaths){const html=renderPublic(route)||'';assert.doesNotMatch(html,/href="[^"]*(?:historical-records|127\.0\.0\.1:4176|\/snapshots\/)/,route);}
+ assert.doesNotMatch(renderPublic('/about/history/'),/準備期の公開記録/);
+ const loan=documents.find(d=>d.id==='FAB-2022-071');assert.equal(loan.links[0].origin,undefined);assert.equal(loan.links[0].path,'/assets/archive/younagi-20220908.pdf');
+ for(const d of documents.filter(d=>d.roles.includes('minamo')))assert.doesNotMatch(d.sections.map(s=>s[1]).join(' '),/0000\s*一般財団/);
+});
+
+test('author search inventory names real results in the appropriate search surface',()=>{
+ for(const item of siteQueries)assert.ok(searchEntries.filter(entry=>matchesSearch(entry,item.word)).some(entry=>entry.url===item.destination),item.word);
+ for(const item of catalogQueries)assert.ok(archiveItems.filter(entry=>entry.listed&&matchesSearch({title:entry.title,text:entry.code+' '+entry.year},item.word)).some(entry=>item.destination===`/collections/items/${entry.id}/`),item.word);
+});
 
 test('news retention applies to visibility, direct URLs and the public search index',()=>{
  assert.equal(!!newsIsAvailable({date:'2021.11.01'}),false);assert.equal(!!newsIsAvailable({date:'2021.11.02'}),true);
@@ -71,6 +95,7 @@ test('every planned hint has in-world evidence and the prerequisite graph reache
  for(const h of hintPlan){assert.equal(h.hints.length,3,h.id);for(const id of [...h.requires,...h.leads])assert.ok(ids.has(id),id);
   for(const witness of h.evidence){
    if(witness.kind==='private'){assert.equal((await readFile('private/expose.pdf')).subarray(0,5).toString(),'%PDF-');continue;}
+   if(witness.kind==='asset'){assert.ok(witness.path.startsWith('/assets/'));assert.equal((await readFile('public'+witness.path)).subarray(0,5).toString(),'%PDF-');continue;}
    const ctx=context(witness.role);Object.assign(ctx.caseState,witness.state||{});
    const html=witness.kind==='main'?(witness.path==='/guide/access/'?notFound():renderPublic(witness.path)):witness.kind==='member'?renderMember(witness.path,ctx):renderLegacy(witness.path,{origins,session:{archiveAccess:witness.role==='ticket'?'H17-0038':null}});
    assert.ok(html,h.id+' missing '+witness.path);

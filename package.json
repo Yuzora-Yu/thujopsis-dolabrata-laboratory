@@ -14,7 +14,8 @@
     "dev:cloudflare": "wrangler dev",
     "typecheck": "tsc --noEmit",
     "build:hints": "node scripts/build-hint-plan.mjs",
-    "build:cloudflare-pages": "node scripts/build-cloudflare-pages.mjs"
+    "build:cloudflare-pages": "node scripts/build-cloudflare-pages.mjs",
+    "build:queries": "node scripts/build-query-index.mjs"
   },
   "engines": {
     "node": ">=20"

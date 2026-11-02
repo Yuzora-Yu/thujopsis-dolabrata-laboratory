@@ -13,3 +13,4 @@ lines.push('## 更新時の点検','','- ヒントを追加する前に、根拠
 '## 参考にした構造','','[公式サイト](https://kagamino-jrep.net/)と[攻略チャート](https://yaoroz.hatenablog.com/entry/2024/05/20/000000)、[ページと検索語の対応表](https://yaoroz.hatenablog.com/entry/2024/04/20/000000)を確認。段階ごとの必要情報、任意の補足情報、複数資料の照合を分けて設計する考え方を参考にした。作品固有の人物・用語・文面は使用していない。','');
 await writeFile(new URL('../docs/hint-plan.md',import.meta.url),lines.join('\n'));
 console.log(`Updated author hint plan: ${hintPlan.length} stages, ${pageRegistry.length} registered pages.`);
+await import('./build-query-index.mjs');

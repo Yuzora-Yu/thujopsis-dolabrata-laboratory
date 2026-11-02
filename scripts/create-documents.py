@@ -167,8 +167,9 @@ records={'record':'YH / 原本照合','subjects':[{'id':'P-026','name':'稲葉 �
 continuity={'project':'原型継承試験','owner':'朝倉紬','receiver':'災害技術記録保全センター 榎本航','source':'榊原恒一の判断記録','exclusions':'2021年手控えを病状による変化として除外','method':'基準回答と異なる応答を再評価・再訓練へ戻す','handover':['評価モデル','装置図面','応答位置データ','原型資料採否一覧']}
 records['subjects'].append({'id':'P-034','name':'瀬尾 灯','exit_record':'2022-08-31','last_measurement':'2026-10-26','location':'B1-B07','consent':'短期の補助具試用として説明。退出申出は運用上保留。','source':'YH-2022-034 / P034-2026-102'})
 records['staff_case']={'name':'三枝 律','support_request':'SA-2023-012','public_status':'2023-06-15 業務終了','original_status':'2023-06-14 施設内で死亡。外部診療照会は未承認。','recipient':'倉橋真紀への退出支援申出は未送信'}
-records['founding_origin']='OR-2006-004 / 瀬尾灯と家族の生活用具を聞き取り、旧研究再開を中止した経緯'
+records['founding_origin']='OR-2006-004 / 瀬尾文乃の生活と用具の聞き取り、FUM-2010-002の本人意見を踏まえた設立条件'
 continuity['subject_transfer']={'subject':'P-034 瀬尾灯','condition':'本人の退出希望ではなく、基準判断への一致を受渡し条件とする','source':'AS-2023-008 / P034-2026-102'}
+records['family_inquiry']={'id':'FAM-2022-009','name':'瀬尾 文乃','subject':'娘の瀬尾灯の所在と本人意思の確認','newspaper':'NK-2022-0908','finding':'代理回答に本人の自由意思を確認できる原本がない'}
 (PRIVATE/'records.json').write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding='utf-8')
 (PRIVATE/'continuity.json').write_text(json.dumps(continuity,ensure_ascii=False,indent=2),encoding='utf-8')
 print('Updated statement PDF and archive sources.' if '--statement-only' in sys.argv else 'Created 3 PDFs, 2 SVG floor plans and private archive sources.')

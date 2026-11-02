@@ -21,7 +21,9 @@ function go(path,kind='main'){location.assign(urlFor(path,kind));}
 function fillTokens(html){return html.replaceAll('@@CASE@@',state.id).replaceAll('@@CSRF@@','preview-session');}
 function display(html){
  const doc=new DOMParser().parseFromString(fillTokens(html),'text/html');document.title=doc.title;document.body.className=doc.body.className;document.body.innerHTML=doc.body.innerHTML;
+ for(const key of ['asunaroStage','seedDriftEnabled','seedDriftThreshold'])document.body.dataset[key]=doc.body.dataset[key]||'';
  window.asunaroInit?.();
+ window.asunaroDrift?.refresh();
 }
 async function loadBundle(namespace,id,key){
  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(namespace+':'+id))),b=>b.toString(16).padStart(2,'0')).join('');

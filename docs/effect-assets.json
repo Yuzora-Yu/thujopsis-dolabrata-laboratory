@@ -1,0 +1,18 @@
+[
+  {
+    "key": "seed-0021",
+    "year": 2012,
+    "prompt": "Use case: photorealistic-natural, psychological suspense. A fictional Japanese civic facility's narrow windowless service corridor at night, photographed casually in 2012 with a cheap compact camera and weak built-in flash. Plain off-white walls, gray vinyl floor, ordinary utility pipes, one dim fluorescent fitting, a heavy undecorated door at the far end. Deep down the corridor, an indistinct adult human-shaped silhouette stands unusually close to the wall, turned away from the camera, partly hidden by the shadow of a door recess. The person has no identifiable face or clothing detail. Quiet oppressive stillness and uncertainty, mundane credible public-building proportions, slightly low resolution, JPEG softness, grain in dark areas, restrained sickly green-white light. 3:2 landscape photographic composition. No dramatic cinematic fog, gore, injuries, blood, readable numbers, text, logos or watermark. Intended as a brief anomalous image replacing an ordinary workshop product photo.",
+    "mode": "built-in image_gen",
+    "path": "docs/source-images/seed-0021.png",
+    "asset": "public/assets/effects/seed-0021.webp"
+  },
+  {
+    "key": "seed-0024",
+    "year": 2015,
+    "prompt": "Use case: photorealistic-natural, restrained psychological horror. An original fictional institutional waiting room at night, photographed in 2015 with a small old digital camera. A compact blank windowless room, three identical gray molded chairs bolted in a row, a plain closed internal door, a large dark observation window on the opposite wall. Cold fluorescent light is almost out. The room itself is empty, but a faint indistinct adult silhouette appears reflected in the observation glass near the camera position, its face obscured by a vertical frame. The view is slightly off level and underexposed, with poor automatic white balance, image grain and ordinary digital JPEG softness. A small room of credible civic-building proportions, no theatrical props. Quiet oppressive mundane atmosphere, uncertainty about whether somebody is behind the glass. Landscape 3:2 photo, no gore, blood, injury, readable text, symbols, logos or watermark. This will briefly replace a photo of a small 3D-printed owl on a workshop website; the scene should have no connection to an owl.",
+    "mode": "built-in image_gen",
+    "path": "docs/source-images/seed-0024.png",
+    "asset": "public/assets/effects/seed-0024.webp"
+  }
+]

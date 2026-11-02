@@ -3,7 +3,7 @@ import {editorialPages} from './world/editorial.mjs';
 import {archiveItems,archiveNotes} from './world/archive-data.mjs';
 import {projects} from './world/projects.mjs';
 
-export const experienceSettings={showPageIndex:true,showGrowthStage:true,showDisclaimer:true,copyright:'ⓒYU-ZORA'};
+export const experienceSettings={showPageIndex:true,showGrowthStage:true,showDisclaimer:true,copyright:'ⓒYU-ZORA',seedDrift:{enabled:true,threshold:30}};
 export const growthStages=[
  {name:'SEED',label:'種子'},
  {name:'ROOT',label:'根'},
@@ -41,5 +41,7 @@ export function decoratePage(html,{kind='main',path='/',role}={}){
  if(!html)return html;const position=pagePosition(kind,path,role);
  const growth=growthStages[position?.level]||growthStages[0];
  const counter=experienceSettings.showPageIndex&&position?`<span class="page-index" data-page-number="${position.number}" data-page-total="${position.total}" data-growth-stage="${growth.name.toLowerCase()}" aria-label="ページ${position.number}、全${position.total}ページ${experienceSettings.showGrowthStage?'、探索段階 '+growth.name+'（'+growth.label+'）':''}">${experienceSettings.showGrowthStage?`<span class="index-growth">${growth.name}</span>`:''}<span class="index-number">${String(position.number).padStart(3,'0')} <span>/</span> ${position.total}</span></span>`:'';
- return html.replace('<!--PAGE_INDEX-->',counter);
+ return html.replace('<!--PAGE_INDEX-->',counter)
+  .replace(/<body\b([^>]*)>/,`<body$1 data-asunaro-stage="${growth.name.toLowerCase()}" data-seed-drift-enabled="${experienceSettings.seedDrift.enabled}" data-seed-drift-threshold="${experienceSettings.seedDrift.threshold}">`)
+  .replace('</head>','<script defer src="/seed-drift.js"></script></head>');
 }
