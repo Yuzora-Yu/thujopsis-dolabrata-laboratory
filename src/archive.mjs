@@ -1,5 +1,11 @@
 import {readFile} from 'node:fs/promises';
 import {createHash,createCipheriv,randomBytes} from 'node:crypto';
+import {researchRecords} from './world/records.mjs';
+
+export function originalRecords(){
+ const fields=['id','title','date','updated','owner','kindLabel','sections','tables','entries','addenda','signoff','quote'];
+ return researchRecords.map(record=>Object.fromEntries(fields.filter(key=>record[key]!==undefined).map(key=>[key,record[key]])));
+}
 
 function crc32(data){let c=0xffffffff;for(const b of data){c^=b;for(let k=0;k<8;k++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;}
 export function zipFiles(files){
@@ -14,7 +20,7 @@ export function zipFiles(files){
 }
 
 function encrypted(data,label){
- const key=createHash('sha256').update('ASUNARO/AS-2024-002/'+label).digest();const iv=randomBytes(12);const cipher=createCipheriv('aes-256-gcm',key,iv);const bytes=Buffer.concat([cipher.update(data),cipher.final()]);return Buffer.concat([Buffer.from('ASNR01'),iv,cipher.getAuthTag(),bytes]);
+ const key=createHash('sha256').update('ASUNARO/AS-2024-002/'+label).digest();const iv=randomBytes(12);const cipher=createCipheriv('aes-256-gcm',key,iv);const bytes=Buffer.concat([cipher.update(Buffer.from(data)),cipher.final()]);return Buffer.concat([Buffer.from('ASNR01'),iv,cipher.getAuthTag(),bytes]);
 }
 
 export async function makeArchive(root,{complete=false}={}){
@@ -23,6 +29,8 @@ export async function makeArchive(root,{complete=false}={}){
 }
 
 export function buildEvidenceArchive({pdf,records,continuity},{complete=false}={}){
- if(complete)return zipFiles([{name:'告発書.pdf',data:pdf},{name:'実験記録.json',data:records},{name:'継承計画.json',data:continuity},{name:'資料移送記録.txt',data:'TR-2026-011\n受領先：災害技術記録保全センター 榎本航\n原型継承資料を含む移管計画。原型から前理事長晩年の反対意見を除外。\n外部調査照会 EA-2026-009 は返信保留。'}]);
- return zipFiles([{name:'告発書.pdf',data:pdf},{name:'実験記録.enc',data:encrypted(records,'records')},{name:'継承資料.enc',data:encrypted(continuity,'continuity')}]);
+ const originals=JSON.stringify({exported:'2026-11-02',documents:originalRecords()},null,2);
+ if(complete)return zipFiles([{name:'告発書.pdf',data:pdf},{name:'実験記録.json',data:records},{name:'継承計画.json',data:continuity},{name:'文書原本.json',data:originals},{name:'資料移送記録.txt',data:'TR-2026-011\n受領先：災害技術記録保全センター 榎本航\n原型継承資料を含む移管計画。原型から前理事長晩年の反対意見を除外。\n外部調査照会 EA-2026-009 は返信保留。\n文書原本.json：登録資料の原文・時刻別記録・追記の複写。実験記録.json：原本照合の要約。'}]);
+ const protectedRecords=JSON.stringify({summary:JSON.parse(Buffer.from(records).toString('utf8')),documents:originalRecords()});
+ return zipFiles([{name:'告発書.pdf',data:pdf},{name:'実験記録.enc',data:encrypted(protectedRecords,'records')},{name:'継承資料.enc',data:encrypted(continuity,'continuity')}]);
 }
