@@ -118,8 +118,14 @@ test('ordinary restart preserves authentication and the received-evidence state'
   await fetch(restartBase+'/members/login/',{method:'POST',headers:{cookie},body:new URLSearchParams({csrf,id:'201204010000',password:'20100615'}),redirect:'manual'});
   const home=await (await fetch(restartBase+'/members/',{headers:{cookie}})).text();csrf=home.match(/name="csrf" value="([^"]+)"/)[1];
   await fetch(restartBase+'/members/inquiry/',{method:'POST',headers:{cookie},body:new URLSearchParams({csrf,record:'CH-2021-003'}),redirect:'manual'});
+  const archiveBase=restartBase.replace(':4517',':4520');
+  await fetch(archiveBase+'/room/login/',{method:'POST',headers:{cookie},body:new URLSearchParams({csrf,ticket:'H17-0038',code:'W416-12'}),redirect:'manual'});
+  for(const values of [{action:'register',handle:'再起動後も残す呼称'},{action:'card',index:0,selected:2}]){
+   const result=await fetch(archiveBase+'/room/console/api/',{method:'POST',headers:{cookie},body:new URLSearchParams({...values,csrf})});assert.equal(result.status,200);
+  }
   await restarted.close();restarted=await startServers({port:4517,stateFile});
   const response=await fetch(restartBase+'/members/messages/',{headers:{cookie},redirect:'manual'});assert.equal(response.status,200);assert.match(await response.text(),/保全資料_20261102.zip/);
+  const preserved=await fetch(archiveBase+'/room/console/api/',{headers:{cookie}}).then(r=>r.json());assert.equal(preserved.trial.handle,'再起動後も残す呼称');assert.equal(preserved.trial.cards.length,1);assert.equal(preserved.trial.cards[0].selected,2);
  }finally{await restarted.close();await unlink(stateFile).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 });
 

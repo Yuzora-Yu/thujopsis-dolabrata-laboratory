@@ -7,6 +7,7 @@ import {renderMember,loginPage,memberLayout,agencyPage} from '../src/member.mjs'
 import {archivePublicPaths,renderLegacy,legacyLogin} from '../src/legacy.mjs';
 import {archiveTicket,archiveNotes} from '../src/world/archive-data.mjs';
 import {projects} from '../src/world/projects.mjs';
+import {subjectViews} from '../src/world/lab-data.mjs';
 import {makeArchive} from '../src/archive.mjs';
 import {hostingOrigins,rewriteHostedHtml} from '../src/hosting.mjs';
 
@@ -15,7 +16,7 @@ if(base&&!/^\/[a-zA-Z0-9_-]+$/.test(base))throw new Error('Invalid Pages base pa
 const out=path.resolve('dist/pages'),origins=hostingOrigins(base||''),stageValues={initial:{contact:false,ending:''},contact:{contact:true,ending:''},end1:{contact:true,ending:'end1'},end2:{contact:true,ending:'end2'},end3:{contact:true,ending:'end3'}};
 await mkdir(path.join(out,'assets/portal'),{recursive:true});
 await cp('public/assets',path.join(out,'assets'),{recursive:true});
-for(const name of ['styles.css','app.js','seed-drift.js','member-reading.js','reading-state.js'])await cp('public/'+name,path.join(out,name));
+for(const name of ['styles.css','app.js','seed-drift.js','member-reading.js','reading-state.js','lab-core.js','lab-console.js'])await cp('public/'+name,path.join(out,name));
 await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));await cp('scripts/static-runtime.js',path.join(out,'static-runtime.js'));
 function hosted(html,kind='main'){
  const result=rewriteHostedHtml(html,{kind,origins,basePath:base});
@@ -41,6 +42,7 @@ const portalPaths=['/members/','/members/login/','/members/records/','/members/a
 for(const route of portalPaths)await page(route,route==='/members/login/'?loginPage('@@CSRF@@',{next:route}):memberLayout('会員サイト','<section class="portal-loading" role="status"><p>ページを読み込んでいます。</p></section>'));
 for(const route of archivePublicPaths)await page(route,renderLegacy(route,{...ctxBase,session:{}}),'archive');
 await page('/room/',legacyLogin('@@CSRF@@'),'archive');
+for(const route of ['/room/console/','/room/console/subjects/'])await page(route,legacyLogin('@@CSRF@@'),'archive');
 for(const n of archiveNotes)await page(`/room/records/${n.id}/`,legacyLogin('@@CSRF@@'),'archive');
 for(const kind of ['hozen','audit'])for(const route of ['/','/receive/','/received/'])await page(route,agencyPage(kind,route,{caseId:'@@CASE@@',origins}),kind);
 for(const route of ['/news/closure/','/news/staff-change/'])await page(route,notFound());
@@ -81,8 +83,8 @@ for(const [id,account] of Object.entries(accounts)){
  const pending=hosted(agencyPage('audit','/received/',{caseId:'@@CASE@@',origins,received:true,pending:true}),'audit');
  await encryptedBundle('member',id,account.password,{account:{...account,password:undefined,id},pages,docs,stages,downloads,outcomes,pending,ended:hosted(ended)});
 }
-const roomPages={};for(const route of ['/room/',...archiveNotes.map(n=>`/room/records/${n.id}/`)])roomPages[route]=hosted(renderLegacy(route,{...ctxBase,session:{archiveAccess:archiveTicket.id}}),'archive');
-await encryptedBundle('archive',archiveTicket.id,archiveTicket.code,{pages:roomPages});
+const roomPages={};for(const route of ['/room/','/room/console/','/room/console/subjects/',...archiveNotes.map(n=>`/room/records/${n.id}/`)])roomPages[route]=hosted(renderLegacy(route,{...ctxBase,session:{archiveAccess:archiveTicket.id}}),'archive');
+await encryptedBundle('archive',archiveTicket.id,archiveTicket.code,{pages:roomPages,labSubjects:{initial:subjectViews({}),current:subjectViews({contact:true}),end3:subjectViews({ending:'end3'})}});
 await writeFile(path.join(out,'assets/site-index.json'),JSON.stringify({edition:randomBytes(12).toString('hex'),entries:searchEntries,login:hosted(loginPage('@@CSRF@@')),loginError:hosted(loginPage('@@CSRF@@',{error:'会員IDまたはパスワードをご確認ください。'})),archiveLogin:hosted(legacyLogin('@@CSRF@@')),archiveError:hosted(legacyLogin('@@CSRF@@',{error:'閲覧票番号と照会符号をご確認ください。'})),notFound:hosted(notFound()),agency:{hozen:hosted(agencyPage('hozen','/receive/',{caseId:'@@CASE@@',origins}),'hozen'),audit:hosted(agencyPage('audit','/receive/',{caseId:'@@CASE@@',origins}),'audit')}}));
 const manifest=path.join(out,'pages-manifest.json');let previous=[];try{previous=JSON.parse(await readFile(manifest,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
 for(const old of previous.filter(f=>!generated.includes(f))){const target=path.resolve(out,old);if(!target.startsWith(out+path.sep))throw new Error('Invalid generated path');await unlink(target).catch(e=>{if(e.code!=='ENOENT')throw e;});}

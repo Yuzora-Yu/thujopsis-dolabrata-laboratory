@@ -1,5 +1,6 @@
 import {matchesSearch,normalizeDocumentId} from './search-engine.js';
 import {classifyEvidence,nextEnding} from './evidence.js';
+import {advanceTrial,trialView} from './lab-core.js';
 
 const base=document.querySelector('meta[name="asunaro-base"]')?.content||'';
 const storageKey='asunaro-preview-v1:'+base,authKey=storageKey+':auth',archiveKey=storageKey+':archive';
@@ -26,6 +27,7 @@ function display(html){
  window.asunaroInit?.();
  window.asunaroDrift?.refresh();
  window.asunaroReading?.refresh();
+ if(document.querySelector('[data-lab-root], [data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({bridge:window.asunaroLabBridge,trial:trialView(state.consoleTrial),ending:state.ending})).catch(()=>showError('測定端末を読み込めませんでした。再読み込みしてご確認ください。'));
 }
 async function packedBundle(namespace,id){
  const identifier=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(namespace+':'+id))),b=>b.toString(16).padStart(2,'0')).join('');
@@ -64,6 +66,12 @@ function documentResults(account,id){
  if(!id)return;const found=account.docs.find(d=>d.id===id);
  form.insertAdjacentHTML('afterend',found?`<p class="result-count">検索結果　1件</p><a class="document-result" href="${urlFor('/members/records/'+found.id+'/')}"><small>${esc(found.id)}　${esc(found.date)}</small><h2>${esc(found.title)}</h2><small>${esc(found.owner)}</small></a>`:'<p class="empty-state">該当する資料はありません。</p>');
 }
+window.asunaroLabBridge=async(action,input={})=>{
+ if(!roomBundle)throw new Error('資料照会室の閲覧票をご確認ください。');
+ state=stored(storageKey,state);
+ if(action!=='context'){state.consoleTrial=advanceTrial(state.consoleTrial,action,input);save();}
+ const trial=trialView(state.consoleTrial);return {trial,csrf:'preview-session',ending:state.ending||'',subjects:trial?.complete?roomBundle.labSubjects[state.ending==='end3'?'end3':state.contact||state.truth||state.ending?'current':'initial']:null};
+};
 async function boot(){
  if(rendering)return;rendering=true;
  try{
@@ -93,6 +101,7 @@ async function boot(){
     const capable=await outcomeBundle();const html=state.auditPending&&current.kind==='audit'&&state.ending!=='end3'?capable?.pending:capable?.outcomes[state.ending]?.[current.kind+':/received/'];
     display(html||site.agency[current.kind]);
    }else display(site.agency[current.kind]);
+   const sender=document.querySelector('#sender');if(current.kind==='audit'&&sender&&trialView(state.consoleTrial)?.complete)sender.value=state.consoleTrial.handle;
    return;
   }
   if(state.ending){const capable=await outcomeBundle();const html=capable?.outcomes[state.ending]?.['main:'+current.path];if(html)display(html);}

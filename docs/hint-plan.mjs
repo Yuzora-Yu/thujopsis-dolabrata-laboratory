@@ -1251,5 +1251,21 @@ export const hintPlan = [
     "leads": [
       "independent"
     ]
+  },
+  {
+    "id":"aptitude",
+    "goal":"旧基盤の適性測定を任意で受け、被験者の原票と比較する",
+    "requires":["transfer"],
+    "evidence":[
+      {"kind":"archive","path":"/room/records/0014/","role":"ticket","words":["AP-2022-028","適性反応測定端末AP-06"]},
+      {"kind":"member","path":"/members/records/AP-2022-028/","role":"institution","words":["共同行動","在籍や退出","/room/console/"]}
+    ],
+    "hints":[
+      "資料照会室には現在も接続されている機器の受領記録がある。",
+      "受領簿0014は、適性反応測定端末AP-06を案内している。",
+      "呼称を登録してカード五試行と粒子観測を終えると、保存されていた五人の測定原票を照合できる。点数の条件はない。"
+    ],
+    "answer":"任意の迂回路。単回の適性値と、本人の希望・運命が一致するわけではない。AP-2022-028から利用区分の変更も確認できる。完了時はEnd3に呼称宛てのお礼を追加するが、本筋の到達条件には加えない。",
+    "leads":[]
   }
 ];

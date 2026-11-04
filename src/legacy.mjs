@@ -3,13 +3,14 @@ import {archiveItems,archiveNotes} from './world/archive-data.mjs';
 import {esc} from './render.mjs';
 import {news} from './content.mjs';
 import {matchesSearch} from './search.mjs';
+import {consoleContent} from './lab.mjs';
 
 const snapshotNewsIds=['20120401','20120903','20161003','20170714'];
 export const archivePublicPaths=['/','/collections/','/snapshots/','/snapshots/2009/','/snapshots/2011/','/snapshots/2017/',...archiveItems.map(i=>`/collections/items/${i.id}/`),...snapshotNewsIds.map(id=>`/snapshots/2017/news/${id}/`)];
 
 const linked=(url,text)=>`<a href="${esc(url)}">${esc(text)}</a>`;
-export function legacyLayout(title,body,{privateRoom=false}={}){
- return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}｜産業継続研究資料 保存室</title><link rel="stylesheet" href="/styles.css"></head><body class="legacy-body"><a class="skip" href="#legacy-main">本文へ移動</a><header class="legacy-header"><p>INDUSTRIAL CONTINUITY RECORDS</p><a href="/">産業継続研究資料 保存室</a><small>旧産業継続研究準備室・部分保存資料</small></header><nav class="legacy-nav" aria-label="資料保存室"><a href="/collections/">収蔵目録</a><a href="/snapshots/">公開画面の保存</a><a href="/room/">資料照会室</a></nav><main id="legacy-main" class="legacy-main">${privateRoom?'<p class="legacy-classification">資料照会室 ／ 移管・保守</p>':''}<h1>${esc(title)}</h1>${body}</main><footer class="legacy-footer">資料管理：旧基盤保存担当 ／ 公開保存資料と継続照会の更新日は各資料に記載</footer>${fictionFooter()}</body></html>`;
+export function legacyLayout(title,body,{privateRoom=false,consolePage=false}={}){
+ return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}｜産業継続研究資料 保存室</title><link rel="stylesheet" href="/styles.css">${consolePage?'<script type="module" src="/lab-console.js"></script>':''}</head><body class="legacy-body"><a class="skip" href="#legacy-main">本文へ移動</a><header class="legacy-header"><p>INDUSTRIAL CONTINUITY RECORDS</p><a href="/">産業継続研究資料 保存室</a><small>旧産業継続研究準備室・部分保存資料</small></header><nav class="legacy-nav" aria-label="資料保存室"><a href="/collections/">収蔵目録</a><a href="/snapshots/">公開画面の保存</a><a href="/room/">資料照会室</a></nav><main id="legacy-main" class="legacy-main">${privateRoom?'<p class="legacy-classification">資料照会室 ／ 移管・保守</p>':''}<h1>${esc(title)}</h1>${body}</main><footer class="legacy-footer">資料管理：旧基盤保存担当 ／ 公開保存資料と継続照会の更新日は各資料に記載</footer>${fictionFooter()}</body></html>`;
 }
 const noteRow=n=>`<a class="legacy-row" href="/room/records/${n.id}/"><span>No.${n.id}</span><time>${n.date}</time><strong>${esc(n.title)}</strong></a>`;
 export function legacyLogin(csrf,{error=''}={}){
@@ -41,9 +42,10 @@ function renderLegacyPage(path,ctx){
  }
  if(path.startsWith('/room/')){
   if(!session.archiveAccess)return legacyLogin(csrf);
+  const consolePage=consoleContent(path,ctx);if(consolePage)return legacyLayout(consolePage.title,consolePage.body,{privateRoom:true,consolePage:true});
   if(path==='/room/')return legacyLayout('移管・保守受領簿',`<p>閲覧票 ${esc(session.archiveAccess)} ／ 継続照会</p><div class="legacy-catalog">${archiveNotes.filter(n=>n.listed).map(noteRow).join('')}</div><form action="/room/logout/" method="post"><input type="hidden" name="csrf" value="${esc(csrf)}"><button class="legacy-logout" type="submit">照会室を終了</button></form>`,{privateRoom:true});
   const note=archiveNotes.find(n=>path===`/room/records/${n.id}/`);
-  if(note)return legacyLayout(note.title,`<div class="legacy-record-meta">受領簿 No.${note.id} ／ ${note.date} ／ ${esc(note.by)}${note.updated?'<br>最終更新：'+note.updated:''}</div><p class="legacy-memo">${esc(note.body)}</p><p><a href="/room/">受領簿へ</a></p>`,{privateRoom:true});
+  if(note)return legacyLayout(note.title,`<div class="legacy-record-meta">受領簿 No.${note.id} ／ ${note.date} ／ ${esc(note.by)}${note.updated?'<br>最終更新：'+note.updated:''}</div><p class="legacy-memo">${esc(note.body)}</p>${(note.links||[]).map(link=>`<p><a href="${esc(link.path)}">${esc(link.text)}</a></p>`).join('')}<p><a href="/room/">受領簿へ</a></p>`,{privateRoom:true});
  }
  return null;
 }

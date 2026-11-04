@@ -1,6 +1,7 @@
 import {readFile} from 'node:fs/promises';
 import {createHash,createCipheriv,randomBytes} from 'node:crypto';
 import {researchRecords} from './world/records.mjs';
+import {subjectViews} from './world/lab-data.mjs';
 
 export function originalRecords(){
  const fields=['id','title','date','updated','owner','kindLabel','sections','tables','entries','addenda','signoff','quote'];
@@ -29,8 +30,9 @@ export async function makeArchive(root,{complete=false}={}){
 }
 
 export function buildEvidenceArchive({pdf,records,continuity},{complete=false}={}){
+ const measurementSheets=subjectViews({contact:true});
  const originals=JSON.stringify({exported:'2026-11-02',documents:originalRecords()},null,2);
- if(complete)return zipFiles([{name:'告発書.pdf',data:pdf},{name:'実験記録.json',data:records},{name:'継承計画.json',data:continuity},{name:'文書原本.json',data:originals},{name:'資料移送記録.txt',data:'TR-2026-011\n受領先：災害技術記録保全センター 榎本航\n原型継承資料を含む移管計画。原型から前理事長晩年の反対意見を除外。\n外部調査照会 EA-2026-009 は返信保留。\n文書原本.json：登録資料の原文・時刻別記録・追記の複写。実験記録.json：原本照合の要約。'}]);
- const protectedRecords=JSON.stringify({summary:JSON.parse(Buffer.from(records).toString('utf8')),documents:originalRecords()});
+ if(complete)return zipFiles([{name:'告発書.pdf',data:pdf},{name:'実験記録.json',data:records},{name:'継承計画.json',data:continuity},{name:'文書原本.json',data:originals},{name:'適性測定原票.json',data:JSON.stringify({exported:'2026-11-02',protocol:'AP-2022-028',sheets:measurementSheets},null,2)},{name:'資料移送記録.txt',data:'TR-2026-011\n受領先：災害技術記録保全センター 榎本航\n原型継承資料を含む移管計画。原型から前理事長晩年の反対意見を除外。\n外部調査照会 EA-2026-009 は返信保留。\n文書原本.json：登録資料の原文・時刻別記録・追記の複写。実験記録.json：原本照合の要約。\n適性測定原票.json：過去の単回測定原票5件。外部照会者の呼称と測定結果は含まない。'}]);
+ const protectedRecords=JSON.stringify({summary:JSON.parse(Buffer.from(records).toString('utf8')),documents:originalRecords(),measurementSheets});
  return zipFiles([{name:'告発書.pdf',data:pdf},{name:'実験記録.enc',data:encrypted(protectedRecords,'records')},{name:'継承資料.enc',data:encrypted(continuity,'continuity')}]);
 }

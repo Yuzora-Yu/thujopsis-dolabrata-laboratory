@@ -14,7 +14,7 @@ export function rewriteHostedHtml(html,{kind='main',origins,basePath=''}){
  return html.replace(/\b(href|src|action|data-image-open)="([^"\n]*)"/g,(all,key,value)=>{
   if(!value.startsWith('/')||value.startsWith('//'))return all;
   if(basePath&&(value===basePath||value.startsWith(basePath+'/')))return all;
-  const asset=/^\/(?:assets\/|styles\.css|app\.js|seed-drift\.js|member-reading\.js|reading-state\.js|static-runtime\.js|evidence\.js|search-engine\.js)/.test(value);
+  const asset=/^\/(?:assets\/|styles\.css|app\.js|seed-drift\.js|member-reading\.js|reading-state\.js|lab-core\.js|lab-console\.js|static-runtime\.js|evidence\.js|search-engine\.js)/.test(value);
   const dest=asset?basePath+value:(value.startsWith('/members/')?origins.main:origins[kind]||origins.main)+value;
   return `${key}="${dest}"`;
  });

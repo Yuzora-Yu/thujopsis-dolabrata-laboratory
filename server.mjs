@@ -7,6 +7,7 @@ import {accounts,documents} from './src/content.mjs';
 import {renderPublic,notFound} from './src/render.mjs';
 import {loginPage,renderMember,memberLayout,agencyPage} from './src/member.mjs';
 import {makeArchive} from './src/archive.mjs';
+import {labContext,labAction} from './src/lab.mjs';
 import {renderLegacy,legacyLogin,legacyLayout} from './src/legacy.mjs';
 import {archiveTicket} from './src/world/archive-data.mjs';
 import {classifyEvidence,nextEnding} from './src/evidence.mjs';
@@ -55,14 +56,21 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
    const url=new URL(req.url,'http://127.0.0.1');let pathname=decodeURIComponent(url.pathname);
    if(pathname.includes('\0')||pathname.includes('\\'))return send(res,400,'Bad request','text/plain; charset=utf-8');
    // Only this directory is a static root. Server sources and protected records are never served.
-   if(req.method==='GET'&&(pathname.startsWith('/assets/')||pathname==='/styles.css'||pathname==='/app.js'||pathname==='/seed-drift.js'||pathname==='/member-reading.js'||pathname==='/reading-state.js')){
+   if(req.method==='GET'&&(pathname.startsWith('/assets/')||pathname==='/styles.css'||pathname==='/app.js'||pathname==='/seed-drift.js'||pathname==='/member-reading.js'||pathname==='/reading-state.js'||pathname==='/lab-core.js'||pathname==='/lab-console.js')){
     const target=path.resolve(publicRoot,'.'+pathname);if(!target.startsWith(publicRoot+path.sep))return send(res,404,notFound());
     try{const info=await stat(target);if(!info.isFile())throw new Error('not a file');const data=await readFile(target);res.writeHead(200,{'Content-Type':mime[path.extname(target)]||'application/octet-stream','Cache-Control':'public, max-age=3600','X-Content-Type-Options':'nosniff'});return res.end(data);}catch{return send(res,404,notFound());}
    }
    if(req.method==='GET'&&pathname==='/favicon.ico'){res.writeHead(302,{Location:'/assets/logo.png'});return res.end();}
    if(req.method==='GET'&&!path.extname(pathname)&&!pathname.endsWith('/')){res.writeHead(308,{Location:pathname+'/'+url.search});return res.end();}
    if(kind==='archive'){
-    const session=sessionFor(req,res),ctx={session,csrf:session.csrf,origins,query:url.searchParams};
+    const session=sessionFor(req,res),caseState=cases.get(session.caseId),ctx={session,caseState,caseId:session.caseId,csrf:session.csrf,origins,query:url.searchParams};
+    if(pathname==='/room/console/api/'){
+     if(!session.archiveAccess)return send(res,403,JSON.stringify({error:'資料照会室の閲覧票をご確認ください。'}),'application/json; charset=utf-8');
+     if(req.method==='GET')return send(res,200,JSON.stringify(labContext(caseState,session.csrf)),'application/json; charset=utf-8');
+     if(req.method!=='POST')return send(res,405,JSON.stringify({error:'受付方法をご確認ください。'}),'application/json; charset=utf-8');
+     const {fields}=await readBody(req);if(!safeEqual(fields.csrf,session.csrf))return send(res,403,JSON.stringify({error:'閲覧情報を更新して再度お試しください。'}),'application/json; charset=utf-8');
+     try{const result=labAction(caseState,fields.action,fields);persist();return send(res,200,JSON.stringify({...result,csrf:session.csrf}),'application/json; charset=utf-8');}catch(error){return send(res,400,JSON.stringify({error:error.message}),'application/json; charset=utf-8');}
+    }
     if(req.method==='POST'){
      const {fields}=await readBody(req);if(!safeEqual(fields.csrf,session.csrf))return send(res,403,legacyLayout('受付できませんでした','<p>ページを開き直してお手続きください。</p>'));
      if(pathname==='/room/login/'){
@@ -85,7 +93,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
      if(kind==='audit'&&evidenceZip(files.archive)!=='complete'){state.auditPending=true;persist();return redirect(res,`/received/?case=${fields.case}`);}
      state.ending=nextEnding(state.ending,kind==='audit'?'end3':'end1');persist();return redirect(res,(state.ending==='end3'?origins.audit:'')+`/received/?case=${fields.case}`);
     }
-    const caseId=url.searchParams.get('case')||'';const state=cases.get(caseId);if(pathname==='/received/'&&kind==='hozen'&&state?.ending==='end3')return redirect(res,origins.audit+'/received/?case='+caseId);const pending=kind==='audit'&&!!state?.auditPending&&state?.ending!=='end3'&&state?.ending!=='end2';const received=pathname==='/received/'&&(pending||kind==='audit'&&state?.ending==='end3'||kind==='hozen'&&state?.ending==='end1');return send(res,200,agencyPage(kind,pathname,{caseId,origins,received,pending,ending:state?.ending||''}));
+    const caseId=url.searchParams.get('case')||'';const state=cases.get(caseId);if(pathname==='/received/'&&kind==='hozen'&&state?.ending==='end3')return redirect(res,origins.audit+'/received/?case='+caseId);const pending=kind==='audit'&&!!state?.auditPending&&state?.ending!=='end3'&&state?.ending!=='end2';const received=pathname==='/received/'&&(pending||kind==='audit'&&state?.ending==='end3'||kind==='hozen'&&state?.ending==='end1');return send(res,200,agencyPage(kind,pathname,{caseId,origins,received,pending,ending:state?.ending||'',consoleTrial:state?.consoleTrial}));
    }
    const session=sessionFor(req,res),caseState=cases.get(session.caseId),account=Date.now()-(session.authenticatedAt||session.created)<28800000?accounts[session.accountId]:null;const ctx={account,csrf:session.csrf,caseState,caseId:session.caseId,query:url.searchParams,origins};
    if(req.method==='POST'){
