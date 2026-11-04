@@ -4,6 +4,7 @@ import {expandNews} from './world/news.mjs';
 import {extraAccounts,refineDocuments} from './world/research.mjs';
 import {deepenDocuments} from './world/investigation.mjs';
 import {enrichHumanStory,humanSearchEntries} from './world/people.mjs';
+import {deepenResidential} from './world/residential.mjs';
 export const facility = {
   name: 'あすなろ産業支援交流施設',
   en: 'ASUNARO INDUSTRY & EXCHANGE',
@@ -134,6 +135,7 @@ Object.assign(accounts,extraAccounts);
 refineDocuments(documents);
 deepenDocuments(documents);
 enrichHumanStory({gallery,tenants,documents});
+deepenResidential(documents);
 
 export const searchEntries = [
  ...humanSearchEntries,
@@ -144,7 +146,7 @@ export const searchEntries = [
  {title:'4階フロアマップ',url:'/floor-map/',text:'フロアマップ 案内図 会議室 ラウンジ'},
  {title:'入居者紹介',url:'/tenants/',text:'入居企業 過去入居 企業紹介 活動報告'},
  ...tenants.filter(t=>t.listed).map(t=>({title:t.name,url:`/tenants/${t.page}/`,text:t.business+' '+t.description})),
- ...news.filter(n=>n.listed||n.searchable).map(n=>({title:n.title,url:`/news/${n.id}/`,text:n.restored?n.keywords:n.body})),
+ ...news.filter(n=>n.listed||n.searchable).map(n=>({title:n.title,url:`/news/${n.id}/`,text:n.restored?n.keywords:[n.body,...(n.sections||[]).flat(),...(n.facts||[]).flat()].join(' ')})),
  ...gallery.filter(g=>g.listed).map(g=>({title:g.title,url:`/gallery/${g.id}/`,text:g.body+' '+g.tag})),
  {title:'朝倉 紬｜制作と活動の記録',url:'/people/asakura-tsumugi/',text:'朝倉 紬 あさくら つむぎ 制作 プロフィール'},
  {title:'稲葉 澪｜利用者インタビュー',url:'/people/inaba-mio/',text:'稲葉 澪 いなば みお 案内 図解 制作者'},

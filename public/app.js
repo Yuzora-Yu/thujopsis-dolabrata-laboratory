@@ -5,6 +5,17 @@ document.querySelectorAll('dialog .dialog-close').forEach(b=>b.addEventListener(
 document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close();}}));
 const menu=document.querySelector('.menu-toggle');
 menu?.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));document.getElementById('main-navigation').classList.toggle('open',open);});
+const newsForm=document.querySelector('[data-news-filter]');
+if(newsForm){
+ const params=new URLSearchParams(location.search),year=params.get('year')||'',kind=params.get('kind')||'';
+ newsForm.elements.year.value=year;newsForm.elements.kind.value=kind;
+ const rows=[...document.querySelectorAll('.news-archive .news-rows>a')],matched=rows.filter(row=>(!year||row.dataset.newsYear===year)&&(!kind||row.dataset.newsKind===kind));
+ const pageSize=12,totalPages=Math.max(1,Math.ceil(matched.length/pageSize)),current=Math.min(totalPages,Math.max(1,Math.trunc(Number(params.get('page')))||1));
+ const visible=new Set(matched.slice((current-1)*pageSize,current*pageSize));rows.forEach(row=>row.hidden=!visible.has(row));
+ document.querySelector('.news-result-count').textContent=matched.length?`${(current-1)*pageSize+1}–${Math.min(current*pageSize,matched.length)}件 ／ ${matched.length}件`:'該当するお知らせはありません。';
+ const pagination=document.querySelector('.news-pagination');pagination.replaceChildren();
+ for(let page=1;page<=totalPages;page++){if(totalPages===1)break;const anchor=document.createElement('a'),query=new URLSearchParams(location.search);query.set('page',String(page));anchor.href=location.pathname+'?'+query;anchor.textContent=String(page);anchor.setAttribute('aria-label',page+'ページ目');if(page===current)anchor.setAttribute('aria-current','page');pagination.append(anchor);}
+}
 const photoDialog=document.querySelector('.image-dialog');let zoom=1,angle=0,fitWidth=0,fitHeight=0;
 function paintPhoto(){if(!photoDialog||!fitWidth)return;const photo=photoDialog.querySelector('img'),stage=photoDialog.querySelector('.image-stage');const turn=angle%180!==0;stage.style.width=(turn?fitHeight:fitWidth)*zoom+'px';stage.style.height=(turn?fitWidth:fitHeight)*zoom+'px';photo.style.width=fitWidth*zoom+'px';photo.style.height=fitHeight*zoom+'px';photo.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;}
 document.querySelectorAll('[data-image-open]').forEach(b=>b.addEventListener('click',()=>{const d=photoDialog,photo=d.querySelector('img'),source=b.dataset.imageOpen;zoom=1;angle=0;fitWidth=0;photo.onload=()=>{const scale=Math.min((d.clientWidth-32)/photo.naturalWidth,(innerHeight*.7)/photo.naturalHeight,1);fitWidth=photo.naturalWidth*scale;fitHeight=photo.naturalHeight*scale;paintPhoto();};photo.alt=b.querySelector('img')?.alt||'';d.querySelector('a').href=source;d.showModal();photo.src=source;}));

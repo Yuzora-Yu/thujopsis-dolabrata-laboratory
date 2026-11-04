@@ -1,4 +1,5 @@
 import {editorialNews,newsIsAvailable,newsIsListed} from './editorial.mjs';
+import {newsroomNews,editNewsroom} from './newsroom.mjs';
 const entry=(date,tag,title,body,extra={})=>({id:date.replaceAll('.',''),date,tag,title,body,...extra});
 const yearly={
  2012:[['04.01','施設案内','あすなろ産業支援交流施設を開設いたしました','本日、あすなろ産業支援交流施設を開設いたしました。個室オフィスと共用の製作設備、交流スペースを通じ、異なる技術と経験を持つ方々の活動を支えてまいります。'],['07.10','活動報告','開設記録の編集を進めております','ナギサ編集室のご協力により、開設に携わった皆様のお話を記録しております。模型や試作品と併せ、準備段階で交わされた言葉も残してまいります。']],
@@ -17,7 +18,7 @@ const yearly={
  2025:[['02.14','活動報告','端材から作る、小さなプレート','動物の輪郭を切り抜いたプレートを製作しました。穴の位置と強度を確かめながら、材料を無駄なく使う配置を検討しました。'],['10.10','施設案内','共用設備の点検について','共用設備の定期点検を実施いたします。ご利用に影響する時間帯については、会員サイトにて個別にご案内いたします。']],
 };
 export function expandNews(existing){
- const all=[...existing,...editorialNews];
+ const all=[...existing,...editorialNews,...newsroomNews];
  for(const [year,items] of Object.entries(yearly))for(const [md,tag,title,body] of items)all.push(entry(`${year}.${md}`,tag,title,body));
  for(const n of all){
   n.important=['20211103','20120401','20220218'].includes(n.id);
@@ -29,5 +30,5 @@ export function expandNews(existing){
   if(n.id==='20120401')n.links=[{path:'/about/identity/',text:'施設名に込めた願い'},{path:'/about/emblem/',text:'ロゴに込めた想い'}];
   if(n.id==='20120903'){n.body='アスナロ材で製作した木製ボートを交流スペースに展示いたしました。さまざまな形の部材が組み合わさり、一つの舟を支えています。開設に携わったモクノワデザインの皆様にご協力いただきました。';delete n.link;delete n.linkText;}
  }
- return all.sort((a,b)=>b.id.localeCompare(a.id));
+ return editNewsroom(all).sort((a,b)=>b.id.localeCompare(a.id));
 }

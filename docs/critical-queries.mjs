@@ -1,5 +1,7 @@
 // Author-only source of the input inventory. Never copy this file to public assets.
 export const siteQueries=[
+ {word:'吉野夏帆',source:'製本相談の記事／EV-2022-091',destination:'/people/yoshino-kaho/',purpose:'重大事案の対象者を、亡くなった人の番号だけでなく、制作していた人として知る。'},
+ {word:'青井真',source:'GR-2022-009／PN-2022-034',destination:'/news/20220415/',purpose:'現在のP-031と、工房で押さえ板を作っていた人を結ぶ。'},
  {word:'入居者紹介',source:'制作物0005の製作者コメント／アクセス先404',destination:'/tenants/',purpose:'入口の迂回。掲載番号の欠番を調べる。'},
  {word:'瀬尾灯',source:'制作物0021、取材記事',destination:'/people/seo-akari/',purpose:'経歴、活動終了、試作貸出票の番号を確認する。'},
  {word:'瀬尾文乃',source:'灯のプロフィール／施設名に込めた願い',destination:'/people/seo-fumino/',purpose:'母の生活と、設立前の聞き取りを読む。'},
@@ -15,6 +17,8 @@ export const catalogQueries=[
  {word:'NK-2021-1105',source:'新聞初刷、保存目録',destination:'/collections/items/0010/',purpose:'自殺説の撤回を確認する。初刷0009は目録の欠番から直接開く。'},
 ];
 export const directInputs=[
+ {kind:'旧募集記事URL',input:'/news/20160520/',source:'CONS-2016-005 → RE-2016-002の原掲載URL',purpose:'無償滞在・館内利用と、参加の取り消しによる退出を確認。通常一覧と検索からは出ない。'},
+ {kind:'追加募集記事URL',input:'/news/20220715/',source:'受領簿0013／RE-2022-006の原掲載URL',purpose:'退出条項が削られた説明と、検査・設備・生存評価の差を追う。'},
  {kind:'企業URL',input:'/tenants/0003/',source:'No.0002と0004の間の欠番',purpose:'ミナモの移転写真と最初の認証情報。'},
  {kind:'企業URL',input:'/tenants/0013/',source:'No.0012と0014の間の欠番／オルディスの登録番号0046',purpose:'評価企業の入居日・登録番号・設立日。'},
  {kind:'企業URL',input:'/tenants/0010/',source:'No.0009と0011の間の欠番／FAB-2020-026の登録0038',purpose:'アシタの企業情報と移管資料への権限。'},

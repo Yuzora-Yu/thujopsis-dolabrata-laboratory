@@ -3,7 +3,7 @@ import {editorialPages} from './world/editorial.mjs';
 import {archiveItems,archiveNotes} from './world/archive-data.mjs';
 import {projects} from './world/projects.mjs';
 
-export const experienceSettings={showPageIndex:true,showGrowthStage:true,showDisclaimer:true,copyright:'ⓒYU-ZORA',seedDrift:{enabled:true,threshold:30}};
+export const experienceSettings={showPageIndex:true,showGrowthStage:true,showDisclaimer:true,copyright:'ⓒYU-ZORA',seedDrift:{enabled:true,threshold:15}};
 export const growthStages=[
  {name:'SEED',label:'種子'},
  {name:'ROOT',label:'根'},

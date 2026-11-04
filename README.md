@@ -50,7 +50,7 @@ npm run build
 npm test
 ```
 
-公開側は94ページのHTMLとして出力します。会員認証、権限ごとの文書照会、ファイル受領と分岐にはNode.jsサーバーを使用します。`public`のみを静的ホスティングした場合、会員側の機能は動作しません。
+公開側は112ページのHTMLとして出力します。会員認証、権限ごとの文書照会、ファイル受領と分岐にはNode.jsサーバーを使用します。`public`のみを静的ホスティングした場合、会員側の機能は動作しません。
 
 `src`、`private`、`docs`を静的配信する設定にしないでください。アプリのHTTPサーバーは、画像等の静的ファイルを`public/assets`に限定し、研究本文は認証したアカウントごとにサーバー側で生成しています。
 
@@ -62,7 +62,7 @@ npm test
 
 画像はすべてリポジトリ内に収録済みです。サイトの起動・ビルドに画像生成APIキーは不要です。
 
-旧新聞記事・研究概要の生成は`scripts/create-history-documents.py`。図面と告発書の生成は`scripts/create-documents.py`（ReportLabと日本語フォントを使用）。Web画像への書き出しは`scripts/prepare-images.cjs`（Sharpを使用）。施設共通画像の生成元一覧は`docs/generated-assets.json`、制作物・企業・貸館・人物・試験写真55点のプロンプトと採用先は`docs/media-assets.json`です。個別写真の書き出しは`scripts/prepare-media.cjs`を使用します。
+旧新聞記事・研究概要の生成は`scripts/create-history-documents.py`。図面と告発書の生成は`scripts/create-documents.py`（ReportLabと日本語フォントを使用）。Web画像への書き出しは`scripts/prepare-images.cjs`（Sharpを使用）。施設共通画像の生成元一覧は`docs/generated-assets.json`、制作物・企業・貸館・人物・試験写真56点のプロンプトと採用先は`docs/media-assets.json`です。個別写真の書き出しは`scripts/prepare-media.cjs`を使用します。
 
 活動報告写真は、付箋とPC周囲の光・影を画像生成で整えた一枚の`minamo-desk.webp`です。文字はPC利用者が座って読める向きに配置し、全体表示では小さく、原寸の拡大では読める解像度で保存しています。認証情報をHTML本文・altテキスト・検索インデックスには記載していません。
 
@@ -70,7 +70,7 @@ npm test
 
 [GitHub Pages確認版](https://yuzora-yu.github.io/thujopsis-dolabrata-laboratory/)はmainへのPushで自動更新します。会員資料も含めた探索を確認できます。
 
-`npm run build:pages`で192ページの静的確認版を生成します。`npm run preview:pages`でプロジェクト配下のURLもローカル検証できます。公開版は架空会員の資料を認証情報で復号し、進行をブラウザー内へ保存します。
+`npm run build:pages`で220ページの静的確認版を生成します。`npm run preview:pages`でプロジェクト配下のURLもローカル検証できます。公開版は架空会員の資料を認証情報で復号し、進行をブラウザー内へ保存します。
 
 Cloudflare公開用の入口は`worker/index.ts`、設定は`wrangler.jsonc`。`npm run build:worker`、`npm run typecheck`、`npm run dev:cloudflare`で準備・検証します。プレイヤーごとのDurable Objectsで進行を保存します。yu-zora.comのドメイン設定は変更していません。詳細は[公開先の運用](docs/publishing.md)を参照してください。
 
@@ -78,14 +78,16 @@ Cloudflare公開用の入口は`worker/index.ts`、設定は`wrangler.jsonc`。`
 
 ## ページ番号と攻略設計
 
-`src/experience.mjs`でページ番号・総数・成長段階の表示を一括管理します。現在の登録は189ページ。`showPageIndex`と`showGrowthStage`で表示を切り替えられます。
+`src/experience.mjs`でページ番号・総数・成長段階の表示を一括管理します。現在の登録は217ページ。`showPageIndex`と`showGrowthStage`で表示を切り替えられます。
 
-作者用の[攻略・ヒント設計](docs/hint-plan.md)は27段階。必要情報、根拠ページ、段階別ヒント、解答、次の接続を整理しています。`npm run build:hints`でページ番号を同期します。
+作者用の[攻略・ヒント設計](docs/hint-plan.md)は31段階。必要情報、根拠ページ、段階別ヒント、解答、次の接続を整理しています。`npm run build:hints`でページ番号を同期します。
 
 管理用の[クリティカルな検索語・文書ID・入力一覧](docs/critical-search-words.md)も同時に生成します。根拠となるページと必要権限を記載し、公開アセットには含めません。
 
-SEEDの閲覧・更新が30回に達すると、遷移時の短いノイズ、制作物0021・0024の写真変化、404への赤い誘導が現れます。SEED外のページへ到達すると演出回数だけを解除します。認証・進行・結末の保存とは独立しています。`src/experience.mjs`の`seedDrift`で一括変更できます。演出素材2点は`docs/effect-assets.json`で管理しています。
+SEEDの閲覧・更新が15回に達すると、遷移時の短いノイズ、制作物0021・0024の写真変化、404への赤い誘導が現れます。SEED外のページへ到達すると演出回数だけを解除します。認証・進行・結末の保存とは独立しています。`src/experience.mjs`の`seedDrift`で一括変更できます。演出素材2点は`docs/effect-assets.json`で管理しています。
 
 瀬尾灯・三枝律・朝倉紬と設立者の関係、途絶えた制作記事から救出までの情報順序は[人物の経路](docs/character-thread.md)へ整理しています。
+
+非掲載の募集記事、日次検査、設備変更、群内事案、生存評価を照合する追加経路は[居住実証の経路](docs/residential-thread.md)へ整理しています。通常のお知らせは年・種別で絞り込み、1ページ12件ずつ表示します。
 
 `tests/editorial.test.mjs`はヒントの根拠、時系列、公開期限、番号とLV、保存状態を検証します。`scripts/playtest.cjs`はブラウザー操作で最初の入口から3つの結末まで進みます。

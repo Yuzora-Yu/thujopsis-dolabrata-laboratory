@@ -20,6 +20,29 @@ import {startServers} from '../server.mjs';
 const origins=hostingOrigins('https://asunaro.example');
 const context=role=>({account:Object.values(accounts).find(a=>a.role===role),csrf:'test',caseId:'case',caseState:{contact:false,ending:''},query:new URLSearchParams(),origins});
 
+test('retired recruitment articles are discoverable through records, not public lists or search',()=>{
+ for(const id of ['20160520','20220715']){
+  const n=news.find(n=>n.id===id);assert.ok(n.available&&!n.listed&&!n.searchable);
+  assert.doesNotMatch(renderPublic('/news/'),new RegExp(`/news/${id}/`));assert.ok(!searchEntries.some(e=>e.url===`/news/${id}/`));
+  assert.match(renderPublic(`/news/${id}/`),/外出|外泊/);assert.match(renderPublic(`/news/${id}/`),/無償|負担/);
+ }
+ const consent=documents.find(d=>d.id==='CONS-2016-005');assert.match(consent.sections.flat().join(' '),/RE-2016-002/);
+ assert.match(renderMember('/members/records/RE-2016-002/',context('ordis')),/news\/20160520/);
+ assert.equal(renderMember('/members/records/GR-2022-009/',context('ordis')),null);
+ assert.equal(renderMember('/members/records/QC-2026-015/',context('institution')),null);
+ assert.ok(renderMember('/members/records/QC-2026-015/',context('asakura')));
+ for(const id of ['ENV-2022-031','EV-2022-091','GR-2022-009'])assert.ok(renderMember(`/members/records/${id}/`,context('institution')));
+ assert.match(renderMember('/members/records/GR-2022-009/',context('institution')),/殺傷/);
+ assert.match(renderMember('/members/records/PN-2022-034/',context('asakura')),/夏帆さんの本/);
+});
+
+test('current news has operational detail and later references do not appear in old recruitment copies',()=>{
+ assert.ok(news.filter(n=>n.listed).length>=30);
+ for(const n of news.filter(n=>n.listed)){assert.ok(n.sections?.length>=2,n.id);assert.ok(n.body.length+n.sections.flat().join('').length>180,n.id);}
+ for(const id of ['20160520','20220715'])assert.doesNotMatch(renderPublic(`/news/${id}/`),/EV-2022|GR-2022|QC-2026|PN-2022/);
+ const exposed=documents.find(d=>d.id==='PN-2022-034');assert.doesNotMatch(exposed.sections.flat().join(' '),/2026/);
+});
+
 test('the mother anchors the founding while her daughter qualifies and disappears at 28',()=>{
  const ageAt=(birth,date)=>{const b=new Date(birth),d=new Date(date);return d.getUTCFullYear()-b.getUTCFullYear()-(d.getUTCMonth()<b.getUTCMonth()||d.getUTCMonth()===b.getUTCMonth()&&d.getUTCDate()<b.getUTCDate()?1:0);};
  assert.equal(ageAt(seoFamily.akari.birthDate,'2022-07-08'),28);assert.equal(ageAt(seoFamily.akari.birthDate,'2020-04-01'),26);assert.equal(ageAt(seoFamily.akari.birthDate,seoFamily.akari.workshopStart),27);

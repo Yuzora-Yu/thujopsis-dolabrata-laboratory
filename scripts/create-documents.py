@@ -170,6 +170,8 @@ records['staff_case']={'name':'三枝 律','support_request':'SA-2023-012','publ
 records['founding_origin']='OR-2006-004 / 瀬尾文乃の生活と用具の聞き取り、FUM-2010-002の本人意見を踏まえた設立条件'
 continuity['subject_transfer']={'subject':'P-034 瀬尾灯','condition':'本人の退出希望ではなく、基準判断への一致を受渡し条件とする','source':'AS-2023-008 / P034-2026-102'}
 records['family_inquiry']={'id':'FAM-2022-009','name':'瀬尾 文乃','subject':'娘の瀬尾灯の所在と本人意思の確認','newspaper':'NK-2022-0908','finding':'代理回答に本人の自由意思を確認できる原本がない'}
+records['subjects'].append({'id':'P-031','name':'青井 真','last_measurement':'2026-10-26','location':'B1-B06','source':'PN-2022-034 / OPS-2026-084'})
+records['closed_group']={'recruitment':['RE-2016-002','RE-2022-006'],'promised':'居住費と飲食費無償、簡単な日次検査、館内設備の利用。期間中の外出不可。','difference':'参加者に告知せず検査に伴う投薬と評価機材を導入。対立と退出条件を作り、群内の殺傷に介入せず生存評価へ採用。','victim':{'id':'P-033','name':'吉野 夏帆','date':'2022-09-11','record':'EV-2022-091'},'sources':['OBS-2022-044','ENV-2022-031','EV-2022-091','GR-2022-009','PN-2022-034','QC-2026-015'],'excluded':'助け合いと全員の退出を求めた共同申出は生存評価の集計から除外。'}
 (PRIVATE/'records.json').write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding='utf-8')
 (PRIVATE/'continuity.json').write_text(json.dumps(continuity,ensure_ascii=False,indent=2),encoding='utf-8')
 print('Updated statement PDF and archive sources.' if '--statement-only' in sys.argv else 'Created 3 PDFs, 2 SVG floor plans and private archive sources.')

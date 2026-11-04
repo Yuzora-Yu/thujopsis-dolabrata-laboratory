@@ -75,7 +75,7 @@ test('publication numbers form tight sequences independent of account registrati
  assert.deepEqual(tenants.map(t=>Number(t.page)),Array.from({length:18},(_,i)=>i+1));
  assert.equal(tenants.find(t=>t.page==='0003').id,'0017');
  assert.equal(new Set(gallery.map(g=>g.image)).size,gallery.length);
- assert.ok(news.filter(n=>n.listed).length<=18);
+ assert.equal(new Set(news.map(n=>n.id)).size,news.length);
 });
 
 test('public search tolerates spacing and width, and member links open a separate tab',async()=>{

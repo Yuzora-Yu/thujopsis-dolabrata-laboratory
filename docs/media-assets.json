@@ -475,10 +475,12 @@
     "key": "p-seo-saegusa",
     "year": 2022,
     "path": "docs/source-images/p-seo-saegusa.png",
-    "prompt": "Use case: precise-object-edit. Edit the supplied fictional makerspace interview photograph. Preserve the man's identity, pose and age, workshop, tools, notebook, grip prototypes, camera viewpoint, window lighting and candid composition. On the left, portray Akari Seo as a 28-year-old Japanese woman in July 2022: a young adult occupational therapist with an engineering background, chin-length dark bob, simple thin-frame glasses, navy cotton cardigan over a cream shirt, natural youthful face and ordinary unretouched skin. Keep her absorbed in explaining the one-piece pencil grip in her hands, with a modest warm expression. Her appearance should be credible for someone who graduated engineering in 2016 and qualified as an occupational therapist in 2020. Preserve natural hands, the small FDM plastic grips with visible layers, and the unposed working atmosphere. The photograph was taken with an older compact camera: slight JPEG softness, everyday color, no studio glamour, no beauty-filter finish. One landscape 3:2 photograph. Do not add text, captions or labels.",
+    "prompt": "Use case: precise-object-edit. Asset: fictional makerspace interview photograph for an ARG's ordinary public website. Input image is the edit target. Preserve the man on the right exactly as the same workshop technician, the table, pencil grip prototypes, practical room, daylight, and candid two-person composition. Redesign only the young adult woman on the left as Akari Seo, a memorable, appealing and approachable 28-year-old Japanese woman and occupational therapist with mechanical engineering experience. She has a youthful adult oval face, bright expressive dark eyes, a lively warm smile with a subtle dimple, short dark-brown bob tucked behind one ear, airy natural bangs, and a tiny plain brass hairclip. Her face is uncovered; her thin-rimmed reading glasses are folded beside the notebook. Practical faded indigo work overshirt with sleeves rolled above the wrists over an ivory cotton top. Attentive, capable and spirited while explaining the small one-piece gray pencil grip, natural relaxed working posture, realistic unretouched skin and hands. This is a friendly everyday character viewers will remember and want to know, photographed during an actual conversation. Keep her clearly in her late twenties. Ordinary compact-camera photograph with the technical quality of late-Heisei Japanese community newsletters circa 2016–2018: mild sensor grain, imperfect fluorescent/window white balance, modest contrast and slight JPEG softness, deep focus; not a studio portrait or glossy film still. One landscape 3:2 photograph. Plain unbranded tools and objects, no added writing or captions.",
     "mode": "built-in image_gen",
     "references": [],
-    "asset": "public/assets/media/p-seo-saegusa.webp"
+    "asset": "public/assets/media/p-seo-saegusa.webp",
+    "publicationWidth": 1280,
+    "jpegQuality": 78
   },
   {
     "key": "p-fumino",
@@ -488,5 +490,18 @@
     "mode": "built-in image_gen",
     "references": [],
     "asset": "public/assets/media/p-fumino.webp"
+  },
+  {
+    "key": "p-akari",
+    "year": 2022,
+    "publicationWidth": 1280,
+    "jpegQuality": 78,
+    "path": "docs/source-images/p-akari.png",
+    "asset": "public/assets/media/p-akari.webp",
+    "mode": "built-in image_gen",
+    "references": [
+      "docs/source-images/p-seo-saegusa.png"
+    ],
+    "prompt": "Use case: identity-preserve. Asset: second activity photograph of the same fictional character Akari Seo for her maker profile. Input is a face, hair and clothes reference for the adult woman on the left. Create a different candid photograph from the same makerspace interview day in July 2022. Show only Akari, exactly the same recognizable appealing 28-year-old Japanese adult woman: short dark brown bob, airy bangs, small brass hairclip, warm bright dark eyes and slight dimples, indigo cotton overshirt over an ivory top. She is seated by the workshop window, looking toward an interviewer just outside frame while showing an unfinished small one-piece 3D-printed page-holder prototype and an opened plain cooking book on the table. Her expression is gently amused and thoughtful, capable and easy to like. Natural slight hair flyaways, unretouched skin, natural hands. Medium portrait including both hands and the small objects, original landscape 3:2 framing, a practical ordinary workshop with shelves in the background. Preserve a late-Heisei 2016–2018 compact-camera documentary look: deep focus, imperfect cool fluorescent/daylight white balance, restrained colors, modest JPEG softness and slight sensor noise. Everyday interview photography rather than a polished celebrity portrait. No added lettering, legible book text, brands, captions or watermark."
   }
 ]
