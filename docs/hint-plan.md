@@ -2,7 +2,7 @@
 
 ゲーム内へ配信しない設計資料。段階別ヒントの公開用サイトは、この資料を基に後から構築できる。
 
-ページ番号・総数・成長段階はsrc/experience.mjsから取得する。総数は217。
+ページ番号・総数・成長段階はsrc/experience.mjsから取得する。総数は221。
 
 | 段階 | 到達目標 | 事前に成立すべき段階 | |
 | --- | --- | --- | --- |
@@ -37,6 +37,7 @@
 | 29 | 告発者の個人記録を読む | current | informant |
 | 30 | 告発者の救済像が設立者の思想と一致するかを見極める | informant | prototype |
 | 31 | 施設と研究の移送先を、独立した相手へ伝える | prototype | independent |
+| 32 | 自分の照会経路も継承試験の対象へ取り込まれていると知る | prototype | reader |
 
 ## 1. 保存された募集案内から、退出できた当初の条件を読む
 
@@ -44,9 +45,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/CONS-2016-005/ — SAPLING · 153 / 217／閲覧者 ordis。確認する記載：RE-2016-002。
-- /members/records/RE-2016-002/ — SAPLING · 168 / 217／閲覧者 ordis。確認する記載：/news/20160520/、参加を取り消した人。
-- /news/20160520/ — ROOT · 033 / 217。確認する記載：14泊15日、居住費、施設を出て。
+- /members/records/CONS-2016-005/ — SAPLING · 156 / 221／閲覧者 ordis。確認する記載：RE-2016-002。
+- /members/records/RE-2016-002/ — SAPLING · 171 / 221／閲覧者 ordis。確認する記載：/news/20160520/、参加を取り消した方。
+- /news/20160520/ — ROOT · 035 / 221。確認する記載：14泊15日、居住費、施設を出て。
 
 段階別ヒント案：
 
@@ -64,9 +65,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/RE-2022-006/ — BRANCH · 169 / 217／閲覧者 institution。確認する記載：/news/20220715/、OBS-2022-044。
-- /news/20220715/ — ROOT · 042 / 217。確認する記載：家賃、無償、日次検査。
-- /members/records/OBS-2022-044/ — SAPLING · 170 / 217／閲覧者 ordis。確認する記載：本人の同意原本なし、ENV-2022-031。
+- /members/records/RE-2022-006/ — BRANCH · 172 / 221／閲覧者 institution。確認する記載：/news/20220715/、OBS-2022-044。
+- /news/20220715/ — ROOT · 044 / 221。確認する記載：家賃、無償、日次検査。
+- /members/records/OBS-2022-044/ — SAPLING · 173 / 221／閲覧者 ordis。確認する記載：本人同意原本は受領できず、ENV-2022-031。
 
 段階別ヒント案：
 
@@ -84,9 +85,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/ENV-2022-031/ — CANOPY · 171 / 217／閲覧者 institution。確認する記載：退出が近づく、EV-2022-091。
-- /members/records/EV-2022-091/ — CANOPY · 172 / 217／閲覧者 institution。確認する記載：吉野夏帆、介入、GR-2022-009。
-- /members/records/GR-2022-009/ — CANOPY · 173 / 217／閲覧者 institution。確認する記載：殺傷、生存、集計から除いた。
+- /members/records/ENV-2022-031/ — CANOPY · 174 / 221／閲覧者 institution。確認する記載：あなたの退出審査、EV-2022-091。
+- /members/records/EV-2022-091/ — CANOPY · 175 / 221／閲覧者 institution。確認する記載：吉野夏帆、介入、GR-2022-009。
+- /members/records/GR-2022-009/ — CANOPY · 176 / 221／閲覧者 institution。確認する記載：自発的淘汰、存続、欠測扱い。
 
 段階別ヒント案：
 
@@ -104,8 +105,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/PN-2022-034/ — CANOPY · 174 / 217／閲覧者 institution。確認する記載：青井真、夏帆さんの本、誰かを残して。
-- /members/records/QC-2026-015/ — HEARTWOOD · 175 / 217／閲覧者 asakura。確認する記載：助け合おうとした、EA-2026-009。
+- /members/records/PN-2022-034/ — CANOPY · 177 / 221／閲覧者 institution。確認する記載：青井真、夏帆さんの本、私はそこを見てしまった。
+- /members/records/QC-2026-015/ — HEARTWOOD · 178 / 221／閲覧者 asakura。確認する記載：共同申出、EA-2026-009。
 
 段階別ヒント案：
 
@@ -123,8 +124,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /people/seo-akari/ — SEED · 022 / 217。確認する記載：1994年、夜間3年制、2021年4月。
-- /people/seo-fumino/ — SEED · 023 / 217。確認する記載：図書館、2006年、娘の灯。
+- /people/seo-akari/ — SEED · 022 / 221。確認する記載：1994年、夜間3年制、2021年4月。
+- /people/seo-fumino/ — SEED · 023 / 221。確認する記載：図書館、2006年、灯は。
 
 段階別ヒント案：
 
@@ -142,7 +143,7 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/FAB-2022-071/ — SPROUT · 160 / 217／閲覧者 minamo。確認する記載：NK-2022-0908、対外報道の切抜。
+- /members/records/FAB-2022-071/ — SPROUT · 163 / 221／閲覧者 minamo。確認する記載：NK-2022-0908、対外報道の切抜。
 - /assets/archive/younagi-20220908.pdf。確認する記載：瀬尾灯さん、28、文乃。
 
 段階別ヒント案：
@@ -161,15 +162,15 @@
 
 根拠と、その時点で読めるページ：
 
-- /gallery/0021/ — SEED · 104 / 217。確認する記載：瀬尾灯、道具づくりの話。
-- /workshop/stories/seo-akari/ — SEED · 021 / 217。確認する記載：来月、母、三枝。
-- /people/seo-akari/ — SEED · 022 / 217。確認する記載：FAB-2022-071、2022年8月。
+- /gallery/0021/ — SEED · 106 / 221。確認する記載：瀬尾灯、道具づくりの話。
+- /workshop/stories/seo-akari/ — SEED · 021 / 221。確認する記載：来月、母、三枝。
+- /people/seo-akari/ — SEED · 022 / 221。確認する記載：一般制作活動、2022年8月。
 
 段階別ヒント案：
 
 1. 制作物には、作った人の話が掲載されていることもある。
 2. インタビューの次回予定と、プロフィールの最終更新を比べる。
-3. 瀬尾灯の読書具は公開されていない。プロフィールの試作受付番号を控える。
+3. 瀬尾灯の読書具は公開されていない。公開上の活動終了を確かめ、会員側の共同試作の連絡と比較する。
 
 作者用の解答・解釈：自助具製作者の瀬尾灯が、2022年7月に翌月の新作を約束したまま活動終了となっている。まだ地下の対象者番号は分からない。
 
@@ -181,8 +182,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/projects/fabrication/ — SPROUT · 126 / 217／閲覧者 minamo。確認する記載：焼き芋、瀬尾、FAB-2022-071。
-- /members/records/FAB-2022-071/ — SPROUT · 160 / 217／閲覧者 minamo。確認する記載：同じ氏名、YH-2022-034。
+- /members/projects/fabrication/ — SPROUT · 129 / 221／閲覧者 minamo。確認する記載：焼き芋、瀬尾、FAB-2022-071。
+- /members/records/FAB-2022-071/ — SPROUT · 163 / 221／閲覧者 minamo。確認する記載：同じ名前、YH-2022-034。
 
 段階別ヒント案：
 
@@ -200,7 +201,7 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/YH-2022-034/ — SAPLING · 161 / 217／閲覧者 ordis。確認する記載：瀬尾、短期、2022年8月19日、B-07。
+- /members/records/YH-2022-034/ — SAPLING · 164 / 221／閲覧者 ordis。確認する記載：瀬尾、短期、2022年8月19日、B-07。
 
 段階別ヒント案：
 
@@ -218,9 +219,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/RG-2007-011/ — CANOPY · 146 / 217／閲覧者 institution。確認する記載：OR-2006-004、瀬尾。
-- /members/records/OR-2006-004/ — CANOPY · 162 / 217／閲覧者 institution。確認する記載：瀬尾文乃、再開案は凍結。
-- /members/records/SA-2023-012/ — CANOPY · 165 / 217／閲覧者 institution。確認する記載：三枝、死亡、倉橋。
+- /members/records/RG-2007-011/ — CANOPY · 149 / 221／閲覧者 institution。確認する記載：OR-2006-004、瀬尾。
+- /members/records/OR-2006-004/ — CANOPY · 165 / 221／閲覧者 institution。確認する記載：瀬尾文乃、再開案に同意しない。
+- /members/records/SA-2023-012/ — CANOPY · 168 / 221／閲覧者 institution。確認する記載：三枝、死亡、倉橋。
 
 段階別ヒント案：
 
@@ -238,8 +239,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/AS-2023-008/ — HEARTWOOD · 167 / 217／閲覧者 asakura。確認する記載：律、灯さんが決められるように、採用しない。
-- /members/records/P034-2026-102/ — CANOPY · 166 / 217／閲覧者 asakura。確認する記載：いま帰りたい、あなたを嫌いになったからではありません。
+- /members/records/AS-2023-008/ — HEARTWOOD · 170 / 221／閲覧者 asakura。確認する記載：律、灯さんが決められるように、誰が決めてもいい形。
+- /members/records/P034-2026-102/ — CANOPY · 169 / 221／閲覧者 asakura。確認する記載：いま帰りたい、この紙も最後まで読んでほしい。
 
 段階別ヒント案：
 
@@ -257,9 +258,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /news/20120401/ — SEED · 031 / 217。確認する記載：施設名に込めた願い、ロゴに込めた想い。
-- /about/identity/ — SEED · 025 / 217。確認する記載：アスナロは、アスナロとして育つ。
-- /about/emblem/ — SEED · 026 / 217。確認する記載：同じ葉を複製したものではありません。
+- /news/20120401/ — SEED · 033 / 221。確認する記載：施設名に込めた願い、ロゴに込めた想い。
+- /about/identity/ — SEED · 027 / 221。確認する記載：アスナロは、アスナロとして育つ。
+- /about/emblem/ — SEED · 028 / 221。確認する記載：同じ葉を複製したものではありません。
 
 段階別ヒント案：
 
@@ -277,9 +278,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /visit/ — SEED · 015 / 217。確認する記載：アクセス。
+- /visit/ — SEED · 015 / 221。確認する記載：アクセス。
 - /guide/access/。確認する記載：入居者紹介。
-- /gallery/0005/ — SEED · 088 / 217。確認する記載：入居者紹介。
+- /gallery/0005/ — SEED · 090 / 221。確認する記載：入居者紹介。
 
 段階別ヒント案：
 
@@ -297,8 +298,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /tenants/ — SEED · 028 / 217。確認する記載：No. 0002、No. 0004。
-- /tenants/0003/ — ROOT · 068 / 217。確認する記載：登録番号、2008年5月19日、2012年4月1日。
+- /tenants/ — SEED · 030 / 221。確認する記載：No. 0002、No. 0004。
+- /tenants/0003/ — ROOT · 070 / 221。確認する記載：登録番号、2008年5月19日、2012年4月1日。
 
 段階別ヒント案：
 
@@ -316,7 +317,7 @@
 
 根拠と、その時点で読めるページ：
 
-- /tenants/0003/ — ROOT · 068 / 217。確認する記載：minamo-desk.webp。
+- /tenants/0003/ — ROOT · 070 / 221。確認する記載：minamo-desk.webp。
 
 段階別ヒント案：
 
@@ -336,8 +337,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/messages/ — SPROUT · 118 / 217／閲覧者 minamo。確認する記載：YH-2013-014、YH-2016-032。
-- /members/records/YH-2018-041/ — SPROUT · 132 / 217／閲覧者 minamo。確認する記載：12名、YH-2018-041-A。
+- /members/messages/ — SPROUT · 121 / 221／閲覧者 minamo。確認する記載：YH-2013-014、YH-2016-032。
+- /members/records/YH-2018-041/ — SPROUT · 135 / 221／閲覧者 minamo。確認する記載：12名、YH-2018-041-A。
 
 段階別ヒント案：
 
@@ -355,9 +356,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /news/20250509/ — SEED · 054 / 217。確認する記載：2013年、流れ。
-- /members/projects/circulation/ — SPROUT · 127 / 217／閲覧者 minamo。確認する記載：赤い水、着色。
-- /members/records/FLOW-2013-007/ — SPROUT · 152 / 217／閲覧者 minamo。確認する記載：着色、人を対象とする評価は本納入の範囲に含めない。
+- /news/20250509/ — SEED · 056 / 221。確認する記載：2013年、流れ。
+- /members/projects/circulation/ — SPROUT · 130 / 221／閲覧者 minamo。確認する記載：赤い水、着色。
+- /members/records/FLOW-2013-007/ — SPROUT · 155 / 221／閲覧者 minamo。確認する記載：着色、人を対象とする試験は本納入の範囲に含まない。
 
 段階別ヒント案：
 
@@ -375,8 +376,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /tenants/0013/ — ROOT · 078 / 217。確認する記載：0046、2018年4月1日、2015年11月12日。
-- /members/records/YH-2018-041-A/ — SAPLING · 133 / 217／閲覧者 ordis。確認する記載：P-026、2019年4月11日。
+- /tenants/0013/ — ROOT · 080 / 221。確認する記載：0046、2018年4月1日、2015年11月12日。
+- /members/records/YH-2018-041-A/ — SAPLING · 136 / 221／閲覧者 ordis。確認する記載：P-026、2019年4月11日。
 
 段階別ヒント案：
 
@@ -394,8 +395,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/CONS-2016-005/ — SAPLING · 153 / 217／閲覧者 ordis。確認する記載：本人の申し出、退出を制限する観察。
-- /people/inaba-mio/ — SEED · 030 / 217。確認する記載：2019年3月、ひとつの正解だけに揃えない。
+- /members/records/CONS-2016-005/ — SAPLING · 156 / 221／閲覧者 ordis。確認する記載：本人の申出、退出を妨げる観察。
+- /people/inaba-mio/ — SEED · 032 / 221。確認する記載：2019年3月、ひとつの正解だけに揃えない。
 
 段階別ヒント案：
 
@@ -413,9 +414,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/MX-2019-410/ — SAPLING · 154 / 217／閲覧者 ordis。確認する記載：2012年4月16日、A4-01。
-- /news/20120416/ — ROOT · 032 / 217。確認する記載：floor-4f-2012.svg、asunaro-4f-2012.pdf。
-- /floor-map/ — SEED · 012 / 217。確認する記載：floor-4f.svg。
+- /members/records/MX-2019-410/ — SAPLING · 157 / 221／閲覧者 ordis。確認する記載：2012年4月16日、A4-01。
+- /news/20120416/ — ROOT · 034 / 221。確認する記載：floor-4f-2012.svg、asunaro-4f-2012.pdf。
+- /floor-map/ — SEED · 012 / 221。確認する記載：floor-4f.svg。
 
 段階別ヒント案：
 
@@ -433,8 +434,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /news/20230616/ — SEED · 046 / 217。確認する記載：東側、個室オフィスの区画変更はございません。
-- /members/records/PUB-2023-014/ — CANOPY · 155 / 217／閲覧者 institution。確認する記載：2019年、西側の個室群は本作業に含まない。
+- /news/20230616/ — SEED · 048 / 221。確認する記載：東側、個室オフィスの区画変更はございません。
+- /members/records/PUB-2023-014/ — CANOPY · 158 / 221／閲覧者 institution。確認する記載：2019年、西側の個室群は工事対象に含まない。
 
 段階別ヒント案：
 
@@ -452,9 +453,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/FAB-2020-026/ — SAPLING · 135 / 217／閲覧者 ordis。確認する記載：0038、AH-2017-009。
-- /tenants/0010/ — ROOT · 075 / 217。確認する記載：2017年4月1日、2016年12月4日。
-- /members/records/AH-2017-009/ — BRANCH · 144 / 217／閲覧者 ashita。確認する記載：H17-0038、W416-12。
+- /members/records/FAB-2020-026/ — SAPLING · 138 / 221／閲覧者 ordis。確認する記載：0038、AH-2017-009。
+- /tenants/0010/ — ROOT · 077 / 221。確認する記載：2017年4月1日、2016年12月4日。
+- /members/records/AH-2017-009/ — BRANCH · 147 / 221／閲覧者 ashita。確認する記載：H17-0038、W416-12。
 
 段階別ヒント案：
 
@@ -472,9 +473,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/AH-2017-009/ — BRANCH · 144 / 217／閲覧者 ashita。確認する記載：旧基盤・資料照会室。
-- /snapshots/2011/ — SPROUT · 180 / 217。確認する記載：旧事業の承継を行わず。
-- /collections/items/0004/ — SPROUT · 185 / 217。確認する記載：辞退、RG-2007-011。
+- /members/records/AH-2017-009/ — BRANCH · 147 / 221／閲覧者 ashita。確認する記載：旧基盤・資料照会室。
+- /snapshots/2011/ — SPROUT · 184 / 221。確認する記載：旧事業の承継を行わず。
+- /collections/items/0004/ — SPROUT · 189 / 221。確認する記載：辞退、RG-2007-011。
 
 段階別ヒント案：
 
@@ -492,9 +493,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /room/records/0005/ — BRANCH · 203 / 217／閲覧者 ticket。確認する記載：0006。
-- /room/records/0006/ — BRANCH · 204 / 217／閲覧者 ticket。確認する記載：0000、2012年4月1日、2010年6月15日。
-- /members/records/RM-2020-019/ — CANOPY · 136 / 217／閲覧者 institution。確認する記載：通信先、健康管理。
+- /room/records/0005/ — BRANCH · 207 / 221／閲覧者 ticket。確認する記載：0006。
+- /room/records/0006/ — BRANCH · 208 / 221／閲覧者 ticket。確認する記載：0000、2012年4月1日、2010年6月15日。
+- /members/records/RM-2020-019/ — CANOPY · 139 / 221／閲覧者 institution。確認する記載：外部への回答、健康管理。
 
 段階別ヒント案：
 
@@ -512,8 +513,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/RG-2007-011/ — CANOPY · 146 / 217／閲覧者 institution。確認する記載：同意しない。
-- /members/records/YH-2022-017/ — CANOPY · 148 / 217／閲覧者 institution。確認する記載：旧継舟、旧設立条件。
+- /members/records/RG-2007-011/ — CANOPY · 149 / 221／閲覧者 institution。確認する記載：同意しません。
+- /members/records/YH-2022-017/ — CANOPY · 151 / 221／閲覧者 institution。確認する記載：継舟、設立経緯。
 
 段階別ヒント案：
 
@@ -531,10 +532,10 @@
 
 根拠と、その時点で読めるページ：
 
-- /news/20211103/ — SEED · 034 / 217。確認する記載：病気。
-- /collections/items/0009/ — SPROUT · 190 / 217。確認する記載：服毒による自殺か。
-- /members/records/HC-2021-031-R/ — CANOPY · 150 / 217／閲覧者 institution。確認する記載：管理係、複写。
-- /members/records/CH-2021-003/ — CANOPY · 137 / 217／閲覧者 institution。確認する記載：署名、外部との通信。
+- /news/20211103/ — SEED · 036 / 221。確認する記載：病気。
+- /collections/items/0009/ — SPROUT · 194 / 221。確認する記載：服毒による自殺か。
+- /members/records/HC-2021-031-R/ — CANOPY · 153 / 221／閲覧者 institution。確認する記載：管理係、複写。
+- /members/records/CH-2021-003/ — CANOPY · 140 / 221／閲覧者 institution。確認する記載：署名、外部へ送れない。
 
 段階別ヒント案：
 
@@ -552,8 +553,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/OPS-2026-084/ — CANOPY · 139 / 217／閲覧者 institution。確認する記載：P-026、FAB-2026-018。
-- /members/records/FAB-2026-018/ — CANOPY · 140 / 217／閲覧者 institution。確認する記載：原本確認、記録についての照会。
+- /members/records/OPS-2026-084/ — CANOPY · 142 / 221／閲覧者 institution。確認する記載：P-026、FAB-2026-018。
+- /members/records/FAB-2026-018/ — CANOPY · 143 / 221／閲覧者 institution。確認する記載：原本照会、記録についての照会。
 
 段階別ヒント案：
 
@@ -571,8 +572,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/messages/ — CANOPY · 118 / 217／閲覧者 institution／原本照会後。確認する記載：保全資料_20261102.zip、資料保全・匿名通報受付。
-- /members/contact/ — CANOPY · 121 / 217／閲覧者 institution。確認する記載：添付資料。
+- /members/messages/ — CANOPY · 121 / 221／閲覧者 institution／原本照会後。確認する記載：保全資料_20261102.zip、資料保全・匿名通報受付。
+- /members/contact/ — CANOPY · 124 / 221／閲覧者 institution。確認する記載：添付資料。
 
 段階別ヒント案：
 
@@ -591,7 +592,7 @@
 根拠と、その時点で読めるページ：
 
 - 告発書.pdf。確認する記載：朝倉 紬、20120901P0083。
-- /people/asakura-tsumugi/ — SEED · 029 / 217。確認する記載：1993年6月18日。
+- /people/asakura-tsumugi/ — SEED · 031 / 221。確認する記載：1993年6月18日。
 
 段階別ヒント案：
 
@@ -609,9 +610,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/AS-2024-002/ — HEARTWOOD · 141 / 217／閲覧者 asakura。確認する記載：原型から除外、私は全員を乗せる。
-- /members/records/AS-2026-021/ — HEARTWOOD · 159 / 217／閲覧者 asakura。確認する記載：続く留保、採用しない。
-- /members/records/TR-2026-011/ — HEARTWOOD · 142 / 217／閲覧者 asakura。確認する記載：榎本航、EA-2026-009。
+- /members/records/AS-2024-002/ — HEARTWOOD · 144 / 221／閲覧者 asakura。確認する記載：病気の時の言葉、私は選ばない。
+- /members/records/AS-2026-021/ — HEARTWOOD · 162 / 221／閲覧者 asakura。確認する記載：その理由を聞ける場所、除外。
+- /members/records/TR-2026-011/ — HEARTWOOD · 145 / 221／閲覧者 asakura。確認する記載：榎本航、EA-2026-009。
 
 段階別ヒント案：
 
@@ -629,8 +630,8 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/EA-2026-009/ — HEARTWOOD · 143 / 217／閲覧者 asakura。確認する記載：東都研究監査室。
-- /members/personal/ — HEARTWOOD · 124 / 217／閲覧者 asakura。確認する記載：原本および移送関係資料一式。
+- /members/records/EA-2026-009/ — HEARTWOOD · 146 / 221／閲覧者 asakura。確認する記載：東都研究監査室。
+- /members/records/TR-2026-011/ — HEARTWOOD · 145 / 221／閲覧者 asakura。確認する記載：complete.zip、原本および移送関係資料.zip。
 
 段階別ヒント案：
 
@@ -641,6 +642,24 @@
 作者用の解答・解釈：End3。瀬尾灯は本人の希望で施設を離れ、母の料理帳と型紙を受け取る。研究の外部継承と三枝律の死亡経緯も調査される。
 
 次に接続する段階：結末へ
+
+## 32. 自分の照会経路も継承試験の対象へ取り込まれていると知る
+
+前提：prototype。
+
+根拠と、その時点で読めるページ：
+
+- /members/records/AS-2026-019/ — HEARTWOOD · 179 / 221／閲覧者 asakura。確認する記載：同じ照会端末、最初の状態、照会の終了：保留。
+
+段階別ヒント案：
+
+1. 受領協力者は申出者本人とは別に記録されている。
+2. 私的な研究ノートと受渡しの送信控えに、経路確認の番号が残る。
+3. AS-2026-019には、自分が開いた順序が名義をまたいで表示される。資料の提出だけで照合が終わるのかを読む。
+
+作者用の解答・解釈：朝倉は外部の調査者も基準回答へ揃える対象とする。役に立つ閲覧履歴が、観察資料へ転用されていた。実際のIP・個人情報の取得は行わない。
+
+次に接続する段階：independent
 
 ## 更新時の点検
 

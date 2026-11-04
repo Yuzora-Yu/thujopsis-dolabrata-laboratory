@@ -1,5 +1,6 @@
 import {writeFile} from 'node:fs/promises';
 import {documents} from '../src/content.mjs';
+import {recordText} from '../src/world/records.mjs';
 import {publicPaths,renderPublic} from '../src/render.mjs';
 import {archiveItems,archiveNotes} from '../src/world/archive-data.mjs';
 import {projects} from '../src/world/projects.mjs';
@@ -12,7 +13,7 @@ const lines=['# クリティカルな検索語・入力一覧（作者用）',''
 for(const d of documents){
  const sources=[];
  for(const p of publicText)if(contains(p.text,d.id))sources.push(p.path);
- for(const other of documents)if(other.id!==d.id&&contains(other.sections.flat().join(' '),d.id))sources.push(other.id);
+ for(const other of documents)if(other.id!==d.id&&contains(recordText(other),d.id))sources.push(other.id);
  for(const p of projects)if(contains(p.posts.flat().join(' '),d.id))sources.push('/members/projects/'+p.slug+'/');
  for(const item of archiveItems)if(contains(item.text+' '+item.next,d.id))sources.push('/collections/items/'+item.id+'/');
  for(const note of archiveNotes)if(contains(note.body,d.id))sources.push('/room/records/'+note.id+'/');

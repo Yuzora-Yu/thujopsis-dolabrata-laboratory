@@ -15,7 +15,7 @@ if(base&&!/^\/[a-zA-Z0-9_-]+$/.test(base))throw new Error('Invalid Pages base pa
 const out=path.resolve('dist/pages'),origins=hostingOrigins(base||''),stageValues={initial:{contact:false,ending:''},contact:{contact:true,ending:''},end1:{contact:true,ending:'end1'},end2:{contact:true,ending:'end2'},end3:{contact:true,ending:'end3'}};
 await mkdir(path.join(out,'assets/portal'),{recursive:true});
 await cp('public/assets',path.join(out,'assets'),{recursive:true});
-for(const name of ['styles.css','app.js','seed-drift.js'])await cp('public/'+name,path.join(out,name));
+for(const name of ['styles.css','app.js','seed-drift.js','member-reading.js','reading-state.js'])await cp('public/'+name,path.join(out,name));
 await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));await cp('scripts/static-runtime.js',path.join(out,'static-runtime.js'));
 function hosted(html,kind='main'){
  const result=rewriteHostedHtml(html,{kind,origins,basePath:base});
@@ -37,8 +37,8 @@ await page('/search/',renderPublic('/search/',{origins}));
 await writeFile(path.join(out,'404.html'),hosted(notFound()));generated.push('404.html');
 await writeFile(path.join(out,'.nojekyll'),'');
 const ctxBase={csrf:'@@CSRF@@',caseId:'@@CASE@@',query:new URLSearchParams(),origins,caseState:{contact:false,ending:'',truth:false}};
-const portalPaths=['/members/','/members/login/','/members/records/','/members/messages/','/members/projects/','/members/organization/','/members/reservations/','/members/inquiry/','/members/contact/','/members/contact/received/','/members/personal/',...documents.map(d=>`/members/records/${d.id}/`),...projects.map(p=>`/members/projects/${p.slug}/`)];
-for(const route of portalPaths)await page(route,loginPage('@@CSRF@@',{next:route}));
+const portalPaths=['/members/','/members/login/','/members/records/','/members/activity/','/members/messages/','/members/projects/','/members/organization/','/members/reservations/','/members/inquiry/','/members/contact/','/members/contact/received/','/members/personal/',...documents.map(d=>`/members/records/${d.id}/`),...projects.map(p=>`/members/projects/${p.slug}/`)];
+for(const route of portalPaths)await page(route,route==='/members/login/'?loginPage('@@CSRF@@',{next:route}):memberLayout('会員サイト','<section class="portal-loading" role="status"><p>ページを読み込んでいます。</p></section>'));
 for(const route of archivePublicPaths)await page(route,renderLegacy(route,{...ctxBase,session:{}}),'archive');
 await page('/room/',legacyLogin('@@CSRF@@'),'archive');
 for(const n of archiveNotes)await page(`/room/records/${n.id}/`,legacyLogin('@@CSRF@@'),'archive');
@@ -69,7 +69,7 @@ for(const [id,account] of Object.entries(accounts)){
  const stages={};
  for(const [key,value]of Object.entries(stageValues)){
   stages[key]={};const ctx={...baseContext,caseState:{...value,truth:account.role==='asakura'}};
-  for(const route of ['/members/','/members/messages/','/members/reservations/','/members/contact/received/'])stages[key][route]=hosted(renderMember(route,ctx));
+  for(const route of ['/members/','/members/messages/','/members/activity/','/members/reservations/','/members/contact/received/'])stages[key][route]=hosted(renderMember(route,ctx));
  }
  const downloads={};
  if(account.role==='institution')downloads['hozen.zip']={name:'保全資料_20261102.zip',type:'application/zip',data:baseZip};

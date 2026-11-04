@@ -10,6 +10,7 @@ import {newsIsAvailable,newsIsListed} from '../src/world/editorial.mjs';
 import {pageRegistry,pagePosition,experienceSettings,growthStages} from '../src/experience.mjs';
 import {hintPlan} from '../docs/hint-plan.mjs';
 import {seoFamily} from '../src/world/people.mjs';
+import {recordText} from '../src/world/records.mjs';
 import {siteQueries,catalogQueries} from '../docs/critical-queries.mjs';
 import {archiveItems,archiveNotes} from '../src/world/archive-data.mjs';
 import {normalizeSearch,matchesSearch} from '../src/search.mjs';
@@ -26,13 +27,13 @@ test('retired recruitment articles are discoverable through records, not public 
   assert.doesNotMatch(renderPublic('/news/'),new RegExp(`/news/${id}/`));assert.ok(!searchEntries.some(e=>e.url===`/news/${id}/`));
   assert.match(renderPublic(`/news/${id}/`),/外出|外泊/);assert.match(renderPublic(`/news/${id}/`),/無償|負担/);
  }
- const consent=documents.find(d=>d.id==='CONS-2016-005');assert.match(consent.sections.flat().join(' '),/RE-2016-002/);
+ const consent=documents.find(d=>d.id==='CONS-2016-005');assert.match(recordText(consent),/RE-2016-002/);
  assert.match(renderMember('/members/records/RE-2016-002/',context('ordis')),/news\/20160520/);
  assert.equal(renderMember('/members/records/GR-2022-009/',context('ordis')),null);
  assert.equal(renderMember('/members/records/QC-2026-015/',context('institution')),null);
  assert.ok(renderMember('/members/records/QC-2026-015/',context('asakura')));
  for(const id of ['ENV-2022-031','EV-2022-091','GR-2022-009'])assert.ok(renderMember(`/members/records/${id}/`,context('institution')));
- assert.match(renderMember('/members/records/GR-2022-009/',context('institution')),/殺傷/);
+ assert.match(renderMember('/members/records/GR-2022-009/',context('institution')),/自発的淘汰/);
  assert.match(renderMember('/members/records/PN-2022-034/',context('asakura')),/夏帆さんの本/);
 });
 
@@ -49,7 +50,7 @@ test('the mother anchors the founding while her daughter qualifies and disappear
  assert.equal(ageAt(seoFamily.fumino.birthDate,seoFamily.fumino.founderMeeting),43);
  assert.match(renderPublic('/people/seo-akari/'),/1994年生まれ/);assert.match(renderPublic('/people/seo-akari/'),/夜間3年制/);assert.match(renderPublic('/people/seo-fumino/'),/図書館/);
  const original=documents.find(d=>d.id==='OR-2006-004').sections.map(s=>s[1]).join(' ');assert.match(original,/瀬尾文乃/);assert.doesNotMatch(original,/瀬尾灯氏/);
- assert.ok(documents.find(d=>d.id==='CO-2010-001').sections.some(s=>s[1].includes('FUM-2010-002')));
+ assert.match(recordText(documents.find(d=>d.id==='CO-2010-001'))+' '+documents.find(d=>d.id==='CO-2010-001').signoff,/FUM-2010-002/);
 });
 
 test('public facility routes do not announce the old archive and the first clipping is a direct PDF',()=>{
@@ -108,7 +109,7 @@ test('page numbering and growth stages share a registry and sit beside the copyr
 test('document references to later records have a sufficiently late update date',()=>{
  const numeric=date=>{const m=date.match(/(\d{4})年(\d+)月(\d+)日/);assert.ok(m,date);return Number(m[1]+m[2].padStart(2,'0')+m[3].padStart(2,'0'));};
  for(const d of documents){const latest=numeric(d.updated||d.date);assert.ok(latest>=numeric(d.date),d.id);
-  const text=d.sections.map(s=>s.join(' ')).join(' ');
+  const text=recordText(d);
   for(const related of documents)if(related.id!==d.id&&text.includes(related.id))assert.ok(latest>=numeric(related.date),d.id+' references '+related.id+' before creation');
  }
 });
@@ -161,4 +162,17 @@ test('authentication expiry does not erase the case or its ending after restart'
   assert.match(await (await fetch('http://127.0.0.1:4717/',{headers:{cookie}})).text(),/施設の利用休止/);
   assert.equal((await fetch('http://127.0.0.1:4717/members/',{headers:{cookie},redirect:'manual'})).status,303);
  }finally{await app.close();await unlink(stateFile).catch(e=>{if(e.code!=='ENOENT')throw e;});}
+});
+
+test('original sections and dated attachments do not know later documents',()=>{
+ const value=text=>{const m=text?.match(/(\d{4})年(\d+)月(\d+)日/);return m?Number(m[1]+m[2].padStart(2,'0')+m[3].padStart(2,'0')):null;};
+ const check=(d,text,date)=>{for(const other of documents)if(other.id!==d.id&&new RegExp(other.id+'(?![A-Z0-9-])').test(text))assert.ok(date>=value(other.date),d.id+' original at '+date+' cites '+other.id+' created '+other.date);};
+ for(const d of documents){
+  const created=value(d.date);check(d,(d.sections||[]).flat().join(' '),created);
+  check(d,d.signoff||'',created);
+  let entryDate=created;for(const entry of d.entries||[]){entryDate=/後日転記/.test(entry.at)?created:value(entry.at)||entryDate;check(d,entry.text,entryDate);}
+  for(const note of d.addenda||[])check(d,note.sections.flat().join(' '),value(note.date));
+  for(const table of d.tables||[])check(d,[...table.head,...table.rows.flat()].join(' '),value(table.date)||created);
+ }
+ for(const g of gallery.filter(g=>g.record)){const doc=documents.find(d=>d.id===g.record);assert.ok(doc,g.id);assert.ok(Number((g.recordUpdated||g.date).replaceAll('.',''))>=value(doc.date),'gallery '+g.id+' has a future record');}
 });

@@ -50,4 +50,4 @@
 
 ## 瀬尾灯の人物写真
 
-取材の二人写真p-seo-saegusa.pngを再描画し、同じ人物の別カットp-akari.pngを生成。28歳の作業療法士・設計者として、自然な表情、短い髪と小さなヘアピン、実用的な作業着を統一した。両写真とも1280px・JPEG品質78を経てWebP化。内蔵画像生成を使用し、採用原本はdocs/source-images/、最終画像はpublic/assets/media/、プロンプトはdocs/media-assets.jsonへ保存。
+作業写真p-akari-work.pngと正面の人物写真p-akari-portrait.pngを使用。作業写真は一人が机上のグリップを確かめる場面、人物写真はカメラへ目線を合わせた胸上の構図とした。背景は明るい壁で受け、人物の周囲に広い余白を設ける。28歳の同一人物として淡い青のシャツと低い位置で結んだ髪を共有。両写真とも1280px・JPEG品質78を経てWebP化。内蔵画像生成を使用し、採用原本はdocs/source-images/、最終画像はpublic/assets/media/、正確なプロンプトと参照関係はdocs/media-assets.jsonへ保存。

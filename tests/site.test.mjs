@@ -42,7 +42,7 @@ test('document visibility is enforced by account, including direct document URLs
  assert.equal((await c.get('/members/records/RM-2020-019/')).response.status,404);
  assert.equal((await c.login('201204010000','20100615')).status,303);
  assert.match((await c.get('/members/records/?document_id=RM-2020-019')).text,/検索結果　1件/);
- assert.match((await c.get('/members/records/CH-2021-003/')).text,/私と同じ答え/);
+ assert.match((await c.get('/members/records/CH-2021-003/')).text,/ここで私の事業を止めてもいい/);
  assert.equal((await c.get('/members/records/AS-2024-002/')).response.status,404);
  assert.equal((await c.get('/members/download/records.json')).response.status,404);
 });
@@ -64,7 +64,7 @@ test('submission to facility office identifies the informant',async()=>{
 });
 test('name search, personal account and independent submission reveal and stop succession',async()=>{
  const c=client();const {caseId}=await evidence(c);assert.match((await c.get('/search/?q='+encodeURIComponent('朝倉 紬'))).text,/asakura-tsumugi/);assert.match((await c.get('/people/asakura-tsumugi/')).text,/1993年6月18日/);
- await c.login('20120901P0083','19930618');assert.match((await c.get('/members/personal/')).text,/原型継承試験/);assert.match((await c.get('/members/records/AS-2024-002/')).text,/原型から除外/);
+ await c.login('20120901P0083','19930618');assert.match((await c.get('/members/personal/')).text,/原型継承試験/);assert.match((await c.get('/members/records/AS-2024-002/')).text,/病気の時の言葉/);
  const doc=(await c.get('/members/records/EA-2026-009/')).text;assert.match(doc,/東都研究監査室/);assert.match(doc,/4319/);
  const r=await c.binary('/members/download/complete.zip');const zip=Buffer.from(await r.arrayBuffer());assert.ok(zip.includes(Buffer.from('継承計画.json')));assert.equal((await submitAgency('audit',caseId,zip)).status,303);assert.match((await c.get('/news/closure/')).text,/外部への資料移管/);
 });
@@ -106,8 +106,8 @@ test('archive traversal reveals handover evidence only after ticket authenticati
  assert.match(await (await fetch(archive+'/room/records/0006/',{headers:{cookie}})).text(),/台帳番号は0000/);
  const catalog=await (await fetch(archive+'/collections/')).text();assert.doesNotMatch(catalog,/href="\/collections\/items\/0009\//);
  assert.match(await (await fetch(archive+'/collections/items/0009/')).text(),/服毒による自殺か/);
- await c.login('201204010000','20100615');assert.match((await c.get('/members/records/RG-2007-011/')).text,/承継した事業としての設立には同意しない/);
- assert.match((await c.get('/members/records/HC-2021-031-R/')).text,/自発的な服用という説明/);
+ await c.login('201204010000','20100615');assert.match((await c.get('/members/records/RG-2007-011/')).text,/旧継舟計画を承継する事業案には同意しません/);
+ assert.match((await c.get('/members/records/HC-2021-031-R/')).text,/本人意思確認欄/);
 });
 
 test('ordinary restart preserves authentication and the received-evidence state',async()=>{
@@ -123,3 +123,14 @@ test('ordinary restart preserves authentication and the received-evidence state'
  }finally{await restarted.close();await unlink(stateFile).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 });
 
+
+test('receipt URLs cannot claim an ending for the wrong recipient or undo protection',async()=>{
+ const c=client(),{caseId,zip}=await evidence(c);
+ await submitAgency('hozen',caseId,zip);
+ const premature=await fetch(`http://127.0.0.1:${port+2}/received/?case=${caseId}`);assert.doesNotMatch(await premature.text(),/B-07で確認|施設外へ移動されました/);
+ await c.login('20120901P0083','19930618');const full=Buffer.from(await (await c.binary('/members/download/complete.zip')).arrayBuffer());
+ await submitAgency('audit',caseId,full);const again=await submitAgency('hozen',caseId,zip);assert.equal(again.status,303);assert.ok(again.headers.get('location').startsWith(app.origins.audit));
+ await c.upload('/members/contact/',{subject:'原本再提出',message:'重複した資料です。'},'原本.zip',zip);
+ assert.equal(app.cases.get(caseId).ending,'end3');assert.equal((await c.get('/people/asakura-tsumugi/')).response.status,200);
+ assert.match((await c.get('/members/activity/')).text,/本件の確認は終了しております/);
+});

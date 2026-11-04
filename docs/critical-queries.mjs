@@ -1,9 +1,11 @@
 // Author-only source of the input inventory. Never copy this file to public assets.
 export const siteQueries=[
+ {word:"安積透",source:"OBS-2022-044の登録控え",destination:"/people/azumi-toru/",purpose:"加害事案の記録だけでは分からない、製作者としての過去と本人の予定。"},
+ {word:"青井真",source:"PN-2022-034／夏帆の取材",destination:"/people/aoi-makoto/",purpose:"共同申出を書いた人の修理の仕事と、募集へ依存する事情。"},
  {word:'吉野夏帆',source:'製本相談の記事／EV-2022-091',destination:'/people/yoshino-kaho/',purpose:'重大事案の対象者を、亡くなった人の番号だけでなく、制作していた人として知る。'},
  {word:'青井真',source:'GR-2022-009／PN-2022-034',destination:'/news/20220415/',purpose:'現在のP-031と、工房で押さえ板を作っていた人を結ぶ。'},
  {word:'入居者紹介',source:'制作物0005の製作者コメント／アクセス先404',destination:'/tenants/',purpose:'入口の迂回。掲載番号の欠番を調べる。'},
- {word:'瀬尾灯',source:'制作物0021、取材記事',destination:'/people/seo-akari/',purpose:'経歴、活動終了、試作貸出票の番号を確認する。'},
+ {word:'瀬尾灯',source:'制作物0021、取材記事',destination:'/people/seo-akari/',purpose:'経歴と活動終了を確認し、会員側の共同試作記録へつなぐ。'},
  {word:'瀬尾文乃',source:'灯のプロフィール／施設名に込めた願い',destination:'/people/seo-fumino/',purpose:'母の生活と、設立前の聞き取りを読む。'},
  {word:'三枝律',source:'取材記事／共同試作の連絡',destination:'/people/saegusa-ritsu/',purpose:'公開上の業務終了日を、非公開原本と照合する。'},
  {word:'榊原恒一',source:'施設案内、灯の経歴',destination:'/news/20211103/',purpose:'公式な訃報と死因説明を読む。'},

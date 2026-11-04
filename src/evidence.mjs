@@ -17,3 +17,10 @@ export function classifyEvidence(bytes){
   return null;
  }catch{return null;}
 }
+// A protected person cannot be put back into the former operator's custody by
+// submitting the same archive again. Independent evidence can extend a closure.
+export function nextEnding(current,target){
+ if(current==='end2'||current==='end3')return current;
+ if(current==='end1'&&target!=='end3')return current;
+ return target;
+}

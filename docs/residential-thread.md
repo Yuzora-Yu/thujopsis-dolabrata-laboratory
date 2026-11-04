@@ -39,4 +39,4 @@
 
 SEED15回目からの異変は、施設案内・会員案内・食堂・工房・お知らせにも断片を置く。SEED外への到達で演出だけを解除し、認証と結末は保持する。作品番号の欠番を調べる経路と、記事から人物を追う経路の双方を残す。
 
-人物写真2点は内蔵画像生成を使用。採用元はdocs/source-images/p-seo-saegusa.png、p-akari.png。Web版は1280px、JPEG品質78相当を経てWebP化し、平成後期の取材写真の質感へ揃える。プロンプトと参照関係はdocs/media-assets.jsonへ記録する。
+人物写真2点は内蔵画像生成を使用。採用元はdocs/source-images/p-akari-work.png、p-akari-portrait.png。机上のグリップを見る写真と、カメラを見る人物写真で役割を分ける。背景と机上を簡潔にし、広い余白を残す。Web版は1280px、JPEG品質78相当を経てWebP化。プロンプトと参照関係はdocs/media-assets.jsonへ記録する。

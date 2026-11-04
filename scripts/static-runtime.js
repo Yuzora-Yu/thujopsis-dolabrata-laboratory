@@ -1,5 +1,5 @@
 import {matchesSearch,normalizeDocumentId} from './search-engine.js';
-import {classifyEvidence} from './evidence.js';
+import {classifyEvidence,nextEnding} from './evidence.js';
 
 const base=document.querySelector('meta[name="asunaro-base"]')?.content||'';
 const storageKey='asunaro-preview-v1:'+base,authKey=storageKey+':auth',archiveKey=storageKey+':archive';
@@ -21,9 +21,11 @@ function go(path,kind='main'){location.assign(urlFor(path,kind));}
 function fillTokens(html){return html.replaceAll('@@CASE@@',state.id).replaceAll('@@CSRF@@','preview-session');}
 function display(html){
  const doc=new DOMParser().parseFromString(fillTokens(html),'text/html');document.title=doc.title;document.body.className=doc.body.className;document.body.innerHTML=doc.body.innerHTML;
- for(const key of ['asunaroStage','seedDriftEnabled','seedDriftThreshold'])document.body.dataset[key]=doc.body.dataset[key]||'';
+ for(const key of ['asunaroStage','seedDriftEnabled','seedDriftThreshold','memberRole','memberLabel','memberCase','memberRecord','memberRecordTitle'])document.body.dataset[key]=doc.body.dataset[key]||'';
+ document.body.dataset.memberInquiry=state.inquiryRecord||'';
  window.asunaroInit?.();
  window.asunaroDrift?.refresh();
+ window.asunaroReading?.refresh();
 }
 async function loadBundle(namespace,id,key){
  const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(namespace+':'+id))),b=>b.toString(16).padStart(2,'0')).join('');
@@ -82,6 +84,7 @@ async function boot(){
   }
   if(current.kind==='audit'||current.kind==='hozen'){
    if(current.path==='/received/'){
+    if(state.ending==='end3'&&current.kind==='hozen'){go('/received/?case='+state.id,'audit');return;}
     const capable=await outcomeBundle();const html=state.auditPending&&current.kind==='audit'&&state.ending!=='end3'?capable?.pending:capable?.outcomes[state.ending]?.[current.kind+':/received/'];
     display(html||site.agency[current.kind]);
    }else display(site.agency[current.kind]);
@@ -101,7 +104,8 @@ async function boot(){
    const keyword=params.get('q');document.querySelector('#collection-query').value=keyword;
    document.querySelectorAll('.legacy-row').forEach(row=>{row.hidden=!matchesSearch({title:row.querySelector('strong').textContent,text:row.textContent},keyword);});
   }
- }finally{rendering=false;}
+ }catch{showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');}
+ finally{rendering=false;}
 }
 
 document.addEventListener('submit',async event=>{
@@ -130,13 +134,13 @@ document.addEventListener('submit',async event=>{
    if(!kind){showError('提出内容とZIP形式の添付資料をご確認ください。');return;}
    if(state.ending==='end2'){showError('この照会に関する記録は、施設運営側の管理へ移管されています。');return;}
    if(!await outcomeBundle()){showError('受付情報を確認できませんでした。資料を受領した際の照会画面からお手続きください。');return;}
-   if(current.kind==='audit'&&kind!=='complete')state.auditPending=true;else state.ending=current.kind==='audit'?'end3':'end1';save();go('/received/?case='+state.id,current.kind);return;
+   if(current.kind==='audit'&&kind!=='complete')state.auditPending=true;else state.ending=nextEnding(state.ending,current.kind==='audit'?'end3':'end1');save();go('/received/?case='+state.id,state.ending==='end3'?'audit':current.kind);return;
   }
   const account=await currentBundle();if(!account){go('/members/login/');return;}
   if(action==='/members/logout/'){localStorage.removeItem(authKey);go('/members/login/');return;}
   if(current.path==='/members/inquiry/'){
    const id=normalizeDocumentId(values.get('record')||'');if(!account.docs.some(d=>d.id===id&&d.inquiry)){showError('文書IDと照会先をご確認ください。');return;}
-   state.contact=true;save();go('/members/messages/');return;
+   state.contact=true;state.inquiryRecord=id;save();go('/members/messages/');return;
   }
   if(current.path==='/members/reservations/'){
    if(['end1','end3'].includes(state.ending)){await boot();return;}
@@ -144,7 +148,7 @@ document.addEventListener('submit',async event=>{
    go('/members/reservations/?received=1');return;
   }
   if(current.path==='/members/contact/'){
-   const file=values.get('attachment');if(file instanceof File&&/\.zip$/i.test(file.name)&&classifyEvidence(await file.arrayBuffer()))state.ending='end2';save();go('/members/contact/received/');return;
+   const file=values.get('attachment');if(file instanceof File&&/\.zip$/i.test(file.name)&&classifyEvidence(await file.arrayBuffer()))state.ending=nextEnding(state.ending,'end2');save();go('/members/contact/received/');return;
   }
  }catch{showError('お手続きを完了できませんでした。ページを再読み込みしてご確認ください。');}
  finally{if(submit)submit.disabled=false;}

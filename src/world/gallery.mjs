@@ -31,5 +31,5 @@ export const galleryRecords = [
  ['spares','2026.06.02','保守交換部品・第18便','3Dプリンター','research',false,'居住実証区画の保守交換用部品です。外観確認後、工房保全担当へ引き渡しました。','FAB-2026-018'],
  ['lizard','2026.10.23','関節が動く小さなトカゲ','3Dプリンター','hobby',true,'関節を組み立てずに造形する、小さなトカゲです。部品同士の隙間を確かめ、造形後に少しずつ動かして仕上げています。'],
 ].map(([key,date,title,tag,category,listed,body,record],index)=>({
- id:String(index+1).padStart(4,'0'),key,date,title,tag,category,listed,body,record,image:`media/g-${key}.webp`,
+ id:String(index+1).padStart(4,'0'),key,date,title,tag,category,listed,body,record,recordUpdated:({guide:"2016.10.03",grip:"2018.12.18",posture:"2020.02.21",standard:"2024.07.12",judgment:"2024.07.12",spares:"2026.10.27"})[key],image:`media/g-${key}.webp`,
 }));

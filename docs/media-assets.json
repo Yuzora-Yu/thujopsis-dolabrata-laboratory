@@ -346,10 +346,12 @@
   {
     "key": "c-0029",
     "year": 2015,
-    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. Very close work record of calipers measuring an old broken plastic appliance knob beside three gray FDM-printed replacement trials on a green cutting mat. A scratched surface, old ruler and a simple technical sketch with no legible words. Original repair engineering workshop. A single original landscape 3:2 photograph plausibly taken in 2015, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
+    "prompt": "Create one landscape 3:2 original ordinary technical product-record photograph taken at a tiny Japanese repair business in February 2015 with a consumer compact digital camera. Close overhead three-quarter view of a simple green cutting mat on a pale wood desk. On the mat four small replacement rotary control knobs: one aged ivory plastic round knob with a straight raised rectangular ridge across its center, a visible chip in its bottom rim; three modest grey FDM 3D-printed replacement knobs of the same basic shape, 35mm diameter, visible fine horizontal layer lines, slight imperfect print seams, one lying upside down showing a single D-shaped shaft socket. Ordinary physically buildable parts. A single small piece of blank white tracing paper in the far upper corner. The four objects are grouped on the right half, plenty of empty cutting mat on the left. Clear contact shadows on the mat. Soft fluorescent room light, slight cool white balance, moderate focus, mild sensor grain and modest 2015 JPEG softness. Matter-of-fact photograph made by a staff member for a local company activity report, natural restrained colors and small-scale wear. The scene shows these four parts and the quiet work surface.",
     "references": [],
-    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-fd7e7649-01bc-44db-815a-a7176e637b11.png",
-    "asset": "public/assets/media/c-0029.webp"
+    "path": "C:/Users/ship2/.codex/generated_images/01a18b44-efea-75a3-a872-2f78fc077219/exec-57211297-c9bc-436a-b81e-c9c75a83ab14.png",
+    "asset": "public/assets/media/c-0029.webp",
+    "mode": "built-in imagegen",
+    "source": "docs/source-images/c-0029.png"
   },
   {
     "key": "c-0045",
@@ -442,10 +444,17 @@
   {
     "key": "p-asakura",
     "year": 2017,
-    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-16737dea-d4f9-4c9b-87bb-54f4cab06574.png",
-    "prompt": "Use case: photorealistic-natural. Asset: fictional facility historical activity photograph. A candid work-record photograph in a modest Japanese community makerspace. A young Japanese woman about twenty-four, dark hair tied back, plain gray work shirt, seated at a small bench inspecting a simple blue 3D-printed adaptive handle with calipers. Her attention stays on the object, no posing, practical tool storage, only a few ordinary projects around her. Medium-wide portrait in landscape framing. A single original landscape 3:2 image. Shot in 2017 on an ordinary consumer compact digital camera, slightly cool fluorescent illumination mixed with window light, deep focus, mild high-ISO noise, modest JPEG softness, imperfect exposure and white balance. Late-Heisei documentary quality, restrained colors and practical framing. Plain unbranded objects, no captions or added lettering.",
-    "references": [],
-    "asset": "public/assets/media/p-asakura.webp"
+    "path": "C:/Users/ship2/.codex/generated_images/01a18b44-efea-75a3-a872-2f78fc077219/exec-57477afa-3dc2-4c20-8633-10180f5868e3.png",
+    "prompt": "Generate a new horizontal 3:2 documentary photograph for a small Japanese makerspace website, taken in 2017 on an ordinary compact digital camera. Use the referenced woman's face identity and dark grey work shirt only as identity reference. She is 24-year-old Japanese workshop technician Tsumugi Asakura, dark hair tied low, ordinary skin texture, a reserved small genuine smile and eyes looking directly at the camera photographer. A waist-up interview portrait composed with her on the right third, arms comfortably hanging below the bottom crop and both hands entirely outside frame. Soft flat window daylight, modest white workshop room, one simple grey metal cabinet far behind her with doors closed, a narrow wooden workbench edge at bottom, generous quiet pale wall on the left, lightly soft focus background. Believable unstyled local newsletter photo with mild sensor grain, slightly muted 2010s colors, normal lens perspective, no fashion lighting. Single clear subject and calm composition. The image is a real-looking candid portrait of a fictional adult person.",
+    "references": [
+      "C:/Users/ship2/.codex/generated_images/01a18b44-efea-75a3-a872-2f78fc077219/exec-16737dea-d4f9-4c9b-87bb-54f4cab06574.png"
+    ],
+    "asset": "public/assets/media/p-asakura.webp",
+    "mode": "built-in imagegen",
+    "source": "docs/source-images/p-asakura.png",
+    "identitySource": "Former p-asakura workshop photograph; face and work shirt reference only.",
+    "publicationWidth": 1280,
+    "jpegQuality": 76
   },
   {
     "key": "p-inaba",
@@ -472,15 +481,17 @@
     "asset": "public/assets/media/r-flow-test.webp"
   },
   {
-    "key": "p-seo-saegusa",
+    "key": "p-akari-work",
     "year": 2022,
-    "path": "docs/source-images/p-seo-saegusa.png",
-    "prompt": "Use case: precise-object-edit. Asset: fictional makerspace interview photograph for an ARG's ordinary public website. Input image is the edit target. Preserve the man on the right exactly as the same workshop technician, the table, pencil grip prototypes, practical room, daylight, and candid two-person composition. Redesign only the young adult woman on the left as Akari Seo, a memorable, appealing and approachable 28-year-old Japanese woman and occupational therapist with mechanical engineering experience. She has a youthful adult oval face, bright expressive dark eyes, a lively warm smile with a subtle dimple, short dark-brown bob tucked behind one ear, airy natural bangs, and a tiny plain brass hairclip. Her face is uncovered; her thin-rimmed reading glasses are folded beside the notebook. Practical faded indigo work overshirt with sleeves rolled above the wrists over an ivory cotton top. Attentive, capable and spirited while explaining the small one-piece gray pencil grip, natural relaxed working posture, realistic unretouched skin and hands. This is a friendly everyday character viewers will remember and want to know, photographed during an actual conversation. Keep her clearly in her late twenties. Ordinary compact-camera photograph with the technical quality of late-Heisei Japanese community newsletters circa 2016–2018: mild sensor grain, imperfect fluorescent/window white balance, modest contrast and slight JPEG softness, deep focus; not a studio portrait or glossy film still. One landscape 3:2 photograph. Plain unbranded tools and objects, no added writing or captions.",
+    "path": "docs/source-images/p-akari-work.png",
+    "asset": "public/assets/media/p-akari-work.webp",
     "mode": "built-in image_gen",
-    "references": [],
-    "asset": "public/assets/media/p-seo-saegusa.webp",
     "publicationWidth": 1280,
-    "jpegQuality": 78
+    "jpegQuality": 78,
+    "references": [
+      "docs/source-images/p-akari-portrait.png"
+    ],
+    "prompt": "Use case: photorealistic-natural. The supplied portrait is only an identity reference for the same 28-year-old Japanese woman in a pale blue cotton shirt, dark hair tied low. Create a fresh ordinary late-Heisei compact-camera workshop record photograph, landscape 3:2, soft window daylight and restrained everyday color. Quiet clear tabletop and plain light wall, ample negative space. The woman concentrates on one small action; her gaze points to the visible object she is using. Natural unposed posture. The scene contains only the person and the stated necessary object. Slight normal JPEG softness. A quiet medium portrait at a plain workshop table. She is gently checking a small smooth gray pencil-grip sleeve resting on a white sheet: the sleeve stays on the table, and she lightly steadies it with the pads of one hand rather than holding it up. Her other hand rests relaxed and open on the tabletop, separated from the object. Both hands are fully visible with a clear outline. She looks directly down at the sleeve. Place the figure to the right, with empty table and wall on the left."
   },
   {
     "key": "p-fumino",
@@ -492,16 +503,15 @@
     "asset": "public/assets/media/p-fumino.webp"
   },
   {
-    "key": "p-akari",
+    "key": "p-akari-portrait",
     "year": 2022,
+    "path": "docs/source-images/p-akari-portrait.png",
+    "asset": "public/assets/media/p-akari-portrait.webp",
+    "mode": "built-in image_gen",
     "publicationWidth": 1280,
     "jpegQuality": 78,
-    "path": "docs/source-images/p-akari.png",
-    "asset": "public/assets/media/p-akari.webp",
-    "mode": "built-in image_gen",
-    "references": [
-      "docs/source-images/p-seo-saegusa.png"
-    ],
-    "prompt": "Use case: identity-preserve. Asset: second activity photograph of the same fictional character Akari Seo for her maker profile. Input is a face, hair and clothes reference for the adult woman on the left. Create a different candid photograph from the same makerspace interview day in July 2022. Show only Akari, exactly the same recognizable appealing 28-year-old Japanese adult woman: short dark brown bob, airy bangs, small brass hairclip, warm bright dark eyes and slight dimples, indigo cotton overshirt over an ivory top. She is seated by the workshop window, looking toward an interviewer just outside frame while showing an unfinished small one-piece 3D-printed page-holder prototype and an opened plain cooking book on the table. Her expression is gently amused and thoughtful, capable and easy to like. Natural slight hair flyaways, unretouched skin, natural hands. Medium portrait including both hands and the small objects, original landscape 3:2 framing, a practical ordinary workshop with shelves in the background. Preserve a late-Heisei 2016–2018 compact-camera documentary look: deep focus, imperfect cool fluorescent/daylight white balance, restrained colors, modest JPEG softness and slight sensor noise. Everyday interview photography rather than a polished celebrity portrait. No added lettering, legible book text, brands, captions or watermark."
+    "references": [],
+    "prompt": "Use case: identity-preserve. Use the supplied newly generated photograph only as the identity reference for the same 28-year-old Japanese woman. Create a separate, straightforward profile photograph taken at the same workshop interview. She wears the same pale blue cotton shirt and her dark hair is tied low. She sits comfortably with relaxed shoulders and looks DIRECTLY INTO THE CAMERA LENS, both eyes meeting the camera. A small easy closed-mouth smile, natural facial asymmetry and ordinary adult skin. Frame her head and upper torso on the LEFT side of a landscape 3:2 photograph; her hands and the table are outside the frame. The RIGHT half is quiet empty warm-white wall. Soft daylight from a nearby window, simple room, human eye-level perspective. This is a modest 2017-era compact-camera snapshot for a local facility profile: restrained colors, mild sensor texture, ordinary white balance and slight JPEG softness. The subject and a plain wall are the whole composition. Plain everyday observed portrait, no graphics or writing.",
+    "identitySource": "Built-in generated study b059c690-1c9f-4b23-b289-6e98799362c7, used for face identity only; not an adopted site asset."
   }
 ]

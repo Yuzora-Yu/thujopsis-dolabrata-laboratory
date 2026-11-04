@@ -55,7 +55,7 @@ export default {
  async fetch(request:Request,env:Env):Promise<Response>{
   try{
    const url=new URL(request.url);
-   if(/^\/(?:assets\/|styles\.css$|app\.js$|seed-drift\.js$|favicon\.ico$)/.test(url.pathname)){
+   if(/^\/(?:assets\/|styles\.css$|app\.js$|seed-drift\.js$|member-reading\.js$|reading-state\.js$|favicon\.ico$)/.test(url.pathname)){
     const assetUrl=new URL(request.url);if(url.pathname==='/favicon.ico')assetUrl.pathname='/assets/logo.png';
     return env.ASSETS.fetch(new Request(assetUrl,request));
    }
