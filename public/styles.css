@@ -41,3 +41,5 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .reading-expand{margin:1rem 0}.reading-expand summary{cursor:pointer;color:#315a49;text-decoration:underline;text-underline-offset:.25em;width:fit-content;padding:.45rem 0}.reading-expand[open]+.reading-preview{display:none}.reading-list .reading-omission{padding:.4rem 0 .4rem 3rem;color:#8a958d;border:0}
 .portal-loading{max-width:40rem;margin:5rem auto;padding:2rem;color:#68766e;min-height:35vh}
 .reading-status{font-size:.83rem;padding:.8rem 0;margin:1.4rem 0;color:#536e5d}.reading-status[hidden]{display:none}
+.company-image{margin:0 0 2rem}.company-image figcaption{margin-top:.75rem;font-size:.76rem;line-height:1.7;color:#6f7d77}
+.company-image{max-width:1000px;margin-inline:auto}.company-image .tenant-photo{height:auto;aspect-ratio:auto;object-fit:contain;max-height:none}

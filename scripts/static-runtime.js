@@ -27,16 +27,21 @@ function display(html){
  window.asunaroDrift?.refresh();
  window.asunaroReading?.refresh();
 }
+async function packedBundle(namespace,id){
+ const identifier=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(namespace+':'+id))),b=>b.toString(16).padStart(2,'0')).join('');
+ const cacheKey=storageKey+':encrypted-bundle:'+namespace;
+ try{const saved=JSON.parse(sessionStorage.getItem(cacheKey));if(saved?.identifier===identifier&&saved.edition===site.edition&&Date.now()-saved.created<28800000)return saved.packed;}catch{}
+ const response=await fetch(base+'/assets/portal/'+identifier+'.json',{cache:'no-store'});if(!response.ok)throw new Error('Unknown account');const packed=await response.json();
+ try{sessionStorage.setItem(cacheKey,JSON.stringify({identifier,edition:site.edition,created:Date.now(),packed}));}catch{}
+ return packed;
+}
 async function loadBundle(namespace,id,key){
- const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(namespace+':'+id))),b=>b.toString(16).padStart(2,'0')).join('');
- const response=await fetch(base+'/assets/portal/'+hash+'.json',{cache:'no-store'});if(!response.ok)throw new Error('Unknown account');
- const packed=await response.json();
+ const packed=await packedBundle(namespace,id);
  const cryptoKey=await crypto.subtle.importKey('raw',bytes(key),{name:'AES-GCM'},false,['decrypt']);
  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(packed.iv)},cryptoKey,bytes(packed.data))));
 }
 async function authenticate(namespace,id,password){
- const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(namespace+':'+id))),b=>b.toString(16).padStart(2,'0')).join('');
- const response=await fetch(base+'/assets/portal/'+hash+'.json',{cache:'no-store'});if(!response.ok)throw new Error('Unknown account');const packed=await response.json();
+ const packed=await packedBundle(namespace,id);
  const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(id+'\0'+password),'PBKDF2',false,['deriveKey']);
  const key=await crypto.subtle.deriveKey({name:'PBKDF2',hash:'SHA-256',salt:bytes(packed.salt),iterations:packed.iterations},material,{name:'AES-GCM',length:256},true,['decrypt']);
  const value=JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(packed.iv)},key,bytes(packed.data))));
