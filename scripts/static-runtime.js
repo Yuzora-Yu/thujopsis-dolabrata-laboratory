@@ -132,6 +132,7 @@ document.addEventListener('submit',async event=>{
   if(current.kind==='main'&&action==='/members/login/'){
    try{
     const result=await authenticate('member',String(values.get('id')||'').trim(),String(values.get('password')||''));
+    state=stored(storageKey,state);
     if(state.ending==='end2'&&result.value.account.role==='asakura')throw new Error('Ended account');
     localStorage.setItem(authKey,JSON.stringify(result.credential));
     if(result.value.outcomes.end1)state.capability=result.credential;if(result.value.account.role==='asakura')state.truth=true;save();
@@ -146,11 +147,13 @@ document.addEventListener('submit',async event=>{
   if(current.kind==='hozen'||current.kind==='audit'){
    const file=values.get('archive'),kind=file instanceof File&&/\.zip$/i.test(file.name)?classifyEvidence(await file.arrayBuffer()):null;
    if(!kind){showError('提出内容とZIP形式の添付資料をご確認ください。');return;}
-   if(state.ending==='end2'){showError('この照会に関する記録は、施設運営側の管理へ移管されています。');return;}
    if(!await outcomeBundle()){showError('受付情報を確認できませんでした。資料を受領した際の照会画面からお手続きください。');return;}
+   state=stored(storageKey,state);
+   if(state.ending==='end2'){showError('この照会に関する記録は、施設運営側の管理へ移管されています。');return;}
    if(current.kind==='audit'&&kind!=='complete')state.auditPending=true;else state.ending=nextEnding(state.ending,current.kind==='audit'?'end3':'end1');save();go('/received/?case='+state.id,state.ending==='end3'?'audit':current.kind);return;
   }
   const account=await currentBundle();if(!account){go('/members/login/');return;}
+  state=stored(storageKey,state);
   if(action==='/members/logout/'){localStorage.removeItem(authKey);go('/members/login/');return;}
   if(current.path==='/members/inquiry/'){
    const id=normalizeDocumentId(values.get('record')||'');if(!account.docs.some(d=>d.id===id&&d.inquiry)){showError('文書IDと照会先をご確認ください。');return;}
@@ -162,7 +165,7 @@ document.addEventListener('submit',async event=>{
    go('/members/reservations/?received=1');return;
   }
   if(current.path==='/members/contact/'){
-   const file=values.get('attachment');if(file instanceof File&&/\.zip$/i.test(file.name)&&classifyEvidence(await file.arrayBuffer()))state.ending=nextEnding(state.ending,'end2');save();go('/members/contact/received/');return;
+   const file=values.get('attachment'),valid=file instanceof File&&/\.zip$/i.test(file.name)&&classifyEvidence(await file.arrayBuffer());state=stored(storageKey,state);if(valid)state.ending=nextEnding(state.ending,'end2');save();go('/members/contact/received/');return;
   }
  }catch{showError('お手続きを完了できませんでした。ページを再読み込みしてご確認ください。');}
  finally{if(submit)submit.disabled=false;}
@@ -171,9 +174,10 @@ document.addEventListener('submit',async event=>{
 document.addEventListener('click',async event=>{
  const anchor=event.target.closest?.('a[href]');if(!anchor)return;
  const url=new URL(anchor.href,location.href),path=url.pathname.slice(base.length);if(!path.startsWith('/members/download/'))return;
- event.preventDefault();const account=await currentBundle();if(!account||state.ending==='end2'&&account.account.role==='asakura')return;
+ event.preventDefault();const account=await currentBundle();state=stored(storageKey,state);if(!account||state.ending==='end2'&&account.account.role==='asakura')return;
  const file=account.downloads[path.split('/').filter(Boolean).at(-1)];if(!file||path.endsWith('hozen.zip')&&!state.contact)return;
  const href=URL.createObjectURL(new Blob([bytes(file.data)],{type:file.type})),download=document.createElement('a');download.href=href;download.download=file.name;download.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
 });
+window.addEventListener('storage',event=>{if(event.key===storageKey){state=stored(storageKey,state);if(!document.querySelector('[data-lab-root]')&&document.querySelector('[data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({trial:trialView(state.consoleTrial),ending:state.ending}));}});
 window.addEventListener('pageshow',event=>{if(event.persisted&&!rendering&&site)void boot();});
 await boot();
