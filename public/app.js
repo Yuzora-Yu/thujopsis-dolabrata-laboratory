@@ -1,3 +1,72 @@
+const unsavedSeedNotes = new Set();
+
+function seedCollection(){
+ const nav = document.querySelector('[data-seed-collection-nav]');
+ if (!nav) return null;
+ const base = document.querySelector('meta[name="asunaro-base"]')?.content || '';
+ return {
+  nav,
+  total: Number(nav.dataset.seedCollectionNav),
+  href: base + nav.dataset.seedCollectionPath,
+  key: 'asunaro-seed-notes:' + base + ':',
+ };
+}
+
+function seedNoteCount(collection){
+ let count = 0;
+ for (let number=1; number<=collection.total; number++) {
+  const key = collection.key + number;
+  let found = unsavedSeedNotes.has(key);
+  try { found ||= localStorage.getItem(key)==='1'; } catch {}
+  if (found) count++;
+ }
+ return count;
+}
+
+function refreshSeedCollection(){
+ const collection = seedCollection();
+ if (!collection) return;
+ const {nav,total,href} = collection;
+ const count = seedNoteCount(collection);
+ const complete = count===total;
+ if (complete && !nav.firstElementChild) {
+  const link = document.createElement('a');
+  link.href = href;
+  link.textContent = '中央受付の引継ぎ控え';
+  nav.append(link);
+ } else if (!complete && nav.firstElementChild) nav.replaceChildren();
+ nav.hidden = !complete;
+ const progress = document.querySelector('[data-seed-note-progress]');
+ if (progress) progress.textContent = `記録済み ${count} / ${total}`;
+ const reward = document.querySelector('[data-seed-note-reward]');
+ if (reward) {
+  if (complete) reward.href = href;
+  else reward.removeAttribute('href');
+  reward.hidden = !complete;
+ }
+ const page = document.querySelector('[data-seed-collection-page]');
+ if (!page) return;
+ const locked = page.querySelector('[data-seed-collection-locked]');
+ const copy = page.querySelector('.reception-copy');
+ locked.hidden = complete;
+ if (complete && !copy) page.append(page.querySelector('template').content.cloneNode(true));
+ else if (!complete && copy) copy.remove();
+}
+
+function rememberSeedNote(number){
+ const collection = seedCollection();
+ if (!collection || !Number.isInteger(number) || number<1 || number>collection.total) return;
+ const key = collection.key + number;
+ try { localStorage.setItem(key,'1'); } catch { unsavedSeedNotes.add(key); }
+ refreshSeedCollection();
+}
+
+window.addEventListener('pageshow',refreshSeedCollection);
+window.addEventListener('storage',event=>{
+ const collection = seedCollection();
+ if (collection && (event.key===null || event.key.startsWith(collection.key))) refreshSeedCollection();
+});
+
 function installSeedNotes(){
  const source = document.querySelector('[data-seed-notes]');
  const button = document.querySelector('.seed-note');
@@ -5,14 +74,21 @@ function installSeedNotes(){
 
  const note = JSON.parse(source.textContent);
  const dialog = document.createElement('dialog');
- dialog.className = 'seed-note-dialog';
+ dialog.className = note.beginsDrift ? 'seed-note-dialog seed-note-receipt-dialog' : 'seed-note-dialog';
  dialog.id = 'seed-note-dialog';
  dialog.setAttribute('aria-labelledby','seed-note-title');
  dialog.setAttribute('aria-describedby','seed-note-body');
- dialog.innerHTML = '<p class="eyebrow">あすなろの豆知識</p><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><div class="seed-note-actions"><a target="_blank" rel="noopener">参考資料（NASA・別タブ）</a><button type="button" class="button dark">閉じる</button></div>';
+ dialog.innerHTML = '<div class="seed-note-meta"><p class="eyebrow"></p><span class="seed-note-number"></span></div><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><div class="seed-note-actions"><a data-seed-note-source target="_blank" rel="noopener" hidden>参考資料（NASA・別タブ）</a><span data-seed-note-progress></span><a class="text-link" data-seed-note-reward hidden>中央受付の引継ぎ控えへ</a><button type="button" class="button dark">閉じる</button></div>';
+ dialog.querySelector('.eyebrow').textContent = note.beginsDrift ? '受付控え ／ 複写' : 'あすなろの豆知識';
+ const total = seedCollection()?.total;
+ if (total && note.number) dialog.querySelector('.seed-note-number').textContent = `No. ${note.number} / ${total}`;
  dialog.querySelector('h2').textContent = note.title;
  dialog.querySelector('#seed-note-body').textContent = note.body;
- dialog.querySelector('.seed-note-actions a').href = note.source;
+ if (note.source) {
+  const reference = dialog.querySelector('[data-seed-note-source]');
+  reference.href = note.source;
+  reference.hidden = false;
+ }
  if (note.related) {
   const related = dialog.querySelector('.seed-note-related');
   const base = document.querySelector('meta[name="asunaro-base"]')?.content || '';
@@ -25,6 +101,8 @@ function installSeedNotes(){
  dialog.addEventListener('close', () => button.focus({preventScroll:true}));
  button.setAttribute('aria-controls',dialog.id);
  button.addEventListener('click', () => {
+  rememberSeedNote(note.number);
+  if (note.beginsDrift) window.asunaroDrift?.revealFromCopy();
   dialog.showModal();
   close.focus();
  });
@@ -33,6 +111,7 @@ function installSeedNotes(){
 
 window.asunaroInit=function(){
 installSeedNotes();
+refreshSeedCollection();
 const searchDialog=document.querySelector('.search-dialog');
 document.querySelector('[data-search-open]')?.addEventListener('click',()=>{searchDialog.showModal();searchDialog.querySelector('input').focus();});
 document.querySelectorAll('dialog .dialog-close').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));

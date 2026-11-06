@@ -12,11 +12,12 @@ async function checkMenuNotes(browser){
    const marker=page.locator('main .seed-note');
    assert.equal(await marker.count(),1,path);
    assert.equal(await page.locator('.site-footer .seed-note').count(),0,path);
-   labels.add(await marker.innerText());
+   labels.add(await marker.getAttribute('aria-label'));
    const before=(await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_'));
    await marker.click();
    const dialog=page.getByRole('dialog');
    await dialog.waitFor();
+   assert.equal(await dialog.locator('.seed-note-number').innerText(),`No. ${titles.size+1} / 9`);
    titles.add(await dialog.getByRole('heading').innerText());
    await page.keyboard.press('Escape');
    assert.equal(await marker.evaluate(button=>button===document.activeElement),true,path);
@@ -28,6 +29,63 @@ async function checkMenuNotes(browser){
    await page.goto(at(path));
    assert.equal(await page.locator('.seed-note').count(),0,path);
   }
+ } finally {
+  await context.close();
+ }
+}
+async function checkReceptionCopy(browser){
+ const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
+ try {
+  const page=await context.newPage(),errors=[];
+  page.on('pageerror',error=>errors.push(error.message));
+  await page.goto(at('/visit/reception-copy/'));
+  await page.getByText('この控えは現在表示できません。').waitFor();
+  assert.equal(await page.locator('.reception-copy').count(),0);
+  assert.equal(await page.locator('.seed-collection-nav a').count(),0);
+
+  await page.goto(at('/visit/'));
+  assert.equal(await page.locator('.seed-drift-link').count(),0);
+  const receipt=page.getByRole('button',{name:'返却欄',exact:true});
+  await receipt.focus();
+  await page.keyboard.press('Enter');
+  const note=page.getByRole('dialog');
+  await note.getByRole('heading',{name:'会員証の返却控え'}).waitFor();
+  assert.equal(await note.locator('.seed-note-number').innerText(),'No. 9 / 9');
+  assert.equal(await note.locator('[data-seed-note-progress]').innerText(),'記録済み 1 / 9');
+  assert.equal(await note.getByRole('link').count(),0);
+  assert.equal((await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_')).value,'15');
+  await page.locator('body.seed-drift-active').waitFor();
+  await page.keyboard.press('Escape');
+  await page.locator('.seed-drift-link').waitFor();
+  assert.equal(await receipt.evaluate(button=>button===document.activeElement),true);
+  await page.goto(at('/gallery/'));
+  await page.locator('.seed-corrupted img').first().waitFor();
+  await page.goto(at('/gallery/0029/'));
+  assert.equal(await page.locator('.seed-drift-link').count(),0);
+  assert.equal((await context.cookies()).some(cookie=>cookie.name.startsWith('asunaro_seed_')),false);
+
+  const other=await context.newPage();
+  await other.goto(at('/visit/reception-copy/'));
+  await other.locator('[data-seed-collection-locked]').waitFor();
+  for (const [i,path] of noteRoutes.entries()) {
+   await page.goto(at(path));
+   await page.locator('.seed-note').click();
+   await note.waitFor();
+   assert.equal(await note.locator('[data-seed-note-progress]').innerText(),`記録済み ${i+2} / 9`);
+   if(i===0){
+    await page.keyboard.press('Escape');
+    await page.locator('.seed-note').click();
+    assert.equal(await note.locator('[data-seed-note-progress]').innerText(),'記録済み 2 / 9');
+   }
+   if(i<noteRoutes.length-1)await page.keyboard.press('Escape');
+  }
+  await other.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
+  await note.getByRole('link',{name:'中央受付の引継ぎ控えへ'}).click();
+  await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
+  await page.reload();
+  await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
+  await page.screenshot({path:'.work/qa/seed-reception-reward.png'});
+  assert.deepEqual(errors,[]);
  } finally {
   await context.close();
  }
@@ -72,6 +130,7 @@ async function followPublicLinks(browser){
 (async()=>{
  await fs.mkdir('.work/qa',{recursive:true});browser=await chromium.launch({headless:true,channel:'msedge'});
  await checkMenuNotes(browser);
+ await checkReceptionCopy(browser);
  await followPublicLinks(browser);
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
@@ -127,5 +186,5 @@ async function followPublicLinks(browser){
  const reduced=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});await reduced.addCookies([{...seed,value:'14'}]);const mobile=await reduced.newPage();mobile.on('pageerror',error=>errors.push(error.message));await mobile.goto(at('/gallery/'));await mobile.locator('body.seed-drift-active').waitFor();
  assert.equal(await mobile.locator('.seed-noise').count(),0);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
  await mobile.locator('.seed-corrupted img').evaluateAll(images=>Promise.all(images.map(image=>image.decode())));await mobile.screenshot({path:'.work/qa/seed-drift-mobile.png',fullPage:true});await reduced.close();assert.deepEqual(errors,[]);
- console.log('SEED playtest passed: one unique discovery on each of eight menu pages, 15-page visit threshold, dated 404, back navigation, ROOT and cross-tab reset, preserved progress, mobile.');
+ console.log('SEED playtest passed: nine numbered discoveries, rare shortcut to threshold, saved collection and reward, 15-page visit threshold, dated 404, ROOT and cross-tab reset, mobile.');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{await browser?.close();});

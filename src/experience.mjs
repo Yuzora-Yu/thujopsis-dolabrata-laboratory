@@ -1,5 +1,5 @@
 import {programPath,programNotesPath} from './program.mjs';
-import {seedNoteData} from './seed-notes.mjs';
+import {seedNoteData,seedCollectionPath} from './seed-notes.mjs';
 import {gallery,tenants,news,documents,tenantMaterialEntries} from './content.mjs';
 import {editorialPages} from './world/editorial.mjs';
 import {archiveItems,archiveNotes} from './world/archive-data.mjs';
@@ -33,6 +33,7 @@ const entries=[
  {kind:'main',path:programNotesPath,level:1},
  ...tenantMaterialEntries.map(material=>({kind:'main',path:material.path,level:material.tenant.listed?0:1})),
  {kind:'main',path:'/facilities/staff/',level:0},
+ {kind:'main',path:seedCollectionPath,level:0},
 ];
 export const pageRegistry=entries.map((entry,index)=>({...entry,number:index+1}));
 const byKey=new Map(pageRegistry.map(p=>[p.kind+':'+p.path,p]));
@@ -48,7 +49,7 @@ export function decoratePage(html,{kind='main',path='/',role}={}){
  const counter=experienceSettings.showPageIndex&&position?`<span class="page-index" data-page-number="${position.number}" data-page-total="${position.total}" data-growth-stage="${growth.name.toLowerCase()}" aria-label="ページ${position.number}、全${position.total}ページ${experienceSettings.showGrowthStage?'、探索段階 '+growth.name+'（'+growth.label+'）':''}">${experienceSettings.showGrowthStage?`<span class="index-growth">${growth.name}</span>`:''}<span class="index-number">${String(position.number).padStart(3,'0')} <span>/</span> ${position.total}</span></span>`:'';
  const note = kind==='main' && position?.level===0 ? seedNoteData(path) : '';
  const seedNotes = note ? `<script type="application/json" data-seed-notes>${note}</script>` : '';
- const noIndex=kind==='main'&&(path===programNotesPath||path==='/news/20261027/'||/^\/tenants\/\d+\/materials\//.test(path))?'<meta name="robots" content="noindex,nofollow">':'';
+ const noIndex=kind==='main'&&(path===programNotesPath||path===seedCollectionPath||path==='/news/20261027/'||/^\/tenants\/\d+\/materials\//.test(path))?'<meta name="robots" content="noindex,nofollow">':'';
  return html.replace('<!--PAGE_INDEX-->',counter)
   .replace(/<body\b([^>]*)>/,`<body$1 data-asunaro-stage="${growth.name.toLowerCase()}" data-seed-drift-enabled="${experienceSettings.seedDrift.enabled}" data-seed-drift-threshold="${experienceSettings.seedDrift.threshold}">`)
   .replace('</body>',seedNotes+'</body>')
