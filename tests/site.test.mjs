@@ -325,12 +325,13 @@ test('printed editions and archival copies follow the underlying record permissi
  const individualCopy='/members/download/records/YH-2018-041-A-scan.jpg';
  const intakeCopy='/members/download/records/PN-2022-034-scan.jpg';
  const loanCopy='/members/download/records/FAB-2022-071.pdf';
- const dailyCopies=['CONS-2016-005.pdf','OBS-2022-044.pdf','OBS-2022-044-scan.jpg'].map(file=>'/members/download/records/'+file);
+ const evaluationCopies=['CONS-2016-005.pdf','OBS-2022-044.pdf','OBS-2022-044-scan.jpg','YH-2022-034.pdf','YH-2022-034-scan.jpg'];
  const closedGroupCopies=['EV-2022-091.pdf','GR-2022-009.pdf'];
  const fabrication='/members/download/records/FAB-2020-026.pdf';
  const handover='/members/download/records/AH-2017-009.pdf';
  assert.equal((await c.binary(pdf)).status,303);
  assert.equal((await c.binary(loanCopy)).status,303);
+ for(const file of evaluationCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,303,file);
  await c.login('201204010017','20080519');const aggregate=await c.binary(pdf);assert.equal(aggregate.status,200);assert.equal(aggregate.headers.get('content-type'),'application/pdf');assert.equal(Buffer.from(await aggregate.arrayBuffer()).subarray(0,5).toString(),'%PDF-');
  const loan=await c.binary(loanCopy);
  assert.equal(loan.status,200);
@@ -338,7 +339,7 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary(annex)).status,404);assert.equal((await c.binary(scan)).status,404);
  assert.equal((await c.binary(individualCopy)).status,404);
  assert.equal((await c.binary(westCopy)).status,404);
- for(const file of dailyCopies)assert.equal((await c.binary(file)).status,404,file);
+ for(const file of evaluationCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,404,file);
  assert.equal((await c.binary(fabrication)).status,404);
  assert.equal((await c.binary(handover)).status,404);
  await c.login('201804010046','20151112');assert.equal((await c.binary(annex)).status,200);
@@ -349,11 +350,17 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary(eastWork)).status,404);
  assert.equal((await c.binary(reorganization)).status,404);
  assert.equal((await c.binary(intakeCopy)).status,404);
- for(const file of dailyCopies)assert.equal((await c.binary(file)).status,200,file);
+ for(const file of evaluationCopies){
+  const copy=await c.binary('/members/download/records/'+file);
+  assert.equal(copy.status,200,file);
+  assert.equal(copy.headers.get('content-type'),file.endsWith('.pdf')?'application/pdf':'image/jpeg',file);
+  assert.equal((await c.binary('/assets/record-media/'+file)).status,404,file);
+ }
  assert.equal((await c.binary(fabrication)).status,200);
  assert.equal((await c.binary(handover)).status,404);
  for(const file of closedGroupCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,404,file);
  await c.login('201204010000','20100615');const copy=await c.binary(scan);assert.equal(copy.status,200);assert.equal(copy.headers.get('content-type'),'image/jpeg');assert.equal(Buffer.from(await copy.arrayBuffer()).readUInt16BE(0),0xffd8);
+ for(const file of evaluationCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,200,file);
  const east=await c.binary(eastWork);assert.equal(east.status,200);assert.equal(east.headers.get('content-type'),'application/pdf');
  const decision=await c.binary(reorganization);assert.equal(decision.status,200);assert.equal(decision.headers.get('content-type'),'application/pdf');
  for(const file of closedGroupCopies){
@@ -374,5 +381,5 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary(loanCopy)).status,404);
  assert.equal((await c.binary(fabrication)).status,404);
  assert.equal((await c.binary(handover)).status,200);
- for(const file of dailyCopies)assert.equal((await c.binary(file)).status,404,file);
+ for(const file of evaluationCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,404,file);
 });

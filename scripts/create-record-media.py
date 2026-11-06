@@ -37,6 +37,7 @@ STYLES = {
     "group-review": ("Gothic", "#263f62", "#e9eef6", "評価統括／結果提出", "strip"),
     "individual": ("Office", "#414948", "#edf0eb", "評価統括／個票再録", "form"),
     "consent": ("Mincho", "#423c36", "#f1eee8", "居住環境実証部会", "form"),
+    "trial-intake": ("Office", "#3d4c55", "#eaf0f1", "居住実証運用室／評価個票", "form"),
     "daily-check": ("Office", "#3d4949", "#edf1ef", "評価統括／検査記録保管", "form"),
     "minutes": ("Mincho", "#37342d", "#eeece6", "議事記録", "formal"),
     "memo": ("Mincho", "#484337", "#f3f0e7", "手控え", "memo"),
@@ -82,9 +83,18 @@ def render(record, style_key, target):
     font, accent_hex, pale_hex, register, frame = STYLES[style_key]
     accent, pale = colors.HexColor(accent_hex), colors.HexColor(pale_hex)
     dark = colors.HexColor("#232824")
-    compact = style_key in {"individual", "workshop-receipt", "daily-check", "decision", "watch-log", "shop-change"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
+    compact = style_key in {"individual", "workshop-receipt", "trial-intake", "daily-check", "decision", "watch-log", "shop-change"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
     tables = record.get("tables", [])
     participant_sheet = next((item for item in tables if item.get("participantCopy")), None)
+    participant_form = {
+        "heading": "日次確認票",
+        "series": "生活環境継続試験",
+        "formCode": "検査様式 02",
+        "instruction": "体調や設備の利用について、ご記入ください。",
+        "reminder": "次回の確認時刻まで、この控えはお手元にお持ちください。",
+    }
+    if participant_sheet and isinstance(participant_sheet["participantCopy"], dict):
+        participant_form.update(participant_sheet["participantCopy"])
     issue_date = datetime.strptime(record.get("updated", record["date"]), "%Y年%m月%d日").strftime("%Y%m%d")
     title = ParagraphStyle("title", fontName=font, fontSize=21, leading=29, wordWrap="CJK", textColor=dark, spaceAfter=15)
     base = ParagraphStyle("body", fontName=font, fontSize=10.1 if compact else 10.6, leading=16.1 if compact else 17.6, wordWrap="CJK", textColor=dark, spaceAfter=6 if compact else 9)
@@ -116,10 +126,10 @@ def render(record, style_key, target):
         flow.extend([t, Spacer(1, 10)])
 
     if participant_sheet:
-        flow.extend([p("本人控え", meta), p("日次確認票", title),
-                     p("体調や設備の利用について、ご記入ください。"), Spacer(1, 8)])
+        flow.extend([p("本人控え", meta), p(participant_form["heading"], title),
+                     p(participant_form["instruction"]), Spacer(1, 8)])
         table(participant_sheet["head"], participant_sheet["rows"], [122, BODY - 122])
-        flow.append(p("次回の確認時刻まで、この控えはお手元にお持ちください。", meta))
+        flow.append(p(participant_form["reminder"], meta))
         flow.append(PageBreak())
     flow.extend([p(record.get("kindLabel", register), meta), p(record["title"], title)])
     info = [["作成", record["date"]], ["管理・作成者", record["owner"]]]
@@ -168,8 +178,8 @@ def render(record, style_key, target):
         else:
             recipient_copy = participant_sheet and doc.page == 1
             c.setFont(font, 9)
-            c.drawString(X + 6, H - 45, "生活環境継続試験" if recipient_copy else register)
-            c.drawRightString(W - X - 6, H - 45, "検査様式 02" if recipient_copy else record["id"])
+            c.drawString(X + 6, H - 45, participant_form["series"] if recipient_copy else register)
+            c.drawRightString(W - X - 6, H - 45, participant_form["formCode"] if recipient_copy else record["id"])
             c.setLineWidth(.55 if frame == "memo" else 1.1)
             c.line(X + 6, H - 54, W - X - 6, H - 54)
         c.setStrokeColor(colors.HexColor("#bac2bc"))

@@ -57,8 +57,17 @@ test('Akari’s trial dates and the two sets of workshop property remain distinc
  const record=id=>documents.find(document=>document.id===id);
  const trial=record('YH-2022-034');
  assert.match(recordText(trial),/試用票の期間は8月19日から22日まで/);
- assert.match(trial.entries.find(entry=>entry.at==='2022年8月22日').text,/継続群へ編入/);
+ const slip=trial.tables.find(table=>table.participantCopy);
+ const fields=Object.fromEntries(slip.rows);
+ assert.match(fields['試用期間'],/8月19日.*8月22日/);
+ assert.match(fields['お帰りの日'],/8月22日.*中央受付/);
+ assert.match(trial.entries.find(entry=>entry.at==='2022年8月22日').text,/本日付で短期試用から継続群へ編入/);
  assert.match(trial.entries.find(entry=>entry.at==='2022年8月31日').text,/一般制作の利用登録を終了/);
+ assert.match(trial.entries.find(entry=>entry.by==='本人からの申出').text,/工房に預けた型紙と、母の料理帳の写し/);
+ assert.match(recordText(trial),/第3居住群の照合欄（OBS-2022-044）/);
+ const group=record('OBS-2022-044').tables.find(table=>table.caption.startsWith('第3居住群'));
+ assert.match(group.rows.find(row=>row[1].startsWith('P-034')).join(' '),/9月9日.*同じ説明/);
+ assert.doesNotMatch(recordText(trial),/B-07|2026年|現所在/);
  assert.match(recordText(record('FAM-2022-009')),/8月19日の外出後は本人と話せず、22日の帰宅予定/);
  assert.match(archiveItems.find(item=>item.code==='NK-2022-0908').text,/22日に帰宅する予定だったが戻らず/);
  const receipt=record('PN-2022-034');
