@@ -51,7 +51,7 @@ for(const route of archivePublicPaths)await page(route,renderLegacy(route,{...ct
 await page('/room/',legacyLogin('@@CSRF@@'),'archive');
 for(const route of ['/room/console/','/room/console/subjects/'])await page(route,legacyLogin('@@CSRF@@'),'archive');
 for(const n of archiveNotes)await page(`/room/records/${n.id}/`,legacyLogin('@@CSRF@@'),'archive');
-for(const kind of ['hozen','audit'])for(const route of ['/','/receive/','/received/'])await page(route,agencyPage(kind,route,{caseId:'@@CASE@@',origins,receipt:route==='/received/'?'loading':''}),kind);
+for(const kind of ['hozen','audit'])for(const route of ['/','/receive/','/received/'])await page(route,agencyPage(kind,route,{caseId:'@@CASE@@',origins,receipt:route==='/'?'':'loading'}),kind);
 for(const route of ['/news/closure/','/news/staff-change/'])await page(route,notFound());
 
 const baseZip=(await makeArchive(new URL('../src/archive.mjs',import.meta.url))).toString('base64');

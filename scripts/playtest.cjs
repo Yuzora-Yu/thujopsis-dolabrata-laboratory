@@ -193,7 +193,7 @@ async function newsInterface(p){
  const auditReceipt=p.url();
  assert.match(await body(p),/EA-2026-1102/);
  await p.getByRole('link',{name:'追加資料を提出する',exact:true}).click();
- assert.match(await body(p),/EA-2026-1102/);
+ await p.getByText('受付番号：EA-2026-1102',{exact:true}).waitFor();
  await submit(p,complete.file);assert.match(await body(p),/外部への資料移送/);assert.match(await body(p),/本人の希望を個別に確認し、施設外へ移動/);assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
  await login(p,institution.id,institution.password);
  await p.goto(auditReceipt);await until(p,'資料を受領しました');
