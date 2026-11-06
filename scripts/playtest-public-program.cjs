@@ -151,6 +151,20 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
    await member.getByText(message,{exact:true}).waitFor();
    assert.equal(await member.locator('.document-result').count(),0);
   }
+  for (const [path,label] of [['/floor-map/','フロアマップを拡大'],['/news/20120416/','開設時の配置図を拡大']]) {
+   await p.goto(base+path);
+   const preview=p.getByRole('button',{name:label,exact:true});
+   const inlineWidth=(await preview.locator('img').boundingBox()).width;
+   await preview.click();
+   const viewer=p.getByRole('dialog',{name:label,exact:true});
+   const image=viewer.locator('img');
+   await image.waitFor();
+   const fittedWidth=(await image.boundingBox()).width;
+   assert.ok(fittedWidth>=inlineWidth*.85,path+' opens at a readable size');
+   await viewer.getByRole('button',{name:'画像を拡大',exact:true}).click();
+   assert.ok((await image.boundingBox()).width>fittedWidth);
+   await p.keyboard.press('Escape');
+  }
   const mobile=await b.newPage({viewport:{width:390,height:844}});mobile.on('pageerror',e=>errors.push(e.message));
   for(const route of ['/','/research/lunar-habitat/','/news/20261027/','/news/20250509/','/tenants/','/tenants/0003/','/tenants/0004/materials/opening-exhibition/','/members/login/','/floor-map/','/facilities/staff/','/gallery/0021/']){
    await mobile.goto(base+route);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);

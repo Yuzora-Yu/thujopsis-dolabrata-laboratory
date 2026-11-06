@@ -20,30 +20,49 @@ INK='#263635'; ROOM='#dce5d3'; COMMON='#e9edc8'; ADMIN='#d9e1e1'
 
 def create_plan(old=False):
     primitives=[]
+    corridor='#f9f7ee' if old else '#fff'
     def rect(x,y,w,h,fill='none',stroke=INK,sw=1): primitives.append(('rect',(x,y,w,h),fill,stroke,sw))
     def line(x1,y1,x2,y2,stroke=INK,sw=1):primitives.append(('line',(x1,y1,x2,y2),'none',stroke,sw))
     def polygon(points,fill='none',stroke=INK,sw=1):primitives.append(('polygon',points,fill,stroke,sw))
     def text(x,y,value,size=12,anchor='middle',color=INK):primitives.append(('text',(x,y,value,size,anchor),color,'none',0))
     def room(x,y,w,h,label,fill=ROOM):
         rect(x,y,w,h,('#f4f1e6' if old else fill),INK,1.35)
-        if label:text(x+w/2,y+(h*.75 if old and h<90 else h/2)+3,label,11)
+        if label:text(x+w/2,y+(h*.75 if old and 70<=h<90 else h/2)+3,label,11)
         if old and h>=70:
-            # Door opening and furniture from the source plan's repeated office grid.
-            line(x+9,y+h,x+9,y+h-17,INK,.6);line(x+9,y+h-17,x+26,y+h,INK,.6)
             rect(x+w/2-14,y+12,28,12,'none',INK,.45)
             rect(x+w/2-6,y+25,12,8,'none',INK,.4)
+    def door(x,y,dx,dy,show_swing=False):
+        line(x,y,x+dx,y+dy,corridor,4)
+        if show_swing:
+            # Rotate the closed leaf toward the room about its hinge.
+            line(x,y,x+dy,y-dx,INK,.7)
+            previous=(x+dx,y+dy)
+            for step in range(1,7):
+                angle=math.pi*step/12
+                end=(round(x+dx*math.cos(angle)+dy*math.sin(angle),1),
+                     round(y+dy*math.cos(angle)-dx*math.sin(angle),1))
+                line(*previous,*end,INK,.55)
+                previous=end
+
+    def office(x,y,w,h,number):
+        room(x,y,w,h,str(number))
+        if number==408:
+            door(x+w,y+77,0,-18,old)
+        else:
+            door(x+10,y+h,18,0,old)
+
     rect(0,0,1200,710,'#f3f0e4' if old else '#fbfcf8','none')
     text(40,34,'あすなろ産業支援交流施設',19,'start')
     text(1160,34,'4F 配置図　2012.04' if old else '4F FLOOR GUIDE',13,'end')
-    polygon([(75,90),(1050,90),(1135,190),(1085,382),(995,430),(995,550),(175,550),(175,432),(75,382)],'#f9f7ee' if old else '#fff',INK,2.3)
+    polygon([(75,90),(1050,90),(1135,190),(1085,382),(995,430),(995,550),(175,550),(175,432),(75,382)],corridor,INK,2.3)
     # Offices in the west: the repeated north/south arrangement follows the supplied SHIP plan.
-    for i in range(6):room(85+i*86,100,86,108,str(402+i))
-    room(85,240,95,137,'408')
+    for i in range(6):office(85+i*86,100,86,108,402+i)
+    office(85,240,95,137,408)
     for i in range(5):
         number=409+i
-        if old or number not in [410,411,412]:room(205+i*63,240,63,90,str(number))
+        if old or number not in [410,411,412]:office(205+i*63,240,63,90,number)
     if not old:rect(268,240,189,90,'#ebeeeb',INK,1.35)
-    for i in range(3):room(205+i*85,360,85,72,str(414+i))
+    for i in range(3):office(205+i*85,360,85,72,414+i)
     room(480,344,121,49,'工房 2')
     room(480,393,121,49,'工房 1')
     room(619,235,83,94,'管理事務室',ADMIN)
@@ -56,7 +75,7 @@ def create_plan(old=False):
     polygon([(910,100),(1044,100),(1123,193),(1095,250),(1035,207),(985,205),(910,205)],'#f4f1e6' if old else COMMON,INK,1.3)
     text(1012,154,'食堂・カフェ',12)
     if old:
-        for x in [940,980,1020]:
+        for x in [960,1000,1040]:
             rect(x,169,22,12,'none',INK,.5)
             rect(x,183,7,7,'none',INK,.5)
     rect(718,230,175,170,'#f4f1e6' if old else COMMON,INK,1.3)
@@ -71,30 +90,33 @@ def create_plan(old=False):
     elevator_label='エレベーター' if old else '中央エレベーター'
     for x,w,label in [(185,85,'階段・EV'),(286,110,'トイレ'),(412,132,elevator_label),(561,66,'共用'),(718,115,'トイレ'),(850,130,'階段・EV')]:
         rect(x,467,w,73,'#f4f1e6' if old else ADMIN,INK,1.2);text(x+w/2,508,label,10)
-        if old:
+        if old and label=='階段・EV':
             for sy in range(475,532,6):line(x+5,sy,x+20,sy,INK,.35)
+        elif old and label=='トイレ':
+            for offset in [8,22,36]:rect(x+offset,519,12,13,'none',INK,.4)
+        elif old and label==elevator_label:
+            rect(x+8,479,18,23,'none',INK,.5)
+            rect(x+8,506,18,23,'none',INK,.5)
+    # The two editions share the public door locations. Only the technical
+    # drawing shows hinged door leaves.
+    for opening in [(718,375,0,22),(783,208,23,0),(831,208,16,0),(868,208,16,0),
+                    (896,143,0,-20),(932,205,26,0),(926,319,11,22),
+                    (601,378,0,-21),(601,426,0,-21),
+                    (251,467,-24,0),(352,467,-22,0),(786,467,-22,0),(932,467,-24,0)]:
+        door(*opening,show_swing=old)
+    door(491,467,-26,0)
     if old:
+        door(619,300,0,17,True)
         text(665,413,'エントランス',11);text(665,433,'↓',16)
-        line(603,442,704,442,INK,1)
+        line(603,442,641,442,INK,1);line(687,442,704,442,INK,1)
     else:
-        # Draw only ordinary visitor access. Retain the room footprints and
-        # the unlabelled western zone; this is not a technical service plan.
-        gap='#ffffff'
-        line(718,375,718,397,gap,4)
-        line(783,208,806,208,gap,4)
-        line(831,208,847,208,gap,4);line(868,208,884,208,gap,4)
-        line(896,123,896,143,gap,4)
-        line(932,205,958,205,gap,4)
-        line(926,319,937,341,gap,4)
-        line(601,357,601,378,gap,4);line(601,405,601,426,gap,4)
-        line(465,467,491,467,gap,4)
         line(893,246,893,373,'#6d8f86',2.8)
         route='#47796a'
         line(478,467,478,452,route,2.4);line(478,452,660,452,route,2.4)
         line(660,452,660,369,route,2.4)
         polygon([(660,361),(655,371),(665,371)],route,route,.4)
         text(675,444,'中央受付へ',11,'start',route)
-        rect(656,408,8,8,gap,route,1.5)
+        rect(656,408,8,8,corridor,route,1.5)
         text(648,416,'撮影位置',10,'end',route)
         line(718,395,736,412,route,.9)
         text(742,417,'ラウンジ入口',10,'start',route)
@@ -125,7 +147,7 @@ def create_plan(old=False):
     return primitives
 
 def write_svg(primitives,target):
-    parts=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 710" role="img"><title>あすなろ産業支援交流施設 4階配置図</title><g font-family="Yu Gothic,Meiryo,sans-serif">']
+    parts=['<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="710" viewBox="0 0 1200 710" role="img"><title>あすなろ産業支援交流施設 4階配置図</title><g font-family="Yu Gothic,Meiryo,sans-serif">']
     for kind,p,fill,stroke,sw in primitives:
         attrs=f'fill="{fill}" stroke="{stroke}" stroke-width="{sw}"'
         if kind=='rect':x,y,w,h=p;parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" {attrs}/>')
