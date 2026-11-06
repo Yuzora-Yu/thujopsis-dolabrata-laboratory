@@ -15,3 +15,8 @@ export function matchesSearch(entry,query) {
 export function normalizeDocumentId(value=''){
  return String(value).normalize('NFKC').toUpperCase().replace(/[‐‑‒–—−]/gu,'-').replace(/\s+/gu,'');
 }
+
+export const documentLookupMessages = {
+ missing:'該当する資料はありません。',
+ restricted:'該当する資料は閲覧できません。',
+};

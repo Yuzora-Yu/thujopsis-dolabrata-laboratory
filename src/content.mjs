@@ -1,6 +1,7 @@
 import {programPath,programTitle} from './program.mjs';
 import {galleryRecords} from './world/gallery.mjs';
 import {additionalTenants,tenantDetails} from './world/tenants.mjs';
+import {tenantMaterials} from './world/tenant-materials.mjs';
 import {expandNews} from './world/news.mjs';
 import {extraAccounts} from './world/accounts.mjs';
 import {researchRecords} from './world/records.mjs';
@@ -52,6 +53,16 @@ tenants.sort((a,b)=>tenantOrder.indexOf(a.id)-tenantOrder.indexOf(b.id));
 tenants.forEach((t,i)=>Object.assign(t,tenantDetails[t.id],{page:String(i+1).padStart(4,'0')}));
 Object.assign(accounts,extraAccounts);
 
+export const tenantMaterialEntries = tenants.flatMap(tenant =>
+ (tenantMaterials[tenant.id] || []).map(material => {
+  const article = material.articleId && news.find(n => n.id === material.articleId);
+  const copy = article ? {
+   title:article.title, date:article.date, desk:article.desk,
+   paragraphs:[article.body,...(article.paragraphs || [])],
+  } : {};
+  return {...material,...copy,tenant,path:`/tenants/${tenant.page}/materials/${material.slug}/`};
+ })
+);
 
 enrichPublicPeople({gallery,tenants});
 

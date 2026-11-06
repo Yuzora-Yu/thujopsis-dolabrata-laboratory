@@ -3,7 +3,7 @@ import {fictionFooter,decoratePage} from './experience.mjs';
 import {projects} from './world/projects.mjs';
 import {labThanks,labAssessment} from './lab.mjs';
 import {reservationSpaces} from './world/editorial.mjs';
-import {normalizeDocumentId} from './search.mjs';
+import {normalizeDocumentId,documentLookupMessages} from './search.mjs';
 import {documents,facility,accounts} from './content.mjs';
 import {esc,brand,arrow} from './render.mjs';
 
@@ -41,8 +41,15 @@ function renderMemberPage(path,ctx){
  if(project)return memberLayout(project.title,`<h1>${esc(project.title)}</h1><p class="member-meta">${esc(project.members)}<br>保存期間：${project.period}</p><div class="project-thread">${project.posts.map(([date,by,text])=>`<article class="project-post"><header><b>${esc(by)}</b><time>${date}</time></header><p>${esc(text)}</p></article>`).join('')}</div>${(project.links||[]).map(l=>`<p><a class="text-link" href="${esc(origins[l.origin]+l.path)}" target="_blank" rel="noopener">${esc(l.text)}</a></p>`).join('')}<a class="text-link" href="/members/projects/">共同事業一覧へ</a>`,{...ctx,active:'projects'});
  if(path==='/members/organization/')return memberLayout('運営団体情報',`<h1>運営団体情報</h1><dl class="detail-list"><div><dt>法人名</dt><dd>${facility.foundation}</dd></div><div><dt>法人設立</dt><dd>2010年6月15日</dd></div><div><dt>施設開設</dt><dd>2012年4月1日</dd></div><div><dt>代表者</dt><dd>深町 玲司</dd></div></dl><h2>事業</h2><p>産業支援、交流施設の運営、共同研究および実証事業の企画・管理。</p>`,{...ctx,active:'organization'});
  if(path==='/members/records/'){
-  const id=normalizeDocumentId(query.get('document_id')||'');const found=documents.find(d=>d.id===id&&d.roles.includes(account.role));
-  return memberLayout('研究資料照会',`<h1>研究資料照会</h1>${documentLookup(id)}${id?(found?`<p class="result-count">検索結果　1件</p><a class="document-result" href="/members/records/${found.id}/"><small>${found.id}　${found.date}</small><h2>${esc(found.title)}</h2><small>${esc(found.owner)}</small></a>`:'<p class="empty-state">該当する資料はありません。</p>'):''}`,{...ctx,active:'records'});
+  const id = normalizeDocumentId(query.get('document_id') || '');
+  const found = documents.find(document => document.id === id);
+  let result = '';
+  if (found?.roles.includes(account.role)) {
+   result = `<p class="result-count">検索結果　1件</p><a class="document-result" href="/members/records/${found.id}/"><small>${found.id}　${found.date}</small><h2>${esc(found.title)}</h2><small>${esc(found.owner)}</small></a>`;
+  } else if (id) {
+   result = `<p class="empty-state">${found ? documentLookupMessages.restricted : documentLookupMessages.missing}</p>`;
+  }
+  return memberLayout('研究資料照会',`<h1>研究資料照会</h1>${documentLookup(id)}${result}`,{...ctx,active:'records'});
  }
  const docMatch=path.match(/^\/members\/records\/([A-Z0-9-]+)\/$/);
  if(docMatch){const d=documents.find(d=>d.id===docMatch[1]&&d.roles.includes(account.role));return d?renderDocument(d,ctx):null;}

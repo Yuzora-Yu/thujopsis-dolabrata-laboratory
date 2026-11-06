@@ -1,4 +1,4 @@
-import {matchesSearch,normalizeDocumentId} from './search-engine.js';
+import {matchesSearch,normalizeDocumentId,documentLookupMessages} from './search-engine.js';
 import {classifyEvidence,nextEnding} from './evidence.js';
 import {advanceTrial,trialView} from './lab-core.js';
 
@@ -61,10 +61,35 @@ function stage(){return state.ending|| (state.contact?'contact':'initial');}
 function showError(message){
  let element=document.querySelector('.form-error');if(!element){element=document.createElement('p');element.className='form-error';element.setAttribute('role','alert');(document.querySelector('form')||document.querySelector('main')).prepend(element);}element.textContent=message;
 }
-function documentResults(account,id){
- const form=document.querySelector('.record-form');if(!form)return;form.querySelector('input[name=document_id]').value=id;
- if(!id)return;const found=account.docs.find(d=>d.id===id);
- form.insertAdjacentHTML('afterend',found?`<p class="result-count">検索結果　1件</p><a class="document-result" href="${urlFor('/members/records/'+found.id+'/')}"><small>${esc(found.id)}　${esc(found.date)}</small><h2>${esc(found.title)}</h2><small>${esc(found.owner)}</small></a>`:'<p class="empty-state">該当する資料はありません。</p>');
+async function documentResults(account,id){
+ const form = document.querySelector('.record-form');
+ if (!form) return;
+ form.querySelector('input[name=document_id]').value = id;
+ if (!id) return;
+ const found = account.docs.find(document => document.id === id);
+ const path = /^[A-Z0-9-]{1,60}$/.test(id) ? urlFor('/members/records/'+id+'/') : '';
+ if (found) {
+  form.insertAdjacentHTML('afterend',`<p class="result-count">検索結果　1件</p><a class="document-result" href="${path}"><small>${esc(found.id)}　${esc(found.date)}</small><h2>${esc(found.title)}</h2><small>${esc(found.owner)}</small></a>`);
+  return;
+ }
+ // A Pages shell marks a registered ID without carrying any record metadata.
+ let message = documentLookupMessages.missing;
+ if (path) {
+  try {
+   const response = await fetch(path);
+   if (!response.ok && response.status !== 404) throw new Error('Record lookup unavailable');
+   if (response.ok && (await response.text()).includes('data-record-shell="registered"')) {
+    message = documentLookupMessages.restricted;
+   }
+  } catch {
+   message = '資料を照会できませんでした。時間をおいて再度お試しください。';
+  }
+ }
+ const result = document.createElement('p');
+ result.className = 'empty-state';
+ result.setAttribute('role','status');
+ result.textContent = message;
+ form.after(result);
 }
 window.asunaroLabBridge=async(action,input={})=>{
  if(!roomBundle)throw new Error('資料照会室の閲覧票をご確認ください。');
@@ -83,7 +108,7 @@ async function boot(){
    const documentMatch=current.path.match(/^\/members\/records\/([A-Z0-9-]+)\/$/);
    if(documentMatch){display(account.docs.find(d=>d.id===documentMatch[1])?.html||site.notFound);return;}
    const html=account.stages[stage()]?.[current.path]||account.pages[current.path];display(html||site.notFound);
-   if(current.path==='/members/records/')documentResults(account,normalizeDocumentId(params.get('document_id')||''));
+   if(current.path==='/members/records/')await documentResults(account,normalizeDocumentId(params.get('document_id')||''));
    if(current.path==='/members/inquiry/'){const id=normalizeDocumentId(params.get('record')||'');document.querySelector('#record').value=account.docs.some(d=>d.id===id&&d.inquiry)?id:'';}
    if(current.path==='/members/reservations/'){
     const select=document.querySelector('#space');if(select&&params.get('space'))select.value=params.get('space');

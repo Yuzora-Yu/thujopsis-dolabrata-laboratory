@@ -53,20 +53,46 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   assert.ok(logoSources.every(src=>src.includes('/tenant-logos/')));
   assert.ok(!logoSources.some(src=>src.endsWith('/0003.svg')));
   await p.screenshot({path:'.work/qa/tenant-cards-desktop.png',fullPage:true});
+  await cards.filter({hasText:'モクノワデザイン'}).click();
+  await p.getByRole('link',{name:'資料の閲覧履歴',exact:true}).click();
+  const history = p.locator('#reading-history');
+  await history.getByRole('link',{name:/開設記念の模型を展示いたしました/}).click();
+  await p.getByRole('heading',{name:'開設記念の模型を展示いたしました',exact:true}).waitFor();
+  assert.match(await p.locator('.tenant-material-source').innerText(),/お知らせの控え.*2012\.09\.03/);
+  await p.getByRole('link',{name:'モクノワデザインの閲覧履歴へ',exact:true}).click();
+  assert.equal(new URL(p.url()).hash,'#reading-history');
+  await p.locator('.tenant-reading').screenshot({path:'.work/qa/tenant-reading-desktop.png'});
+  await p.goto(base+'/tenants/0008/');
+  await history.getByRole('link',{name:/工房ギャラリー掲載のお知らせ/}).click();
+  await p.getByRole('link',{name:'つまみを回しやすくするカバー',exact:true}).click();
+  await p.getByRole('heading',{name:'つまみを回しやすくするカバー',exact:true}).waitFor();
   await p.goto(base+'/floor-map/');await p.locator('img[src$="/floor-4f.svg"]').waitFor();
   await p.locator('.floor-arrival img').evaluate(image=>image.decode());
   await p.screenshot({path:'.work/qa/nov06-floor.png',fullPage:true});
   await p.goto(base+'/tenants/0003/');await p.locator('.tenant-exhibit').waitFor();await p.locator('img.tenant-logo').evaluate(image=>image.decode());await p.screenshot({path:'.work/qa/nov06-tenant.png',fullPage:true});
-  await p.goto(base+'/members/login/');await p.locator('#member-id').fill('201204010017');await p.locator('#member-password').fill('20080519');
-  assert.notEqual(await p.locator('.member-header').evaluate(header=>getComputedStyle(header).backgroundColor),publicHeader);
-  await p.getByRole('button',{name:/ログイン/}).click();await p.getByRole('heading',{name:'会員トップ',exact:true}).waitFor();
-  await p.screenshot({path:'.work/qa/member-palette-desktop.png'});
-  await p.goto(base+'/members/records/YH-2018-041/');await p.locator('.record-media a').waitFor();assert.equal(media.length,0,'PDF loaded before a player asked for it');
-  const waiting=p.waitForEvent('download');await p.locator('.record-media a').click();const file=await waiting;assert.equal(file.suggestedFilename(),'YH-2018-041.pdf');
+  const publicUrl = p.url();
+  const [member] = await Promise.all([p.waitForEvent('popup'),p.locator('.member-link').click()]);
+  assert.equal(p.url(),publicUrl);
+  member.on('pageerror',e=>errors.push(e.message));
+  member.on('request',r=>{if(r.url().includes('/assets/record-media/'))media.push(r.url());});
+  await member.locator('#member-id').fill('201204010017');await member.locator('#member-password').fill('20080519');
+  assert.notEqual(await member.locator('.member-header').evaluate(header=>getComputedStyle(header).backgroundColor),publicHeader);
+  await member.getByRole('button',{name:/ログイン/}).click();await member.getByRole('heading',{name:'会員トップ',exact:true}).waitFor();
+  await member.screenshot({path:'.work/qa/member-palette-desktop.png'});
+  await member.goto(base+'/members/records/YH-2018-041/');await member.locator('.record-media a').waitFor();assert.equal(media.length,0,'PDF loaded before a player asked for it');
+  const waiting=member.waitForEvent('download');await member.locator('.record-media a').click();const file=await waiting;assert.equal(file.suggestedFilename(),'YH-2018-041.pdf');
   assert.equal((await fs.readFile(await file.path())).subarray(0,5).toString(),'%PDF-');assert.equal(media.length,1);
-  await p.goto(base+'/members/records/YH-2018-041-A/');assert.equal(await p.locator('.record-media a').count(),0);
+  await member.goto(base+'/members/records/YH-2018-041-A/');assert.equal(await member.locator('.record-media a').count(),0);
+  for (const [id,message] of [
+   ['ＹＨ－２０１８－０４１－Ａ','該当する資料は閲覧できません。'],
+   ['ZZ-2099-999','該当する資料はありません。'],
+  ]) {
+   await member.goto(base+'/members/records/?document_id='+encodeURIComponent(id));
+   await member.getByText(message,{exact:true}).waitFor();
+   assert.equal(await member.locator('.document-result').count(),0);
+  }
   const mobile=await b.newPage({viewport:{width:390,height:844}});mobile.on('pageerror',e=>errors.push(e.message));
-  for(const route of ['/','/research/lunar-habitat/','/news/20261027/','/news/20250509/','/tenants/','/tenants/0003/','/members/login/','/floor-map/']){
+  for(const route of ['/','/research/lunar-habitat/','/news/20261027/','/news/20250509/','/tenants/','/tenants/0003/','/tenants/0004/materials/opening-exhibition/','/members/login/','/floor-map/']){
    await mobile.goto(base+route);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);
    if(route==='/'){await mobile.locator('.facility-hero img').evaluate(im=>im.decode());await mobile.screenshot({path:'.work/qa/nov06-home-mobile.png'});}
   }
@@ -91,6 +117,6 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await memberNav.getByRole('link',{name:'研究資料照会',exact:true}).click();
   await mobile.getByRole('heading',{name:'研究資料照会',exact:true}).waitFor();
   await mobile.screenshot({path:'.work/qa/member-palette-mobile.png'});
-  assert.deepEqual(errors,[]);console.log('Public program passed: facility hero and note, 13 tenant logo cards and hidden profile, member palette, exhibition, maps, 390px layout, authorized PDF.');
+  assert.deepEqual(errors,[]);console.log('Public program passed: tenant history and saved notice, gallery link, separate member tab, distinct lookup responses, maps, 390px layout, authorized PDF.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

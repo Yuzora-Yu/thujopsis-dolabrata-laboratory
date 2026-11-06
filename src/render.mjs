@@ -2,7 +2,7 @@ import {programPath,programTitle,programNotesPath,programBanner,programExhibit,p
 import {tenantExhibits} from './world/tenant-exhibits.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
 import {editorialPages,facilityInfo} from './world/editorial.mjs';
-import {facility, gallery, tenants, news, searchEntries} from './content.mjs';
+import {facility, gallery, tenants, news, searchEntries, tenantMaterialEntries} from './content.mjs';
 import {matchesSearch} from './search.mjs';
 
 export const esc = (v='') => String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -16,7 +16,7 @@ export function brand(){return `<a class="brand" href="/" aria-label="あすな�
 
 export function layout(title,body,{home=false,legacy=false,kind='',description='人と技術が出会い、次の一歩が生まれる。あすなろ産業支援交流施設の施設・サービス、工房、イベントをご案内いたします。'}={}){
  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${esc(description)}"><meta name="theme-color" content="#14282c"><title>${esc(title)}${home?'':' | あすなろ産業支援交流施設'}</title><link rel="icon" href="/assets/logo.png"><link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script></head><body class="${home?'home ':''}${kind}"><a class="skip" href="#main">本文へ移動</a>
- <header class="site-header"><div class="header-main">${brand()}<div class="header-right"><div class="utility"><span>OPEN　平日 8:00–22:00</span><a href="/price/">料金案内</a><a href="/membership/">会員のご案内</a><button type="button" class="search-toggle" aria-label="サイト内検索を開く" data-search-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button><a class="member-link" href="/members/" target="_blank" rel="noopener">会員サイト<span class="sr-only">（別タブで開きます）</span></a></div><button class="menu-toggle" type="button" aria-controls="main-navigation" aria-expanded="false">MENU <span>☰</span></button><nav id="main-navigation" aria-label="メインナビゲーション"><a href="/about/">あすなろについて</a><a href="/facilities/">施設・サービス</a><a href="/workshop/">工房のご案内</a>${kind==='error-page'?'<a href="/tenants/">入居者紹介</a>':''}<a href="/gallery/">制作物ギャラリー</a><a href="/news/">お知らせ</a></nav></div></div></header>
+ <header class="site-header"><div class="header-main">${brand()}<div class="header-right"><div class="utility"><span>OPEN　平日 8:00–22:00</span><a href="/price/">料金案内</a><a href="/membership/">会員のご案内</a><button type="button" class="search-toggle" aria-label="サイト内検索を開く" data-search-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>${link('/members/','会員サイト','member-link')}</div><button class="menu-toggle" type="button" aria-controls="main-navigation" aria-expanded="false">MENU <span>☰</span></button><nav id="main-navigation" aria-label="メインナビゲーション"><a href="/about/">あすなろについて</a><a href="/facilities/">施設・サービス</a><a href="/workshop/">工房のご案内</a>${kind==='error-page'?'<a href="/tenants/">入居者紹介</a>':''}<a href="/gallery/">制作物ギャラリー</a><a href="/news/">お知らせ</a></nav></div></div></header>
  <main id="main">${body}</main>
  <footer class="site-footer"><div class="footer-top">${brand()}<p>人と技術のあいだに、<br>あたらしい可能性を。</p></div><div class="footer-links"><a href="/about/">あすなろについて</a><a href="/facilities/">施設・サービス</a><a href="/floor-map/">フロアマップ</a><a href="/workshop/">工房のご案内</a>${kind==='error-page'?'<a href="/tenants/">入居者紹介</a>':''}<a href="/gallery/">制作物ギャラリー</a><a href="/membership/">会員のご案内</a><a href="/news/">お知らせ</a>${legacy?'<a href="/guide/access/">アクセス</a>':''}</div><div class="footer-bottom"><span>© ASUNARO INDUSTRY & EXCHANGE</span><a href="/privacy/">個人情報の取り扱いについて</a><a href="#main">PAGE TOP ↑</a></div></footer>
  ${fictionFooter()}<dialog class="search-dialog"><div class="search-dialog-head"><span>SITE SEARCH</span><button type="button" class="dialog-close" aria-label="検索を閉じる">×</button></div><form action="/search/" method="get"><label for="site-query">サイト内検索</label><div class="search-box"><input id="site-query" name="q" type="search" placeholder="キーワード" autocomplete="off" required><button type="submit" aria-label="検索">→</button></div></form></dialog>
@@ -40,6 +40,28 @@ function tenantExhibit(id){
 function galleryCards(items){return `<div class="gallery-grid">${items.map(g=>`<a class="gallery-card" href="/gallery/${g.id}/"><div class="image-wrap">${img(g.image,g.title)}</div><div class="card-meta"><time>${g.date}</time><span>${g.tag}</span></div><h3>${g.title}</h3><span class="card-number">No. ${g.id}</span></a>`).join('')}</div>`;}
 function tenantLogo(tenant,alt=''){
  return img(`tenant-logos/${tenant.page}.svg`,alt,'tenant-logo',false,[360,192]);
+}
+function tenantReadingHistory(tenant){
+ const entries = tenantMaterialEntries.filter(material => material.tenant === tenant);
+ return `<section id="reading-history" class="prose tenant-reading">
+  <h2>資料の閲覧履歴</h2>
+  <p>掲載の了承を得た記録を、資料の控えとあわせて掲載しております。</p>
+  <ul class="tenant-reading-list">${entries.map(material => `<li>
+   <a href="${material.path}">
+    <span><time datetime="${material.viewed.replaceAll('.','-')}">${material.viewed}</time><small>閲覧</small></span>
+    <strong>${esc(material.title)}</strong><small>${esc(material.kind)}</small>
+   </a>
+  </li>`).join('')}</ul>
+ </section>`;
+}
+function tenantMaterialPage(material){
+ const {tenant, title, date, desk, paragraphs, kind, galleryId} = material;
+ const work = galleryId && gallery.find(item => item.id === galleryId && item.listed);
+ return layout(title,heading('TENANT MATERIALS',esc(title))+`<article class="wrap article narrow prose tenant-material">
+  <p class="tenant-material-source">${esc(kind)} ／ <time datetime="${date.replaceAll('.','-')}">${date}</time><br>${esc(desk)}</p>
+  ${paragraphs.map(text => `<p>${esc(text)}</p>`).join('')}${work ? `\n  <p>${link('/gallery/'+work.id+'/',esc(work.title))}</p>` : ''}
+  <div class="tenant-material-return">${link('/tenants/'+tenant.page+'/#reading-history',esc(tenant.name)+'の閲覧履歴へ')}</div>
+ </article>`);
 }
 function tenantCards(items){
  return `<div class="tenant-grid">${items.map(tenant=>`
@@ -71,7 +93,7 @@ export function home(ending=''){
 }
 
 const facilityCards=[['coworking','lounge.webp','コワーキング・ラウンジ','日々の仕事から、新しい出会いまで。'],['meeting','media/f-meeting.webp','会議室','打ち合わせや勉強会に合わせた4つの会議室。'],['office','media/f-office.webp','個室オフィス','研究・開発に集中できる独立したワークスペース。'],['cafe','cafe.webp','食堂・カフェ','ひと息つきながら、会話が広がる場所。'],['presentation','media/f-presentation.webp','プレゼンテーションホール','発表会や交流のためのフラットなスペース。'],['hall','media/f-hall.webp','3階ホール','最大500名規模の講演会・展示会に。']];
-export const publicPaths=[...Object.keys(editorialPages),'/','/about/',programPath,programNotesPath,'/facilities/','/workshop/','/gallery/','/news/','/floor-map/','/price/','/membership/','/visit/','/privacy/','/tenants/','/people/asakura-tsumugi/','/people/inaba-mio/','/404/',...facilityCards.map(f=>`/facilities/${f[0]}/`),...news.filter(n=>n.available).map(n=>`/news/${n.id}/`),...tenants.map(t=>`/tenants/${t.page}/`),...gallery.map(g=>`/gallery/${g.id}/`)];
+export const publicPaths=[...Object.keys(editorialPages),'/','/about/',programPath,programNotesPath,'/facilities/','/workshop/','/gallery/','/news/','/floor-map/','/price/','/membership/','/visit/','/privacy/','/tenants/','/people/asakura-tsumugi/','/people/inaba-mio/','/404/',...facilityCards.map(f=>`/facilities/${f[0]}/`),...news.filter(n=>n.available).map(n=>`/news/${n.id}/`),...tenants.map(t=>`/tenants/${t.page}/`),...gallery.map(g=>`/gallery/${g.id}/`),...tenantMaterialEntries.map(material=>material.path)];
 
 function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCHIVE_ORIGIN||'http://127.0.0.1:4176'}}={}){
  if(path==='/') return home(ending);
@@ -106,12 +128,14 @@ function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCH
  if(path==='/visit/')return layout('見学のご案内',heading('VISIT','見学のご案内')+`<section class="wrap article narrow prose"><h2>施設の雰囲気を、実際に。</h2><p>平日9時から17時まで、ラウンジと共用エリアの見学を承っております。中央受付にお立ち寄りください。混雑時にはお待ちいただく場合がございます。</p><p>個室オフィスおよび製作中の工房内は、ご利用者の活動を優先してご案内しております。</p><div class="button-row">${link('/guide/access/','アクセス','button dark')}${link('/floor-map/','4階フロアマップ','button outline')}</div></section>`);
  if(path==='/privacy/')return layout('個人情報の取り扱いについて',heading('PRIVACY','個人情報の取り扱いについて')+`<section class="wrap article narrow prose"><p>施設の利用申請、資料照会においてお預かりした情報は、ご利用に関する確認と連絡のために使用いたします。</p><h2>会員情報</h2><p>会員情報は、本人および所属する事業者の登録内容に基づいて管理しております。変更のご連絡は会員サイトの運営事務局窓口にて承ります。</p><h2>記録資料</h2><p>共同事業の記録には、事業ごとの閲覧区分を設けております。取得した資料は、関係する利用条件に従ってお取り扱いください。</p></section>`);
  if(path==='/tenants/')return layout('入居者紹介',heading('TENANTS','入居者紹介','あすなろで活動する企業と、これまでの入居企業をご紹介いたします。')+`<section class="wrap article">${tenantCards(tenants.filter(t=>t.listed))}</section>`);
+ const material=tenantMaterialEntries.find(entry=>entry.path===path);
+ if(material)return tenantMaterialPage(material);
  const t=tenants.find(t=>path===`/tenants/${t.page}/`);
  if(t){
  const visualKind=t.image?.endsWith('.svg')?'図':'写真';
  const logo=tenantLogo(t,`${t.name}のロゴ`);
  const companyVisual=t.logoOnly?`<div class="tenant-logo-panel">${logo}</div>`:`<figure class="company-image"><button type="button" class="photo-button" data-image-open="/assets/${t.image}" aria-label="${esc(t.name)}の${visualKind}を拡大">${img(t.image,`${t.name}の研究・製品の記録`,'tenant-photo',true)}</button><figcaption>${esc(t.photoDate||t.activities.find(a=>a.image===t.image)?.date||'')}　${esc(t.activities.find(a=>a.image===t.image)?.title||'研究・製品の記録')}</figcaption></figure>`;
- return layout(t.name,heading('TENANT PROFILE',t.name)+`<article class="wrap article tenant-profile"><div class="tenant-profile-lead"><p class="profile-index">No. ${t.page} / ${esc(t.period)}</p>${t.logoOnly?'':logo}</div>${companyVisual}<nav class="profile-tabs" aria-label="企業情報"><a href="#profile">企業紹介</a><a href="#activities">活動報告</a></nav><section id="profile" class="prose"><h2>${esc(t.tagline)}</h2><p>${esc(t.description)}</p><ul class="company-services">${t.products.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${tenantExhibit(t.id)}<dl class="detail-list"><div><dt>代表者</dt><dd>${esc(t.person)}</dd></div><div><dt>設立</dt><dd>${t.established}</dd></div><div><dt>入居</dt><dd>${t.joined}</dd></div><div><dt>登録番号</dt><dd>${t.id}</dd></div><div><dt>区画</dt><dd>${t.room}号室</dd></div><div><dt>入居期間</dt><dd>${t.period}</dd></div></dl></section><section id="activities" class="prose"><h2>活動報告</h2>${t.activities.map(a=>`<article class="company-activity"><time>${a.date}</time><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p>${a.image&&a.image!==t.image?`<button type="button" class="photo-button" data-image-open="/assets/${a.image}" aria-label="${esc(a.title)}の写真を拡大">${img(a.image,`${t.name} ${a.date}の活動記録`,'activity-photo',false,a.credential?[6144,4096]:null)}</button>`:''}</article>`).join('')}</section>${link('/tenants/','入居者紹介へ')}</article>`);
+ return layout(t.name,heading('TENANT PROFILE',t.name)+`<article class="wrap article tenant-profile"><div class="tenant-profile-lead"><p class="profile-index">No. ${t.page} / ${esc(t.period)}</p>${t.logoOnly?'':logo}</div>${companyVisual}<nav class="profile-tabs tenant-profile-tabs" aria-label="企業情報"><a href="#profile">企業紹介</a><a href="#activities">活動報告</a><a href="#reading-history">資料の閲覧履歴</a></nav><section id="profile" class="prose"><h2>${esc(t.tagline)}</h2><p>${esc(t.description)}</p><ul class="company-services">${t.products.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${tenantExhibit(t.id)}<dl class="detail-list"><div><dt>代表者</dt><dd>${esc(t.person)}</dd></div><div><dt>設立</dt><dd>${t.established}</dd></div><div><dt>入居</dt><dd>${t.joined}</dd></div><div><dt>登録番号</dt><dd>${t.id}</dd></div><div><dt>区画</dt><dd>${t.room}号室</dd></div><div><dt>入居期間</dt><dd>${t.period}</dd></div></dl></section><section id="activities" class="prose"><h2>活動報告</h2>${t.activities.map(a=>`<article class="company-activity"><time>${a.date}</time><h3>${esc(a.title)}</h3><p>${esc(a.body)}</p>${a.image&&a.image!==t.image?`<button type="button" class="photo-button" data-image-open="/assets/${a.image}" aria-label="${esc(a.title)}の写真を拡大">${img(a.image,`${t.name} ${a.date}の活動記録`,'activity-photo',false,a.credential?[6144,4096]:null)}</button>`:''}</article>`).join('')}</section>${tenantReadingHistory(t)}${link('/tenants/','入居者紹介へ')}</article>`);
  }
  if(path==='/people/asakura-tsumugi/')return layout('朝倉 紬乃｜制作と活動の記録',heading('PEOPLE','朝倉 紬乃')+`<article class="wrap article narrow prose"><p class="profile-kicker">TSUMUGINO ASAKURA / FABRICATION</p><p>1993年6月18日生まれ。2012年からあすなろの個人会員として制作を始め、2015年より工房の技術支援に従事。生活道具の製作と、過去の制作記録の保全に取り組んでいます。</p>${img('media/p-asakura.webp','2017年、工房の取材時に撮影した朝倉紬乃')}<h2>制作について</h2><p>最初の頃、治具を割ってしまって、もう来ない方がいいのかと聞いたことがあります。榊原先生は、工房の費用で交換できると説明してから、「失敗した人を追い出したら、誰も試せないでしょう」と笑いました。私も同じ説明をできる側になりたいと思いました。</p><p>使った人がいなくなった道具にも、直した跡が残っています。捨てる前に、誰がどこを変えたのか調べるのが好きです。先生の言葉を記録する仕事も、そこから続いています。</p><h2>工房で教わったこと</h2><p>2021年、初めて工房に来た瀬尾灯さんに、機械と材料の扱いをご案内しました。私と一つ違いの年齢で、設計の仕事を経て作業療法士になったと伺いました。困りごとを聞くとすぐ図面を描き始めるので、三枝律と一緒に、今日はどこまで作るかと相談したものです。</p></article>`);
  if(path==='/people/inaba-mio/')return layout('稲葉 澪｜利用者インタビュー',heading('PEOPLE','伝わる道具を、少しずつ。')+`<article class="wrap article narrow prose"><p class="profile-kicker">稲葉 澪 / 図解・案内制作　2016.03.25</p>${img('media/p-inaba.webp','2016年、案内図の原稿と触知サンプルを照合する作業の記録')}<p>ものの位置や使い方を、図や立体で伝える仕事をしています。ここでは、使う方の話を直接聞きながら試作できるのがうれしいです。</p><blockquote>同じものを見ても、必要な案内は人それぞれ。ひとつの正解だけに揃えないで作っていきたいです。</blockquote><p>触ってわかる案内図の制作に参加。<small>掲載情報更新：2019.03.31</small><br>2019年3月、当施設での活動を終了。</p></article>`);

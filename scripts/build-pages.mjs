@@ -39,8 +39,14 @@ await page('/search/',renderPublic('/search/',{origins}));
 await writeFile(path.join(out,'404.html'),hosted(notFound()));generated.push('404.html');
 await writeFile(path.join(out,'.nojekyll'),'');
 const ctxBase={csrf:'@@CSRF@@',caseId:'@@CASE@@',query:new URLSearchParams(),origins,caseState:{contact:false,ending:'',truth:false}};
-const portalPaths=['/members/','/members/login/','/members/records/','/members/activity/','/members/messages/','/members/projects/','/members/organization/','/members/reservations/','/members/inquiry/','/members/contact/','/members/contact/received/','/members/personal/',...documents.map(d=>`/members/records/${d.id}/`),...projects.map(p=>`/members/projects/${p.slug}/`)];
-for(const route of portalPaths)await page(route,route==='/members/login/'?loginPage('@@CSRF@@',{next:route}):memberLayout('会員サイト','<section class="portal-loading" role="status"><p>ページを読み込んでいます。</p></section>'));
+const recordPaths = new Set(documents.map(document => `/members/records/${document.id}/`));
+const portalPaths=['/members/','/members/login/','/members/records/','/members/activity/','/members/messages/','/members/projects/','/members/organization/','/members/reservations/','/members/inquiry/','/members/contact/','/members/contact/received/','/members/personal/',...recordPaths,...projects.map(p=>`/members/projects/${p.slug}/`)];
+for (const route of portalPaths) {
+ const marker = recordPaths.has(route) ? ' data-record-shell="registered"' : '';
+ const shell = `<section class="portal-loading" role="status"${marker}><p>ページを読み込んでいます。</p></section>`;
+ const html = route === '/members/login/' ? loginPage('@@CSRF@@',{next:route}) : memberLayout('会員サイト',shell);
+ await page(route,html);
+}
 for(const route of archivePublicPaths)await page(route,renderLegacy(route,{...ctxBase,session:{}}),'archive');
 await page('/room/',legacyLogin('@@CSRF@@'),'archive');
 for(const route of ['/room/console/','/room/console/subjects/'])await page(route,legacyLogin('@@CSRF@@'),'archive');

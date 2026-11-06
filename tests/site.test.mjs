@@ -35,7 +35,10 @@ test('document visibility is enforced by account, including direct document URLs
  const c=client();assert.equal((await c.get('/members/records/CH-2021-003/')).response.status,303);
  assert.equal((await c.login('201204010017','wrong')).status,401);assert.equal((await c.login('201204010017','20080519')).status,303);
  assert.match((await c.get('/members/records/?document_id=YH-2018-041')).text,/検索結果　1件/);
- const absent=(await c.get('/members/records/?document_id=YH-2018-041-A')).text;assert.match(absent,/該当する資料はありません/);assert.doesNotMatch(absent,/稲葉 澪/);
+ const denied=(await c.get('/members/records/?document_id=YH-2018-041-A')).text;
+ assert.match(denied,/該当する資料は閲覧できません。/);assert.doesNotMatch(denied,/稲葉 澪|class="document-result"/);
+ const absent=(await c.get('/members/records/?document_id=ZZ-2099-999')).text;
+ assert.match(absent,/該当する資料はありません。/);
  assert.equal((await c.get('/members/records/YH-2018-041-A/')).response.status,404);
  assert.equal((await c.login('201804010046','20151112')).status,303);
  assert.match((await c.get('/members/records/YH-2018-041-A/')).text,/稲葉 澪/);
@@ -89,7 +92,7 @@ test('document viewer can query another document from its footer and preserves p
  const c=client();await c.login('201204010017','20080519');
  const doc=(await c.get('/members/records/YH-2018-041/')).text;
  assert.match(doc,/<section class="record-lookup"[\s\S]*action="\/members\/records\/"[\s\S]*id="next-document-id"/);
- assert.match((await c.get('/members/records/?document_id=YH-2018-041-A')).text,/該当する資料はありません/);
+ assert.match((await c.get('/members/records/?document_id=YH-2018-041-A')).text,/該当する資料は閲覧できません。/);
  assert.doesNotMatch((await c.get('/members/organization/')).text,/0000/);
  assert.doesNotMatch((await c.get('/members/records/YH-2013-014/')).text,/0000/);
 });
