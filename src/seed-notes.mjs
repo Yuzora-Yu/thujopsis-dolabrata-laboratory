@@ -53,8 +53,8 @@ export const seedNotes = {
   source:'https://www.nasa.gov/missions/artemis/networks-keeping-nasas-artemis-ii-mission-connected/',
  },
  '/visit/':{
-  number:9, label:'返却欄', mark:'receipt', title:'会員証の返却控え',
-  body:'受領：済\n返却先：本人\n退館：＿＿＿＿\n\n閉館後も、呼出表示は消さないこと。\n本人が戻るまで、退館欄は空欄のまま。',
+  number:9, label:'案内票の版番号', mark:'receipt', stamp:'見学案内 第4版', title:'会員証の返却控え',
+  body:'会員証：受領済\n返却先：本人\n退館時刻：＿＿＿＿\n\n見学者名簿は閉じました。\n呼出表示はまだ消さないでください。',
   beginsDrift:true,
  },
 };

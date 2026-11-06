@@ -172,7 +172,7 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .price-note{text-align:left;font-weight:600;padding-bottom:.25rem}
 .visit-form-edition{border-top:1px solid var(--line);padding-top:.45rem;color:#647069;font-size:.73rem}
 .visit-guide>h2:first-child{margin-top:0}
-.visit-form-edition .seed-note-receipt{color:inherit;min-width:3.2rem;font-size:inherit}
+.visit-form-edition .seed-note-receipt{color:inherit;padding:0 .2rem 0 0;font-size:inherit;letter-spacing:inherit}
 @media(min-width:801px){.facility-hero .seed-note-sun{--note-ink:#eedcba}}
 .closure-hero .seed-note-sun{--note-ink:#eedcba}
 .gallery-detail-links{max-width:850px;margin-inline:auto;gap:.8rem 1rem}

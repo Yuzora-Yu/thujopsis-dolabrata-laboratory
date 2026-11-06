@@ -35,6 +35,7 @@ async function checkMenuNotes(browser){
 }
 async function checkReceptionCopy(browser){
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
+ let savedProgress;
  try {
   const page=await context.newPage(),errors=[];
   page.on('pageerror',error=>errors.push(error.message));
@@ -45,7 +46,8 @@ async function checkReceptionCopy(browser){
 
   await page.goto(at('/visit/'));
   assert.equal(await page.locator('.seed-drift-link').count(),0);
-  const receipt=page.getByRole('button',{name:'返却欄',exact:true});
+  const receipt=page.getByRole('button',{name:'案内票の版番号',exact:true});
+  assert.equal(await receipt.innerText(),'見学案内 第4版');
   await receipt.focus();
   await page.keyboard.press('Enter');
   const note=page.getByRole('dialog');
@@ -63,6 +65,12 @@ async function checkReceptionCopy(browser){
   await page.goto(at('/gallery/0029/'));
   assert.equal(await page.locator('.seed-drift-link').count(),0);
   assert.equal((await context.cookies()).some(cookie=>cookie.name.startsWith('asunaro_seed_')),false);
+
+  await page.goto(at('/visit/'));
+  await receipt.click();
+  assert.equal(await note.locator('[data-seed-note-progress]').innerText(),'記録済み 1 / 9');
+  assert.equal(await page.locator('.seed-drift-link').count(),0);
+  await page.keyboard.press('Escape');
 
   const other=await context.newPage();
   await other.goto(at('/visit/reception-copy/'));
@@ -84,10 +92,21 @@ async function checkReceptionCopy(browser){
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   await page.reload();
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
+  await page.locator('.seed-collection-nav').getByRole('link',{name:'中央受付の引継ぎ控え'}).waitFor();
   await page.screenshot({path:'.work/qa/seed-reception-reward.png'});
   assert.deepEqual(errors,[]);
+  savedProgress=await context.storageState();
  } finally {
   await context.close();
+ }
+ const reopened=await browser.newContext({storageState:savedProgress});
+ try {
+  const page=await reopened.newPage();
+  await page.goto(at('/'));
+  await page.locator('.seed-collection-nav').getByRole('link',{name:'中央受付の引継ぎ控え'}).click();
+  await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
+ }finally{
+  await reopened.close();
  }
 }
 async function followPublicLinks(browser){

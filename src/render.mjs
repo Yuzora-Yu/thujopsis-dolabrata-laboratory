@@ -39,7 +39,7 @@ function seedNoteButton(path){
  const note=seedNotes[path];
  if(!note)return '';
  const mark=noteMarks[note.mark];
- const content=mark?`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${mark}</svg>`:esc(note.label);
+ const content=mark?`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${mark}</svg>`:esc(note.stamp||note.label);
  return `<button type="button" class="seed-note seed-note-${note.mark}" aria-haspopup="dialog" aria-label="${esc(note.label)}">${content}</button>`;
 }
 const heading=(en,title,lead='')=>`<div class="page-heading wrap"><div class="breadcrumb"><a href="/">HOME</a><span>/</span>${esc(title)}</div><p class="eyebrow">${en}</p><h1>${title}</h1>${lead?`<p class="page-lead">${lead}</p>`:''}</div>`;
@@ -214,9 +214,9 @@ function receptionCopyPage(){
      <h2>10月1日　引継ぎ</h2>
      <dl><div><dt>17:00</dt><dd>見学受付終了。</dd></div>
       <div><dt>17:06</dt><dd>案内板を翌日分へ差し替え。</dd></div>
-      <div><dt>17:14</dt><dd>返却欄に記入のない会員証、一枚。</dd></div></dl>
-     <p>会員証は引き出しに戻さず、呼出札の横へ置きました。</p>
-     <p class="reception-copy-note">次に呼ぶときは、番号ではなく、お名前で。</p>
+      <div><dt>17:14</dt><dd>返却待ちの会員証、一枚。呼出札の横に置いてあります。</dd></div>
+      <div><dt>17:26</dt><dd>裏口の通行記録は照合済み。該当なし。</dd></div></dl>
+     <p class="reception-copy-note">次の方が出勤したら、館内放送でお名前を呼んでください。もう一度だけ。</p>
     </article>
    </template>
   </section>`);
@@ -274,7 +274,7 @@ function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCH
  if(path==='/membership/')return layout('会員のご案内',heading('MEMBERSHIP','会員のご案内','仕事や研究、ものづくりの拠点としてご利用いただけます。')+`<section class="wrap article narrow"><div class="notice"><span class="eyebrow">受付状況</span><h2>現在、新規受付を休止しております。</h2><p>月額会員および個室オフィスは定員に達しております。受付再開の際は、お知らせにてご案内いたします。</p></div><div class="prose"><h2>月額会員</h2><p>ラウンジ、会議室、工房などをご利用いただけます。日常の仕事や共同事業の拠点として、企業・個人の方にご利用いただいております。</p><h2>オフィス会員</h2><p>独立した個室を事業や研究の拠点としてご利用いただけます。法人・個人事業の方を対象として、事業内容と利用計画を確認のうえ、区画ごとに契約を承っております。</p><h2>ご入会までの流れ</h2><p>募集を行う際は、施設見学、利用計画のご相談、登録内容の確認、契約のお手続きの順にご案内いたします。現在は定員に達しているため、新規のお申し込みは受け付けておりません。</p><h2>よくあるご質問</h2><h3>工房の経験がなくても利用できますか。</h3><p>スタッフによる製作支援をご利用いただけます。材料と用途を確認し、加工方法をご提案いたします。入居企業・登録会員の工房利用は無料です。</p><h3>会議室の利用料は月額会費に含まれますか。</h3><p>会議室の利用料は別途申し受けます。予約前に${link('/price/','料金のご案内')}をご確認ください。</p><div class="button-row"> ${link('/members/','既存会員の方はこちら','button dark')}${link('/visit/','見学のご案内')}${seedNoteButton('/membership/')}</div></div></section>`);
  if(path==='/price/')return layout('料金のご案内',heading('PRICE','料金のご案内')+`<section class="wrap article narrow prose"><p>表示金額は税込です。工房は入居企業・登録会員に無料でご利用いただけます。</p><div class="table-scroll"><table><caption class="seed-note-line price-note">施設利用料${seedNoteButton('/price/')}</caption><thead><tr><th>区分</th><th>料金</th><th>単位</th></tr></thead><tbody><tr><td>ラウンジ月額会員</td><td>11,000円</td><td>月額</td></tr><tr><td>会議室A（24名）</td><td>2,200円</td><td>1時間</td></tr><tr><td>会議室B・C（6名）</td><td>880円</td><td>1時間</td></tr><tr><td>会議室D（10名）</td><td>1,320円</td><td>1時間</td></tr><tr><td>工房設備・少量試作</td><td>無料</td><td>入居企業・登録会員</td></tr><tr><td>プレゼンテーションホール（60名）</td><td>3,300円</td><td>1時間</td></tr><tr><td>3階ホール（500名）</td><td>11,000円</td><td>1時間</td></tr><tr><td>個室オフィス</td><td>区画別に設定</td><td>月額</td></tr></tbody></table></div><p>会議室・工房のご利用は会員サイトからお申し込みください。</p>${link('/members/reservations/','利用申請','button dark')}</section>`);
  if(path===seedCollectionPath)return receptionCopyPage();
- if(path==='/visit/')return layout('見学のご案内',heading('VISIT','見学のご案内')+`<section class="wrap article narrow prose visit-guide"><h2>施設の雰囲気を、実際に。</h2><p>平日9時から17時まで、ラウンジと共用エリアの見学を承っております。中央受付にお立ち寄りください。混雑時にはお待ちいただく場合がございます。</p><p>個室オフィスおよび製作中の工房内は、ご利用者の活動を優先してご案内しております。</p><div class="button-row">${link('/guide/access/','アクセス','button dark')} ${link('/floor-map/','4階フロアマップ','button outline')}</div><p class="visit-form-edition seed-note-line"><span>見学案内　2026年10月版</span>${seedNoteButton('/visit/')}</p></section>`);
+ if(path==='/visit/')return layout('見学のご案内',heading('VISIT','見学のご案内')+`<section class="wrap article narrow prose visit-guide"><h2>施設の雰囲気を、実際に。</h2><p>平日9時から17時まで、ラウンジと共用エリアの見学を承っております。中央受付にお立ち寄りください。混雑時にはお待ちいただく場合がございます。</p><p>個室オフィスおよび製作中の工房内は、ご利用者の活動を優先してご案内しております。</p><div class="button-row">${link('/guide/access/','アクセス','button dark')} ${link('/floor-map/','4階フロアマップ','button outline')}</div><p class="visit-form-edition seed-note-line">${seedNoteButton('/visit/')}<span>2026年10月改訂</span></p></section>`);
  if(path==='/privacy/')return layout('個人情報の取り扱いについて',heading('PRIVACY','個人情報の取り扱いについて')+`<section class="wrap article narrow prose"><p>施設の利用申請、資料照会においてお預かりした情報は、ご利用に関する確認と連絡のために使用いたします。</p><h2>会員情報</h2><p>会員情報は、本人および所属する事業者の登録内容に基づいて管理しております。変更のご連絡は会員サイトの運営事務局窓口にて承ります。</p><h2>記録資料</h2><p>共同事業の記録には、事業ごとの閲覧区分を設けております。取得した資料は、関係する利用条件に従ってお取り扱いください。</p></section>`);
  if(path==='/tenants/')return layout('入居者紹介',heading('TENANTS','入居者紹介','あすなろで活動する企業と、これまでの入居企業をご紹介いたします。')+`<section class="wrap article">${tenantCards(tenants.filter(t=>t.listed))}</section>`);
  const material=tenantMaterialEntries.find(entry=>entry.path===path);
