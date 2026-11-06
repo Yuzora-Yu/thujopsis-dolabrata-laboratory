@@ -48,21 +48,22 @@ async function traceNewspaper(page,archive){
  assert.equal(await catalog.locator('a:visible').count(),1);
  await catalog.getByRole('link',{name:/訂正欄/}).click();
  assert.match(await body(archive),/紙面抄録[\s\S]*地域版初刷[\s\S]*当該記述を撤回[\s\S]*後刷では、当該記述を削除/);
- const checkClipping=async filename=>{
-  const pdf=archive.locator('a[href$="/'+filename+'"]');
+ const checkClipping=async (filename,label)=>{
+  const pdf=archive.getByRole('link',{name:label});
+  assert.ok((await pdf.getAttribute('href')).endsWith('/'+filename));
   assert.equal(await pdf.getAttribute('target'),'_blank');
   const response=await archive.request.get(new URL(await pdf.getAttribute('href'),archive.url()).href);
   assert.ok(response.ok(),filename);
   assert.deepEqual(await response.body(),await fs.readFile('public/assets/archive/'+filename));
  };
- await checkClipping('younagi-20211105.pdf');
- await checkClipping('younagi-20211104-late.pdf');
+ await checkClipping('younagi-20211105.pdf',/11月5日地域版 訂正欄（PDF）/);
+ await checkClipping('younagi-20211104-late.pdf',/11月4日地域版 後刷（PDF）/);
  assert.equal(await archive.locator('a[href$="/0009/"], a[href$="/younagi-20211104.pdf"]').count(),0);
  const firstPrint=new URL(archive.url());
  firstPrint.pathname=firstPrint.pathname.replace(/\d{4}\/$/,'0009/');
  await archive.goto(firstPrint.href);
  assert.match(await body(archive),/服毒による自殺か/);
- await checkClipping('younagi-20211104.pdf');
+ await checkClipping('younagi-20211104.pdf',/11月4日地域版 初刷（PDF）/);
  const firstPrintCode=await archive.locator('.legacy-record-meta').innerText();
  await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
  await search(firstPrintCode.match(/NK-\d{4}-\d{4}/)[0]);

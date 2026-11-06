@@ -28,7 +28,7 @@ function renderLegacyPage(path,ctx){
  const item=archiveItems.find(i=>path===`/collections/items/${i.id}/`);
  if(item){
   const original=item.sourcePath?`<p>${linked((origins.main||'../../../..')+item.sourcePath,'施設サイトのお知らせ（2021年11月3日）')}</p>`:'';
-  const copy=item.file?archivePdf(item.file,item.kind+'の複写'):'';
+  const copy=item.file?archivePdf(item.file,item.fileLabel||item.kind+'の複写'):'';
   const related=item.relatedEdition?archivePdf(item.relatedEdition.file,item.relatedEdition.label):'';
   return legacyLayout(item.title,`<div class="legacy-record-meta">収蔵番号 ${item.code} ／ ${item.year}年 ／ ${item.kind}</div><p>${esc(item.body)}</p><div class="legacy-transcription"><h2>${item.kind==='新聞切抜'?'紙面抄録':'収録内容'}</h2><p>${esc(item.text).replaceAll('\n','<br>')}</p></div><p class="small">${esc(item.next)}</p>${item.scan?`<figure class="archival-scan"><a href="/assets/archive/${esc(item.scan)}" target="_blank" rel="noopener"><img src="/assets/archive/${esc(item.scan)}" loading="lazy" alt="継舟計画の保存複写。本文の文字起こしは上に掲載しています。"><span class="sr-only">画像を別タブで開く</span></a><figcaption>所蔵原本の保存複写</figcaption></figure>`:''}${original}${copy}${related}<p><a href="/collections/">収蔵目録へ</a></p>`);
  }
