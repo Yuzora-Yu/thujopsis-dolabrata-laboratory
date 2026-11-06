@@ -17,7 +17,10 @@ if(newsForm){
  for(let page=1;page<=totalPages;page++){if(totalPages===1)break;const anchor=document.createElement('a'),query=new URLSearchParams(location.search);query.set('page',String(page));anchor.href=location.pathname+'?'+query;anchor.textContent=String(page);anchor.setAttribute('aria-label',page+'ページ目');if(page===current)anchor.setAttribute('aria-current','page');pagination.append(anchor);}
 }
 const habitat=document.querySelector('[data-habitat-demo]');
-if(habitat){const modes={normal:{water:'通常の循環経路',record:'外部保管先と同期',workshop:'補用品を受領',note:'外部から補用品を受け取り、設備を通常の系統で運用します。'},isolated:{water:'循環を予備経路へ切替',record:'施設内の控えで引継ぎ',workshop:'手元の材料で部品を製作',note:'外部との接続が戻るまで、水・記録・製作を施設内でつなぎます。'}};const buttons=[...habitat.querySelectorAll('[data-habitat-mode]')];
+if(habitat){const modes={
+ normal:{water:'通常の循環経路',record:'地上側の控えと照合',workshop:'補用品を受領',note:'補給便から交換部品を受け取り、通常の系統で運用します。'},
+ isolated:{water:'循環を予備経路へ切替',record:'居住区に残した控えで引き継ぐ',workshop:'手元の材料で部品を製作',note:'次の便が届くまで、居住区にある設備・材料・記録で作業を続けます。'}
+ };const buttons=[...habitat.querySelectorAll('[data-habitat-mode]')];
  for(const button of buttons)button.addEventListener('click',()=>{const key=button.dataset.habitatMode,mode=modes[key];if(!mode)return;habitat.dataset.mode=key;for(const b of buttons)b.setAttribute('aria-pressed',String(b===button));for(const cell of habitat.querySelectorAll('[data-system-status]'))cell.textContent=mode[cell.dataset.systemStatus];habitat.querySelector('[data-habitat-note]').textContent=mode.note;});
 }
 const photoDialog=document.querySelector('.image-dialog');let zoom=1,angle=0,fitWidth=0,fitHeight=0;

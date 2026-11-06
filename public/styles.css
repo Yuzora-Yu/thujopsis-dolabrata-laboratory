@@ -60,3 +60,22 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .record-media{display:flex;flex-wrap:wrap;gap:.45rem 1.15rem;margin:1.1rem 0 1.9rem;font-size:.85rem}.record-media>a{color:#285146;padding:.35rem 0;min-height:40px;display:inline-flex;align-items:center;gap:.45rem;text-underline-offset:.25em}.record-media>a[aria-busy=true]{opacity:.65}.record-media p{flex-basis:100%;margin:0;color:#745134}.record-media p:empty{display:none}.archival-scan{max-width:440px;margin:2rem 0}.archival-scan img{display:block;width:100%;height:auto;border:1px solid #bdb8a9}.archival-scan figcaption{font-size:.78rem;margin-top:.5rem;color:#5a5a51}
 .company-activity .activity-photo{height:auto}.floor-section .map-legend{gap:.7rem 1.3rem}.floor-section .map-toolbar>a{min-height:44px;display:inline-flex;align-items:center}
 .lunar-system-diagram{width:100%;height:auto;display:block;margin:0 0 .8rem}.lunar-feed-external{stroke:#cbdca8}.lunar-feed-core{stroke:#adc595}.lunar-feed-backup{stroke:#72877e;stroke-dasharray:6 7;opacity:.65}.lunar-demonstrator[data-mode=isolated] .lunar-feed-external{stroke:#72877e;stroke-dasharray:6 7;opacity:.5}.lunar-demonstrator[data-mode=isolated] .lunar-feed-core{stroke:#aabeb2}.lunar-demonstrator[data-mode=isolated] .lunar-feed-backup{stroke:#e5d69c;stroke-dasharray:none;opacity:1}
+#handover{scroll-margin-top:7.5rem}
+.lunar-handover-slip{margin:1.8rem 0 0;padding:1rem 1.2rem;background:#f4f5ee;border:1px solid var(--line)}
+.lunar-handover-slip figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.3rem .8rem;margin:0 0 .7rem;font-size:.78rem;color:var(--muted)}
+.lunar-handover-slip dl{margin:0;font-size:.9rem;line-height:1.65}
+.lunar-handover-slip dl div{display:grid;grid-template-columns:minmax(7.6rem,1fr) minmax(0,3fr);gap:.2rem 1rem;padding:.65rem 0;border-top:1px solid var(--line)}
+.lunar-handover-slip dt{font-weight:600}
+.lunar-handover-slip dd{margin:0}
+.lunar-reading{
+ display:grid;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:1rem 1.6rem;
+ margin-top:2rem;
+}
+.lunar-reading>div{border-top:1px solid var(--line);padding-top:.9rem}
+.lunar-reading p{margin:0 0 .4rem;color:var(--muted);font-size:.86rem;line-height:1.75}
+.lunar-reading a{font-size:.94rem;line-height:1.75}
+@media(max-width:520px){
+ .lunar-reading,.lunar-handover-slip dl div{grid-template-columns:1fr}
+}

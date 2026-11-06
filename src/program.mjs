@@ -9,7 +9,7 @@ export function programOverview(){
 export function programBody(){
  return `<article class="wrap article lunar-program">
  <figure class="lunar-concept"><img src="/assets/media/lunar-habitat-concept.webp" alt="月面の平原に三つの居住モジュールをつないだ構想図。窓に暖色の灯りがともっている。" width="1817" height="866" decoding="async"><figcaption>月面居住区 構想図</figcaption></figure>
- <div class="lunar-intro"><p class="eyebrow">A72 / 地上統合実証</p><h2>ひとつずつ動くことと、<br>一緒に暮らせること。</h2><p>水を循環させる装置、途絶に備えた記録、現地で使う製作設備。ひとつずつ試した技術を、一つの居住区に組み込みます。外部からの補給を受けられない72時間を想定し、どこから暮らしの手順が変わるかを確かめる地上実証です。</p></div>
+ <div class="lunar-intro"><p class="eyebrow">A72 / 地上統合実証</p><h2>補給便が遅れた朝、<br>最初に何をしますか。</h2><p>次の便に積んだ部品を待つあいだも、水を使い、食事を作り、翌朝の班に仕事を渡します。A72は、補給を受けられない72時間を想定した地上実証です。水の循環、現地での部品製作、作業記録の引き継ぎを、一つの居住環境で確かめます。</p></div>
  <section class="lunar-demonstrator" aria-labelledby="demo-heading" data-habitat-demo data-mode="normal"><header><div><p class="eyebrow">A72 / SYSTEM EXHIBIT</p><h2 id="demo-heading">補給が止まったら</h2></div><div class="lunar-mode" role="group" aria-label="設備展示の運用状態"><button type="button" data-habitat-mode="normal" aria-pressed="true">通常</button><button type="button" data-habitat-mode="isolated" aria-pressed="false">補給停止</button></div></header>
  <svg class="lunar-system-diagram" viewBox="0 0 860 220" role="img" aria-label="三つの居住モジュールを結ぶ設備の概略図">
  <defs><pattern id="lunar-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#55736a" stroke-opacity=".25"/></pattern></defs>
@@ -23,10 +23,15 @@ export function programBody(){
  </svg>
  <div class="lunar-system" aria-label="居住モジュールの設備構成">
  <div><span class="system-code">01 / WATER</span><h3>水を戻す</h3><p data-system-status="water">通常の循環経路</p></div>
- <div><span class="system-code">02 / RECORD</span><h3>記録を残す</h3><p data-system-status="record">外部保管先と同期</p></div>
+ <div><span class="system-code">02 / RECORD</span><h3>記録を残す</h3><p data-system-status="record">地上側の控えと照合</p></div>
  <div><span class="system-code">03 / WORKSHOP</span><h3>現地で直す</h3><p data-system-status="workshop">補用品を受領</p></div>
- </div><p class="lunar-system-note" data-habitat-note aria-live="polite">外部から補用品を受け取り、設備を通常の系統で運用します。</p></section>
- <section class="lunar-section"><h2>72時間に、何を測るか</h2><p>装置が復旧する時刻と、食事や仕事を再開できる時刻を別々に記録します。修理のために止めた設備を待つ間も、別の経路で暮らしを続けられるかを見ます。遠くから指示が届かない場面では、引き継いだ記録だけで次の担当者が判断します。</p><a class="text-link" href="/news/20250509/">循環設備の切替試験</a></section>
+ </div><p class="lunar-system-note" data-habitat-note aria-live="polite">補給便から交換部品を受け取り、通常の系統で運用します。</p></section>
+ <section class="lunar-section" id="handover"><h2>次の班が、仕事を始めるまで</h2><p>引き継ぎでは、前の班から口頭で説明を受けず、居住区に残された控えを使います。どの弁を開けたか、どの道具を移したか。次の班がその記録を受け取り、食事や仕事を再開できた時刻までを確かめます。</p>
+ <figure class="lunar-handover-slip">
+ <figcaption><span>A72 / 交代用控え</span><span>展示用見本</span></figcaption>
+ <dl><div><dt>使える水の系統</dt><dd>予備系統。通常系統は点検中。</dd></div><div><dt>移動した道具</dt><dd>洗いかごと清掃済みの器具は、洗い場右手の棚の上から二段目。</dd></div></dl>
+ </figure>
+ <div class="lunar-reading"><div><p>朝の交代で、二つの時刻を記録しました。</p><a class="text-link" href="/news/20261027/">装置が直った時刻、暮らしが戻った時刻</a></div><div><p>片方の枝を閉じても、水が試験槽へ戻るかを確かめました。</p><a class="text-link" href="/news/20250509/">循環設備の切替試験</a></div></div></section>
  <section class="lunar-section"><h2>地上で試せることから</h2><p>地上実証では、外部補給と通信の一部を試験用の系統で再現しております。月面の重力や真空を再現する設備ではございません。公開展示では、4階で試験設備の構成と、個別の技術をご紹介しております。</p><div class="button-row"><a class="button dark" href="/news/20261020/">公開展示のご案内</a><a class="text-link" href="/facilities/">施設・サービス</a></div></section>
  </article>`;
 }

@@ -16,9 +16,24 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   assert.equal(await p.getByRole('button',{name:'補給停止',exact:true}).getAttribute('aria-pressed'),'true');
   assert.match(await p.locator('[data-system-status=water]').innerText(),/予備経路/);
   await p.locator('.lunar-demonstrator').screenshot({path:'.work/qa/nov06-system-exhibit.png'});
+  await p.getByRole('link',{name:'装置が直った時刻、暮らしが戻った時刻',exact:true}).click();
+  await p.getByRole('heading',{name:/06:14.*設備側の記録/}).waitFor();
+  await p.getByRole('heading',{name:/06:41.*次の班の記録/}).waitFor();
+  await p.getByRole('link',{name:'地上統合実証A72の引き継ぎ',exact:true}).click();
+  assert.equal(new URL(p.url()).hash,'#handover');
+  await p.locator('#handover').waitFor();
   await p.getByRole('link',{name:'循環設備の切替試験',exact:true}).click();
   await p.locator('figure.technical-diagram img').evaluate(im=>im.decode());
   await p.locator('figure.technical-diagram').screenshot({path:'.work/qa/nov06-flow.png'});
+  await p.goto(base+'/research/lunar-habitat/');
+  await p.getByRole('link',{name:'公開展示のご案内',exact:true}).click();
+  await p.getByRole('link',{name:'見学のご案内',exact:true}).click();
+  const [accessResponse]=await Promise.all([
+   p.waitForResponse(response=>new URL(response.url()).pathname.endsWith('/guide/access/')&&response.request().isNavigationRequest()),
+   p.getByRole('link',{name:'アクセス',exact:true}).click(),
+  ]);
+  assert.equal(accessResponse.status(),404);
+  await p.getByRole('navigation',{name:'メインナビゲーション'}).getByRole('link',{name:'入居者一覧',exact:true}).waitFor();
   await p.goto(base+'/floor-map/');await p.locator('img[src$="/floor-4f.svg"]').waitFor();
   await p.screenshot({path:'.work/qa/nov06-floor.png',fullPage:true});
   await p.goto(base+'/tenants/0003/');await p.locator('.tenant-exhibit').waitFor();await p.screenshot({path:'.work/qa/nov06-tenant.png',fullPage:true});
@@ -29,10 +44,10 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   assert.equal((await fs.readFile(await file.path())).subarray(0,5).toString(),'%PDF-');assert.equal(media.length,1);
   await p.goto(base+'/members/records/YH-2018-041-A/');assert.equal(await p.locator('.record-media a').count(),0);
   const mobile=await b.newPage({viewport:{width:390,height:844}});mobile.on('pageerror',e=>errors.push(e.message));
-  for(const route of ['/','/research/lunar-habitat/','/news/20250509/','/tenants/0003/','/floor-map/']){
+  for(const route of ['/','/research/lunar-habitat/','/news/20261027/','/news/20250509/','/tenants/0003/','/floor-map/']){
    await mobile.goto(base+route);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);
    if(route==='/'){await mobile.locator('.lunar-hero img').evaluate(im=>im.decode());await mobile.screenshot({path:'.work/qa/nov06-home-mobile.png'});}
   }
-  assert.deepEqual(errors,[]);console.log('Public program passed: concept hero, interactive exhibit, flow diagram, tenant profile, 390px layout, lazy authorized PDF download.');
+  assert.deepEqual(errors,[]);console.log('Public program passed: concept hero, interactive exhibit, handover report and return link, flow diagram, tenant profile, 390px layout, lazy authorized PDF download.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});
