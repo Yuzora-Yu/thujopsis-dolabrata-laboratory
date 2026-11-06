@@ -23,6 +23,7 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
 
 .image-controls{display:flex;gap:8px;margin:0 0 12px}.image-controls button{background:#e8ece4;border:1px solid #d0d9cf;min-width:36px;min-height:32px;padding:2px 10px;font-size:14px}.image-viewport{max-height:74svh;overflow:auto;background:#eef0e9}.image-stage{position:relative;margin:auto}.image-stage img{position:absolute;left:50%;top:50%;max-width:none;max-height:none;object-fit:contain;transform-origin:center}
+.image-stage img[hidden]{display:none}
 
 .gallery-card img{object-fit:contain;background:#eeeae0}.photo-button .article-photo{object-fit:contain;background:#eeeae0}
 

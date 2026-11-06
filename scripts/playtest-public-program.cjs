@@ -263,6 +263,12 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   const workshopImage=workshopPhoto.getByRole('img');
   const photoZoom=workshopPhoto.getByRole('button',{name:'画像を拡大',exact:true});
   await workshopImage.waitFor();
+  assert.equal(await workshopImage.evaluate(img=>{
+   img.hidden=true;
+   const display=getComputedStyle(img).display;
+   img.hidden=false;
+   return display;
+  }),'none','the image stays hidden until it is fitted');
   const initialPhotoWidth=(await workshopImage.boundingBox()).width;
   assert.ok(initialPhotoWidth<=390,'archival photo opens with its full scene');
   for(let step=0;step<8;step++)await photoZoom.click();
