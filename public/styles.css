@@ -96,6 +96,18 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .floor-arrival figcaption{color:var(--muted);font-size:.8rem;margin-top:.5rem}
 .facility-photo{margin:0}
 .facility-photo figcaption{color:var(--muted);font-size:.8rem;margin-top:.65rem}
+.site-header .utility>[data-site-operation="paused"]{display:inline-block;color:#784336;font-weight:700;white-space:nowrap}
+.facility-use-pause{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:.35rem 1.5rem;margin-top:1.1rem;padding:1rem 1.25rem;border-left:3px solid #92795f;background:#f5f1eb}
+.facility-use-pause p{margin:0;font-size:.87rem;line-height:1.8}
+.facility-use-pause .text-link{white-space:nowrap}
+@media(max-width:800px){
+ .site-header .utility>[data-site-operation="paused"]{position:absolute;right:20px;bottom:.42rem;font-size:.64rem}
+ .site-header .member-link{white-space:nowrap}
+}
+@media(max-width:360px){
+ .site-header .header-main{column-gap:10px;padding-inline:12px}
+ .site-header .utility>[data-site-operation="paused"]{right:12px}
+}
 .meeting-rooms{max-width:68rem;padding-bottom:clamp(3rem,7vw,6rem);scroll-margin-top:8.5rem}
 .meeting-rooms h2{font-size:clamp(1.3rem,2.7vw,2rem);line-height:1.45}
 .meeting-rooms>p{margin:.8rem 0 1.25rem;font-size:.93rem;line-height:1.8}
@@ -280,7 +292,7 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .metal-workshop-example,.hall-exhibition figure{margin:0}
 .metal-workshop-example img,.hall-exhibition img{display:block;width:100%;height:auto}
 .metal-workshop-example figcaption,.hall-exhibition figcaption{margin-top:.55rem;font-size:.82rem;color:var(--muted)}
-.hall-exhibition{padding:clamp(1.25rem,4vw,2.6rem);background:#f1f2eb}
+.hall-exhibition{padding:clamp(1.25rem,4vw,2.6rem);background:#f1f2eb;scroll-margin-top:8.5rem}
 .hall-exhibition h2{margin:.35rem 0 .8rem}
 .staff-profile cite{display:block;margin-top:.75rem;font-size:.8rem;font-style:normal;color:var(--muted)}
 .gallery-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem 1.5rem;margin:-.7rem 0 1.65rem}

@@ -21,6 +21,26 @@ async function company(p,number){
  return p.locator('#profile .detail-list>div').evaluateAll(rows=>Object.fromEntries(rows.map(r=>[r.querySelector('dt').textContent,r.querySelector('dd').textContent])));
 }
 async function download(p,selector,name){const waiting=p.waitForEvent('download');await p.locator(selector).click();const file=await waiting;const target='.work/qa/'+mode+'-'+name;await file.saveAs(target);return {file:target,data:await fs.readFile(target)};}
+async function verifyPausedGuide(p,path,content){
+ await p.goto(main(path));
+ const status=p.locator('[data-site-operation="paused"]');
+ await status.waitFor();
+ assert.equal(await status.innerText(),'一般利用休止中');
+ await p.locator('.facility-use-pause').getByRole('link',{name:'休止のお知らせ',exact:true}).waitFor();
+ assert.match(await body(p),content);
+ assert.equal(await p.locator('main a[href*="/members/reservations/"]').count(),0);
+ if(path.includes('#'))await p.waitForFunction(()=>{
+  const target=document.getElementById(location.hash.slice(1));
+  const header=document.querySelector('.site-header').getBoundingClientRect();
+  const top=target?.getBoundingClientRect().top;
+  return top>=header.bottom-1&&top<innerHeight/2;
+ });
+ if(p.viewportSize().width<=390){
+  const [label,member]=await Promise.all([status.boundingBox(),p.locator('.site-header .member-link').boundingBox()]);
+  assert.ok(label.y>=member.y+member.height-1,'mobile status overlaps member navigation');
+  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+ }
+}
 async function traceNewspaper(page,archive){
  await archive.getByRole('link',{name:'収蔵目録',exact:true}).click();
  const catalog=archive.locator('.legacy-catalog');
@@ -352,9 +372,45 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(await p.locator('.visit-band').innerText(),/見学の受付を休止/);
  await p.goto(main('/visit/'));await p.getByRole('heading',{name:'見学の受付を休止しております。'}).waitFor();
  assert.doesNotMatch(await body(p),/平日9時から17時まで/);
+ await verifyPausedGuide(p,'/facilities/meeting/#meeting-rooms',/会議室の定員と位置[\s\S]*会議室D[\s\S]*定員 10名/);
+ await p.setViewportSize({width:320,height:760});
+ await verifyPausedGuide(p,'/floor-map/#floor-meeting',/休止前[\s\S]*会議室/);
+ await p.setViewportSize({width:1440,height:1000});
+ await verifyPausedGuide(p,'/workshop/',/工房の設置機器[\s\S]*工房の試作例/);
+ await verifyPausedGuide(p,'/price/',/会議室D（10名）[\s\S]*1,320円/);
+ await verifyPausedGuide(p,'/research/lunar-habitat/',/展示の様子を写真でご覧いただけます/);
+ await p.goto(main('/news/20120416/'));
+ await p.getByRole('button',{name:'開設時の配置図を拡大'}).waitFor();
+ await p.locator('[data-site-operation="paused"]').waitFor();
+ assert.equal(await p.locator('.facility-use-pause').count(),0);
  for(const ending of ['end1','end2']){
   const branch=await browser.newContext({viewport:{width:1200,height:900},acceptDownloads:true});const q=await branch.newPage();q.on('pageerror',e=>errors.push(e.message));const received=await evidence(q,institution);
-  if(ending==='end1'){await q.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).click();await submit(q,received.file);assert.match(await body(q),/新たな研究支援事業/);await q.goto(main('/members/reservations/'));await until(q,'利用申請・予約');await q.getByText('受付を休止しております。',{exact:true}).waitFor();}
+  if(ending==='end1'){
+   let mapTab,zoom;
+   if(mode==='pages'){
+    mapTab=await branch.newPage();
+    await mapTab.goto(main('/floor-map/'));
+    await mapTab.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
+    zoom=mapTab.getByRole('dialog',{name:'フロアマップを拡大'});
+    await zoom.waitFor();
+   }
+   await q.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).click();
+   await submit(q,received.file);
+   assert.match(await body(q),/新たな研究支援事業/);
+   if(mapTab){
+    await mapTab.locator('[data-site-operation="paused"]').waitFor({state:'attached'});
+    assert.equal(await zoom.isVisible(),true);
+    assert.equal(await mapTab.locator('.facility-use-pause').count(),0);
+    await zoom.getByRole('button',{name:'画像を閉じる'}).click();
+    await mapTab.locator('.facility-use-pause').waitFor();
+    await mapTab.getByRole('heading',{name:'案内図上の位置',exact:true}).waitFor();
+    await mapTab.close();
+   }
+   await verifyPausedGuide(q,'/facilities/meeting/',/休止前のご利用時間/);
+   await q.goto(main('/members/reservations/'));
+   await until(q,'利用申請・予約');
+   await q.getByText('受付を休止しております。',{exact:true}).waitFor();
+  }
   else{
    const entry=await q.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).getAttribute('href');
    const caseQuery=new URL(entry,q.url()).search;
@@ -367,7 +423,11 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
    assert.equal(await q.getByRole('link',{name:'追加資料を提出する',exact:true}).count(),0);
    await q.goto(main('/members/inquiry/?record=CH-2021-003'));
    await q.getByText(/この窓口での受付は終了しました/).waitFor();
-   await q.goto(main('/members/messages/'));await q.getByText('担当者の変更',{exact:true}).waitFor();await q.goto(main('/people/asakura-tsumugi/'));await until(q,'ページが見つかりません');}
+   await q.goto(main('/members/messages/'));await q.getByText('担当者の変更',{exact:true}).waitFor();await q.goto(main('/people/asakura-tsumugi/'));await until(q,'ページが見つかりません');
+   await q.goto(main('/facilities/meeting/'));
+   await q.getByRole('link',{name:/会議室Dの利用申請/}).waitFor();
+   assert.equal(await q.locator('[data-site-operation="paused"]').count(),0);
+  }
   await q.screenshot({path:'.work/qa/'+mode+'-'+ending+'.png',fullPage:true});await branch.close();
  }
  const mobile=await browser.newPage({viewport:{width:390,height:844}});mobile.on('pageerror',e=>errors.push(e.message));for(const route of ['/','/about/identity/','/about/emblem/','/visit/','/workshop/stories/seo-akari/','/people/seo-akari/','/people/seo-fumino/','/people/saegusa-ritsu/','/gallery/0005/','/news/20220218/','/news/20261028/','/news/20220715/','/news/20160520/','/news/20120416/']){await mobile.goto(main(route));assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);}

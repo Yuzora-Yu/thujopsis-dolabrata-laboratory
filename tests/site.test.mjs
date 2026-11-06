@@ -1,7 +1,7 @@
 import {test,before,after} from 'node:test';
 import assert from 'node:assert/strict';
 import {startServers} from '../server.mjs';
-import {publicPaths,renderPublic} from '../src/render.mjs';
+import {pausedFacilityPaths,publicPaths,renderPublic} from '../src/render.mjs';
 import {readFile,mkdir,unlink} from 'node:fs/promises';
 import path from 'node:path';
 import {accounts,gallery,tenants,news} from '../src/content.mjs';
@@ -25,6 +25,9 @@ test('public HTML is rendered without credentials, protected data or hidden link
  }
  const c=client();assert.equal((await c.get('/gallery/0015/')).response.status,200);assert.equal((await c.get('/tenants/0003/')).response.status,200);
  assert.match((await c.get('/guide/access/')).text,/href="\/tenants\/"/);assert.equal((await c.get('/guide/access/')).response.status,404);
+ const openGuide=(await c.get('/facilities/meeting/')).text;
+ assert.match(openGuide,/OPEN　平日/);
+ assert.doesNotMatch(openGuide,/一般利用休止中|href="\/news\/closure\//);
 });
 
 test('public pages and their referenced local assets exist',async()=>{
@@ -59,17 +62,38 @@ test('source files, private data and traversal cannot be downloaded',async()=>{
 async function evidence(c){await c.login('201204010000','20100615');await c.post('/members/inquiry/',{record:'CH-2021-003',request:'原本確認',note:'原本の照合をお願いします。'});const message=(await c.get('/members/messages/')).text;assert.match(message,/保全資料_20261102.zip/);const caseId=message.match(/receive\/\?case=([a-f0-9]+)/)[1];const r=await c.binary('/members/download/hozen.zip');assert.equal(r.status,200);const zip=Buffer.from(await r.arrayBuffer());assert.equal(zip.readUInt32LE(0),0x04034b50);assert.ok(zip.includes(Buffer.from('告発書.pdf')));return {caseId,zip};}
 async function submitAgency(kind,caseId,zip){const fd=new FormData();fd.set('case',caseId);fd.set('title','資料の保全について');fd.set('statement','関係資料を提出いたします。');fd.set('archive',new Blob([zip]),'保全資料.zip');return fetch(`http://127.0.0.1:${port+(kind==='audit'?2:1)}/receive/`,{method:'POST',body:fd,redirect:'manual'});}
 
+async function pausedGuides(c){
+ for(const route of ['/','/visit/','/news/closure/',...pausedFacilityPaths,'/gallery/0021/','/news/20120416/','/guide/access/']){
+  const {response,text}=await c.get(route);
+  assert.equal(response.status,route==='/guide/access/'?404:200,route);
+  assert.match(text,/data-site-operation="paused">一般利用休止中/,route);
+  assert.doesNotMatch(text,/OPEN　平日|href="\/members\/reservations\//,route);
+  if(pausedFacilityPaths.includes(route))assert.match(text,/施設の一般利用を休止しております。掲載内容は休止前の案内です。/,route);
+  if(route==='/facilities/meeting/')assert.match(text,/4階 会議室A[\s\S]*会議室の定員と位置[\s\S]*定員 10名/);
+  if(route==='/workshop/')assert.match(text,/工房の設置機器[\s\S]*工房の試作例/);
+  if(route==='/floor-map/')assert.match(text,/floor-4f\.svg[\s\S]*案内図上の位置/);
+  if(route==='/news/20120416/')assert.match(text,/floor-4f-2012\.svg/);
+ }
+ const reservations=(await c.get('/members/reservations/?space=meeting-d')).text;
+ assert.match(reservations,/受付を休止しております。/);
+ assert.doesNotMatch(reservations,/data-reservation-form/);
+}
+
 test('anonymous reporting leads to closure and continuity notice',async()=>{
- const c=client();const {caseId,zip}=await evidence(c);const r=await submitAgency('hozen',caseId,zip);assert.equal(r.status,303);const receipt=await fetch(`http://127.0.0.1:${port+1}${r.headers.get('location')}`);assert.match(await receipt.text(),/新たな研究支援事業/);assert.match((await c.get('/')).text,/施設の利用休止/);
+ const c=client();const {caseId,zip}=await evidence(c);const r=await submitAgency('hozen',caseId,zip);assert.equal(r.status,303);const receipt=await fetch(`http://127.0.0.1:${port+1}${r.headers.get('location')}`);assert.match(await receipt.text(),/新たな研究支援事業/);assert.match((await c.get('/')).text,/施設の利用休止/);await pausedGuides(c);
 });
 test('submission to facility office identifies the informant',async()=>{
  const c=client();const {zip}=await evidence(c);const r=await c.upload('/members/contact/',{subject:'資料の確認',message:'添付資料をご確認ください。'},'資料.zip',zip);assert.equal(r.status,303);assert.equal((await c.get('/people/asakura-tsumugi/')).response.status,404);assert.match((await c.get('/members/messages/')).text,/個人登録は終了/);
+ const guide=(await c.get('/facilities/meeting/')).text;
+ assert.match(guide,/OPEN　平日[\s\S]*space=meeting-d/);
+ assert.doesNotMatch(guide,/facility-use-pause/);
+ assert.match((await c.get('/members/reservations/?space=meeting-d')).text,/data-reservation-form/);
 });
 test('name search, personal account and independent submission reveal and stop succession',async()=>{
  const c=client();const {caseId}=await evidence(c);assert.match((await c.get('/search/?q='+encodeURIComponent('朝倉 紬乃'))).text,/asakura-tsumugi/);assert.match((await c.get('/people/asakura-tsumugi/')).text,/1993年6月18日/);
  await c.login('20120901P0083','19930618');assert.match((await c.get('/members/personal/')).text,/原型継承試験/);assert.match((await c.get('/members/records/AS-2024-002/')).text,/病気の時の言葉/);
  const doc=(await c.get('/members/records/EA-2026-009/')).text;assert.match(doc,/東都研究監査室/);assert.match(doc,/4319/);
- const r=await c.binary('/members/download/complete.zip');const zip=Buffer.from(await r.arrayBuffer());assert.ok(zip.includes(Buffer.from('継承計画.json')));assert.equal((await submitAgency('audit',caseId,zip)).status,303);assert.match((await c.get('/news/closure/')).text,/外部への資料移管/);
+ const r=await c.binary('/members/download/complete.zip');const zip=Buffer.from(await r.arrayBuffer());assert.ok(zip.includes(Buffer.from('継承計画.json')));assert.equal((await submitAgency('audit',caseId,zip)).status,303);assert.match((await c.get('/news/closure/')).text,/外部への資料移管/);await pausedGuides(c);
 });
 test('state changes require CSRF verification',async()=>{const r=await fetch(base+'/members/login/',{method:'POST',body:new URLSearchParams({id:'201204010017',password:'20080519'})});assert.equal(r.status,403);});
 

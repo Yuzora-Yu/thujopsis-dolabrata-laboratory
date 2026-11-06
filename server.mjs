@@ -11,7 +11,7 @@ import {makeArchive} from './src/archive.mjs';
 import {labContext,labAction} from './src/lab.mjs';
 import {renderLegacy,legacyLogin,legacyLayout} from './src/legacy.mjs';
 import {archiveTicket} from './src/world/archive-data.mjs';
-import {agencyReceipt,classifyEvidence,hasOfficeReceipt,inquiryClosed,nextEnding} from './src/evidence.mjs';
+import {agencyReceipt,classifyEvidence,generalUsePaused,hasOfficeReceipt,inquiryClosed,nextEnding} from './src/evidence.mjs';
 import {normalizeDocumentId} from './src/search.mjs';
 import {isValidReservation} from './public/assets/reservation-policy.js';
 import {readFileSync} from 'node:fs';
@@ -120,7 +120,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
      caseState.contact=true;caseState.inquiryRecord=id;persist();return redirect(res,'/members/messages/');
     }
     if(pathname==='/members/reservations/'){
-     if(['end1','end3'].includes(caseState.ending))return send(res,409,renderMember(pathname,ctx));
+     if(generalUsePaused(caseState.ending))return send(res,409,renderMember(pathname,ctx));
      if(!isValidReservation(fields))return send(res,400,renderMember(pathname,{...ctx,reservationDraft:fields,error:'施設・利用日時・利用内容をご確認ください。'}));
      return redirect(res,'/members/reservations/?received=1');
     }
@@ -160,7 +160,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
    if(pathname==='/people/asakura-tsumugi/'&&caseState.ending==='end2')return send(res,404,notFound());
    if(pathname==='/index.html')pathname='/';
    const q=url.searchParams.get(pathname==='/gallery/'?'method':'q')||'';
-   const page=renderPublic(pathname,{q,ending:caseState.ending,origins});return page?send(res,200,page):send(res,404,notFound());
+   const page=renderPublic(pathname,{q,ending:caseState.ending,origins});return page?send(res,200,page):send(res,404,notFound(caseState.ending));
   }catch(error){console.error('Request failed:',error.message);if(!res.headersSent)send(res,error.message==='body too large'?413:500,'お手続きを完了できませんでした。時間をおいて再度お試しください。','text/plain; charset=utf-8');else res.end();}
  }
  return {handler,sessions,cases,origins,flush:()=>persistence};

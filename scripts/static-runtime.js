@@ -1,6 +1,6 @@
 import {matchesSearch,normalizeDocumentId,documentLookupMessages} from './search-engine.js';
 import {isValidReservation,updateReservationHours} from './assets/reservation-policy.js';
-import {agencyReceipt,classifyEvidence,hasOfficeReceipt,inquiryClosed,nextEnding} from './evidence.js';
+import {agencyReceipt,classifyEvidence,generalUsePaused,hasOfficeReceipt,inquiryClosed,nextEnding,publicOperationLabel} from './evidence.js';
 import {advanceTrial,trialView} from './lab-core.js';
 
 const base=document.querySelector('meta[name="asunaro-base"]')?.content||'';
@@ -11,7 +11,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 function stored(key,fallback=null){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch{return fallback;}}
 let state=stored(storageKey);if(!state){state={id:Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,'0')).join(''),contact:false,ending:'',truth:false};localStorage.setItem(storageKey,JSON.stringify(state));}
 function save(){localStorage.setItem(storageKey,JSON.stringify(state));}
-let site,bundle,roomBundle,rendering=false;
+let site,bundle,roomBundle,rendering=false,refreshPublicAfterBoot=false;
 async function loadSiteIndex(){
  const response = await fetch(base+'/assets/site-index.json',{cache:'no-store'});
  if (!response.ok) throw new Error('Site index');
@@ -26,10 +26,18 @@ function route(){
 const urlFor=(path,kind='main')=>base+({archive:'/historical-records',hozen:'/records-center',audit:'/independent-review'}[kind]||'')+path;
 function go(path,kind='main'){location.assign(urlFor(path,kind));}
 function fillTokens(html){return html.replaceAll('@@CASE@@',state.id).replaceAll('@@CSRF@@','preview-session');}
+function reflectPublicOperation(){
+ const status=document.querySelector('.site-header .utility>span');
+ if(!status)return;
+ if(generalUsePaused(state.ending))status.dataset.siteOperation='paused';
+ else delete status.dataset.siteOperation;
+ status.textContent=publicOperationLabel(state.ending);
+}
 function display(html){
  const doc=new DOMParser().parseFromString(fillTokens(html),'text/html');document.title=doc.title;document.body.className=doc.body.className;document.body.innerHTML=doc.body.innerHTML;
- for(const key of ['asunaroStage','seedDriftEnabled','seedDriftThreshold','memberRole','memberLabel','memberCase','memberRecord','memberRecordTitle'])document.body.dataset[key]=doc.body.dataset[key]||'';
+ for(const key of ['asunaroStage','seedDriftEnabled','seedDriftThreshold','publicOutcome','memberRole','memberLabel','memberCase','memberRecord','memberRecordTitle'])document.body.dataset[key]=doc.body.dataset[key]||'';
  document.body.dataset.memberInquiry=state.inquiryRecord||'';
+ reflectPublicOperation();
  window.asunaroInit?.();
  window.asunaroDrift?.refresh();
  window.asunaroReading?.refresh();
@@ -135,12 +143,14 @@ function filterArchiveCatalogue(params){
  summary.textContent='収蔵資料・公開対象'+(keyword?' ／ '+count+'件':'');
  empty.hidden=count>0;
 }
-async function boot(){
+async function boot({restoreFragment=false}={}){
  if(rendering)return;rendering=true;
  try{
   const current=route(),params=new URLSearchParams(location.search);
   if(current.kind==='archive'&&current.path==='/collections/')filterArchiveCatalogue(params);
+  reflectPublicOperation();
   await sitePromise;state=stored(storageKey,state);
+  reflectPublicOperation();
   if(current.kind==='main'&&current.path.startsWith('/members/')){
    if(current.path==='/members/login/'){display(site.login);const next=params.get('next');if(next)document.querySelector('input[name=next]').value=next;return;}
    const account=await currentBundle();if(!account){display(site.login);document.querySelector('input[name=next]').value=current.path+location.search;return;}
@@ -191,7 +201,15 @@ async function boot(){
   if(state.ending){
    let ending=state.ending,capable=await outcomeBundle(ending);
    if(!capable&&ending==='end3'){ending='end1';capable=await outcomeBundle();}
-   const html=capable?.outcomes[ending]?.['main:'+current.path];if(html)display(html);
+   const html=capable?.outcomes[ending]?.['main:'+current.path]||(generalUsePaused(ending)?capable?.pausedPublic?.[current.path]:null);
+   if(html){
+    display(html);
+    if(restoreFragment&&location.hash){
+     let id=location.hash.slice(1);
+     try{id=decodeURIComponent(id);}catch{}
+     document.getElementById(id)?.scrollIntoView({block:'start',behavior:'instant'});
+    }
+   }
   }
   if(current.kind==='main'&&current.path==='/search/'){
    const keyword=params.get('q')||'';const input=document.querySelector('main input[name=q]');if(input)input.value=keyword;
@@ -199,7 +217,13 @@ async function boot(){
    const summary=document.querySelector('.search-results');if(summary){summary.innerHTML=keyword?results.map(x=>`<a href="${urlFor(x.url)}"><h2>${esc(x.title)}</h2><p>${esc(x.text.slice(0,100))}…</p></a>`).join('')||'<p>該当するページはありません。</p>':'';summary.previousElementSibling.textContent=keyword?'「'+keyword+'」の検索結果　'+results.length+'件':'';}
   }
  }catch{showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');}
- finally{rendering=false;}
+ finally{
+  rendering=false;
+  if(refreshPublicAfterBoot){
+   refreshPublicAfterBoot=false;
+   refreshPublicOutcome();
+  }
+ }
 }
 
 document.addEventListener('submit',async event=>{
@@ -246,7 +270,7 @@ document.addEventListener('submit',async event=>{
    state.contact=true;state.inquiryRecord=id;save();go('/members/messages/');return;
   }
   if(current.path==='/members/reservations/'){
-   if(['end1','end3'].includes(state.ending)){await boot();return;}
+   if(generalUsePaused(state.ending)){await boot();return;}
    if(!isValidReservation(Object.fromEntries(values))){
     const error=form.querySelector('[data-reservation-error]');
     if(error){
@@ -346,6 +370,25 @@ document.addEventListener('click',async event=>{
   anchor.removeAttribute('aria-busy');
  }
 });
-window.addEventListener('storage',event=>{if(event.key===storageKey){state=stored(storageKey,state);if(!document.querySelector('[data-lab-root]')&&document.querySelector('[data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({trial:trialView(state.consoleTrial),ending:state.ending}));}});
+function refreshPublicOutcome(){
+ if(document.body.dataset.publicOutcome!=='true')return;
+ const dialog=document.querySelector('dialog[open]');
+ if(dialog){
+  dialog.addEventListener('close',refreshPublicOutcome,{once:true});
+  return;
+ }
+ if(rendering)refreshPublicAfterBoot=true;
+ else void boot();
+}
+window.addEventListener('storage',event=>{
+ if(event.key!==storageKey)return;
+ const previousEnding=state.ending;
+ state=stored(storageKey,state);
+ if(previousEnding!==state.ending){
+  reflectPublicOperation();
+  refreshPublicOutcome();
+ }
+ if(!document.querySelector('[data-lab-root]')&&document.querySelector('[data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({trial:trialView(state.consoleTrial),ending:state.ending}));
+});
 window.addEventListener('pageshow',event=>{if(event.persisted&&!rendering&&site)void boot();});
-await boot();
+await boot({restoreFragment:true});

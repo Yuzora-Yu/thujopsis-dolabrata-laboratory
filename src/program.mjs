@@ -8,18 +8,18 @@ export function programBanner(){
  return `<aside class="wrap program-promo" aria-label="企画展示"><a href="${programPath}"><img src="/assets/media/lunar-habitat-concept.webp" width="1817" height="866" alt="" loading="lazy" decoding="async"><div><p class="eyebrow">あすなろの企画展示</p><h2>${programTitle}</h2><p>もし月で暮らすなら、どんな道具を持っていきますか。</p><span class="text-link">企画展示を見る</span></div></a></aside>`;
 }
 
-export function programExhibit(){
+export function programExhibit(pauseNotice=''){
  const workKeys = ['metal-lattice','latch','layered-map'];
  const works = workKeys.map(key => galleryRecords.find(work => work.key === key));
  return `<section class="hero lunar-hero" aria-labelledby="lunar-title">
  <img class="hero-image" src="/assets/media/lunar-habitat-concept.webp" alt="月面の平原に三つの建物をつないだ構想図。窓に暖色の灯りがともっている。" width="1817" height="866" fetchpriority="high" decoding="async">
  <div class="hero-shade"></div><div class="hero-content"><p class="hero-en">あすなろの企画展示</p><h1 id="lunar-title">月に、暮らしを<br>持っていく。</h1><p>もし月で暮らすなら、どんな道具を持っていきますか。</p></div><p class="lunar-hero-caption">月面居住区 構想図</p></section>
  <article class="lunar-exhibition">
-  <section class="wrap lunar-exhibit-overview" aria-labelledby="exhibit-intro">
+  ${pauseNotice?`${pauseNotice}\n  `:''}<section class="wrap lunar-exhibit-overview" aria-labelledby="exhibit-intro">
    <div class="lunar-intro"><p class="eyebrow">EXHIBITION / 4F</p><h2 id="exhibit-intro">月へ持っていくもの。</h2>
     <p>道具の蓋が閉まらなくなったら。昨日と違う順序で設備を使うことになったら。月での暮らしを想像すると、ふだん何気なく使っている道具にも、違う工夫が見えてきます。</p>
-    <p>4階の交流スペースでは、居住区の模型と工房の試作品を並べて展示しております。ご見学の際は中央受付へお越しください。</p>
-    <div class="button-row"><a class="button dark" href="/news/20261020/">展示のご案内</a><a class="text-link" href="/facilities/hall/#exhibition">3階ホールでの特別展示</a></div>
+    <p>${pauseNotice?'4階の交流スペースに、居住区の模型と工房の試作品を並べました。展示の様子を写真でご覧いただけます。':'4階の交流スペースでは、居住区の模型と工房の試作品を並べて展示しております。ご見学の際は中央受付へお越しください。'}</p>
+    <div class="button-row"><a class="button dark" href="/news/20261020/">${pauseNotice?'開催時のお知らせ':'展示のご案内'}</a><a class="text-link" href="/facilities/hall/#exhibition">3階ホールでの特別展示</a></div>
    </div>
    <figure class="lunar-exhibit-view"><img src="/assets/media/lunar-exhibit.webp" alt="4階の交流スペースに設けた展示。ガラスケースの中に小さな月面居住区の模型がある。" width="1536" height="1024" loading="lazy" decoding="async"><figcaption>4階 交流スペース ／ 展示の様子</figcaption></figure>
   </section>

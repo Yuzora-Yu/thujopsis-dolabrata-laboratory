@@ -1,4 +1,4 @@
-import {inquiryClosed} from './evidence.mjs';
+import {generalUsePaused,inquiryClosed} from './evidence.mjs';
 import {mediaForRecord,recordMediaPrefix} from './record-media.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
 import {projects} from './world/projects.mjs';
@@ -121,7 +121,7 @@ function renderMemberPage(path,ctx){
   return memberLayout('記録についての照会',`<h1>記録についての照会</h1>${ctx.error?`<p class="form-error">${esc(ctx.error)}</p>`:''}<form class="form-stack" method="post">${fieldToken(csrf)}<label for="record">文書ID</label><input id="record" name="record" value="${esc(d?.id||'')}" required><label for="request">照会内容</label><select id="request" name="request"><option>原本確認</option><option>記載内容の確認</option><option>添付資料の確認</option></select><label for="note">備考</label><textarea id="note" name="note" maxlength="3000"></textarea><button class="button dark" type="submit">照会を送信 <span>→</span></button></form>`,{...ctx,active:'records'});
  }
  if(path==='/members/reservations/'){
-  if(['end1','end3'].includes(caseState.ending))return memberLayout('利用申請・予約','<h1>利用申請・予約</h1><div class="notice"><h2>受付を休止しております。</h2><p>施設の一般利用休止に伴い、新規の利用申請を停止しております。</p></div>',{...ctx,active:'reservations'});
+  if(generalUsePaused(caseState.ending))return memberLayout('利用申請・予約','<h1>利用申請・予約</h1><div class="notice"><h2>受付を休止しております。</h2><p>施設の一般利用休止に伴い、新規の利用申請を停止しております。</p></div>',{...ctx,active:'reservations'});
   const draft = ctx.reservationDraft || {};
   const requested = draft.space || query.get('space');
   const space = reservationSpaces.some(([id])=>id===requested) ? requested : reservationSpaces[0][0];

@@ -85,5 +85,7 @@ export function agencyReceipt(kind,state){
  return state.ending==='end2'?'transferred':'pending';
 }
 
+export const generalUsePaused=ending=>ending==='end1'||ending==='end3';
+export const publicOperationLabel=ending=>generalUsePaused(ending)?'一般利用休止中':'OPEN　平日 8:00–22:00';
 export const inquiryClosed=ending=>ending==='end2'||ending==='end3';
 export const hasOfficeReceipt=state=>state.officeReceipt||state.ending==='end2';

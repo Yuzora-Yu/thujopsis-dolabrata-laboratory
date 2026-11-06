@@ -3,7 +3,7 @@ import {readFile,writeFile,mkdir,cp,unlink} from 'node:fs/promises';
 import {createHash,createCipheriv,pbkdf2Sync,randomBytes} from 'node:crypto';
 import path from 'node:path';
 import {accounts,documents,searchEntries} from '../src/content.mjs';
-import {publicPaths,renderPublic,notFound} from '../src/render.mjs';
+import {publicPaths,pausedFacilityPaths,endingNoticePaths,renderPublic,notFound} from '../src/render.mjs';
 import {renderMember,loginPage,memberLayout,agencyPage} from '../src/member.mjs';
 import {archivePublicPaths,renderLegacy,legacyLogin} from '../src/legacy.mjs';
 import {archiveTicket,archiveNotes} from '../src/world/archive-data.mjs';
@@ -57,9 +57,10 @@ for(const route of ['/news/closure/','/news/staff-change/'])await page(route,not
 const baseZip=(await makeArchive(new URL('../src/archive.mjs',import.meta.url))).toString('base64');
 const completeZip=(await makeArchive(new URL('../src/archive.mjs',import.meta.url),{complete:true})).toString('base64');
 const ended=memberLayout('登録終了','<h1>この登録は終了しました。</h1><p>運営事務局にお問い合わせください。</p>');
+const pausedPublicViews=Object.fromEntries(pausedFacilityPaths.map(route=>[route,hosted(renderPublic(route,{ending:'end1',origins}))]));
 function outcomeViews(ending){
  const views={};
- for(const route of ['/','/visit/','/news/','/news/closure/','/news/staff-change/']){const html=renderPublic(route,{ending,origins});if(html)views['main:'+route]=hosted(html);}
+ for(const route of endingNoticePaths){const html=renderPublic(route,{ending,origins});if(html)views['main:'+route]=hosted(html);}
  if(ending==='end2')views['main:/people/asakura-tsumugi/']=hosted(notFound());
  const kind=ending==='end3'?'audit':'hozen';
  if(ending!=='end2')views[kind+':/received/']=hosted(agencyPage(kind,'/received/',{caseId:'@@CASE@@',origins,receipt:'received'}),kind);
@@ -102,7 +103,7 @@ for(const [id,account] of Object.entries(accounts)){
   for(const name of ['records.json','continuity.json'])downloads[name]={name,type:'application/json',data:(await readFile('private/'+name)).toString('base64')};
  }
  const outcomes=account.role==='institution'||account.role==='asakura'?{end1:outcomeViews('end1'),end2:outcomeViews('end2'),...(account.role==='asakura'?{end3:outcomeViews('end3')}:{})}:{};
- await encryptedBundle('member',id,account.password,{account:{...account,password:undefined,id},pages,docs,stages,downloads,outcomes,auditForms:outcomes.end1?auditForms:undefined,ended:hosted(ended)});
+ await encryptedBundle('member',id,account.password,{account:{...account,password:undefined,id},pages,docs,stages,downloads,outcomes,pausedPublic:outcomes.end1?pausedPublicViews:undefined,auditForms:outcomes.end1?auditForms:undefined,ended:hosted(ended)});
 }
 const roomPages={};for(const route of ['/room/','/room/console/','/room/console/subjects/',...archiveNotes.map(n=>`/room/records/${n.id}/`)])roomPages[route]=hosted(renderLegacy(route,{...ctxBase,session:{archiveAccess:archiveTicket.id}}),'archive');
 await encryptedBundle('archive',archiveTicket.id,archiveTicket.code,{pages:roomPages,labSubjects:{initial:subjectViews({}),current:subjectViews({contact:true}),end3:subjectViews({ending:'end3'})}});

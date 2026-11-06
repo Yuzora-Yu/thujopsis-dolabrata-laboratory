@@ -36,7 +36,7 @@ export const workshopEquipment = [
   dimensionsLabel:'造形機本体の公称造形範囲',
   dimensions:'300 × 220 × 180 mm',
   materials:['17-4PHステンレス鋼'],
-  description:'金属粉を樹脂で固めたフィラメントで形をつくります。脱脂と焼結を経て、金属の治具や交換部品の試作に使えます。焼結で収縮するため、完成寸法は図面ごとに確認いたします。',
+  description:'金属粉を樹脂で固めたフィラメントで形をつくります。脱脂と焼結を経て、金属の治具や交換部品の試作に使えます。焼結時の収縮を見込んで設計するため、完成寸法は形状や材料によって異なります。',
   access:'4階中央受付で試作のご相談を承ります。造形から脱脂、焼結まで職員が担当し、加工後に受付でお渡しいたします。',
   source:'https://www-objects.markforged.com/craft/3d_printers_detail/metal-x/Metal_System_Datasheets.pdf',
   supporting:[
