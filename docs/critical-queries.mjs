@@ -1,6 +1,6 @@
 // Author-only source of the input inventory. Never copy this file to public assets.
 export const siteQueries=[
- {word:"安積透",source:"OBS-2022-044の登録控え",destination:"/people/azumi-toru/",purpose:"加害事案の記録だけでは分からない、製作者としての過去と本人の予定。"},
+ {word:"安積透",source:"制作物0017／OBS-2022-044の登録控え／EV-2022-091",destination:"/people/azumi-toru/",purpose:"妹に渡す予定のスタンドと、当直が回収した板を照合する。"},
  {word:"青井真澄",source:"PN-2022-034／夏帆の取材",destination:"/people/aoi-makoto/",purpose:"共同申出を書いた人の修理の仕事と、募集へ依存する事情。"},
  {word:'吉野夏帆',source:'製本相談の記事／EV-2022-091',destination:'/people/yoshino-kaho/',purpose:'重大事案の対象者を、亡くなった人の番号だけでなく、制作していた人として知る。'},
  {word:'青井真澄',source:'GR-2022-009／PN-2022-034',destination:'/news/20220415/',purpose:'現在のP-031と、工房で押さえ板を作っていた人を結ぶ。'},

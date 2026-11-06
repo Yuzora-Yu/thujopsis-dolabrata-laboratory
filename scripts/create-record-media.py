@@ -34,6 +34,7 @@ STYLES = {
     "bench": ("Office", "#535d50", "#eff0e9", "機器試験票", "form"),
     "transfer": ("Gothic", "#30475d", "#e8edf1", "設備・資料移管", "strip"),
     "evaluation": ("Gothic", "#263f62", "#e9eef6", "評価資料", "strip"),
+    "group-review": ("Gothic", "#263f62", "#e9eef6", "評価統括／結果提出", "strip"),
     "individual": ("Office", "#414948", "#edf0eb", "評価統括／個票再録", "form"),
     "consent": ("Mincho", "#423c36", "#f1eee8", "居住環境実証部会", "form"),
     "daily-check": ("Office", "#3d4949", "#edf1ef", "評価統括／検査記録保管", "form"),
@@ -41,6 +42,7 @@ STYLES = {
     "memo": ("Mincho", "#484337", "#f3f0e7", "手控え", "memo"),
     "letter": ("Mincho", "#483c30", "#f0ece2", "回答書控え", "formal"),
     "ledger": ("Office", "#414c4e", "#eaeeee", "管理簿複写", "form"),
+    "watch-log": ("Office", "#393c3b", "#eeeeeb", "居住実証運用室／当直連絡", "form"),
     "workshop-receipt": ("Office", "#574937", "#f1ebe2", "工房受付／預かり控え", "form"),
     "maintenance": ("Gothic", "#3f5861", "#e8eff0", "施設保守・作業完了", "strip"),
     "operations": ("Gothic", "#1f4a44", "#e3ece7", "区画運用報告", "strip"),
@@ -79,7 +81,7 @@ def render(record, style_key, target):
     font, accent_hex, pale_hex, register, frame = STYLES[style_key]
     accent, pale = colors.HexColor(accent_hex), colors.HexColor(pale_hex)
     dark = colors.HexColor("#232824")
-    compact = style_key in {"individual", "workshop-receipt", "daily-check", "decision"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
+    compact = style_key in {"individual", "workshop-receipt", "daily-check", "decision", "watch-log"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
     tables = record.get("tables", [])
     participant_sheet = next((item for item in tables if item.get("participantCopy")), None)
     issue_date = datetime.strptime(record.get("updated", record["date"]), "%Y年%m月%d日").strftime("%Y%m%d")
@@ -133,15 +135,17 @@ def render(record, style_key, target):
         if t is participant_sheet:
             continue
         flow.append(p(t["caption"] + ("　" + t["date"] if t.get("date") else ""), sub))
-        table(t["head"], t["rows"])
+        widths = [BODY * weight for weight in (.33, .32, .35)] if style_key == "group-review" else None
+        table(t["head"], t["rows"], widths)
     if record.get("signatureClips"):
         flow.extend([p("署名欄の複写（右端）", sub), signature_comparison(record["signatureClips"], font)])
     for entry in record.get("entries", []):
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):
         flow.append(p(record["signoff"], meta))
-    if style_key == "decision" and record.get("addenda"):
-        flow.extend([PageBreak(), p("決裁後の追記", title)])
+    addendum_title = {"decision": "決裁後の追記", "watch-log": "保存時の照合注記"}.get(style_key)
+    if addendum_title and record.get("addenda"):
+        flow.extend([PageBreak(), p(addendum_title, title)])
     for note in record.get("addenda", []):
         flow.append(p("追記　" + note["date"] + "　" + note["by"], sub))
         sections(note.get("sections", []))

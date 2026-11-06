@@ -413,14 +413,34 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  try{
   await profile.goto(main('/search/?q='+encodeURIComponent(participant)));
   await profile.getByRole('link',{name:/仕事の合間の小さな製作/}).click();
-  assert.match(await body(profile),/妹に渡したら/);
+  assert.match(await body(profile),/妹に渡したら[\s\S]*板の裏に組む向きを鉛筆で書いておきます/);
  }finally{await profile.close();}
  const equipment=await document(p,examination.match(/ENV-2022-\d{3}/)[0]);
- const incident=await document(p,equipment.match(/EV-2022-\d{3}/)[0]);
+ const incidentId=equipment.match(/EV-2022-\d{3}/)[0];
+ const incident=await document(p,incidentId);
  assert.match(incident,/吉野夏帆/);
+ assert.match(incident,/僕がやった。人を呼んで[\s\S]*07:46、P-032を別室の担当に引き渡し/);
+ assert.match(incident,/板二枚を回収。裏に鉛筆の矢印[\s\S]*家族連絡の許可欄は空欄/);
  assert.match(incident,/工房の修理受付は完了に変更/);
- const summary=await document(p,incident.match(/GR-2022-\d{3}/)[0]);
+ await p.setViewportSize({width:390,height:844});
+ try{
+  const timeCells=p.getByRole('region',{name:'9月11日 夜間の連絡'}).locator('tbody td:first-child');
+  assert.deepEqual(await timeCells.evaluateAll(cells=>cells.map(cell=>{
+   const textRange=document.createRange();textRange.selectNodeContents(cell);
+   return textRange.getClientRects().length;
+  })),[1,1,1,1,1,1]);
+  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+ }finally{await p.setViewportSize({width:1440,height:1000});}
+ const incidentFile=incidentId+'.pdf';
+ const incidentPrint=await download(p,'a[href$="'+incidentFile+'"]',incidentFile);
+ assert.deepEqual(incidentPrint.data,await fs.readFile('private/record-media/'+incidentFile));
+ const summaryId=incident.match(/GR-2022-\d{3}/)[0];
+ const summary=await document(p,summaryId);
  assert.match(summary,/自発的淘汰/);
+ assert.match(summary,/当直連絡21:12、21:14[\s\S]*除外。群外の資源要求/);
+ const summaryFile=summaryId+'.pdf';
+ const summaryPrint=await download(p,'a[href$="'+summaryFile+'"]',summaryFile);
+ assert.deepEqual(summaryPrint.data,await fs.readFile('private/record-media/'+summaryFile));
  const intakeId=incident.match(/PN-2022-\d{3}/)[0];
  const intake=await document(p,intakeId);
  assert.match(intake,/青い布表紙の地図帳（別包み）/);
