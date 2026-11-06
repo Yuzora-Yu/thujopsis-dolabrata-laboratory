@@ -1,65 +1,34 @@
 function installSeedNotes(){
- const source=document.querySelector('[data-seed-notes]');
- const main=document.querySelector('#main');
- const footer=document.querySelector('.site-footer');
- if(!source||!main||!footer||document.querySelector('.seed-note-dialog'))return;
+ const source = document.querySelector('[data-seed-notes]');
+ const button = document.querySelector('.seed-note');
+ if (!source || !button || document.querySelector('.seed-note-dialog')) return;
 
- const facts=JSON.parse(source.textContent);
- const dialog=document.createElement('dialog');
- dialog.className='seed-note-dialog';
+ const note = JSON.parse(source.textContent);
+ const dialog = document.createElement('dialog');
+ dialog.className = 'seed-note-dialog';
+ dialog.id = 'seed-note-dialog';
  dialog.setAttribute('aria-labelledby','seed-note-title');
  dialog.setAttribute('aria-describedby','seed-note-body');
- dialog.innerHTML='<p class="eyebrow">あすなろの豆知識</p><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><div class="seed-note-actions"><a target="_blank" rel="noopener">参考資料（NASA・別タブ）</a><button type="button" class="button dark">閉じる</button></div>';
- const title=dialog.querySelector('h2');
- const copy=dialog.querySelector('#seed-note-body');
- const reference=dialog.querySelector('.seed-note-actions a');
- const related=dialog.querySelector('.seed-note-related');
- const base=document.querySelector('meta[name="asunaro-base"]')?.content||'';
- const close=dialog.querySelector('button');
- close.addEventListener('click',()=>dialog.close());
- document.body.append(dialog);
-
- const opening=main.firstElementChild;
- const intro=opening?.querySelector('.eyebrow,.hero-en,.error-code');
- const detail=main.querySelector('.facility-hero-photo figcaption,.article-meta,.map-toolbar>span,.page-lead,.news-rows')
-   ||opening?.querySelector('p:not(.eyebrow,.hero-en,.error-code)');
- const margin=document.createElement('div');
- margin.className='seed-note-margin';
- main.lastElementChild?.after(margin);
- const spots=[
-  intro||opening||main,
-  detail?.matches('.news-rows')?null:detail,
-  margin,
-  footer.querySelector('.footer-top p'),
-  footer.querySelector('.footer-bottom>span'),
- ];
- facts.forEach(([heading,body,url,nearby],index)=>{
-  const button=document.createElement('button');
-  button.type='button';
-  button.className=index===4?'seed-note seed-note-quiet':'seed-note';
-  button.setAttribute('aria-label','豆知識：'+heading);
-  button.setAttribute('aria-haspopup','dialog');
-  button.addEventListener('click',()=>{
-   title.textContent=heading;
-   copy.textContent=body;
-   reference.href=url;
-   related.hidden=!nearby;
-   if(nearby){
-    related.href=base+nearby[0];
-    related.textContent=nearby[1];
-   }
-   dialog.showModal();
-   close.focus();
-  });
-  if(index===1&&!spots[index]){
-   const perch=document.createElement('div');
-   perch.className='wrap seed-note-perch';
-   opening?.after(perch);
-   perch.append(button);
-  }else{
-   spots[index]?.append(button);
-  }
+ dialog.innerHTML = '<p class="eyebrow">あすなろの豆知識</p><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><div class="seed-note-actions"><a target="_blank" rel="noopener">参考資料（NASA・別タブ）</a><button type="button" class="button dark">閉じる</button></div>';
+ dialog.querySelector('h2').textContent = note.title;
+ dialog.querySelector('#seed-note-body').textContent = note.body;
+ dialog.querySelector('.seed-note-actions a').href = note.source;
+ if (note.related) {
+  const related = dialog.querySelector('.seed-note-related');
+  const base = document.querySelector('meta[name="asunaro-base"]')?.content || '';
+  related.href = base + note.related[0];
+  related.textContent = note.related[1];
+  related.hidden = false;
+ }
+ const close = dialog.querySelector('button');
+ close.addEventListener('click', () => dialog.close());
+ dialog.addEventListener('close', () => button.focus({preventScroll:true}));
+ button.setAttribute('aria-controls',dialog.id);
+ button.addEventListener('click', () => {
+  dialog.showModal();
+  close.focus();
  });
+ document.body.append(dialog);
 }
 
 window.asunaroInit=function(){

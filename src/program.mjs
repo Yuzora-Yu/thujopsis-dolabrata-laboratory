@@ -1,3 +1,5 @@
+import {galleryRecords} from './world/gallery.mjs';
+
 export const programPath='/research/lunar-habitat/';
 export const programTitle='月に、暮らしを持っていく。';
 export const programNotesPath=programPath+'field-notes/';
@@ -7,10 +9,29 @@ export function programBanner(){
 }
 
 export function programExhibit(){
+ const workKeys = ['latch','layered-map','hinge'];
+ const works = workKeys.map(key => galleryRecords.find(work => work.key === key));
  return `<section class="hero lunar-hero" aria-labelledby="lunar-title">
  <img class="hero-image" src="/assets/media/lunar-habitat-concept.webp" alt="月面の平原に三つの建物をつないだ構想図。窓に暖色の灯りがともっている。" width="1817" height="866" fetchpriority="high" decoding="async">
  <div class="hero-shade"></div><div class="hero-content"><p class="hero-en">あすなろの企画展示</p><h1 id="lunar-title">月に、暮らしを<br>持っていく。</h1><p>もし月で暮らすなら、どんな道具を持っていきますか。</p></div><p class="lunar-hero-caption">月面居住区 構想図</p></section>
- <article class="wrap article lunar-program"><div class="lunar-intro"><p class="eyebrow">EXHIBITION / 4F</p><h2>月へ持っていくもの。</h2><p>小さな箱、壊れたときに取り替えられる留め具、次の人へ残すメモ。月で暮らす日を想像しながら、工房でつくった道具の見本を展示しております。</p><div class="button-row"><a class="button dark" href="/news/20261020/">展示のご案内</a><a class="text-link" href="/gallery/0026/">工房の小物ケース</a></div></div></article>`;
+ <article class="lunar-exhibition">
+  <section class="wrap lunar-exhibit-overview" aria-labelledby="exhibit-intro">
+   <div class="lunar-intro"><p class="eyebrow">EXHIBITION / 4F</p><h2 id="exhibit-intro">月へ持っていくもの。</h2>
+    <p>道具の蓋が閉まらなくなったら。昨日と違う順序で設備を使うことになったら。月での暮らしを想像すると、ふだん何気なく使っている道具にも、違う工夫が見えてきます。</p>
+    <p>4階の交流スペースでは、居住区の模型と工房の試作品を並べて展示しております。ご見学の際は中央受付へお越しください。</p>
+    <div class="button-row"><a class="button dark" href="/news/20261020/">展示のご案内</a></div>
+   </div>
+   <figure class="lunar-exhibit-view"><img src="/assets/media/lunar-exhibit.webp" alt="4階の交流スペースに設けた展示。ガラスケースの中に小さな月面居住区の模型がある。" width="1536" height="1024" loading="lazy" decoding="async"><figcaption>4階 交流スペース ／ 展示の様子</figcaption></figure>
+  </section>
+  <section class="lunar-exhibit-works" aria-labelledby="exhibit-works">
+   <div class="wrap"><p class="eyebrow">MADE IN THE WORKSHOP</p><h2 id="exhibit-works">工房でつくった展示品</h2>
+    <div class="lunar-work-grid">${works.map(work => `<a class="lunar-work" href="/gallery/${work.id}/">
+     <img src="/assets/${work.image}" alt="" width="1536" height="1024" loading="lazy" decoding="async">
+     <div><small>${work.tag}</small><h3>${work.title}</h3></div>
+    </a>`).join('')}</div>
+   </div>
+  </section>
+ </article>`;
 }
 
 // Working notes for the exhibit are linked from the internal operations report.

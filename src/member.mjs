@@ -11,6 +11,58 @@ function fieldToken(csrf){return `<input type="hidden" name="csrf" value="${esc(
 function documentLookup(value='',id='document-id'){
  return `<form method="get" action="/members/records/" class="record-form"><label for="${id}">文書ID</label><div class="search-box"><input id="${id}" name="document_id" value="${esc(value)}" autocomplete="off" maxlength="60" required><button type="submit">照会</button></div></form>`;
 }
+const assignedNotices = {
+ minamo:[
+  {
+   date:'2016.10.03', desk:'共同研究事務局', title:'第2期の実施計画をお送りします',
+   body:'ミナモ循環技研 川瀬様\n\n本日開始の第2期実施計画を配布いたします。循環設備の現地確認に入られる際は、実施区画と受付の扱いをご確認ください。',
+   record:'YH-2016-032',
+  },
+  {
+   date:'2016.03.22', desk:'共同研究事務局', title:'循環設備・改訂寸法の確定について',
+   body:'ミナモ循環技研 川瀬様\n\n浄水筐体の改訂図は、添付仕様で確定いたしました。次期の実施計画は確定後に別便でお送りいたします。納入時期につきましては、別途日程表をお送りいたします。',
+   record:'YH-2013-014',
+  },
+ ],
+ ashita:[
+  {
+   date:'2017.07.14', desk:'資料保存担当', title:'移管作業票の受領について',
+   body:'旧基盤の引継ぎに関する作業票を収録しました。閲覧票の控えと保存範囲を併せて確認いたします。',
+   record:'AH-2017-009',
+  },
+ ],
+};
+function assignedNoticeList(role){
+ return (assignedNotices[role] || []).map(notice => {
+  const record = documents.find(document => document.id === notice.record && document.roles.includes(role));
+  if (!record) throw new Error(`Assigned notice ${notice.record} is not readable by ${role}`);
+  return `<article class="message">
+   <time>${notice.date} / ${esc(notice.desk)}</time><h2>${esc(notice.title)}</h2>
+   <div class="message-body">${esc(notice.body)}</div>
+   <p><a class="text-link" data-assigned-record="${record.id}" href="/members/records/${record.id}/">${record.id}　${esc(record.title)}</a></p>
+  </article>`;
+ }).join('');
+}
+function memberHome(account){
+ const workshopNote = account.role==='minamo' ? `<section class="member-workshop-note" aria-labelledby="workshop-note-title">
+  <p class="eyebrow"><time datetime="2022-07-08">2022.07.08</time> ／ 工房からの共有</p>
+  <h2 id="workshop-note-title">瀬尾さんの、次の試作</h2>
+  <p>鉛筆の持ち手を作った瀬尾灯さんが、今度は本を片手で開いておける道具を試すそうです。お母さまに家で一週間使ってもらい、来月、工房で見せていただくことになりました。</p>
+  <a class="text-link" href="/members/projects/fabrication/">工房でのやり取りを読む</a>
+ </section>` : '';
+ const lastLink = account.role==='asakura'
+  ? '<a href="/members/personal/">個人保存資料 <small>非共有の研究記録</small></a>'
+  : '<a href="/members/organization/">運営団体情報 <small>事業主体・法人情報</small></a>';
+ return `<h1>会員トップ</h1>${workshopNote}
+  <div class="notice"><h2>施設からのお知らせ</h2><p>会議室・工房の利用申請は、利用日の前営業日までにお手続きをお願いいたします。</p></div>
+  <div class="member-summary">
+   <a href="/members/reservations/">利用申請・予約 <small>会議室・工房など</small></a>
+   <a href="/members/messages/">施設からの連絡 <small>共同事業・事務連絡</small></a>
+   <a href="/members/projects/">共同事業・連絡記録 <small>打ち合わせ・資料の受け渡し</small></a>
+   <a href="/members/records/">研究資料照会 <small>共同事業に関する登録資料</small></a>
+   ${lastLink}
+  </div>`;
+}
 export function memberLayout(title,body,{account=null,csrf='',active='',caseId='',record=null,caseState={}}={}){
  const items=[['/members/','会員トップ','home'],['/members/reservations/','利用申請・予約','reservations'],['/members/records/','研究資料照会','records'],['/members/activity/','資料の閲覧履歴','activity'],['/members/messages/','施設からの連絡','messages'],['/members/projects/','共同事業・連絡記録','projects'],['/members/organization/','運営団体情報','organization'],['/members/contact/','運営事務局へのお問い合わせ','contact']];
  if(account?.role==='asakura')items.splice(4,0,['/members/personal/','個人保存資料','personal']);
@@ -34,7 +86,7 @@ function renderDocument(d,ctx){
 
 function renderMemberPage(path,ctx){
  const {account,csrf,caseState,query,origins,caseId}=ctx;
- if(path==='/members/')return memberLayout('会員トップ',`<h1>会員トップ</h1><p>施設の利用申請、共同事業の資料照会、運営事務局からの連絡をご確認いただけます。</p><div class="notice"><h2>施設からのお知らせ</h2><p>会議室・工房の利用申請は、利用日の前営業日までにお手続きをお願いいたします。</p></div><div class="member-summary"><a href="/members/reservations/">利用申請・予約 <small>会議室・工房など</small></a><a href="/members/records/">研究資料照会 <small>共同事業に関する登録資料</small></a><a href="/members/messages/">施設からの連絡 <small>共同事業・事務連絡</small></a><a href="/members/projects/">共同事業・連絡記録 <small>打ち合わせ・資料の受け渡し</small></a>${account.role==='asakura'?'<a href="/members/personal/">個人保存資料 <small>非共有の研究記録</small></a>':'<a href="/members/organization/">運営団体情報 <small>事業主体・法人情報</small></a>'}</div>`,{...ctx,active:'home'});
+ if(path==='/members/')return memberLayout('会員トップ',memberHome(account),{...ctx,active:'home'});
  if(path==='/members/activity/')return memberLayout('資料の閲覧履歴',`<h1>資料の閲覧履歴</h1><p>この照会端末で表示した資料です。登録名義ごとに表示しております。</p>${caseState.ending==='end3'?'<div class="notice"><h2>本件の確認は終了しております。</h2><p>移送先を含む事業の停止に伴い、外部協力者への継続照会も終了しました。照会資料の控えは引き続き参照いただけます。</p></div>':''}<div data-reading-ledger="current"></div>${account.role==='institution'&&caseState.ending!=='end3'?'<section class="reading-notification" data-after-reading="CH-2021-003 OPS-2026-084" hidden><p class="member-meta">2026.11.02／運営事務局</p><h2>照会名義の確認</h2><p>同一照会端末から、配布先の異なる資料への参照を確認しております。個々の登録における照会を、一件の確認として取りまとめます。</p><p>確認中のため、本件の終了処理は保留しております。原本の受領担当へ照会を引き継ぎます。</p><p class="member-meta" data-reading-reference></p></section>':''}`,{...ctx,active:'activity'});
  if(path==='/members/projects/')return memberLayout('共同事業・連絡記録',`<h1>共同事業・連絡記録</h1><p>参加事業の打ち合わせと、資料の受け渡しに関する記録です。</p><div class="project-list">${projects.filter(p=>p.roles.includes(account.role)).map(p=>`<a href="/members/projects/${p.slug}/"><small>${p.period}</small><h2>${esc(p.title)}</h2><p>${esc(p.members)}</p></a>`).join('')||'<p class="empty-state">参照できる共同事業はありません。</p>'}</div>`,{...ctx,active:'projects'});
  const project=projects.find(p=>path===`/members/projects/${p.slug}/`&&p.roles.includes(account.role));
@@ -54,10 +106,10 @@ function renderMemberPage(path,ctx){
  const docMatch=path.match(/^\/members\/records\/([A-Z0-9-]+)\/$/);
  if(docMatch){const d=documents.find(d=>d.id===docMatch[1]&&d.roles.includes(account.role));return d?renderDocument(d,ctx):null;}
  if(path==='/members/messages/'){
-  const normal=`<article class="message"><time>2016.03.22 / 共同研究事務局</time><h2>循環設備・改訂寸法の確定について</h2><div class="message-body">ミナモ循環技研 川瀬様\n\n浄水筐体の改訂図は、YH-2013-014の添付仕様で確定いたしました。次期実施計画の配布番号はYH-2016-032です。\n納入時期につきましては、別途日程表をお送りいたします。</div></article>`;
+  const assigned=assignedNoticeList(account.role);
   const privateMessage=account.role==='institution'&&caseState.contact?`<article class="message"><time>2026.11.02 / 工房保全担当</time><h2>原本照会への回答</h2><div class="message-body">このアカウントを現在利用されている方へ。\n\n原本の照会を受け取りました。B-07に今も灯さんがいます。型紙を取りに行くたび、道具と一緒に帰るのだと書かれた紙を渡されます。\n\nこちらでは外部への通信が止められています。施設サイトと旧資料の更新だけが残っています。廃止前のページへ参照を戻したのは私です。今度の引渡しで、この更新権限も失います。\n\n保全した原本をまとめました。手を加えず、ZIP全体を資料保全受付へお渡しください。申出者の情報は同梱の書面にあります。終わったら、こちらの記録に受領を返してもらえます。</div><p data-inquiry-record="CH-2021-003" hidden>最後の手控えにあった、事業を止めてもいいという行も読みました。原文のまま残しています。</p><p data-inquiry-record="FAB-2026-018" hidden>B-07の交換票から照会されたのですね。部品を届ける時に受け取った本人の紙も、原本に含めました。</p><a class="download-card" href="/members/download/hozen.zip"><strong>保全資料_20261102.zip ↓</strong><small>申出書・実験記録・継承資料</small></a><div class="submission-links"><a class="text-link" href="${esc(origins.hozen)}/receive/?case=${caseId}">資料保全・匿名通報受付 </a></div></article>`:'';
   const changed=caseState.ending==='end2'?'<article class="message"><time>2026.11.06 / 運営事務局</time><h2>担当者の変更</h2><p>工房保全担当への照会は事務局へ移管いたしました。旧担当者の個人登録は終了しました。</p></article>':'';
-  return memberLayout('施設からの連絡',`<h1>施設からの連絡</h1>${changed}${privateMessage}${account.role==='ashita'?'<article class="message"><time>2017.07.14 / 資料保存担当</time><h2>移管作業票の受領について</h2><p>旧基盤の引継ぎに関する作業票はAH-2017-009に収録しました。閲覧票の控えと保存範囲を併せて確認いたします。</p></article>':account.role==='minamo'?normal:'<article class="message"><time>2026.10.01 / 運営事務局</time><h2>秋季の共用設備点検について</h2><p>ご利用中の区画に点検作業が入る場合がございます。各担当からのご連絡をご確認ください。</p></article>'}`,{...ctx,active:'messages'});
+  return memberLayout('施設からの連絡',`<h1>施設からの連絡</h1>${changed}${privateMessage}${assigned||'<article class="message"><time>2026.10.01 / 運営事務局</time><h2>秋季の共用設備点検について</h2><p>ご利用中の区画に点検作業が入る場合がございます。各担当からのご連絡をご確認ください。</p></article>'}`,{...ctx,active:'messages'});
  }
  if(path==='/members/inquiry/'){
   const id=query.get('record')||'';const d=documents.find(d=>d.id===id&&d.roles.includes(account.role));

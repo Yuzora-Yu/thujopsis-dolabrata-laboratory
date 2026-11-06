@@ -12,12 +12,30 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await p.goto(base+'/');await p.getByRole('heading',{level:1,name:/ともに、/}).waitFor();
   await p.locator('.facility-hero img').evaluate(im=>im.decode());await p.screenshot({path:'.work/qa/nov06-home-desktop.png'});
   const publicHeader=await p.locator('.site-header').evaluate(header=>getComputedStyle(header).backgroundColor);
-  await p.locator('.facility-hero-photo .seed-note').click();
+  await p.locator('.facility-hero-copy .seed-note').click();
   await p.getByRole('dialog').waitFor();
   await p.keyboard.press('Escape');
+  await p.evaluate(()=>window.scrollTo({top:720,behavior:'instant'}));
+  assert.equal(Math.round((await p.locator('.site-header').boundingBox()).y),0);
+  await p.locator('#main-navigation').getByRole('link',{name:'施設・サービス',exact:true}).click();
+  await p.getByRole('link',{name:'職員紹介を見る',exact:true}).click();
+  await p.getByRole('heading',{level:1,name:'施設職員紹介',exact:true}).waitFor();
+  for(const title of ['中央受付スタッフ','工房スタッフ']){
+   await p.getByRole('heading',{level:2,name:title,exact:true}).waitFor();
+  }
+  await p.goto(base+'/');
   await p.locator('.program-promo a').click();
   await p.getByRole('heading',{level:1,name:/月に、暮らしを/}).waitFor();
   assert.equal(await p.locator('[data-habitat-demo],a[href*="/field-notes/"]').count(),0);
+  await p.locator('.lunar-exhibit-view img').evaluate(image=>image.decode());
+  const exhibits=p.locator('.lunar-work-grid .lunar-work');
+  assert.equal(await exhibits.count(),3);
+  await exhibits.locator('img').evaluateAll(images=>Promise.all(images.map(image=>image.decode())));
+  await p.locator('.lunar-exhibition').screenshot({path:'.work/qa/lunar-exhibition-revised.png'});
+  await exhibits.getByRole('heading',{name:'工具を使わず交換できる留め具'}).click();
+  await p.getByRole('heading',{level:1,name:'工具を使わず交換できる留め具'}).waitFor();
+  await p.getByRole('link',{name:'月の企画展示を見る',exact:true}).click();
+  await p.getByRole('heading',{level:1,name:/月に、暮らしを/}).waitFor();
   await p.goto(base+'/research/lunar-habitat/field-notes/');
   assert.equal(await p.locator('body').getAttribute('data-asunaro-stage'),'root');
   assert.equal(await p.locator('.seed-note').count(),0);
@@ -78,6 +96,12 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await member.locator('#member-id').fill('201204010017');await member.locator('#member-password').fill('20080519');
   assert.notEqual(await member.locator('.member-header').evaluate(header=>getComputedStyle(header).backgroundColor),publicHeader);
   await member.getByRole('button',{name:/ログイン/}).click();await member.getByRole('heading',{name:'会員トップ',exact:true}).waitFor();
+  await member.locator('.member-workshop-note').getByRole('link',{name:'工房でのやり取りを読む',exact:true}).click();
+  await member.getByRole('heading',{level:1,name:'生活道具・共同試作の連絡',exact:true}).waitFor();
+  assert.match(await member.locator('.project-thread').innerText(),/焼き芋/);
+  await member.getByRole('navigation',{name:'会員メニュー'}).getByRole('link',{name:'施設からの連絡',exact:true}).click();
+  await member.locator('[data-assigned-record="YH-2016-032"]').click();
+  await member.getByRole('heading',{level:1,name:'第2期居住実証・実施計画',exact:true}).waitFor();
   await member.screenshot({path:'.work/qa/member-palette-desktop.png'});
   await member.goto(base+'/members/records/YH-2018-041/');await member.locator('.record-media a').waitFor();assert.equal(media.length,0,'PDF loaded before a player asked for it');
   const waiting=member.waitForEvent('download');await member.locator('.record-media a').click();const file=await waiting;assert.equal(file.suggestedFilename(),'YH-2018-041.pdf');
@@ -92,10 +116,20 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
    assert.equal(await member.locator('.document-result').count(),0);
   }
   const mobile=await b.newPage({viewport:{width:390,height:844}});mobile.on('pageerror',e=>errors.push(e.message));
-  for(const route of ['/','/research/lunar-habitat/','/news/20261027/','/news/20250509/','/tenants/','/tenants/0003/','/tenants/0004/materials/opening-exhibition/','/members/login/','/floor-map/']){
+  for(const route of ['/','/research/lunar-habitat/','/news/20261027/','/news/20250509/','/tenants/','/tenants/0003/','/tenants/0004/materials/opening-exhibition/','/members/login/','/floor-map/','/facilities/staff/','/gallery/0021/']){
    await mobile.goto(base+route);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);
    if(route==='/'){await mobile.locator('.facility-hero img').evaluate(im=>im.decode());await mobile.screenshot({path:'.work/qa/nov06-home-mobile.png'});}
   }
+  const galleryActions=mobile.locator('.gallery-detail-links');
+  assert.equal(await galleryActions.getByRole('link').count(),2);
+  assert.ok(await galleryActions.evaluate(row=>parseFloat(getComputedStyle(row).gap)>0));
+  await galleryActions.screenshot({path:'.work/qa/gallery-detail-actions-mobile.png'});
+  await mobile.evaluate(()=>window.scrollTo({top:760,behavior:'instant'}));
+  assert.equal(Math.round((await mobile.locator('.site-header').boundingBox()).y),0);
+  await mobile.getByRole('button',{name:/MENU/}).click();
+  await mobile.locator('#main-navigation').getByRole('link',{name:'施設・サービス',exact:true}).click();
+  await mobile.getByRole('heading',{level:1,name:'施設・サービス',exact:true}).waitFor();
+  await mobile.goto(base+'/floor-map/');
   await mobile.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
   await mobile.locator('.image-dialog[open] img[src$="/floor-4f.svg"]').evaluate(image=>image.decode());
   await mobile.keyboard.press('Escape');
@@ -117,6 +151,6 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await memberNav.getByRole('link',{name:'研究資料照会',exact:true}).click();
   await mobile.getByRole('heading',{name:'研究資料照会',exact:true}).waitFor();
   await mobile.screenshot({path:'.work/qa/member-palette-mobile.png'});
-  assert.deepEqual(errors,[]);console.log('Public program passed: tenant history and saved notice, gallery link, separate member tab, distinct lookup responses, maps, 390px layout, authorized PDF.');
+  assert.deepEqual(errors,[]);console.log('Public program passed: sticky menu, staff page, exhibit and gallery, member story, linked notice, authorized PDF, and 390px layout.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

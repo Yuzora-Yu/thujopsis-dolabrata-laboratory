@@ -2,6 +2,36 @@ const {chromium}=require(process.env.ASUNARO_NODE_MODULES?process.env.ASUNARO_NO
 const assert=require('node:assert/strict'),fs=require('node:fs/promises');
 const base=(process.env.BASE_URL||'http://127.0.0.1:4417').replace(/\/$/,''),at=path=>base+path;
 let browser;
+const noteRoutes=['/','/about/','/facilities/','/workshop/','/gallery/','/news/','/price/','/membership/'];
+async function checkMenuNotes(browser){
+ const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
+ try {
+  const page=await context.newPage(),titles=new Set(),labels=new Set();
+  for (const path of noteRoutes) {
+   await page.goto(at(path));
+   const marker=page.locator('main .seed-note');
+   assert.equal(await marker.count(),1,path);
+   assert.equal(await page.locator('.site-footer .seed-note').count(),0,path);
+   labels.add(await marker.innerText());
+   const before=(await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_'));
+   await marker.click();
+   const dialog=page.getByRole('dialog');
+   await dialog.waitFor();
+   titles.add(await dialog.getByRole('heading').innerText());
+   await page.keyboard.press('Escape');
+   assert.equal(await marker.evaluate(button=>button===document.activeElement),true,path);
+   assert.equal((await context.cookies()).find(cookie=>cookie.name===before.name).value,before.value);
+  }
+  assert.equal(titles.size,noteRoutes.length);
+  assert.equal(labels.size,noteRoutes.length);
+  for (const path of ['/gallery/0021/','/facilities/coworking/','/facilities/staff/','/floor-map/','/guide/access/']) {
+   await page.goto(at(path));
+   assert.equal(await page.locator('.seed-note').count(),0,path);
+  }
+ } finally {
+  await context.close();
+ }
+}
 async function followPublicLinks(browser){
  const context=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce'});
  const page=await context.newPage();
@@ -41,28 +71,16 @@ async function followPublicLinks(browser){
 }
 (async()=>{
  await fs.mkdir('.work/qa',{recursive:true});browser=await chromium.launch({headless:true,channel:'msedge'});
+ await checkMenuNotes(browser);
  await followPublicLinks(browser);
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
  await page.goto(at('/gallery/'));
- await page.waitForFunction(()=>document.querySelectorAll('.seed-note').length===5);
  const firstCount=(await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_'));
- const titles=[];
- for(const marker of await page.locator('.seed-note').all()){
-  await marker.click();
-  const dialog=page.getByRole('dialog');
-  await dialog.waitFor();
-  titles.push(await dialog.getByRole('heading').innerText());
-  await page.keyboard.press('Escape');
-  assert.equal(await marker.evaluate(button=>button===document.activeElement),true);
- }
- assert.equal(new Set(titles).size,5);
- assert.equal(await page.locator('.seed-note-quiet').count(),1);
- assert.equal((await context.cookies()).find(cookie=>cookie.name===firstCount.name).value,firstCount.value);
- await page.getByRole('button',{name:'豆知識：地上から届いた工具'}).click();
- await page.getByRole('dialog').getByRole('link',{name:'工房のご案内'}).click();
+ await page.locator('#main-navigation').getByRole('link',{name:'工房のご案内',exact:true}).click();
  await page.waitForURL(at('/workshop/'));
- await page.locator('#main-navigation').getByRole('link',{name:'制作物ギャラリー',exact:true}).click();
+ await page.getByRole('button',{name:'道具の小話',exact:true}).click();
+ await page.getByRole('dialog').getByRole('link',{name:'工房制作物ギャラリー'}).click();
  await page.waitForURL(at('/gallery/'));
  await page.waitForFunction(name=>document.cookie.split('; ').includes(name+'=3'),firstCount.name);
  for(let visit=3;visit<14;visit++)await page.reload();
@@ -85,10 +103,12 @@ async function followPublicLinks(browser){
  await page.goBack();await page.locator('body.seed-drift-active').waitFor();
  assert.equal(await page.locator('.seed-drift-link').innerText(),'アクセス');
  await page.goto(at('/news/'));const red=page.getByRole('link',{name:/第5次居住実証 参加者募集について/});await red.waitFor();
+ assert.equal(await red.locator('time').getAttribute('datetime'),'2025-05-01');
+ assert.equal(await red.getAttribute('href'),new URL(at('/news/20250501-residential/')).pathname);
  assert.equal(await red.locator('.news-title').evaluate(node=>getComputedStyle(node).color),'rgb(155, 32, 40)');
  const response=await Promise.all([page.waitForNavigation(),red.click()]);assert.equal(response[0].status(),404);
  await page.getByRole('heading',{name:'ページが見つかりません。'}).waitFor();await page.locator('#main-navigation a[href$="/tenants/"]').waitFor();
- for(const route of ['/floor-map/','/workshop/','/membership/','/facilities/cafe/']){await page.goto(at(route));await page.locator('.seed-fragment a').waitFor();assert.equal(await page.locator('.seed-fragment a').count(),1,route);assert.equal(await page.locator('.seed-note').count(),5,route);}
+ for(const route of ['/floor-map/','/workshop/','/membership/','/facilities/cafe/']){await page.goto(at(route));await page.locator('.seed-fragment a').waitFor();assert.equal(await page.locator('.seed-fragment a').count(),1,route);assert.equal(await page.locator('.seed-note').count(),noteRoutes.includes(route)?1:0,route);}
  await page.goto(at('/gallery/0021/'));await page.locator('article.seed-corrupted').waitFor();
  await page.goto(at('/gallery/0022/'));assert.equal(await page.locator('body').getAttribute('data-asunaro-stage'),'root');
  assert.equal((await context.cookies()).some(cookie=>cookie.name===seed.name),false);
@@ -107,5 +127,5 @@ async function followPublicLinks(browser){
  const reduced=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});await reduced.addCookies([{...seed,value:'14'}]);const mobile=await reduced.newPage();mobile.on('pageerror',error=>errors.push(error.message));await mobile.goto(at('/gallery/'));await mobile.locator('body.seed-drift-active').waitFor();
  assert.equal(await mobile.locator('.seed-noise').count(),0);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
  await mobile.locator('.seed-corrupted img').evaluateAll(images=>Promise.all(images.map(image=>image.decode())));await mobile.screenshot({path:'.work/qa/seed-drift-mobile.png',fullPage:true});await reduced.close();assert.deepEqual(errors,[]);
- console.log('SEED playtest passed: 15 distinct pages through public links, 14/15 reload boundary, back navigation, altered works, 404, ROOT and cross-tab reset, preserved progress, mobile.');
+ console.log('SEED playtest passed: one unique discovery on each of eight menu pages, 15-page visit threshold, dated 404, back navigation, ROOT and cross-tab reset, preserved progress, mobile.');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{await browser?.close();});

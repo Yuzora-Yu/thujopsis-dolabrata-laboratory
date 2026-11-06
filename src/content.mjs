@@ -71,6 +71,7 @@ export const searchEntries = [
  ...humanSearchEntries,
  {title:programTitle,url:programPath,text:'月面 宇宙 工房 道具 小物入れ 企画展示'},
  {title:'施設・サービス',url:'/facilities/',text:'会議室 オフィス コワーキング 食堂 プレゼンテーションホール フロアマップ'},
+ {title:'施設職員紹介',url:'/facilities/staff/',text:'中央受付 工房スタッフ 施設職員 見学 製作相談'},
  {title:'工房のご案内',url:'/workshop/',text:'3Dプリンター レーザーカッター 試作 ものづくり'},
  {title:'料金のご案内',url:'/price/',text:'利用料金 月額 会議室 工房'},
  {title:'月額会員・入会のご案内',url:'/membership/',text:'入会 会員 新規受付'},

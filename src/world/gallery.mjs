@@ -30,6 +30,9 @@ export const galleryRecords = [
  ['stored','2025.10.17','支持部一式・保管用','3Dプリンター','research',false,'同一形状の支持部一式を製作しました。製作後は各組を区別せず、同じ管理区分で保管しています。','AS-2024-002'],
  ['spares','2026.06.02','保守交換部品・第18便','3Dプリンター','research',false,'居住実証区画の保守交換用部品です。外観確認後、工房保全担当へ引き渡しました。','FAB-2026-018'],
  ['lizard','2026.10.23','関節が動く小さなトカゲ','3Dプリンター','hobby',true,'関節を組み立てずに造形する、小さなトカゲです。部品同士の隙間を確かめ、造形後に少しずつ動かして仕上げています。'],
+ ['latch','2026.10.26','工具を使わず交換できる留め具','3Dプリンター','prototype',true,'狭い作業台でも手順を見失わないよう、蓋を固定する留め具をてこの形にしました。受けとレバーは別々に積層造形し、樹脂の軸でつないでいます。展示用の板では、指をかける位置と、開いたことが目で分かる角度を確かめられます。'],
+ ['layered-map','2026.10.29','経路を重ねて読める設備模型','レーザーカッター','prototype',true,'普段使う経路と点検時の回り道を、色の違う透明板に分けました。レーザーで板の外形を切り出して線を彫り、間隔をそろえて台座に収めています。上の板を外すと、経路が交差して見える場所でも、どの層を通るかを確かめられます。'],
 ].map(([key,date,title,tag,category,listed,body,record],index)=>({
  id:String(index+1).padStart(4,'0'),key,date,title,tag,category,listed,body,record,recordUpdated:({guide:"2016.10.03",grip:"2018.12.18",posture:"2020.02.21",standard:"2024.07.12",judgment:"2024.07.12",spares:"2026.10.27"})[key],image:`media/g-${key}.webp`,
+ ...(category==='prototype'?{links:[{path:'/research/lunar-habitat/',text:'月の企画展示を見る'}]}:{}),
 }));

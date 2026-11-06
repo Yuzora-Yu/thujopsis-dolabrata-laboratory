@@ -74,7 +74,7 @@ test('name search, personal account and independent submission reveal and stop s
 test('state changes require CSRF verification',async()=>{const r=await fetch(base+'/members/login/',{method:'POST',body:new URLSearchParams({id:'201204010017',password:'20080519'})});assert.equal(r.status,403);});
 
 test('publication numbers form tight sequences independent of account registration',()=>{
- assert.deepEqual(gallery.map(g=>Number(g.id)),Array.from({length:30},(_,i)=>i+1));
+ assert.deepEqual(gallery.map(g=>Number(g.id)),Array.from({length:32},(_,i)=>i+1));
  assert.deepEqual(tenants.map(t=>Number(t.page)),Array.from({length:18},(_,i)=>i+1));
  assert.equal(tenants.find(t=>t.page==='0003').id,'0017');
  assert.equal(new Set(gallery.map(g=>g.image)).size,gallery.length);

@@ -42,7 +42,7 @@
   const path=location.pathname.slice(base.length),params=new URLSearchParams(location.search);
   if(path==='/news/'&&!params.get('year')&&!params.get('kind')&&Number(params.get('page')||1)<=1&&!document.querySelector('.seed-drift-news')){
    const archive=document.querySelector('.news-archive>.news-rows');
-   if(archive){const rows=document.createElement('div'),link=document.createElement('a');rows.className='news-rows seed-drift-news';link.href=base+'/news/20261102-residential/';link.innerHTML='<time datetime="2026-11-02">2026.11.02</time><span class="tag">募集</span><span class="news-title">第5次居住実証 参加者募集について</span>';rows.append(link);archive.before(rows);}
+   if(archive){const rows=document.createElement('div'),link=document.createElement('a');rows.className='news-rows seed-drift-news';link.href=base+'/news/20250501-residential/';link.innerHTML='<time datetime="2025-05-01">2025.05.01</time><span class="tag">募集</span><span class="news-title">第5次居住実証 参加者募集について</span>';rows.append(link);archive.before(rows);}
   }
   const fragments={
    '/workshop/':{text:'引取期限を過ぎた試作品について',href:'/gallery/0021/'},
