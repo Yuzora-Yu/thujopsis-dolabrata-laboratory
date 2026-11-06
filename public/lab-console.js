@@ -23,10 +23,16 @@ export async function initConsole(options={}){
   if(response.status===403&&action!=='context'&&retry){await request('context');return request(action,input,false);}
   if(!response.ok)throw new Error(result.error||'測定記録を受け付けられませんでした。');context=result;return result;
  }
- function focusSurface(element){
+ function focusSurface(element,first=element,last=element){
   element.focus({preventScroll:true});
-  const {top,bottom}=element.getBoundingClientRect();
-  if(top<0||bottom>window.innerHeight)element.scrollIntoView({block:'center',behavior:'instant'});
+  const {top}=first.getBoundingClientRect(),{bottom}=last.getBoundingClientRect();
+  const height=window.innerHeight,edge=8;
+  if(bottom-top>height-2*edge){
+   element.scrollIntoView({block:'center',behavior:'instant'});
+   return;
+  }
+  const distance=top<edge?top-edge:Math.max(0,bottom-height+edge);
+  if(distance)window.scrollBy({top:distance,behavior:'instant'});
  }
  function focusPanel(){
   const heading=root.querySelector('.lab-panel h2');
@@ -75,12 +81,33 @@ export async function initConsole(options={}){
  }
  function observe(){
   const run=context.trial.particleAttempt,scene=particleScene(run.seed),eventMap=new Map(scene.events.map(e=>[e.particleId,e]));
-  root.innerHTML=`<section class="lab-panel lab-observation"><div class="lab-observation-head"><h2>粒子観測</h2><p><span class="lab-time">30</span>秒　検出 <span class="lab-found">0</span> / 16</p></div><canvas class="lab-canvas" width="960" height="540" tabindex="0" aria-label="粒子観測面。矢印キーで照準移動、SpaceかEnterで記録"></canvas><p class="lab-feedback" role="status">通常と異なる地点を選択してください。</p>${button('cancel','観測を中断')}</section>`;
-  const canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d'),found=new Set(),discovered=new Set(),taps=[],effects=[];let renderedMs=0,lastTap=-500,lastSecond=30,keyboard=false,aim={x:480,y:270};focusSurface(canvas);
+  root.innerHTML=`<section class="lab-panel lab-observation"><div class="lab-observation-head"><h2>粒子観測</h2><p><span class="lab-time">30</span>秒　検出 <span class="lab-found">0</span> / 16</p></div><canvas class="lab-canvas" width="960" height="540" tabindex="0" aria-label="粒子観測面。矢印キーで照準移動、SpaceかEnterで記録"></canvas><p class="lab-feedback" role="status"><span data-lab-feedback-text>通常と異なる地点を選択してください。</span><span class="lab-feedback-count" hidden></span></p>${button('cancel','観測を中断')}</section>`;
+  const canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d'),found=new Set(),discovered=new Set(),taps=[],effects=[];
+  const feedback=root.querySelector('.lab-feedback'),feedbackText=feedback.querySelector('[data-lab-feedback-text]'),feedbackCount=feedback.querySelector('.lab-feedback-count');
+  let renderedMs=0,lastTap=-labRules.cooldownMs,lastSecond=30,keyboard=false,aim={x:480,y:270};
+  focusSurface(canvas,root.querySelector('.lab-observation-head'),feedback);
   const start=performance.now();active=true;pending=null;
   function cleanup(){active=false;cancelAnimationFrame(raf);document.removeEventListener('visibilitychange',hidden);}
   abortObservation=cleanup;
-  function mark(x,y){if(!active)return;if(renderedMs-lastTap<500){root.querySelector('.lab-feedback').textContent='入力待ちです（0.5秒間隔）。';return;}lastTap=renderedMs;const tap={ms:renderedMs,x,y},decision=judgeTap(scene,tap,found);taps.push(tap);effects.push({x,y,at:renderedMs,kind:decision.kind});if(decision.kind==='hit'){found.add(decision.event.id);discovered.add(decision.particleId);root.querySelector('.lab-found').textContent=String(found.size);}const message=decision.kind==='hit'?'異常を記録しました。':decision.kind==='duplicate'?'同じ異常は記録済みです。':'この地点に該当する異常はありません。';root.querySelector('.lab-feedback').textContent=message+'（入力 '+taps.length+' 件）';}
+  function mark(x,y){
+   if(!active)return;
+   if(renderedMs-lastTap<labRules.cooldownMs){
+    feedbackText.textContent='入力待ちです（0.5秒間隔）。';
+    return;
+   }
+   lastTap=renderedMs;
+   const tap={ms:renderedMs,x,y},decision=judgeTap(scene,tap,found);
+   taps.push(tap);
+   effects.push({x,y,at:renderedMs,kind:decision.kind});
+   if(decision.kind==='hit'){
+    found.add(decision.event.id);
+    discovered.add(decision.particleId);
+    root.querySelector('.lab-found').textContent=String(found.size);
+   }
+   feedbackText.textContent=decision.kind==='hit'?'異常を記録しました。':decision.kind==='duplicate'?'同じ異常は記録済みです。':'この地点に該当する異常はありません。';
+   feedbackCount.textContent='（入力 '+taps.length+' 件）';
+   feedbackCount.hidden=false;
+  }
   canvas.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'&&event.button!==0)return;event.preventDefault();const rect=canvas.getBoundingClientRect(),style=getComputedStyle(canvas),left=parseFloat(style.borderLeftWidth)||0,right=parseFloat(style.borderRightWidth)||0,top=parseFloat(style.borderTopWidth)||0,bottom=parseFloat(style.borderBottomWidth)||0;const x=(event.clientX-rect.left-left)*960/(rect.width-left-right),y=(event.clientY-rect.top-top)*540/(rect.height-top-bottom);if(x>=0&&x<=960&&y>=0&&y<=540)mark(x,y);});
   canvas.addEventListener('keydown',event=>{const moves={ArrowLeft:[-24,0],ArrowRight:[24,0],ArrowUp:[0,-24],ArrowDown:[0,24]};if(moves[event.key]){event.preventDefault();keyboard=true;const [x,y]=moves[event.key];aim={x:Math.max(0,Math.min(960,aim.x+x)),y:Math.max(0,Math.min(540,aim.y+y))};}else if([' ','Enter'].includes(event.key)){event.preventDefault();keyboard=true;mark(aim.x,aim.y);}});
   async function hidden(){if(!document.hidden||!active)return;cleanup();busy=true;try{await request('particle_cancel',{attemptId:run.id});render();error('画面を離れたため観測を中断しました。カードの原票は保存されています。');}catch(err){render();error(err.message);}finally{busy=false;}}

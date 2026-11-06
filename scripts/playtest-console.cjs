@@ -24,14 +24,20 @@ async function exerciseConsole(p,{url,mode='worker',prefix='.work/qa/console-'+m
  const viewport=p.viewportSize();
  await p.setViewportSize({width:390,height:700});
  await p.getByRole('button',{name:'粒子観測を開始',exact:true}).click();await p.locator('canvas').waitFor();
- const canvasView=await p.locator('canvas').evaluate(el=>{
-  const {top,bottom,width}=el.getBoundingClientRect();return {top,bottom,width,height:innerHeight,focused:el===document.activeElement};
- });
- assert.ok(canvasView.top>=0&&canvasView.bottom<=canvasView.height&&canvasView.width>320,JSON.stringify(canvasView));
- assert.equal(canvasView.focused,true);
+ async function observationInView(minWidth){
+  const view=await p.locator('canvas').evaluate(canvas=>{
+   const top=document.querySelector('.lab-observation-head').getBoundingClientRect().top;
+   const bottom=document.querySelector('.lab-feedback').getBoundingClientRect().bottom;
+   return {top,bottom,width:canvas.getBoundingClientRect().width,height:innerHeight,focused:canvas===document.activeElement};
+  });
+  assert.ok(view.top>=0&&view.bottom<=view.height&&view.width>minWidth,JSON.stringify(view));
+  assert.equal(view.focused,true);
+ }
+ await observationInView(320);
  await p.getByRole('button',{name:'観測を中断',exact:true}).click();assert.deepEqual((await read()).trial.cards,cards);
  await p.setViewportSize(viewport);
  await p.reload();await p.getByRole('button',{name:'粒子観測を開始',exact:true}).click();await p.locator('canvas').waitFor();
+ await observationInView(450);
  // Exercise the exact displayed coordinates against the shared deterministic model.
  await p.waitForTimeout(2200);
  const target=await p.evaluate(async endpoint=>{
