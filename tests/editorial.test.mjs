@@ -70,6 +70,10 @@ test('public facility routes do not announce the old archive and the first clipp
  for(const route of publicPaths){const html=renderPublic(route)||'';assert.doesNotMatch(html,/href="[^"]*(?:historical-records|127\.0\.0\.1:4176|\/snapshots\/)/,route);}
  assert.doesNotMatch(renderPublic('/about/history/'),/準備期の公開記録/);
  const loan=documents.find(d=>d.id==='FAB-2022-071');assert.equal(loan.links[0].origin,undefined);assert.equal(loan.links[0].path,'/assets/archive/younagi-20220908.pdf');
+ const loanPage=renderMember('/members/records/FAB-2022-071/',context('minamo'));
+ assert.match(loanPage,/<details>\s*<summary>切抜の本文を読む<\/summary>/);
+ assert.doesNotMatch(loanPage,/historical-records|\/collections\/|\/snapshots\//);
+ assert.doesNotMatch(renderPublic('/workshop/stories/seo-akari/'),/自助具作る女性、所在分からず/);
  for(const d of documents.filter(d=>d.roles.includes('minamo')))assert.doesNotMatch(d.sections.map(s=>s[1]).join(' '),/0000\s*一般財団/);
 });
 

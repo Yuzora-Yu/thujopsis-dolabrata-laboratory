@@ -1,4 +1,6 @@
 from pathlib import Path
+from subprocess import check_output
+import json
 import sys
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -200,13 +202,12 @@ if not {'--missing-only', '--akari-only'}.intersection(sys.argv):
 
 
 if '--corrections-only' not in sys.argv:
- newspaper('younagi-20220908.pdf','2022年9月8日（木）','自助具作る女性、所在分からず','作業療法士の瀬尾灯さん（28）',[
-  '暮らしの道具を自ら設計、製作していた作業療法士の瀬尾灯さん（28）が八月十九日に外出した後、家族は本人と連絡が取れていない。勤務先にも戻っておらず、家族は二十三日に行方不明の届出を行った。',
-  '家族によると、瀬尾さんは産業支援交流施設「あすなろ」で、自作した補助具を短期間試す活動に協力すると伝えて外出した。二十二日には帰宅する予定だったが戻らず、家族はその日の夕方、施設に本人への取次ぎを求めたという。七月の施設の取材では、翌月に新作の使用状況を紹介したいと話していた。',
-  '母の文乃さん（59）は、手を動かしにくくなった自身の暮らしを、娘が道具で支えてくれたと話す。「帰らないなら本人から聞きます。灯が、自分で話せるところにいるか知りたい」と訴える。',
-  '施設側は、本人名義の参加延長と滞在先変更の連絡があると回答した。一方、施設サイトの制作者紹介には、八月末で一般制作活動を終了したと記載されている。本紙は、本人の滞在先と意思を確認できていない。',
-  '家族は、娘の氏名と活動内容を公表し、本人と話せる情報の提供を求めている。',
- ],'収蔵番号 NK-2022-0908')
+ article=json.loads(check_output([
+  'node','--input-type=module','-e',
+  "import {pressClippings} from './src/world/archive-data.mjs'; process.stdout.write(JSON.stringify(pressClippings['NK-2022-0908']));",
+ ],cwd=ROOT))
+ newspaper('younagi-20220908.pdf',article['issue'],article['headline'],article['subhead'],
+           article['paragraphs'],'収蔵番号 NK-2022-0908')
 
 if not {'--corrections-only', '--akari-only'}.intersection(sys.argv):
  newspaper('younagi-20230622.pdf','2023年6月22日（木）','退出支援の元職員とも連絡途絶','工房の三枝律さん（36）',[

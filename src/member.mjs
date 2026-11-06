@@ -3,6 +3,7 @@ import {mediaForRecord,recordMediaPrefix} from './record-media.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
 import {projects} from './world/projects.mjs';
 import {humanPages} from './world/people.mjs';
+import {pressClippings} from './world/archive-data.mjs';
 import {labThanks,labAssessment} from './lab.mjs';
 import {firstReservationDate,lastReservationDate,reservationSpaces,reservationHours,reservationHoursHint} from '../public/assets/reservation-policy.js';
 import {normalizeDocumentId,documentLookupMessages} from './search.mjs';
@@ -107,7 +108,25 @@ function renderDocument(d,ctx){
  const outline=[...(d.sections||[]).map(([title],i)=>[title,'document-section-'+(i+1)]),...(d.tables||[]).map((table,i)=>[table.caption,'record-table-'+(i+1)]),...(d.entries?.length?[['日付順の記録','record-entries']]:[]),...(d.addenda||[]).map((note,i)=>[note.date+'／'+note.by,'record-addendum-'+(i+1)])];
  const contents=outline.length>=4?`<details class="record-outline"><summary>文書内の項目</summary><nav class="document-contents" aria-label="文書内の項目">${outline.map(([title,id])=>`<a href="#${id}">${esc(title)}</a>`).join('')}</nav></details>`:'';
  const editions=mediaForRecord(d.id);const recordFiles=editions.length?`<div class="record-media" aria-label="添付資料">${editions.map(file=>`<a href="${recordMediaPrefix}${file.filename}">${esc(file.label)} <span aria-hidden="true">↓</span></a>`).join('')}<p data-record-media-message role="status"></p></div>`:'';
- const links=(d.links||[]).map(l=>`<p><a class="text-link" href="${esc((l.origin?ctx.origins[l.origin]:'')+l.path)}" target="_blank" rel="noopener">${esc(l.text)}<span class="sr-only">（別タブで開きます）</span></a></p>`).join('');
+ const links=(d.links||[]).map(link=>{
+  const href=(link.origin?ctx.origins[link.origin]:'')+link.path;
+  const anchor=`<a class="text-link" href="${esc(href)}" target="_blank" rel="noopener">${esc(link.text)}${link.clipping?' <span class="record-link-format">PDF・別タブ</span>':'<span class="sr-only">（別タブで開きます）</span>'}</a>`;
+  if(!link.clipping)return `<p>${anchor}</p>`;
+  const clipping=pressClippings[link.clipping];
+  return `<div class="record-clipping">
+   <p>${anchor}</p>
+   <details>
+    <summary>切抜の本文を読む</summary>
+    <article aria-labelledby="clipping-${esc(link.clipping)}">
+     <p class="clipping-edition">夕凪日報 地域面　<time datetime="${esc(clipping.published)}">${esc(clipping.issue)}</time></p>
+     <h2 id="clipping-${esc(link.clipping)}">${esc(clipping.headline).replace('、','、<wbr>')}</h2>
+     <p class="clipping-subhead">${esc(clipping.subhead)}</p>
+     ${clipping.paragraphs.map(text=>`<p>${esc(text)}</p>`).join('')}
+     <p class="clipping-edition">収蔵番号 ${esc(link.clipping)}</p>
+    </article>
+   </details>
+  </div>`;
+ }).join('');
  return memberLayout(d.title,`<article class="research-document"><p class="record-kind">${esc(d.kindLabel||'登録資料')}</p><h1 class="document-title">${esc(d.title)}</h1><div class="member-meta">文書ID：${d.id}<br>作成日：${d.date}${d.updated?`<br>最終更新：${esc(d.updated)}`:''}<br>管理：${esc(d.owner)}</div>${recordFiles}${ctx.account.role==='institution'&&ctx.caseState.ending!=='end3'?'<p class="reading-status" data-after-reading="CH-2021-003 OPS-2026-084" hidden><a href="/members/activity/">照会名義に関する確認が届いています。</a></p>':''}${contents}${originals}${tables}${entries}${d.signoff?`<p class="record-signoff">${esc(d.signoff)}</p>`:''}${addenda}${d.quote?`<blockquote class="document-citation">${esc(d.quote)}</blockquote>`:''}${(d.attachments||[]).map(file=>`<a class="download-card" href="${esc(file.path)}"><strong>${esc(file.name)} ↓</strong><small>${esc(file.description)}</small></a>`).join('')}${d.readingLedger?`<section class="reading-comparison"><h2>${esc(d.readingLedger.heading)}</h2><p>${esc(d.readingLedger.text)}</p><p class="member-meta" data-reading-reference></p><div data-reading-ledger="combined"></div></section>`:""}${d.id==='AS-2026-019'?labAssessment(ctx.caseState.consoleTrial,ctx.caseState.ending):''}${links?`<div class="document-links">${links}</div>`:''}${d.inquiry?`<p><a class="text-link" href="/members/inquiry/?record=${d.id}">記録についての照会</a></p>`:''}${d.audit?`<p><a class="text-link" href="${esc(ctx.origins.audit)}/receive/?case=${ctx.caseId}">東都研究監査室・記録保全受付</a></p>`:''}</article><section class="record-lookup" aria-labelledby="lookup-heading"><h2 id="lookup-heading">研究資料照会</h2>${documentLookup('','next-document-id')}</section>`,{...ctx,active:'records',record:d});
 }
 

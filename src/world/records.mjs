@@ -1674,7 +1674,8 @@ export const researchRecords = [
     "links": [
       {
         "path": "/assets/archive/younagi-20220908.pdf",
-        "text": "対外報道の切抜（2022年9月8日）"
+        "text": "対外報道の切抜（2022年9月8日）",
+        "clipping": "NK-2022-0908"
       }
     ],
     "sections": [
