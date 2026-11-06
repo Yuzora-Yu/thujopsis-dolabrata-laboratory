@@ -262,6 +262,7 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.equal(report.match(/管理責任者\s+([^\n]+)/)[1].trim(),evaluationManager);
  const observation=await document(p,inaba.match(/YH-2019-\d{3}/)[0]);
  assert.match(observation,/『現在地』から線を指でたどると、この扉です/);
+ assert.doesNotMatch(observation,/410・411・412を一括表示|研究・隔離区画/);
  const westId=observation.match(/MX-\d{4}-\d{3}/)[0];
  const westLedger=await document(p,westId);
  assert.match(westLedger,/受付表示「410」/);
@@ -270,6 +271,10 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const westScan=await download(p,'a[href$="'+westId+'-scan.jpg"]','west-ledger.jpg');
  assert.deepEqual(westScan.data,await fs.readFile('private/record-media/'+westId+'-scan.jpg'));
  const originalPlan=westLedger.match(/図面(A4-\d{2})/)[1];
+ const districtDecisionId=westLedger.match(/決裁通知を受領（参照議事録 (RM-\d{4}-\d{3})/)[1];
+ await p.locator('#next-document-id').fill(districtDecisionId);
+ await p.locator('.record-lookup button').click();
+ await p.getByText('該当する資料は閲覧できません。',{exact:true}).waitFor();
  await p.goto(main('/search/?q='+encodeURIComponent(originalPlan)));
  await p.getByRole('link',{name:/開設時の区画配置について/}).click();
  await p.locator('img[src*="floor-4f-2012.svg"]').waitFor();
@@ -310,6 +315,11 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  await archive.goto(provider('archive','/room/records/0005/'));await until(archive,'端末と資料更新の整理');assert.match(await body(archive),/0006/);await archive.goto(provider('archive','/room/records/0006/'));await until(archive,'機関台帳');const registry=await body(archive);
  const institution={id:ymd(registry.match(/加入日([^。]+)/)[1])+registry.match(/台帳番号は(\d{4})/)[1],password:ymd(registry.match(/法人設立日([^。]+)/)[1])};await archive.close();
  await login(p,institution.id,institution.password);
+ const districtDecision=await document(p,districtDecisionId);
+ assert.match(districtDecision,/410・411・412を一括表示[\s\S]*仕切り・扉・室内呼出は現状のまま/);
+ assert.match(districtDecision,/事務局内配布[\s\S]*所管分を決裁通知で送付/);
+ const districtPdf=await download(p,'a[href$="'+districtDecisionId+'.pdf"]','west-district-decision.pdf');
+ assert.deepEqual(districtPdf.data,await fs.readFile('private/record-media/'+districtDecisionId+'.pdf'));
  const refusal=await document(p,'RG-2007-011');
  const originId=refusal.match(/OR-2006-\d{3}/)[0];
  assert.match(await document(p,originId),/再開案に同意しない/);
