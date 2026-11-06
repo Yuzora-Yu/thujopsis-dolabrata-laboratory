@@ -241,7 +241,8 @@ document.addEventListener('submit',async event=>{
    state=stored(storageKey,state);
    if(values.get('case')!==state.id||new URLSearchParams(location.search).get('case')!==state.id||!await outcomeBundle()){showError('受付情報を確認できませんでした。資料を受領した際の照会画面からお手続きください。');return;}
    const file=values.get('archive'),kind=file instanceof File&&/\.zip$/i.test(file.name)?classifyEvidence(await file.arrayBuffer()):null;
-   if(!kind||!String(values.get('title')||'').trim()||!String(values.get('statement')||'').trim()){showError('提出内容とZIP形式の添付資料をご確認ください。');return;}
+   if(!String(values.get('title')||'').trim()||!String(values.get('statement')||'').trim()){showError('受付情報と提出内容をご確認ください。');return;}
+   if(!kind){showError('添付資料を確認できませんでした。受領したZIPファイルをそのまま添付してください。');return;}
    state=stored(storageKey,state);
    if(state.ending==='end2'){showError('この照会に関する記録は、施設運営側の管理へ移管されています。');return;}
    if(current.kind==='audit'&&kind!=='complete')state.auditPending=true;else state.ending=nextEnding(state.ending,current.kind==='audit'?'end3':'end1');save();go('/received/?case='+state.id,state.ending==='end3'?'audit':current.kind);return;

@@ -733,8 +733,8 @@ export const researchRecords = [
       },
       {
         "path": "/members/download/records.json",
-        "name": "実験記録・照合原本",
-        "description": "構成情報／JSON"
+        "name": "実験記録・照合要約",
+        "description": "個票、交付簿、処理記録の照合結果／JSON"
       },
       {
         "path": "/members/download/continuity.json",

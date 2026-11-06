@@ -91,7 +91,8 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
      const {fields,files}=await readBody(req);const state=cases.get(fields.case),evidence=evidenceZip(files.archive);
      const receipt=agencyReceipt(kind,state),form={caseId:fields.case||'',origins,additional:receipt==='pending'};
      if(state?.ending==='end2')return send(res,409,agencyPage(kind,pathname,{...form,receipt:receipt==='transferred'?receipt:'',error:'この照会に関する記録は、施設運営側の管理へ移管されています。'}));
-     if(!state||!evidence||!String(fields.title||'').trim()||!String(fields.statement||'').trim())return send(res,400,agencyPage(kind,pathname,{...form,error:'提出内容とZIP形式の添付資料をご確認ください。'}));
+     if(!state||!String(fields.title||'').trim()||!String(fields.statement||'').trim())return send(res,400,agencyPage(kind,pathname,{...form,error:'受付情報と提出内容をご確認ください。'}));
+     if(!evidence)return send(res,400,agencyPage(kind,pathname,{...form,error:'添付資料を確認できませんでした。受領したZIPファイルをそのまま添付してください。'}));
      if(kind==='audit'&&evidence!=='complete'){state.auditPending=true;persist();return redirect(res,`/received/?case=${fields.case}`);}
      state.ending=nextEnding(state.ending,kind==='audit'?'end3':'end1');persist();return redirect(res,(state.ending==='end3'?origins.audit:'')+`/received/?case=${fields.case}`);
     }

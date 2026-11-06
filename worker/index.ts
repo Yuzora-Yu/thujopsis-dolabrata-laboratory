@@ -1,7 +1,7 @@
 import {DurableObject} from 'cloudflare:workers';
 import {Buffer} from 'node:buffer';
 import {createApplication} from '../server.mjs';
-import {buildEvidenceArchive} from '../src/archive.mjs';
+import {buildEvidenceArchive,healthComparisonFile} from '../src/archive.mjs';
 import {hostingOrigins,providerRoute,rewriteHostedHtml} from '../src/hosting.mjs';
 import evidence from './evidence.generated.mjs';
 
@@ -27,7 +27,17 @@ export class CaseState extends DurableObject<Env>{
  }
  private async handle(requestUrl:string,method:string,headers:Record<string,string>,body:ArrayBuffer,caseId:string):Promise<Response>{
   const url=new URL(requestUrl),origins=originsFor(url,this.env),route=providerRoute(url,origins);
-  const app=createApplication({originOverrides:origins,caseIdFactory:()=>caseId,archiveFactory:(complete:boolean)=>buildEvidenceArchive({pdf:privateFiles['expose.pdf'],records:privateFiles['records.json'],continuity:privateFiles['continuity.json']},{complete}),privateFileLoader:(name:string)=>privateFiles[name]});
+  const app=createApplication({
+   originOverrides:origins,
+   caseIdFactory:()=>caseId,
+   archiveFactory:(complete:boolean)=>buildEvidenceArchive({
+    pdf:privateFiles['expose.pdf'],
+    records:privateFiles['records.json'],
+    continuity:privateFiles['continuity.json'],
+    healthComparison:privateFiles[healthComparisonFile],
+   },{complete}),
+   privateFileLoader:(name:string)=>privateFiles[name],
+  });
   const saved=this.ctx.storage.sql.exec<{payload:string}>('SELECT payload FROM player_state WHERE id=1').toArray()[0];
   if(saved){const state=JSON.parse(saved.payload);for(const [key,value] of state.sessions)app.sessions.set(key,value);for(const [key,value] of state.cases)app.cases.set(key,value);}
   headers.cookie=(headers.cookie||'').replace(/(asunaro_session=[a-f0-9]+)\.[a-f0-9]+/g,'$1');

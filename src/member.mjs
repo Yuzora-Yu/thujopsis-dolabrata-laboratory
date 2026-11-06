@@ -151,7 +151,7 @@ function agencyPageContent(kind,path,{caseId='',error='',receipt='',additional=f
  const receiptNumber=`<div class="receipt-number">受付番号：${audit?'EA':'DR'}-2026-1102</div>`;
  if(receipt==='loading')content='<p role="status">受付情報を確認しています。</p>';
  else if(receipt==='pending'||receipt==='transferred'){
-  content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1>${receiptNumber}<p>対象者の所在と、施設内の事業を確認するため、提出資料を受領しました。外部への資料移送については、受領した資料だけでは範囲を確認できませんでした。</p>
+  content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1>${receiptNumber}<p>対象者の所在と、施設内の事業について確認を進めます。現時点では、外部への移送指示と、その対象となる原本を照合できていません。</p>
    <div class="agency-additional">${receipt==='transferred'
     ?'<h2>追加受付は終了しました</h2><p>この照会に関する記録は、施設運営側の管理へ移管されました。</p>'
     :`<h2>追加資料の受け付け</h2><p>移送先、原本の採否、事業の承継に関する記録がございましたら、同じ受付番号へご提出ください。</p><a class="text-link" href="${esc(base)}/receive/?case=${esc(caseId)}">追加資料を提出する</a>`}</div>`;

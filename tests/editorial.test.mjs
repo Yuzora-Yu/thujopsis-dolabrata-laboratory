@@ -16,7 +16,7 @@ import {archiveItems,archiveNotes} from '../src/world/archive-data.mjs';
 import {normalizeSearch,matchesSearch} from '../src/search.mjs';
 import {hostingOrigins,providerRoute,rewriteHostedHtml} from '../src/hosting.mjs';
 import {classifyEvidence} from '../src/evidence.mjs';
-import {makeArchive} from '../src/archive.mjs';
+import {makeArchive,zipFiles} from '../src/archive.mjs';
 import {startServers} from '../server.mjs';
 const origins=hostingOrigins('https://asunaro.example');
 const context=role=>({account:Object.values(accounts).find(a=>a.role===role),csrf:'test',caseId:'case',caseState:{contact:false,ending:''},query:new URLSearchParams(),origins});
@@ -141,9 +141,31 @@ test('every planned hint has in-world evidence and the prerequisite graph reache
  assert.equal(reached.size,hintPlan.length);assert.ok(reached.has('report')&&reached.has('independent'));
 });
 
-test('evidence types are distinguished by valid ZIP directory entries',async()=>{
- const original=await makeArchive(new URL('../src/archive.mjs',import.meta.url)),complete=await makeArchive(new URL('../src/archive.mjs',import.meta.url),{complete:true});
- assert.equal(classifyEvidence(original),'base');assert.equal(classifyEvidence(complete),'complete');assert.equal(classifyEvidence(Buffer.from('告発書.pdf 実験記録.enc')),null);assert.equal(classifyEvidence(original.subarray(0,original.length-30)),null);
+test('only intact evidence with matching source records qualifies as complete',async()=>{
+ const archiveUrl=new URL('../src/archive.mjs',import.meta.url);
+ const original=await makeArchive(archiveUrl),complete=await makeArchive(archiveUrl,{complete:true});
+ assert.equal(classifyEvidence(original),'base');
+ assert.equal(classifyEvidence(complete),'complete');
+ assert.equal(classifyEvidence(Buffer.from('告発書.pdf 実験記録.enc')),null);
+ assert.equal(classifyEvidence(original.subarray(0,original.length-30)),null);
+ const altered=Buffer.from(complete);
+ const pdfStart=altered.indexOf('%PDF-');
+ assert.ok(pdfStart>0);
+ altered[pdfStart+12]^=1;
+ assert.equal(classifyEvidence(altered),null);
+
+ const [pdf,records,continuity]=await Promise.all(['expose.pdf','records.json','continuity.json'].map(file=>readFile(new URL('../private/'+file,import.meta.url))));
+ const recipient=JSON.parse(continuity).receiver;
+ const summary=[
+  {name:'告発書.pdf',data:pdf},
+  {name:'実験記録.json',data:records},
+  {name:'継承計画.json',data:continuity},
+  {name:'資料移送記録.txt',data:`TR-2026-011\n受領先：${recipient}`},
+ ];
+ assert.equal(classifyEvidence(zipFiles(summary)),'base');
+ assert.equal(classifyEvidence(zipFiles(summary.map(({name})=>({name,data:''})))),null);
+ const unrelated={name:'文書原本.json',data:JSON.stringify({documents:[{id:'TR-2026-011',entries:[]}]})};
+ assert.equal(classifyEvidence(zipFiles([...summary,unrelated])),null);
 });
 
 test('production domains and project-path previews preserve cross-site and asset links',()=>{
