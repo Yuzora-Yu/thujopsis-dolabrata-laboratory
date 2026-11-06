@@ -1,3 +1,5 @@
+import {venueOpeningHours} from '../../public/assets/reservation-policy.js';
+
 export const storyToday='2026-11-02';
 export function newsIsAvailable(n){const [year,...rest]=storyToday.split('-');const cutoff=[String(Number(year)-5),...rest].join('-');return n.important||n.restored||n.date.replaceAll('.','-')>=cutoff;}
 export function newsIsListed(n){return newsIsAvailable(n)&&!n.restored&&n.listed!==false;}
@@ -40,9 +42,9 @@ export const editorialPages={
 
 export const facilityInfo={
  coworking:{hours:'平日 8:00–22:00／土・日・祝日 9:00–18:00',method:'月額会員の方にご利用いただけます。',notes:'ラウンジでの通話・打ち合わせは周囲のご利用にご配慮ください。',space:'',price:'11,000円／月'},
- meeting:{hours:'平日 9:00–21:00／土・日・祝日 9:00–18:00',method:'会員サイトにて事前申請を承っております。',notes:'モニター、ホワイトボード、無線LANをご利用いただけます。',space:'',price:'880円〜／時間'},
+ meeting:{hours:venueOpeningHours,method:'会員サイトにて事前申請を承っております。',notes:'モニター、ホワイトボード、無線LANをご利用いただけます。',space:'',price:'880円〜／時間'},
  office:{hours:'オフィス会員は24時間利用可',method:'現在、新規募集を休止しております。',notes:'郵便物の受け取りと共用設備の利用は会員規約に基づき承ります。',space:'',price:'区画別に設定／月'},
  cafe:{hours:'平日 11:00–17:00（ラストオーダー16:30）',method:'施設をご利用の方が対象です。',notes:'土・日・祝日は営業を休止しております。交流スペースの利用時間とは異なります。',space:'',price:'メニューごとに表示'},
- presentation:{hours:'平日 9:00–21:00／土・日・祝日 9:00–18:00',method:'会員サイトにて事前申請を承っております。',notes:'定員60名。机と椅子の配置、音響の利用は申請時にご相談ください。',space:'presentation',price:'3,300円／時間'},
- hall:{hours:'平日 9:00–21:00／土・日・祝日 9:00–18:00',method:'会員サイトにて利用申請を承っております。',notes:'写真は講演会形式の設営例です。椅子を並べた場合は最大500名までご利用いただけます。展示や机を使う催事については、準備・撤収の時間も含めてご相談ください。',space:'hall',price:'11,000円／時間'},
+ presentation:{hours:venueOpeningHours,method:'会員サイトにて事前申請を承っております。',notes:'定員60名。机と椅子の配置、音響の利用は申請時にご相談ください。',space:'presentation',price:'3,300円／時間'},
+ hall:{hours:venueOpeningHours,method:'会員サイトにて利用申請を承っております。',notes:'写真は講演会形式の設営例です。椅子を並べた場合は最大500名までご利用いただけます。展示や机を使う催事については、準備・撤収の時間も含めてご相談ください。',space:'hall',price:'11,000円／時間'},
 };

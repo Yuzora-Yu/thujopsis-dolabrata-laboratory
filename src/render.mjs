@@ -6,6 +6,7 @@ import {facility, gallery, tenants, news, searchEntries, tenantMaterialEntries} 
 import {matchesSearch} from './search.mjs';
 import {seedNotes,seedNoteTotal,seedCollectionPath} from './seed-notes.mjs';
 import {workshopEquipment} from './world/workshop-equipment.mjs';
+import {workshopHours} from '../public/assets/reservation-policy.js';
 
 export const esc = (v='') => String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const arrow = '';
@@ -175,7 +176,7 @@ function workshopPage(){
    <div class="workshop-access" aria-labelledby="workshop-access-title">
     <div><p class="eyebrow">ご利用の流れ</p><h2 id="workshop-access-title">入居企業・登録会員は無料でご利用いただけます。</h2>
      <p>機器と施設指定の材料を使った少量の試作は、無料で承ります。初めてご利用になる方は、用途が分かる写真や現物をお持ちください。</p>
-     <p>受付は9:00〜17:00です。工房のご利用は予約制で、16:00までに作業を始められる枠をお申し込みください。</p>
+     <p>受付は${workshopHours.start}〜${workshopHours.close}です。工房のご利用は予約制で、${workshopHours.lastStart}までに作業を始められる枠をお申し込みください。</p>
      ${link('/floor-map/#floor-workshop','中央受付からの行き方')}</div>
     ${link('/members/reservations/?space=workshop','工房利用の申請','button dark')}
    </div>

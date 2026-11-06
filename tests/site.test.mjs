@@ -84,7 +84,10 @@ test('reservation requests respect the selected facility’s start time and keep
  const signedIn=await c.post('/members/login/',{id:'201204010017',password:'20080519',next:roomD});
  assert.equal(signedIn.status,303);
  assert.equal(signedIn.headers.get('location'),roomD);
- assert.match((await c.get(roomD)).text,/<option value="meeting-d" selected>会議室 D/);
+ const selectedRoom=(await c.get(roomD)).text;
+ assert.match(selectedRoom,/<option value="meeting-d" selected>会議室 D/);
+ assert.match(selectedRoom,/<input id="date"[^>]+min="2026-11-02" max="2027-12-31"/);
+ assert.match(selectedRoom,/利用日を選ぶと、その日に申請できる開始時刻を表示/);
  const route='/members/reservations/';
  const form=(await c.get(route+'?space=workshop')).text;
  assert.match(form,/<option value="workshop" selected>工房/);
@@ -100,8 +103,28 @@ test('reservation requests respect the selected facility’s start time and keep
  assert.match(error,/<option value="workshop" selected>工房/);
  assert.match(error,/<input id="time"[^>]+value="16:01"/);
  assert.match(error,/>試作の相談<\/textarea>/);
- assert.equal((await c.post(route,{...draft,space:'meeting-a',time:'20:00'})).status,303);
- for(const change of [{space:'unlisted'}, {date:'2026-11-01'}, {date:'2026-11-31'}, {time:'12:65'}]){
+ for(const space of ['meeting-a','meeting-b','meeting-c','meeting-d','presentation','hall']){
+  for(const [date,lastStart,lateStart] of [
+   ['2026-11-06','20:00','20:01'],
+   ['2026-11-07','17:00','17:01'],
+   ['2026-11-08','17:00','17:01'],
+   ['2026-11-03','17:00','17:01'],
+   ['2027-03-22','17:00','17:01'],
+  ]){
+   assert.equal((await c.post(route,{...draft,space,date,time:lastStart})).status,303,space+' '+date);
+   assert.equal((await c.post(route,{...draft,space,date,time:lateStart})).status,400,space+' '+date);
+  }
+ }
+ const saturdayDraft=await c.post(route,{...draft,space:'meeting-d',date:'2026-11-07',time:'20:00'});
+ assert.equal(saturdayDraft.status,400);
+ const saturday=await saturdayDraft.text();
+ assert.match(saturday,/<option value="meeting-d" selected>会議室 D/);
+ assert.match(saturday,/<input id="date"[^>]+value="2026-11-07"/);
+ assert.match(saturday,/<input id="time"[^>]+max="17:00" value="20:00"/);
+ assert.match(saturday,/施設のご利用は18:00までです。/);
+ assert.match(saturday,/>試作の相談<\/textarea>/);
+ assert.equal((await c.post(route,{...draft,date:'2027-12-31'})).status,303);
+ for(const change of [{space:'unlisted'}, {date:'2026-11-01'}, {date:'2026-11-31'}, {date:'2028-01-01'}, {time:'08:59'}, {time:'12:65'}]){
   assert.equal((await c.post(route,{...draft,...change})).status,400);
  }
 });

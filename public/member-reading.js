@@ -32,7 +32,7 @@ function refresh(){
 window.asunaroReading={refresh};
 document.addEventListener('change',event=>{
  const input=event.target;
- if(input instanceof HTMLSelectElement && input.name==='space' && input.form?.matches('[data-reservation-form]')){
+ if(input.form?.matches('[data-reservation-form]') && ['space','date','time'].includes(input.name)){
   updateReservationHours(input.form);
  }
 });

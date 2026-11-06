@@ -3,7 +3,7 @@ import {mediaForRecord,recordMediaPrefix} from './record-media.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
 import {projects} from './world/projects.mjs';
 import {labThanks,labAssessment} from './lab.mjs';
-import {firstReservationDate,reservationSpaces,reservationHours,reservationHoursHint} from '../public/assets/reservation-policy.js';
+import {firstReservationDate,lastReservationDate,reservationSpaces,reservationHours,reservationHoursHint} from '../public/assets/reservation-policy.js';
 import {normalizeDocumentId,documentLookupMessages} from './search.mjs';
 import {documents,facility,accounts} from './content.mjs';
 import {esc,brand,arrow} from './render.mjs';
@@ -125,16 +125,17 @@ function renderMemberPage(path,ctx){
   const draft = ctx.reservationDraft || {};
   const requested = draft.space || query.get('space');
   const space = reservationSpaces.some(([id])=>id===requested) ? requested : reservationSpaces[0][0];
-  const {start,lastStart} = reservationHours(space);
+  const {start,lastStart} = reservationHours(space,draft.date);
   const options = reservationSpaces.map(([id,name])=>`<option value="${id}"${space===id?' selected':''}>${name}</option>`).join('');
   return memberLayout('利用申請・予約',`<h1>利用申請・予約</h1>${query.get('received')?'<div class="form-success">利用申請を受け付けました。内容を確認のうえ、施設からの連絡にて回答いたします。</div>':''}
    <form class="form-stack" method="post" data-reservation-form>
     ${fieldToken(csrf)}
     <p class="form-error" role="alert" data-reservation-error${ctx.error?'':' hidden'}>${esc(ctx.error||'')}</p>
     <label for="space">施設</label><select id="space" name="space">${options}</select>
-    <label for="date">利用日</label><input id="date" name="date" type="date" min="${firstReservationDate}" value="${esc(draft.date)}" required>
-    <label for="time">開始時刻</label><input id="time" name="time" type="time" min="${start}" max="${lastStart}" value="${esc(draft.time)}" aria-describedby="reservation-hours" required>
-    <p class="member-note" id="reservation-hours" data-reservation-hours aria-live="polite">${reservationHoursHint(space)}</p>
+    <label for="date">利用日</label><input id="date" name="date" type="date" min="${firstReservationDate}" max="${lastReservationDate}" value="${esc(draft.date)}" aria-describedby="reservation-date-range" required>
+    <p class="member-note" id="reservation-date-range">${lastReservationDate.slice(0,4)}年末までのご利用を受け付けております。</p>
+    <label for="time">開始時刻</label><input id="time" name="time" type="time" min="${start}"${lastStart?` max="${lastStart}"`:''} value="${esc(draft.time)}" aria-describedby="reservation-hours" required>
+    <p class="member-note" id="reservation-hours" data-reservation-hours aria-live="polite">${reservationHoursHint(space,draft.date)}</p>
     <label for="purpose">利用内容</label><textarea id="purpose" name="purpose" maxlength="2000" required>${esc(draft.purpose)}</textarea>
     <button class="button dark">申請する <span>→</span></button>
    </form>`,{...ctx,active:'reservations'});

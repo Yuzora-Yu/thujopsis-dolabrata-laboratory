@@ -309,9 +309,43 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.getByRole('heading',{name:'研究資料照会',exact:true}).waitFor();
   await mobile.screenshot({path:'.work/qa/member-palette-mobile.png'});
   await mobile.goto(base+'/members/reservations/?space=workshop');
-  await mobile.waitForFunction(()=>document.querySelector('#time')?.max==='16:00');
-  await mobile.locator('#space').selectOption('meeting-a');
-  await mobile.waitForFunction(()=>document.querySelector('#time')?.max==='20:00');
-  assert.deepEqual(errors,[]);console.log('Public program passed: sticky menu, staff, hall exhibit, real equipment, metal gallery filter, tenant materials, linked member records, and workshop hours.');
+  const lastStartIs=max=>mobile.waitForFunction(value=>document.querySelector('#time')?.max===value,max);
+  const space=mobile.locator('#space'),date=mobile.locator('#date'),time=mobile.locator('#time');
+  const hint=mobile.locator('#reservation-hours');
+  await lastStartIs('16:00');
+  assert.equal(await date.getAttribute('max'),'2027-12-31');
+  await space.selectOption('meeting-a');
+  await lastStartIs('');
+  assert.match(await hint.innerText(),/利用日を選ぶと/);
+  await date.fill('2026-11-06');
+  await lastStartIs('20:00');
+  await time.fill('20:00');
+  assert.equal(await time.evaluate(input=>input.validity.valid),true);
+  await date.fill('2026-11-07');
+  await lastStartIs('17:00');
+  assert.equal(await time.inputValue(),'20:00');
+  assert.equal(await time.evaluate(input=>input.validity.rangeOverflow),true);
+  assert.equal(await time.getAttribute('aria-invalid'),'true');
+  assert.match(await hint.innerText(),/施設のご利用は18:00まで[\s\S]*入力した開始時刻を変更/);
+  for(const value of ['presentation','hall']){
+   await space.selectOption(value);
+   await lastStartIs('17:00');
+  }
+  await date.fill('2027-03-19');
+  await lastStartIs('20:00');
+  await date.fill('2027-03-22');
+  await lastStartIs('17:00');
+  await time.fill('17:00');
+  assert.equal(await time.evaluate(input=>input.validity.valid),true);
+  assert.equal(await time.getAttribute('aria-invalid'),null);
+  assert.doesNotMatch(await hint.innerText(),/入力した開始時刻を変更/);
+  await date.fill('2028-01-01');
+  assert.equal(await date.evaluate(input=>input.validity.rangeOverflow),true);
+  await date.fill('2027-03-22');
+  await space.selectOption('workshop');
+  await lastStartIs('16:00');
+  assert.match(await hint.innerText(),/工房受付は17:00まで/);
+  assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+  assert.deepEqual(errors,[]);console.log('Public program passed: sticky menu, staff, hall exhibit, real equipment, metal gallery filter, tenant materials, linked member records, and date-aware reservation hours.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});
