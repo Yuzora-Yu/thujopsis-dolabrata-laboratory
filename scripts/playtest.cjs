@@ -228,7 +228,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const individual=await document(p,makerRecordId);
  const inquiryId=individual.match(/FAM-\d{4}-\d{3}/)[0];
  assert.match(await document(p,inquiryId),/本人の継続意思を裏付ける原本/);
- assert.match(await document(p,friendRecordId),/死亡/);
+ const friendFile=await document(p,friendRecordId);
+ assert.match(friendFile,/死亡/);
+ assert.match(friendFile,/灯さんの貸出票は返却欄を空けておいてください。夏帆さんの地図帳は別包みです。修理完了にはしないでください/);
  assert.match(await document(p,'YH-2022-017'),/継舟/);
  const originalOffer=await recruitmentCopy(p,'RE-2022-006',2022);
  const examination=await document(p,originalOffer.match(/OBS-2022-\d{3}/)[0]);
