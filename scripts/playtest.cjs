@@ -560,6 +560,16 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(await dispatch.innerText(),/P-032の端末[\s\S]*P-033の未承認/);
  assert.equal(await dispatch.getByRole('row').filter({hasText:'端末応答'}).getByRole('cell').last().innerText(),'受領');
  assert.equal(await dispatch.getByRole('row').filter({hasText:'閲覧時刻'}).getByRole('cell').last().innerText(),'');
+ await p.setViewportSize({width:320,height:844});
+ try{
+  const labels=dispatch.locator('tbody td:first-child');
+  assert.deepEqual(await labels.evaluateAll(cells=>cells.map(cell=>{
+   const range=document.createRange();
+   range.selectNodeContents(cell);
+   return new Set([...range.getClientRects()].map(rect=>rect.top)).size;
+  })),[1,1,1,1,1]);
+  assert.equal(await dispatch.evaluate(table=>table.scrollWidth>table.clientWidth+1),false);
+ }finally{await p.setViewportSize({width:1440,height:1000});}
  const dispatchPrint=await download(p,'a[href$="'+equipmentId+'.pdf"]',equipmentId+'.pdf');
  assert.deepEqual(dispatchPrint.data,await fs.readFile('private/record-media/'+equipmentId+'.pdf'));
  const incidentId=equipment.match(/EV-2022-\d{3}/)[0];
