@@ -10,6 +10,15 @@ import {workshopHours} from '../public/assets/reservation-policy.js';
 import {generalUsePaused,publicOperationLabel} from './evidence.mjs';
 
 export const esc = (v='') => String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function renderPressClipping(clipping,headingId){
+ return `<article class="paper-transcript" aria-labelledby="${esc(headingId)}">
+  <p class="clipping-edition">夕凪日報 地域面　<time datetime="${esc(clipping.published)}">${esc(clipping.issue)}</time></p>
+  <h2 id="${esc(headingId)}">${esc(clipping.headline).replace('、','、<wbr>')}</h2>
+  <p class="clipping-subhead">${esc(clipping.subhead)}</p>
+  ${clipping.paragraphs.map(text=>`<p>${esc(text)}</p>`).join('')}
+  <p class="clipping-edition">収蔵番号 ${esc(clipping.code)}</p>
+ </article>`;
+}
 export const arrow = '';
 const img = (name,alt,cls='',eager=false,dimensions=null) => `<img class="${cls}" src="/assets/${name}" alt="${esc(alt)}" ${eager?'fetchpriority="high"':'loading="lazy"'}${dimensions?` width="${dimensions[0]}" height="${dimensions[1]}"`:''} decoding="async">`;
 const link = (url,text,cls='text-link')=>`<a class="${cls}" href="${url}"${url.startsWith('/members/')?' target="_blank" rel="noopener"':''}>${text}${url.startsWith('/members/')?'<span class="sr-only">（別タブで開きます）</span>':''}${arrow}</a>`;

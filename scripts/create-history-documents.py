@@ -181,33 +181,23 @@ def regional_clipping(name, issue, headline, subhead, paragraphs, code, *, corre
     c.save()
 
 
+clippings = json.loads(check_output([
+    'node', '--input-type=module', '-e',
+    "import {pressClippings} from './src/world/archive-data.mjs'; "
+    "process.stdout.write(JSON.stringify(pressClippings));",
+], cwd=ROOT))
+
 if not {'--missing-only', '--akari-only'}.intersection(sys.argv):
-    regional_clipping('younagi-20211104.pdf','2021年11月4日（木） 初刷','交流施設前理事長死亡','服毒による自殺か',[
-     '産業支援交流施設「あすなろ」の前理事長、榊原惟臣氏（70）が三日朝、施設内で死亡した。施設運営事務局は本紙取材に、本人の服用による可能性があると説明した。',
-     '同氏は二〇一〇年にあすなろ産業振興機構を設立。二〇一二年に施設を開設し、生活支援の道具や設備を、企業と利用者が共同で研究する事業を進めてきた。近年は施設内で療養していたという。',
-     '一方、家族への詳しい説明は行われておらず、経緯の確認が続いている。施設は三日付で、病気による逝去とする告知を掲載した。',
-     '関係者によると、榊原氏は共同事業の記録について運営側に説明を求めていた。事務局は、その内容と今回の死亡との関係について回答していない。',
-    ],'NK-2021-1104')
-    regional_clipping('younagi-20211104-late.pdf','2021年11月4日（木） 後刷','交流施設前理事長死亡','施設が逝去を公表',[
-     '産業支援交流施設「あすなろ」の前理事長、榊原惟臣氏（70）が三日朝、施設内で死亡した。施設は三日付で、病気による逝去とする告知を掲載した。',
-     '同氏は二〇一〇年にあすなろ産業振興機構を設立。二〇一二年に施設を開設し、生活支援の道具や設備を、企業と利用者が共同で研究する事業を進めてきた。近年は施設内で療養していたという。',
-     '家族への詳しい説明は行われていない。本紙は、死亡に至る経緯を確認している。',
-     '関係者によると、榊原氏は共同事業の記録について運営側に説明を求めていた。事務局は、その内容と今回の死亡との関係について回答していない。',
-    ],'NK-2021-1104')
-    regional_clipping('younagi-20211105.pdf','2021年11月5日（金）','おわびと訂正','榊原惟臣氏に関する記事について',[
-     '四日付地域版初刷の榊原惟臣氏の死亡に関する記事で、自殺の可能性について記しましたが、死因及び本人の意思を裏付ける確認が取れなかったため、当該記述を撤回します。',
-     '四日付後刷では、当該記述を削除しました。取材時の施設側説明と、確認済みの事実の区別が不十分でした。関係者の皆様におわびいたします。',
-     '施設からの公式告知は、病気による逝去としております。本紙は、死亡に至る経緯を引き続き確認します。',
-    ],'NK-2021-1105',correction=True)
+    for key in ('NK-2021-1104', 'NK-2021-1104-late', 'NK-2021-1105'):
+        article = clippings[key]
+        regional_clipping(article['file'], article['issue'], article['headline'], article['subhead'],
+                          article['paragraphs'], article['code'], correction=(key == 'NK-2021-1105'))
 
 
 if '--corrections-only' not in sys.argv:
- article=json.loads(check_output([
-  'node','--input-type=module','-e',
-  "import {pressClippings} from './src/world/archive-data.mjs'; process.stdout.write(JSON.stringify(pressClippings['NK-2022-0908']));",
- ],cwd=ROOT))
- newspaper('younagi-20220908.pdf',article['issue'],article['headline'],article['subhead'],
-           article['paragraphs'],'収蔵番号 NK-2022-0908')
+    article = clippings['NK-2022-0908']
+    newspaper(article['file'], article['issue'], article['headline'], article['subhead'],
+              article['paragraphs'], '収蔵番号 ' + article['code'])
 
 if not {'--corrections-only', '--akari-only'}.intersection(sys.argv):
  newspaper('younagi-20230622.pdf','2023年6月22日（木）','退出支援の元職員とも連絡途絶','工房の三枝律さん（36）',[

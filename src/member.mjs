@@ -8,7 +8,7 @@ import {labThanks,labAssessment} from './lab.mjs';
 import {firstReservationDate,lastReservationDate,reservationSpaces,reservationHours,reservationHoursHint} from '../public/assets/reservation-policy.js';
 import {normalizeDocumentId,documentLookupMessages} from './search.mjs';
 import {documents,facility,accounts} from './content.mjs';
-import {esc,brand,arrow} from './render.mjs';
+import {esc,brand,arrow,renderPressClipping} from './render.mjs';
 
 function fieldToken(csrf){return `<input type="hidden" name="csrf" value="${esc(csrf)}">`;}
 function documentLookup(value='',id='document-id'){
@@ -117,13 +117,7 @@ function renderDocument(d,ctx){
    <p>${anchor}</p>
    <details>
     <summary>切抜の本文を読む</summary>
-    <article aria-labelledby="clipping-${esc(link.clipping)}">
-     <p class="clipping-edition">夕凪日報 地域面　<time datetime="${esc(clipping.published)}">${esc(clipping.issue)}</time></p>
-     <h2 id="clipping-${esc(link.clipping)}">${esc(clipping.headline).replace('、','、<wbr>')}</h2>
-     <p class="clipping-subhead">${esc(clipping.subhead)}</p>
-     ${clipping.paragraphs.map(text=>`<p>${esc(text)}</p>`).join('')}
-     <p class="clipping-edition">収蔵番号 ${esc(link.clipping)}</p>
-    </article>
+    ${renderPressClipping(clipping,'clipping-'+link.clipping)}
    </details>
   </div>`;
  }).join('');

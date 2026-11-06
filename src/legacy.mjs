@@ -1,6 +1,6 @@
 import {fictionFooter,decoratePage} from './experience.mjs';
-import {archiveItems,archiveNotes,noticeCapture} from './world/archive-data.mjs';
-import {esc} from './render.mjs';
+import {archiveItems,archiveNotes,noticeCapture,pressClippings} from './world/archive-data.mjs';
+import {esc,renderPressClipping} from './render.mjs';
 import {matchesSearch} from './search.mjs';
 import {consoleContent} from './lab.mjs';
 
@@ -8,7 +8,11 @@ export const archivePublicPaths=['/','/collections/','/snapshots/','/snapshots/2
 
 const linked=(url,text)=>`<a href="${esc(url)}">${esc(text)}</a>`;
 const snapshotDate=iso=>`<time datetime="${iso}">${iso.replaceAll('-','.')}</time>`;
-const archivePdf=(file,label)=>`<p><a href="/assets/archive/${esc(file)}" target="_blank" rel="noopener">${esc(label)}（PDF）<span class="sr-only">・別タブで開きます</span></a></p>`;
+function archivePdf(file,label,clippingKey){
+ const link=`<p><a href="/assets/archive/${esc(file)}" target="_blank" rel="noopener">${esc(label)}（PDF）${clippingKey?' <span class="record-link-format">別タブ</span>':'<span class="sr-only">・別タブで開きます</span>'}</a></p>`;
+ if(!clippingKey)return link;
+ return `<section class="legacy-clipping" aria-label="${esc(label)}">${link}<details><summary>${esc(label)}の本文を読む</summary>${renderPressClipping(pressClippings[clippingKey],'clipping-'+clippingKey)}</details></section>`;
+}
 export function legacyLayout(title,body,{privateRoom=false,consolePage=false}={}){
  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}｜産業継続研究資料 保存室</title><link rel="stylesheet" href="/styles.css">${consolePage?'<script type="module" src="/lab-console.js"></script>':''}</head><body class="legacy-body"><a class="skip" href="#legacy-main">本文へ移動</a><header class="legacy-header"><p>INDUSTRIAL CONTINUITY RECORDS</p><a href="/">産業継続研究資料 保存室</a><small>旧産業継続研究準備室・部分保存資料</small></header><nav class="legacy-nav" aria-label="資料保存室"><a href="/collections/">収蔵目録</a><a href="/snapshots/">公開画面の保存</a><a href="/room/">資料照会室</a></nav><main id="legacy-main" class="legacy-main">${privateRoom?'<p class="legacy-classification">資料照会室 ／ 移管・保守</p>':''}<h1>${esc(title)}</h1>${body}</main><footer class="legacy-footer">資料管理：旧基盤保存担当 ／ 公開保存資料と継続照会の更新日は各資料に記載</footer>${fictionFooter()}</body></html>`;
 }
@@ -27,9 +31,10 @@ function renderLegacyPage(path,ctx){
  const item=archiveItems.find(i=>path===`/collections/items/${i.id}/`);
  if(item){
   const original=item.sourcePath?`<p>${linked((origins.main||'../../../..')+item.sourcePath,'施設サイトのお知らせ（2021年11月3日）')}</p>`:'';
-  const copy=item.file?archivePdf(item.file,item.fileLabel||item.kind+'の複写'):'';
-  const related=item.relatedEdition?archivePdf(item.relatedEdition.file,item.relatedEdition.label):'';
-  return legacyLayout(item.title,`<div class="legacy-record-meta">収蔵番号 ${item.code} ／ ${item.year}年 ／ ${item.kind}</div><p>${esc(item.body)}</p><div class="legacy-transcription"><h2>${item.kind==='新聞切抜'?'紙面抄録':item.scan?'資料抄録':'収録内容'}</h2><p>${esc(item.text).replaceAll('\n','<br>')}</p></div><p class="small">${esc(item.next)}</p>${original}${copy}${related}${item.scan?`<figure class="archival-scan"><a href="/assets/archive/${esc(item.scan)}" target="_blank" rel="noopener"><img src="/assets/archive/${esc(item.scan)}" loading="lazy" alt="${esc(item.title)}の保存複写。資料の抄録は上に掲載しています。"><span class="sr-only">画像を別タブで開く</span></a><figcaption>所蔵原本の保存複写</figcaption></figure>`:''}<p><a href="/collections/">収蔵目録へ</a></p>`);
+  const copy=item.file?archivePdf(item.file,item.fileLabel||item.kind+'の複写',item.clipping):'';
+  const related=item.relatedEdition?archivePdf(item.relatedEdition.file,item.relatedEdition.label,item.relatedEdition.clipping):'';
+  const correction=item.relatedItem?`<p>${linked(item.relatedItem.path,item.relatedItem.label)}</p>`:'';
+  return legacyLayout(item.title,`<div class="legacy-record-meta">収蔵番号 ${item.code} ／ ${item.year}年 ／ ${item.kind}</div><p>${esc(item.body)}</p><div class="legacy-transcription"><h2>${item.kind==='新聞切抜'?'紙面抄録':item.scan?'資料抄録':'収録内容'}</h2><p>${esc(item.text).replaceAll('\n','<br>')}</p></div><p class="small">${esc(item.next)}</p>${original}${copy}${related}${correction}${item.scan?`<figure class="archival-scan"><a href="/assets/archive/${esc(item.scan)}" target="_blank" rel="noopener"><img src="/assets/archive/${esc(item.scan)}" loading="lazy" alt="${esc(item.title)}の保存複写。資料の抄録は上に掲載しています。"><span class="sr-only">画像を別タブで開く</span></a><figcaption>所蔵原本の保存複写</figcaption></figure>`:''}<p><a href="/collections/">収蔵目録へ</a></p>`);
  }
  if(path==='/snapshots/')return legacyLayout('公開画面の保存',`<ul class="snapshot-index"><li><a href="/snapshots/2009/">2009年11月20日取得 ／ 旧産業継続研究準備室</a></li><li><a href="/snapshots/2011/">2011年3月31日取得 ／ 設立準備記録</a></li><li><a href="/snapshots/2017/">2017年7月14日取得 ／ 保存事業案内</a></li></ul>`);
  const snapshot=path.match(/^\/snapshots\/(2009|2011|2017)\/$/);
