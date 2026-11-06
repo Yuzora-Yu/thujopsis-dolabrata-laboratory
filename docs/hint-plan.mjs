@@ -690,7 +690,8 @@ export const hintPlan = [
         "path": "/members/records/YH-2018-041-A/",
         "words": [
           "P-026",
-          "2019年4月11日"
+          "2019年4月11日",
+          "出る道だけ教えてください"
         ],
         "role": "ordis"
       },
@@ -759,6 +760,15 @@ export const hintPlan = [
       "second-login"
     ],
     "evidence": [
+      {
+        "kind": "member",
+        "path": "/members/records/YH-2019-026/",
+        "words": [
+          "現在地",
+          "MX-2019-410"
+        ],
+        "role": "ordis"
+      },
       {
         "kind": "member",
         "path": "/members/records/MX-2019-410/",

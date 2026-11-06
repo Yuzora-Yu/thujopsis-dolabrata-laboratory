@@ -1,4 +1,5 @@
 """Render the canonical research records into dated, in-world print editions."""
+from datetime import datetime
 from pathlib import Path
 from io import BytesIO
 from xml.sax.saxutils import escape
@@ -33,6 +34,7 @@ STYLES = {
     "bench": ("Office", "#535d50", "#eff0e9", "機器試験票", "form"),
     "transfer": ("Gothic", "#30475d", "#e8edf1", "設備・資料移管", "strip"),
     "evaluation": ("Gothic", "#263f62", "#e9eef6", "評価資料", "strip"),
+    "individual": ("Office", "#414948", "#edf0eb", "評価統括／個票再録", "form"),
     "minutes": ("Mincho", "#37342d", "#eeece6", "議事記録", "formal"),
     "memo": ("Mincho", "#484337", "#f3f0e7", "手控え", "memo"),
     "letter": ("Mincho", "#483c30", "#f0ece2", "回答書控え", "formal"),
@@ -73,7 +75,8 @@ def render(record, style_key, target):
     font, accent_hex, pale_hex, register, frame = STYLES[style_key]
     accent, pale = colors.HexColor(accent_hex), colors.HexColor(pale_hex)
     dark = colors.HexColor("#232824")
-    compact = record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
+    compact = style_key == "individual" or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
+    issue_date = datetime.strptime(record.get("updated", record["date"]), "%Y年%m月%d日").strftime("%Y%m%d")
     title = ParagraphStyle("title", fontName=font, fontSize=21, leading=29, wordWrap="CJK", textColor=dark, spaceAfter=15)
     base = ParagraphStyle("body", fontName=font, fontSize=10.1 if compact else 10.6, leading=16.1 if compact else 17.6, wordWrap="CJK", textColor=dark, spaceAfter=6 if compact else 9)
     sub = ParagraphStyle("sub", parent=base, fontSize=12.4, leading=18.5, spaceBefore=9 if compact else 12, spaceAfter=4 if compact else 5, textColor=accent, keepWithNext=True)
@@ -129,6 +132,7 @@ def render(record, style_key, target):
         flow.append(p(record["quote"]))
 
     def stationery(c, doc):
+        c.setDateFormatter(lambda *_: "D:" + issue_date)
         c.setFillColor(accent)
         c.setStrokeColor(accent)
         if frame == "strip":

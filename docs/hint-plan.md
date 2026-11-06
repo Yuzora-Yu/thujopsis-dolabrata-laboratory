@@ -378,7 +378,7 @@
 根拠と、その時点で読めるページ：
 
 - /tenants/0013/ — ROOT · 091 / 263。確認する記載：0046、2018年4月1日、2015年11月12日。
-- /members/records/YH-2018-041-A/ — SAPLING · 151 / 263／閲覧者 ordis。確認する記載：P-026、2019年4月11日。
+- /members/records/YH-2018-041-A/ — SAPLING · 151 / 263／閲覧者 ordis。確認する記載：P-026、2019年4月11日、出る道だけ教えてください。
 - /members/records/YH-2022-034/ — SAPLING · 179 / 263／閲覧者 ordis。確認する記載：P-034、帰宅希望。
 
 段階別ヒント案：
@@ -416,6 +416,7 @@
 
 根拠と、その時点で読めるページ：
 
+- /members/records/YH-2019-026/ — SAPLING · 152 / 263／閲覧者 ordis。確認する記載：現在地、MX-2019-410。
 - /members/records/MX-2019-410/ — SAPLING · 172 / 263／閲覧者 ordis。確認する記載：2012年4月16日、A4-01、西通路側／点検の控え。
 - /news/20120416/ — ROOT · 035 / 263。確認する記載：floor-4f-2012.svg、asunaro-4f-2012.pdf。
 - /floor-map/ — SEED · 013 / 263。確認する記載：floor-4f.svg。

@@ -79,5 +79,5 @@ export const searchEntries = [
  ...news.filter(n=>n.listed||n.searchable).map(n=>({title:n.title,url:`/news/${n.id}/`,text:n.restored?n.keywords:[n.body,...(n.sections||[]).flat(),...(n.facts||[]).flat()].join(' ')})),
  ...gallery.filter(g=>g.listed).map(g=>({title:g.title,url:`/gallery/${g.id}/`,text:g.body+' '+g.tag})),
  {title:'朝倉 紬乃｜制作と活動の記録',url:'/people/asakura-tsumugi/',text:'朝倉 紬乃 あさくら つむぎの 制作 プロフィール'},
- {title:'稲葉 澪｜利用者インタビュー',url:'/people/inaba-mio/',text:'稲葉 澪 いなば みお 案内 図解 制作者'},
+ {title:'稲葉 澪｜利用者インタビュー',url:'/people/inaba-mio/',text:'稲葉 澪 いなば みお 案内 図解 制作者 触ってわかる案内図 立体模型'},
 ];

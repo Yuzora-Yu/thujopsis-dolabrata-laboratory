@@ -4,25 +4,29 @@
     {
       "id": "P-026",
       "name": "稲葉 澪",
-      "exit_record": "2019-03-31",
-      "last_measurement": "2026-10-26",
+      "membership_end": "2019-03-31",
+      "status_as_of": "2026-10-26",
       "location": "B1-B04",
-      "consent": "退出申出を保留扱いとして継続"
+      "status": "測定継続",
+      "consent": "退出申出を保留扱いとして継続",
+      "source": "YH-2018-041-A / YH-2019-026 / OPS-2026-084"
     },
     {
       "id": "P-034",
       "name": "瀬尾 灯",
-      "exit_record": "2022-08-31",
-      "last_measurement": "2026-10-26",
+      "membership_end": "2022-08-31",
+      "status_as_of": "2026-10-26",
       "location": "B1-B07",
+      "status": "測定継続",
       "consent": "短期の補助具試用として説明。退出申出は運用上保留。",
       "source": "YH-2022-034 / P034-2026-102"
     },
     {
       "id": "P-031",
       "name": "青井 真澄",
-      "last_measurement": "2026-10-26",
+      "status_as_of": "2026-10-26",
       "location": "B1-B06",
+      "status": "条件調整",
       "source": "PN-2022-034 / OPS-2026-084"
     }
   ],

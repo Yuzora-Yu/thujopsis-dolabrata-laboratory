@@ -17,7 +17,7 @@ async function checkMenuNotes(browser){
    await marker.click();
    const dialog=page.getByRole('dialog');
    await dialog.waitFor();
-   assert.equal(await dialog.locator('.seed-note-number').innerText(),`No. ${titles.size+1} / 9`);
+   assert.equal(await dialog.locator('.seed-note-number').innerText(),`No.${titles.size+1}/9`);
    titles.add(await dialog.getByRole('heading').innerText());
    await page.keyboard.press('Escape');
    assert.equal(await marker.evaluate(button=>button===document.activeElement),true,path);
@@ -25,6 +25,16 @@ async function checkMenuNotes(browser){
   }
   assert.equal(titles.size,noteRoutes.length);
   assert.equal(labels.size,noteRoutes.length);
+  assert.equal(await page.locator('.seed-collection-nav a').count(),0);
+  await page.goto(at('/visit/'));
+  assert.equal(await page.locator('body.seed-drift-active').count(),0);
+  await page.getByRole('button',{name:'17:06 差替',exact:true}).click();
+  const finalNote=page.getByRole('dialog');
+  assert.equal(await finalNote.locator('.seed-note-number').innerText(),'No.9/9');
+  assert.equal(await finalNote.locator('[data-seed-note-progress]').innerText(),'記録済み 9 / 9');
+  await page.locator('body.seed-drift-active').waitFor();
+  await finalNote.getByRole('link',{name:'中央受付の引継ぎ控えへ'}).click();
+  await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   for (const path of ['/gallery/0021/','/facilities/coworking/','/facilities/staff/','/floor-map/','/guide/access/']) {
    await page.goto(at(path));
    assert.equal(await page.locator('.seed-note').count(),0,path);
@@ -46,13 +56,13 @@ async function checkReceptionCopy(browser){
 
   await page.goto(at('/visit/'));
   assert.equal(await page.locator('.seed-drift-link').count(),0);
-  const receipt=page.getByRole('button',{name:'案内票の版番号',exact:true});
-  assert.equal(await receipt.innerText(),'見学案内 第4版');
+  const receipt=page.getByRole('button',{name:'17:06 差替',exact:true});
+  assert.equal(await receipt.innerText(),'17:06 差替');
   await receipt.focus();
   await page.keyboard.press('Enter');
   const note=page.getByRole('dialog');
-  await note.getByRole('heading',{name:'会員証の返却控え'}).waitFor();
-  assert.equal(await note.locator('.seed-note-number').innerText(),'No. 9 / 9');
+  await note.getByRole('heading',{name:'見学証の返却控え'}).waitFor();
+  assert.equal(await note.locator('.seed-note-number').innerText(),'No.9/9');
   assert.equal(await note.locator('[data-seed-note-progress]').innerText(),'記録済み 1 / 9');
   assert.equal(await note.getByRole('link').count(),0);
   assert.equal((await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_')).value,'15');
@@ -88,6 +98,7 @@ async function checkReceptionCopy(browser){
    if(i<noteRoutes.length-1)await page.keyboard.press('Escape');
   }
   await other.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
+  await other.getByText('翌日分の見学証を確認。12番は棚にありました。',{exact:true}).waitFor();
   await note.getByRole('link',{name:'中央受付の引継ぎ控えへ'}).click();
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   await page.reload();

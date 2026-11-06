@@ -204,14 +204,20 @@ test('office transfer preserves the audit receipt and ends additional submission
 test('printed editions and archival copies follow the underlying record permissions',async()=>{
  const c=client(),pdf='/members/download/records/YH-2018-041.pdf',annex='/members/download/records/YH-2018-041-A.pdf',scan='/members/download/records/RG-2007-011-scan.jpg';
  const westCopy='/members/download/records/MX-2019-410-scan.jpg',eastWork='/members/download/records/PUB-2023-014.pdf';
+ const individualCopy='/members/download/records/YH-2018-041-A-scan.jpg';
  assert.equal((await c.binary(pdf)).status,303);
  await c.login('201204010017','20080519');const aggregate=await c.binary(pdf);assert.equal(aggregate.status,200);assert.equal(aggregate.headers.get('content-type'),'application/pdf');assert.equal(Buffer.from(await aggregate.arrayBuffer()).subarray(0,5).toString(),'%PDF-');
  assert.equal((await c.binary(annex)).status,404);assert.equal((await c.binary(scan)).status,404);
+ assert.equal((await c.binary(individualCopy)).status,404);
  assert.equal((await c.binary(westCopy)).status,404);
  await c.login('201804010046','20151112');assert.equal((await c.binary(annex)).status,200);
+ const individual=await c.binary(individualCopy);
+ assert.equal(individual.status,200);assert.equal(individual.headers.get('content-type'),'image/jpeg');
+ assert.equal(Buffer.from(await individual.arrayBuffer()).readUInt16BE(0),0xffd8);
  const west=await c.binary(westCopy);assert.equal(west.status,200);assert.equal(west.headers.get('content-type'),'image/jpeg');
  assert.equal((await c.binary(eastWork)).status,404);
  await c.login('201204010000','20100615');const copy=await c.binary(scan);assert.equal(copy.status,200);assert.equal(copy.headers.get('content-type'),'image/jpeg');assert.equal(Buffer.from(await copy.arrayBuffer()).readUInt16BE(0),0xffd8);
  const east=await c.binary(eastWork);assert.equal(east.status,200);assert.equal(east.headers.get('content-type'),'application/pdf');
  assert.equal((await c.binary('/assets/record-media/YH-2018-041-A.pdf')).status,404);
+ assert.equal((await c.binary('/assets/record-media/YH-2018-041-A-scan.jpg')).status,404);
 });
