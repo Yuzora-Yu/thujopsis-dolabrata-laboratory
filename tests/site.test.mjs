@@ -206,8 +206,13 @@ test('printed editions and archival copies follow the underlying record permissi
  const westCopy='/members/download/records/MX-2019-410-scan.jpg',eastWork='/members/download/records/PUB-2023-014.pdf';
  const individualCopy='/members/download/records/YH-2018-041-A-scan.jpg';
  const intakeCopy='/members/download/records/PN-2022-034-scan.jpg';
+ const loanCopy='/members/download/records/FAB-2022-071.pdf';
  assert.equal((await c.binary(pdf)).status,303);
+ assert.equal((await c.binary(loanCopy)).status,303);
  await c.login('201204010017','20080519');const aggregate=await c.binary(pdf);assert.equal(aggregate.status,200);assert.equal(aggregate.headers.get('content-type'),'application/pdf');assert.equal(Buffer.from(await aggregate.arrayBuffer()).subarray(0,5).toString(),'%PDF-');
+ const loan=await c.binary(loanCopy);
+ assert.equal(loan.status,200);
+ assert.equal(loan.headers.get('content-type'),'application/pdf');
  assert.equal((await c.binary(annex)).status,404);assert.equal((await c.binary(scan)).status,404);
  assert.equal((await c.binary(individualCopy)).status,404);
  assert.equal((await c.binary(westCopy)).status,404);
@@ -227,4 +232,6 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal(intake.headers.get('content-type'),'image/jpeg');
  assert.equal(Buffer.from(await intake.arrayBuffer()).readUInt16BE(0),0xffd8);
  assert.equal((await c.binary('/assets/record-media/PN-2022-034-scan.jpg')).status,404);
+ await c.login('201704010038','20161204');
+ assert.equal((await c.binary(loanCopy)).status,404);
 });

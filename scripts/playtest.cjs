@@ -10,7 +10,10 @@ async function login(p,id,password){await p.goto(main('/members/login/'));await 
 async function document(p,id){
  if(await p.locator('#next-document-id').count()){
   await p.locator('#next-document-id').fill(id);await p.locator('.record-lookup button').click();
- }else{await p.goto(main('/members/records/'));await p.locator('#document-id').fill(id);await p.locator('.record-form button').click();}
+ }else{
+  if (!await p.locator('#document-id').count()) await p.goto(main('/members/records/'));
+  await p.locator('#document-id').fill(id);await p.locator('.record-form button').click();
+ }
  await p.locator('.document-result').waitFor();await p.locator('.document-result').click();await p.locator('#next-document-id').waitFor();return body(p);
 }
 async function company(p,number){
@@ -175,7 +178,28 @@ async function newsInterface(p){
  await activityPhoto.getByText('写真を拡大',{exact:true}).waitFor();
  await activityPhoto.click();await p.getByRole('button',{name:'画像を拡大',exact:true}).click();await p.keyboard.press('Escape');
  const popup=p.waitForEvent('popup');await p.locator('.member-link').click();const member=await popup;member.on('pageerror',e=>errors.push(e.message));await p.close();p=member;
- await login(p,minamoId,ymd(minamo['設立日']));await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click();await p.getByRole('link',{name:/生活道具・共同試作/}).click();await until(p,'生活道具・共同試作の連絡');makerLoanId=(await body(p)).match(/FAB-\d{4}-\d{3}/)[0];const loan=await document(p,makerLoanId),makerRecordId=loan.match(/YH-2022-\d{3}/)[0],friendRecordId=loan.match(/SA-2023-\d{3}/)[0];assert.match(loan,/同じ名前/);
+ await login(p,minamoId,ymd(minamo['設立日']));
+ const workshopShare=p.locator('.member-workshop-note');
+ assert.match(await workshopShare.innerText(),/工房からの共有（保存分）/);
+ await workshopShare.getByRole('link',{name:'工房でのやり取りを読む'}).click();
+ await until(p,'生活道具・共同試作の連絡');
+ const workshopConversation=await p.locator('.project-thread').innerText();
+ assert.match(workshopConversation,/焼き芋[\s\S]*料理帳のコピー[\s\S]*受取欄はまだ空けて/);
+ assert.doesNotMatch(workshopConversation,/YH-2022-034|SA-2023-012|P-034|B-07/);
+ makerLoanId=workshopConversation.match(/FAB-\d{4}-\d{3}/)[0];
+ await p.getByRole('navigation',{name:'共同事業の関連ページ'}).getByRole('link',{name:'研究資料照会'}).click();
+ assert.equal(await p.locator('#document-id').inputValue(),'');
+ const loan=await document(p,makerLoanId);
+ const makerRecordId=loan.match(/YH-2022-\d{3}/)[0],friendRecordId=loan.match(/SA-2023-\d{3}/)[0];
+ assert.match(loan,/同じ名前/);
+ assert.match(loan,/工房の貸出管理は完了として処理。本人への引渡し日は未記入/);
+ assert.doesNotMatch(loan,/P-034|B-07|居住実証/);
+ const loanItems=p.getByRole('region',{name:'貸出・預かり品'});
+ assert.match(await loanItems.getByRole('row').filter({hasText:'読書補助具の試作'}).getByRole('cell').last().innerText(),/8月19日.*施設受付/);
+ for (const item of ['型紙','料理帳']) assert.equal(await loanItems.getByRole('row').filter({hasText:item}).getByRole('cell').last().innerText(),'');
+ const loanFilename=makerLoanId+'.pdf';
+ const loanCopy=await download(p,'a[href$="'+loanFilename+'"]',loanFilename);
+ assert.deepEqual(loanCopy.data,await fs.readFile('private/record-media/'+loanFilename));
  const evaluationManager=loan.match(/個票の取次：([^（]+)（評価担当）/)[1].trim();
  const clipping=await p.request.get(new URL(await p.getByRole('link',{name:/対外報道の切抜（2022年9月8日）/}).getAttribute('href'),p.url()).href);assert.equal(clipping.status(),200);const clippingPath='.work/qa/'+mode+'-missing-seo.pdf';await fs.writeFile(clippingPath,await clipping.body());const clippingText=execFileSync(process.env.ASUNARO_PYTHON||'python',['-c','from pypdf import PdfReader; import sys; print("".join(p.extract_text() for p in PdfReader(sys.argv[1]).pages))',clippingPath],{encoding:'utf8',env:{...process.env,PYTHONIOENCODING:'utf-8'}}).replace(/\s+/g,'');assert.match(clippingText,/瀬尾灯さん[（(]28[）)]/);assert.match(clippingText,/母の文乃/);
  await p.locator('#next-document-id').fill(makerRecordId);
@@ -188,7 +212,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const ordis=unlistedTenants.find(tenant=>tenant['代表者'].replace(/\s+/g,'')===evaluationManager);
  assert.ok(ordis);await login(p,ymd(ordis['入居日'])+ordis['登録番号'],ymd(ordis['設立日']));
  const originalConsent=await document(p,'CONS-2016-005');await recruitmentCopy(p,originalConsent.match(/RE-2016-\d{3}/)[0],2016);
- assert.match(await document(p,makerRecordId),/瀬尾\s*灯/);
+ const makerEvaluation=await document(p,makerRecordId);
+ assert.match(makerEvaluation,/瀬尾\s*灯[\s\S]*帰宅希望として受領/);
+ assert.doesNotMatch(makerEvaluation,/B-07|2026年|現所在/);
  const inaba=await document(p,'YH-2018-041-A');
  assert.match(inaba,/稲葉 澪/);
  assert.match(inaba,/今は、出る道だけ教えてください/);
@@ -249,7 +275,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(await document(p,motherId),/もう使わない/);
  const individual=await document(p,makerRecordId);
  const inquiryId=individual.match(/FAM-\d{4}-\d{3}/)[0];
- assert.match(await document(p,inquiryId),/本人の継続意思を裏付ける原本/);
+ const familyInquiry=await document(p,inquiryId);
+ assert.match(familyInquiry,/本人の継続意思を裏付ける原本/);
+ const operationsId=familyInquiry.match(/OPS-2026-\d{3}/)[0];
  const friendFile=await document(p,friendRecordId);
  assert.match(friendFile,/死亡/);
  assert.match(friendFile,/灯さんの貸出票は返却欄を空けておいてください。夏帆さんの地図帳は別包みです。修理完了にはしないでください/);
@@ -279,7 +307,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  await p.getByText('該当する資料は閲覧できません。',{exact:true}).waitFor();
  await verifyHealthRecord(p,healthId);
  await document(p,'CH-2021-003');
- const operations=await document(p,'OPS-2026-084');
+ const operations=await document(p,operationsId);
+ const makerLocation=p.getByRole('row').filter({hasText:'P-034 瀬尾灯'});
+ assert.equal(await makerLocation.getByRole('cell').nth(1).innerText(),'B1・B-07');
  const eastId=operations.match(/PUB-2023-\d{3}/)[0];
  const eastWork=await document(p,eastId);
  assert.match(eastWork,/東側・会議室Aへの通路/);

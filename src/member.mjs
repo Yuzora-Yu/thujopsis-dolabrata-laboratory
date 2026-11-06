@@ -46,9 +46,9 @@ function assignedNoticeList(role){
 }
 function memberHome(account){
  const workshopNote = account.role==='minamo' ? `<section class="member-workshop-note" aria-labelledby="workshop-note-title">
-  <p class="eyebrow"><time datetime="2022-07-08">2022.07.08</time> ／ 工房からの共有</p>
+  <p class="eyebrow"><time datetime="2022-07-08">2022.07.08</time> ／ 工房からの共有（保存分）</p>
   <h2 id="workshop-note-title">瀬尾さんの、次の試作</h2>
-  <p>鉛筆の持ち手を作った瀬尾灯さんが、今度は本を片手で開いておける道具を試すそうです。お母さまに家で一週間使ってもらい、来月、工房で見せていただくことになりました。</p>
+  <p>鉛筆の持ち手を作った瀬尾灯さんが、片手で本を開いておける道具を試すそうです。お母さまに家で一週間使っていただいて、8月に工房へ持ってくるとのことです。</p>
   <a class="text-link" href="/members/projects/fabrication/">工房でのやり取りを読む</a>
  </section>` : '';
  const lastLink = account.role==='asakura'
@@ -91,7 +91,7 @@ function renderMemberPage(path,ctx){
  if(path==='/members/activity/')return memberLayout('資料の閲覧履歴',`<h1>資料の閲覧履歴</h1><p>この照会端末で表示した資料です。登録名義ごとに表示しております。</p>${caseState.ending==='end3'?'<div class="notice"><h2>本件の確認は終了しております。</h2><p>移送先を含む事業の停止に伴い、外部協力者への継続照会も終了しました。照会資料の控えは引き続き参照いただけます。</p></div>':''}<div data-reading-ledger="current"></div>${account.role==='institution'&&caseState.ending!=='end3'?'<section class="reading-notification" data-after-reading="CH-2021-003 OPS-2026-084" hidden><p class="member-meta">2026.11.02／運営事務局</p><h2>照会名義の確認</h2><p>同一照会端末から、配布先の異なる資料への参照を確認しております。個々の登録における照会を、一件の確認として取りまとめます。</p><p>確認中のため、本件の終了処理は保留しております。原本の受領担当へ照会を引き継ぎます。</p><p class="member-meta" data-reading-reference></p></section>':''}`,{...ctx,active:'activity'});
  if(path==='/members/projects/')return memberLayout('共同事業・連絡記録',`<h1>共同事業・連絡記録</h1><p>参加事業の打ち合わせと、資料の受け渡しに関する記録です。</p><div class="project-list">${projects.filter(p=>p.roles.includes(account.role)).map(p=>`<a href="/members/projects/${p.slug}/"><small>${p.period}</small><h2>${esc(p.title)}</h2><p>${esc(p.members)}</p></a>`).join('')||'<p class="empty-state">参照できる共同事業はありません。</p>'}</div>`,{...ctx,active:'projects'});
  const project=projects.find(p=>path===`/members/projects/${p.slug}/`&&p.roles.includes(account.role));
- if(project)return memberLayout(project.title,`<h1>${esc(project.title)}</h1><p class="member-meta">${esc(project.members)}<br>保存期間：${project.period}</p><div class="project-thread">${project.posts.map(([date,by,text])=>`<article class="project-post"><header><b>${esc(by)}</b><time>${date}</time></header><p>${esc(text)}</p></article>`).join('')}</div>${(project.links||[]).map(l=>`<p><a class="text-link" href="${esc(origins[l.origin]+l.path)}" target="_blank" rel="noopener">${esc(l.text)}</a></p>`).join('')}<a class="text-link" href="/members/projects/">共同事業一覧へ</a>`,{...ctx,active:'projects'});
+ if(project)return memberLayout(project.title,`<h1>${esc(project.title)}</h1><p class="member-meta">${esc(project.members)}<br>記録期間：${project.period}</p><div class="project-thread">${project.posts.map(([date,by,text])=>`<article class="project-post"><header><b>${esc(by)}</b><time>${date}</time></header><p>${esc(text)}</p></article>`).join('')}</div>${(project.links||[]).map(l=>`<p><a class="text-link" href="${esc(origins[l.origin]+l.path)}" target="_blank" rel="noopener">${esc(l.text)}</a></p>`).join('')}<nav class="button-row" aria-label="共同事業の関連ページ"><a class="text-link" href="/members/projects/">共同事業一覧へ</a><a class="text-link" href="/members/records/">研究資料照会</a></nav>`,{...ctx,active:'projects'});
  if(path==='/members/organization/')return memberLayout('運営団体情報',`<h1>運営団体情報</h1><dl class="detail-list"><div><dt>法人名</dt><dd>${facility.foundation}</dd></div><div><dt>法人設立</dt><dd>2010年6月15日</dd></div><div><dt>施設開設</dt><dd>2012年4月1日</dd></div><div><dt>代表者</dt><dd>深町 玲司</dd></div></dl><h2>事業</h2><p>産業支援、交流施設の運営、共同研究および実証事業の企画・管理。</p>`,{...ctx,active:'organization'});
  if(path==='/members/records/'){
   const id = normalizeDocumentId(query.get('document_id') || '');
@@ -102,7 +102,7 @@ function renderMemberPage(path,ctx){
   } else if (id) {
    result = `<p class="empty-state">${found ? documentLookupMessages.restricted : documentLookupMessages.missing}</p>`;
   }
-  return memberLayout('研究資料照会',`<h1>研究資料照会</h1>${documentLookup(id)}${result}`,{...ctx,active:'records'});
+  return memberLayout('研究資料照会',`<h1>研究資料照会</h1><p class="member-note">配布元から案内された文書IDで照会できます。</p>${documentLookup(id)}${result}`,{...ctx,active:'records'});
  }
  const docMatch=path.match(/^\/members\/records\/([A-Z0-9-]+)\/$/);
  if(docMatch){const d=documents.find(d=>d.id===docMatch[1]&&d.roles.includes(account.role));return d?renderDocument(d,ctx):null;}
@@ -110,7 +110,7 @@ function renderMemberPage(path,ctx){
   const assigned=assignedNoticeList(account.role);
   const privateMessage=account.role==='institution'&&caseState.contact?`<article class="message"><time>2026.11.02 / 工房保全担当</time><h2>原本照会への回答</h2><div class="message-body">このアカウントを現在利用されている方へ。\n\n原本の照会を受け取りました。B-07に今も灯さんがいます。型紙を取りに行くたび、道具と一緒に帰るのだと書かれた紙を渡されます。\n\nこちらでは外部への通信が止められています。施設サイトと旧資料の更新だけが残っています。廃止前のページへ参照を戻したのは私です。今度の引渡しで、この更新権限も失います。\n\n保全した原本をまとめました。手を加えず、ZIP全体を資料保全受付へお渡しください。申出者の情報は同梱の書面にあります。提出後に発行される受付番号は、お手元に控えておいてください。</div><p data-inquiry-record="CH-2021-003" hidden>最後の手控えにあった、事業を止めてもいいという行も読みました。原文のまま残しています。</p><p data-inquiry-record="FAB-2026-018" hidden>B-07の交換票から照会されたのですね。部品を届ける時に受け取った本人の紙も、原本に含めました。</p><a class="download-card" href="/members/download/hozen.zip"><strong>保全資料_20261102.zip ↓</strong><small>申出書・実験記録・継承資料</small></a><div class="submission-links"><a class="text-link" href="${esc(origins.hozen)}/receive/?case=${caseId}">資料保全・匿名通報受付 </a></div></article>`:'';
   const changed=caseState.ending==='end2'?'<article class="message"><time>2026.11.06 / 運営事務局</time><h2>担当者の変更</h2><p>工房保全担当への照会は事務局へ移管いたしました。旧担当者の個人登録は終了しました。</p></article>':'';
-  return memberLayout('施設からの連絡',`<h1>施設からの連絡</h1>${changed}${privateMessage}${assigned||'<article class="message"><time>2026.10.01 / 運営事務局</time><h2>秋季の共用設備点検について</h2><p>ご利用中の区画に点検作業が入る場合がございます。各担当からのご連絡をご確認ください。</p></article>'}`,{...ctx,active:'messages'});
+  return memberLayout('施設からの連絡',`<h1>施設からの連絡</h1>${changed}${privateMessage}<article class="message"><time datetime="2026-10-01">2026.10.01 / 運営事務局</time><h2>4階共用部の自動扉点検について</h2><p>10月19日（月）の9時から11時まで、4階共用部の自動扉を順次点検いたします。作業中は職員が通行をご案内いたします。会議室とラウンジは通常どおりご利用いただけます。</p></article>${assigned}`,{...ctx,active:'messages'});
  }
  if(path==='/members/inquiry/'){
   if(inquiryClosed(caseState.ending)){
