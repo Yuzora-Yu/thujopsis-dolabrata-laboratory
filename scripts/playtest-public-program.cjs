@@ -70,11 +70,58 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await p.waitForURL(url=>url.searchParams.get('method')==='金属3Dプリンター'&&url.hash==='#work-0033');
   await p.locator('#work-0033:target:visible').waitFor();
   assert.equal(await p.locator('.gallery-card:visible').count(),1);
-  await p.getByLabel('制作方法').selectOption('');
-  await p.getByRole('button',{name:'表示する',exact:true}).click();
-  await p.waitForURL(url=>url.searchParams.get('method')===''&&url.hash==='');
+  const clearGallery=p.getByRole('link',{name:'絞り込みを解除',exact:true});
+  await clearGallery.click();
+  await p.waitForURL(url=>!url.searchParams.has('method')&&url.hash==='');
   await p.locator('[data-gallery-scope]').filter({hasText:'すべての制作方法'}).waitFor();
+  assert.equal(await clearGallery.count(),0);
   assert.ok(await p.locator('.gallery-card:visible').count()>1);
+  assert.equal(await p.locator('#work-0004,#work-0008').count(),0);
+  assert.match(await p.locator('#work-0007 img').getAttribute('src'),/g-box-slide\.webp$/);
+  assert.match(await p.locator('#work-0013 img').getAttribute('src'),/g-tray\.webp$/);
+  await p.setViewportSize({width:390,height:844});
+  const guide=p.locator('#work-0009');
+  await guide.scrollIntoViewIfNeeded();
+  await guide.locator('img').evaluate(image=>image.decode());
+  const metadata=await guide.locator('.card-meta').evaluate(row=>{
+   const date=row.querySelector('time'),number=row.querySelector('.card-number');
+   return {oneLine:Math.abs(date.getBoundingClientRect().top-number.getBoundingClientRect().top)<3,dateSize:parseFloat(getComputedStyle(date).fontSize),numberSize:parseFloat(getComputedStyle(number).fontSize)};
+  });
+  assert.equal(metadata.oneLine,true);
+  assert.ok(metadata.dateSize>=11&&metadata.numberSize>=11);
+  await p.locator('.gallery-card img').evaluateAll(images=>Promise.all(images.filter(image=>{
+   const bounds=image.getBoundingClientRect();
+   return bounds.bottom>0&&bounds.top<innerHeight;
+  }).map(image=>image.decode())));
+  await p.screenshot({path:'.work/qa/gallery-numbering-mobile.png'});
+  await guide.click();
+  await p.getByText(/点の間隔が少し広がるところで左に曲がる/).waitFor();
+  await p.getByRole('button',{name:'写真を拡大',exact:true}).click();
+  const print=p.locator('.image-dialog img');
+  await print.evaluate(image=>image.decode());
+  assert.match(await print.getAttribute('src'),/g-map-reception\.webp$/);
+  assert.equal(await print.evaluate(image=>image.naturalWidth),1100);
+  await p.keyboard.press('Escape');
+  await p.screenshot({path:'.work/qa/gallery-reception-model-mobile.png',fullPage:true});
+  await p.getByRole('link',{name:'稲葉澪さんに聞く、案内図づくり',exact:true}).click();
+  await p.getByRole('link',{name:'中央受付までの案内',exact:true}).click();
+  await p.waitForURL(base+'/floor-map/#arrival');
+  await p.locator('#floor-arrival-title').waitFor();
+  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+  await p.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
+  const arrivalPlan=p.getByRole('dialog',{name:'フロアマップを拡大'});
+  await arrivalPlan.getByRole('img',{name:/A4-09/}).waitFor();
+  const arrivalRange=await arrivalPlan.getByRole('region',{name:'拡大画像の表示範囲'}).evaluate(node=>({
+   left:1200*node.scrollLeft/node.scrollWidth,
+   right:1200*(node.scrollLeft+node.clientWidth)/node.scrollWidth,
+   top:710*node.scrollTop/node.scrollHeight,
+   bottom:710*(node.scrollTop+node.clientHeight)/node.scrollHeight,
+  }));
+  assert.ok(arrivalRange.left<=430&&arrivalRange.right>=702,JSON.stringify(arrivalRange));
+  assert.ok(arrivalRange.top<=345&&arrivalRange.bottom>=467,JSON.stringify(arrivalRange));
+  await p.screenshot({path:'.work/qa/gallery-reception-route-mobile.png'});
+  await p.keyboard.press('Escape');
+  await p.setViewportSize({width:1440,height:1000});
   await p.goto(base+'/gallery/0029/');
   const unlistedReturn=new URL(await galleryReturn.getAttribute('href'),p.url());
   assert.equal(unlistedReturn.search+unlistedReturn.hash,'');

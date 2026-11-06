@@ -222,9 +222,9 @@ async function newsInterface(p){
  let makerLoanId;
  assert.match(await body(p),/一般制作活動/);
  await p.goto(main('/gallery/0009/'));
- assert.match(await body(p),/部屋の並びを簡略化/);
+ assert.match(await body(p),/中央エレベーターから受付まで[\s\S]*左に曲がる/);
  await p.getByRole('link',{name:'稲葉澪さんに聞く、案内図づくり',exact:true}).click();
- assert.match(await body(p),/曲がり角の幅を確かめる部分模型/);
+ assert.match(await body(p),/線の太さや点の間隔を比べた試し刷り/);
  assert.match(await body(p),/2019年3月、当施設での利用登録を終了/);
  assert.doesNotMatch(await body(p),/B1・B-04|YH-2018-041-A/);
  await p.goto(main('/gallery/0005/'));assert.match(await body(p),/入居者紹介/);

@@ -131,6 +131,8 @@ function prepareGallery(){
   }
   document.querySelector('[data-gallery-scope]').textContent=method||'すべての制作方法';
   document.querySelector('[data-gallery-count]').textContent=count+'件';
+  const clear=document.querySelector('[data-gallery-clear]');
+  if(clear)clear.hidden=!method;
   const target=document.getElementById(location.hash.slice(1));
   if(target?.matches('.gallery-card:not([hidden])'))requestAnimationFrame(()=>target.scrollIntoView({block:'start'}));
  }
@@ -193,6 +195,7 @@ if(photoViewport&&photoButtons.length){
  const stage=photoViewport.querySelector('.image-stage');
  const photo=stage.querySelector('img');
  const middle={x:.5,y:.5};
+ const mapFocusX={'#arrival':.475,'#floor-exhibition':.63};
  let zoom=1,angle=0,fitWidth=0,fitHeight=0,openingCenter=middle;
 
  photoViewport.tabIndex=0;
@@ -242,9 +245,8 @@ if(photoViewport&&photoButtons.length){
   button.addEventListener('click',()=>{
    const source=button.dataset.imageOpen;
    const focusArrival=button.hasAttribute('data-plan-arrival')&&matchMedia('(max-width: 580px)').matches;
-   const focusExhibition=location.hash==='#floor-exhibition';
    zoom=focusArrival?4:1;
-   openingCenter=focusArrival?{x:focusExhibition ? .63 : .57,y:.57}:middle;
+   openingCenter=focusArrival?{x:mapFocusX[location.hash]??.57,y:.57}:middle;
    angle=0;
    photo.hidden=true;
    stage.style.removeProperty('width');

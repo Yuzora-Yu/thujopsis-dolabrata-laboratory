@@ -56,24 +56,25 @@
     "asset": "public/assets/media/g-nameplate.webp"
   },
   {
-    "key": "g-box",
+    "key": "g-box-slide",
     "year": 2015,
-    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-60da8f41-603d-41f9-b487-9afe0df4f369.png",
-    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A small open laser-cut birch plywood box with clear alternating interlocking finger joints, five planar panels, no metal fasteners. One divider and a few craft tools inside. Real warm wood grain and lightly charred cut edges, photographed on an office cutting mat. Photograph as taken in 2015 using an ordinary compact digital camera: ordinary mixed fluorescent/daylight, imperfect white balance, deep focus, moderate JPEG compression, naturally flat lighting. This is a record kept by staff, not a studio product shoot.",
-    "references": [
-      "https://filescnc.com/models/open-box/"
-    ],
-    "asset": "public/assets/media/g-box.webp"
+    "path": "docs/source-images/g-box-slide.png",
+    "generation": "内蔵画像生成 exec-ef538fb2-a1fb-41e3-9b9f-7eafd5912155",
+    "prompt": "Use case: photorealistic-natural. Create an unpolished ordinary Japanese community makerspace fabrication-record photograph, captured March 2015 using a small point-and-shoot digital camera. Landscape 4:3 composition. A single slim rectangular sliding-lid tool box made from pale 3 mm laser-cut birch plywood, approximately 22 cm long, 7 cm wide, 5 cm high. It is a small hand-made case for long narrow implements. Camera looks down from a modest front three-quarter angle so the short end and one long side are visible. Two long straight narrow rails at the top hold a single flat plywood lid. The lid is pushed open by approximately one third; show it visibly engaged in both rails with no gap or floating. The partly open end reveals one small metal needle file and one wooden pencil lying inside, naturally supported by the box bottom. The visible short end and two long sides interlock with a few discrete rectangular finger joints, slight dark laser kerf at edges. The solid side walls are tall enough to keep the tools inside. No compartments, separate compartments, fasteners, hardware, hinges, decorative engraving, labels or branding. Do not create a shallow open tray. The box is a quick tidy amateur prototype, not a pristine product. Set it alone in the center-left on an old flat pale-gray laminate workbench with one faint stain, generous plain surrounding area. Soft slightly cool window daylight, small compact-camera lens, ordinary exposure, deep focus, subtle period JPEG texture, muted color and visible wood grain. No people, no hands, no added objects, no blue or green cutting mat, no ruler, no lettering, no cinematic depth of field.",
+    "references": [],
+    "asset": "public/assets/media/g-box-slide.webp"
   },
   {
-    "key": "g-map",
+    "key": "g-map-reception",
     "year": 2016,
-    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-a0deb0b1-530a-4e47-a5d0-d317eae8b158.png",
-    "prompt": "A single authentic fabrication-record photograph for a Japanese community makerspace. Use the reference only to understand buildable geometry and material construction; create a different original specimen and photographic composition. No source-page graphics, captions, institutional logos or printed brand names. Show the actual made object, not a CAD render. Landscape photo, mundane tabletop, believable scale and visible manufacturing traces. A cream FDM-printed tactile floor model, elongated footprint with offices on left, central core and large open space with tapered right end. Low raised walls and broad pathways, no impossible fine architectural details, printed in a single piece, a pencil for scale. Casual overhead documentation. Photograph as taken in 2016 using an ordinary compact digital camera: ordinary mixed fluorescent/daylight, imperfect white balance, deep focus, moderate JPEG compression, naturally flat lighting. This is a record kept by staff, not a studio product shoot.",
+    "path": "docs/source-images/g-map-reception.png",
+    "generation": "内蔵画像生成 exec-869be3fc-ca7b-4526-a44f-6ddbe5a92f68",
+    "prompt": "Use case: photorealistic-natural. Generate a new fictional Japanese public makerspace's workbench snapshot taken in March 2016 for an old local public facility gallery. Image 1 is style/context reference: the small ivory tactile route test plaque in the top-right of the interview photo, not the person or entire layout. Image 2 is only reference for the unpolished workbench, warm off-white printed plastic and modest 2010s point-and-shoot photo texture, not the old boat-shaped model.\n\nOne object on a scratched honey-brown wooden workbench: a palm-sized rectangular ivory 3D-printed tactile route test tile, about 16 by 10 cm, 4 mm thick. Show all four edges. The print geometry is deliberately sparse. Near the lower left of the tile is a tiny raised hollow square, representing the elevator. From its top runs a very short straight raised stem north, then the route turns right along a long horizontal row of tiny identical raised dots east. At the far right, the route makes one square left turn and proceeds north as a much shorter straight vertical row of dots. Leave a slightly wider flat gap just before that last bend, to let a reader pause a fingertip. The short northward row ends at one separate low horizontal raised oblong bar near the upper right, representing the reception desk. From above the whole route is exactly a small bottom-left stem, a long left-to-right run, and a shorter right-end upward run. No other paths, rooms, partitions, dots, or markers. All relief is low, just about 1 mm tall, actually fused to one thin FDM base. Keep the layered edge subtle and believable. A plain used yellow pencil can lie well outside the tile, near the bottom, for scale, without pointing at it.\n\nAlmost top-down photograph with a little depth visible at the near edge, a calm landscape crop, the plaque occupying about two thirds of the frame, believable soft light from an upper-left workshop window. The workbench fills the background. Mild compact-camera JPEG texture, restrained late-Heisei colors, modest exposure, ordinary record photograph. Make the dot pattern, square, and bar physically readable in natural light. Avoid glamour, wide-angle distortion, cinematic light, fake text, dates, watermarks, modern phones, people, hands, screws, signs, multiple objects, and the outline of an entire building.",
     "references": [
-      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
+      "public/assets/media/p-inaba.webp（2016年の取材写真）",
+      "public/assets/media/g-map.webp（差し替え前の作業台と造形色。Git履歴で保存）"
     ],
-    "asset": "public/assets/media/g-map.webp"
+    "asset": "public/assets/media/g-map-reception.webp"
   },
   {
     "key": "g-wall",

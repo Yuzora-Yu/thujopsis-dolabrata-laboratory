@@ -67,7 +67,7 @@ function tenantExhibit(id){
  const fields=e.style==='method'?`<ol class="tenant-method">${e.facts.map(([label,value])=>`<li><b>${esc(label)}</b><span>${esc(value)}</span></li>`).join('')}</ol>`:`<dl class="tenant-exhibit-fields">${e.facts.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>`;
  return `<section class="tenant-exhibit exhibit-${e.style}"><p class="exhibit-label">${esc(e.label)}</p><h3>${esc(e.title)}</h3><p>${esc(e.intro)}</p>${fields}${e.link?link(e.link[0],esc(e.link[1])):''}</section>`;
 }
-function galleryCards(items){return `<div class="gallery-grid">${items.map(g=>`<a class="gallery-card" id="work-${g.id}" href="/gallery/${g.id}/" data-gallery-method="${esc(g.tag)}"><div class="image-wrap">${img(g.image,'')}</div><div class="card-meta"><time datetime="${g.date.replaceAll('.','-')}">${g.date}</time><span>${g.tag}</span></div><h3>${g.title}</h3><span class="card-number">No. ${g.id}</span></a>`).join('')}</div>`;}
+function galleryCards(items){return `<div class="gallery-grid">${items.map(g=>`<a class="gallery-card" id="work-${g.id}" href="/gallery/${g.id}/" data-gallery-method="${esc(g.tag)}"><div class="image-wrap">${img(g.image,'')}</div><div class="card-meta"><time datetime="${g.date.replaceAll('.','-')}">${g.date}</time><span class="card-number">No. ${g.id}</span></div><h3>${g.title}</h3><span class="gallery-method">${g.tag}</span></a>`).join('')}</div>`;}
 function galleryPage(query){
  const listed = gallery.filter(work=>work.listed);
  const methods = [...new Set(listed.map(work=>work.tag))];
@@ -77,7 +77,7 @@ function galleryPage(query){
   <section class="wrap section">
    <div class="gallery-tools">
     <form class="filter-form" method="get" action="/gallery/" data-gallery-filter><label>制作方法 <select name="method"><option value="">すべて</option>${methods.map(value=>`<option${method===value?' selected':''}>${esc(value)}</option>`).join('')}</select></label><button type="submit">表示する</button></form>
-    <p class="gallery-results"><span data-gallery-scope>${esc(method||'すべての制作方法')}</span><span data-gallery-count>${shown.length}件</span></p>
+    <p class="gallery-results"><span data-gallery-scope>${esc(method||'すべての制作方法')}</span><span data-gallery-count>${shown.length}件</span><a href="/gallery/" data-gallery-clear${method?'':' hidden'}>絞り込みを解除</a></p>
    </div>
    ${galleryCards(shown.slice().reverse())}
   </section>`);
@@ -355,14 +355,14 @@ function inabaInterview(){
    <p class="article-meta"><time datetime="2016-03-25">2016.03.25</time><span>利用者インタビュー</span></p>
    <p class="profile-kicker">稲葉 澪 ／ 図解・案内制作</p>
    <figure>${img('media/p-inaba.webp','紙の案内図に線を書き足す稲葉さんの手元。机の右奥に樹脂の部分模型。','',true,[1100,733])}
-    <figcaption>図の原稿と、曲がり角の幅を確かめる部分模型。2016年3月、工房にて。</figcaption></figure>
+    <figcaption>図の原稿と、線の太さや点の間隔を比べた試し刷り。2016年3月、工房にて。</figcaption></figure>
    <p>道順や道具の使い方を図にする稲葉澪さん。工房で試作を続けている立体案内図について伺いました。</p>
    <h2>曲がる手前で、指を止める</h2>
    <p>通路の角を指でたどってもらったら、曲がるところを一つ通り過ぎました。線が細いと思って太くしたら、今度は壁との区別がつかなかったんです。それで、曲がる手前に、いったん指を止められる幅を取りました。</p>
    <blockquote>同じものを見ても、必要な案内は人それぞれ。ひとつの正解だけに揃えないで作っていきたいです。</blockquote>
    <h2>次は、朝の通路で</h2>
    <p>図ができたら、人の多い朝に受付から歩いてみたいです。机の上では、迷っても後ろから誰も来ませんから。どこで立ち止まれるかは、実際に歩くと気づくことがありそうです。</p>
-   <div class="editorial-related">${link('/gallery/0009/','触ってわかる案内図')}</div>
+   <div class="editorial-related">${link('/gallery/0009/','触ってわかる案内図')}${link('/floor-map/#arrival','中央受付までの案内')}</div>
    <aside class="news-closed-note"><small>掲載情報更新 <time datetime="2019-03-31">2019.03.31</time></small><p>2019年3月、当施設での利用登録を終了しました。</p></aside>
   </article>`);
 }

@@ -308,7 +308,14 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .gallery-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem 1.5rem;margin:-.7rem 0 1.65rem}
 .gallery-tools .filter-form{margin:0;flex-wrap:wrap}
 @media(max-width:360px){.gallery-tools .filter-form{gap:.4rem}.gallery-tools select{max-width:134px;margin-left:6px;padding-inline:.4rem .9rem}}
-.gallery-results{display:flex;align-items:baseline;gap:.55rem;margin:0;color:var(--muted);font-size:.78rem}
+.gallery-results{display:flex;align-items:baseline;flex-wrap:wrap;gap:.35rem .65rem;margin:0;color:var(--muted);font-size:.78rem}
+.gallery-results a{text-decoration:underline;text-underline-offset:.2em}
+.gallery-card .card-meta{display:flex;align-items:baseline;flex-wrap:wrap;gap:.2rem .4rem;color:#52615a;font-size:.72rem;font-variant-numeric:tabular-nums}
+.gallery-card .card-meta time,.card-number{white-space:nowrap}
+.card-meta .card-number{margin:0}
+.card-number{color:#52615a;font-size:inherit;letter-spacing:.02em}
+.gallery-method{color:#52615a;font-size:.72rem}
+@media(max-width:520px){.gallery-tools+.gallery-grid .image-wrap{height:auto;aspect-ratio:4/3}}
 .gallery-card,.tenant-card{scroll-margin-top:8rem}
 .gallery-card:target,.tenant-card:target{outline:2px solid #889f91;outline-offset:3px}
 .gallery-card[hidden]{display:none}
