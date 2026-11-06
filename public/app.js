@@ -24,6 +24,12 @@ if(habitat){const modes={
  for(const button of buttons)button.addEventListener('click',()=>{const key=button.dataset.habitatMode,mode=modes[key];if(!mode)return;habitat.dataset.mode=key;for(const b of buttons)b.setAttribute('aria-pressed',String(b===button));for(const cell of habitat.querySelectorAll('[data-system-status]'))cell.textContent=mode[cell.dataset.systemStatus];habitat.querySelector('[data-habitat-note]').textContent=mode.note;});
 }
 const photoDialog=document.querySelector('.image-dialog');let zoom=1,angle=0,fitWidth=0,fitHeight=0;
+const photoViewport=photoDialog?.querySelector('.image-viewport');
+if(photoViewport&&document.querySelector('[data-image-open]')){
+ photoViewport.tabIndex=0;
+ photoViewport.setAttribute('role','region');
+ photoViewport.setAttribute('aria-label','拡大画像の表示範囲');
+}
 function paintPhoto(){if(!photoDialog||!fitWidth)return;const photo=photoDialog.querySelector('img'),stage=photoDialog.querySelector('.image-stage');const turn=angle%180!==0;stage.style.width=(turn?fitHeight:fitWidth)*zoom+'px';stage.style.height=(turn?fitWidth:fitHeight)*zoom+'px';photo.style.width=fitWidth*zoom+'px';photo.style.height=fitHeight*zoom+'px';photo.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;}
 document.querySelectorAll('[data-image-open]').forEach(b=>b.addEventListener('click',()=>{const d=photoDialog,photo=d.querySelector('img'),source=b.dataset.imageOpen;zoom=1;angle=0;fitWidth=0;photo.onload=()=>{const scale=Math.min((d.clientWidth-32)/photo.naturalWidth,(innerHeight*.7)/photo.naturalHeight,1);fitWidth=photo.naturalWidth*scale;fitHeight=photo.naturalHeight*scale;paintPhoto();};photo.alt=b.querySelector('img')?.alt||'';d.querySelector('a').href=source;d.showModal();photo.src=source;}));
 document.querySelectorAll('[data-photo-action]').forEach(b=>b.addEventListener('click',()=>{const action=b.dataset.photoAction;if(action==='in')zoom=Math.min(12,zoom*1.6);if(action==='out')zoom=Math.max(1,zoom/1.6);if(action==='rotate')angle=(angle+90)%360;if(action==='reset'){zoom=1;angle=0;}paintPhoto();}));

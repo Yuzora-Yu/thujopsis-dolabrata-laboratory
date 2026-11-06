@@ -81,6 +81,9 @@ def create_plan(old=False):
         gap='#ffffff'
         line(788,400,821,400,gap,4)
         line(783,208,806,208,gap,4)
+        line(831,208,847,208,gap,4);line(868,208,884,208,gap,4)
+        line(896,123,896,143,gap,4)
+        line(932,205,958,205,gap,4)
         line(926,319,937,341,gap,4)
         line(601,357,601,378,gap,4);line(601,405,601,426,gap,4)
         line(893,246,893,373,'#6d8f86',2.8)
@@ -88,7 +91,7 @@ def create_plan(old=False):
         line(478,467,478,452,route,2.4);line(478,452,660,452,route,2.4)
         line(660,452,660,369,route,2.4)
         polygon([(660,361),(655,371),(665,371)],route,route,.4)
-        text(554,446,'受付への経路',11,color=route)
+        text(675,444,'中央受付へ',11,'start',route)
         text(799,424,'ラウンジ入口',10,color=route)
     text(400,226,'通路',9);text(390,351,'通路',9)
     # Column grid, source proportions and dimensions.
@@ -109,10 +112,10 @@ def create_plan(old=False):
         text(1130,620,'あすなろ開設準備室',12,'end');text(1130,644,'2012.04.01',14,'end');text(1130,668,'図面番号 A4-01',10,'end')
     else:
         text(85,598,'西側：オフィス・工房',12,'start');text(85,623,'中央：管理事務室・受付',12,'start');text(85,648,'東側：会議室・食堂・ラウンジ・ホール',12,'start')
-        text(1128,640,'2026.10',10,'end');text(1128,663,'あすなろ運営事務局',10,'end')
+        text(1128,640,'2026.11',10,'end');text(1128,663,'あすなろ運営事務局',10,'end')
     # Cardinal direction only; lower floors are intentionally not shown.
     text(1135,488,'N',11);line(1135,499,1135,533,INK,1);polygon([(1135,495),(1131,505),(1139,505)],INK,INK,.5)
-    text(75,692,('A4-01' if old else 'A4-06')+' / ASUNARO INDUSTRY & EXCHANGE',8,'start')
+    text(75,692,('A4-01' if old else 'A4-07')+' / ASUNARO INDUSTRY & EXCHANGE',8,'start')
     return primitives
 
 def write_svg(primitives,target):

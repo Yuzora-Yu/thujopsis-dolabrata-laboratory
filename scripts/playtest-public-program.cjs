@@ -33,8 +33,9 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
    p.getByRole('link',{name:'アクセス',exact:true}).click(),
   ]);
   assert.equal(accessResponse.status(),404);
-  await p.getByRole('navigation',{name:'メインナビゲーション'}).getByRole('link',{name:'入居者一覧',exact:true}).waitFor();
+  await p.getByRole('navigation',{name:'メインナビゲーション'}).getByRole('link',{name:'入居者紹介',exact:true}).waitFor();
   await p.goto(base+'/floor-map/');await p.locator('img[src$="/floor-4f.svg"]').waitFor();
+  await p.locator('.floor-arrival img').evaluate(image=>image.decode());
   await p.screenshot({path:'.work/qa/nov06-floor.png',fullPage:true});
   await p.goto(base+'/tenants/0003/');await p.locator('.tenant-exhibit').waitFor();await p.screenshot({path:'.work/qa/nov06-tenant.png',fullPage:true});
   await p.goto(base+'/members/login/');await p.locator('#member-id').fill('201204010017');await p.locator('#member-password').fill('20080519');
@@ -48,6 +49,19 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
    await mobile.goto(base+route);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);
    if(route==='/'){await mobile.locator('.lunar-hero img').evaluate(im=>im.decode());await mobile.screenshot({path:'.work/qa/nov06-home-mobile.png'});}
   }
+  await mobile.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
+  await mobile.locator('.image-dialog[open] img[src$="/floor-4f.svg"]').evaluate(image=>image.decode());
+  await mobile.keyboard.press('Escape');
+  await mobile.goto(base+'/search/?q=A4-01');
+  await mobile.getByRole('link',{name:/開設時の区画配置について/}).click();
+  await mobile.getByRole('button',{name:'開設時の配置図を拡大',exact:true}).click();
+  await mobile.waitForFunction(()=>parseFloat(document.querySelector('.image-dialog[open] .image-stage')?.style.width)>0);
+  await mobile.getByRole('button',{name:'画像を拡大',exact:true}).click();
+  const viewport=mobile.getByRole('region',{name:'拡大画像の表示範囲'});
+  assert.ok(await viewport.evaluate(node=>node.scrollWidth>node.clientWidth));
+  await viewport.focus();
+  await mobile.keyboard.press('Escape');
+  assert.equal(await mobile.locator('.image-dialog[open]').count(),0);
   assert.deepEqual(errors,[]);console.log('Public program passed: concept hero, interactive exhibit, handover report and return link, flow diagram, tenant profile, 390px layout, lazy authorized PDF download.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});
