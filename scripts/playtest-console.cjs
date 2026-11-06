@@ -8,12 +8,29 @@ async function exerciseConsole(p,{url,mode='worker',prefix='.work/qa/console-'+m
  await p.getByText('原票の交付',{exact:true}).waitFor();assert.equal(await p.getByText('瀬尾 灯',{exact:true}).count(),0);
  await p.getByRole('link',{name:'測定端末へ',exact:true}).click();
  for(let i=0;i<5;i++){
-  await p.getByRole('button',{name:'カード '+(i%5+1),exact:true}).click();await p.getByRole('button',{name:i===4?'粒子観測へ':'次の試行へ',exact:true}).click();
+  const card=p.getByRole('button',{name:'カード '+(i%5+1),exact:true});
+  await card.press('Enter');
+  const next=p.getByRole('button',{name:i===4?'粒子観測へ':'次の試行へ',exact:true});
+  await next.waitFor();
+  assert.equal(await p.locator('.lab-panel h2').evaluate(el=>el===document.activeElement),true);
+  await p.keyboard.press('Tab');
+  assert.equal(await next.evaluate(el=>el===document.activeElement),true);
+  await p.keyboard.press('Enter');
+  assert.equal(await p.locator('.lab-panel h2').evaluate(el=>el===document.activeElement),true);
   if(i===1){await p.reload();await p.getByRole('button',{name:'カード 3',exact:true}).waitFor();}
  }
  const cards=(await read()).trial.cards;assert.equal(cards.length,5);
  await p.getByText('呼称の訂正',{exact:true}).click();await p.locator('#lab-rename').fill('星をみる灯');await p.getByRole('button',{name:'訂正して保存',exact:true}).click();assert.deepEqual((await read()).trial.cards,cards);
- await p.getByRole('button',{name:'粒子観測を開始',exact:true}).click();await p.locator('canvas').waitFor();await p.getByRole('button',{name:'観測を中断',exact:true}).click();assert.deepEqual((await read()).trial.cards,cards);
+ const viewport=p.viewportSize();
+ await p.setViewportSize({width:390,height:700});
+ await p.getByRole('button',{name:'粒子観測を開始',exact:true}).click();await p.locator('canvas').waitFor();
+ const canvasView=await p.locator('canvas').evaluate(el=>{
+  const {top,bottom,width}=el.getBoundingClientRect();return {top,bottom,width,height:innerHeight,focused:el===document.activeElement};
+ });
+ assert.ok(canvasView.top>=0&&canvasView.bottom<=canvasView.height&&canvasView.width>320,JSON.stringify(canvasView));
+ assert.equal(canvasView.focused,true);
+ await p.getByRole('button',{name:'観測を中断',exact:true}).click();assert.deepEqual((await read()).trial.cards,cards);
+ await p.setViewportSize(viewport);
  await p.reload();await p.getByRole('button',{name:'粒子観測を開始',exact:true}).click();await p.locator('canvas').waitFor();
  // Exercise the exact displayed coordinates against the shared deterministic model.
  await p.waitForTimeout(2200);
@@ -24,14 +41,24 @@ async function exerciseConsole(p,{url,mode='worker',prefix='.work/qa/console-'+m
   const canvas=document.querySelector('canvas'),rect=canvas.getBoundingClientRect(),style=getComputedStyle(canvas),left=parseFloat(style.borderLeftWidth),top=parseFloat(style.borderTopWidth);
   return {x:rect.left+left+position.x*(rect.width-left-parseFloat(style.borderRightWidth))/960,y:rect.top+top+position.y*(rect.height-top-parseFloat(style.borderBottomWidth))/540};
  },endpoint);
- await p.mouse.click(target.x,target.y);await p.getByText('異常を記録しました。',{exact:true}).waitFor();
+ await p.mouse.click(target.x,target.y);await p.getByText('異常を記録しました。（入力 1 件）',{exact:true}).waitFor();
  await p.mouse.click(target.x,target.y);await p.getByText('入力待ちです（0.5秒間隔）。',{exact:true}).waitFor();
  await p.locator('canvas').press('ArrowRight');await p.locator('canvas').press('ArrowDown');await p.waitForTimeout(600);await p.locator('canvas').press('Space');assert.equal(await p.evaluate(()=>document.activeElement.tagName),'CANVAS');
  await p.screenshot({path:prefix+'-observing.png',fullPage:true});
  await p.getByRole('heading',{name:'星をみる灯さんの測定記録',exact:true}).waitFor({timeout:40000});
  const completed=(await read()).trial;assert.equal(completed.complete,true);assert.equal(completed.cards.length,5);assert.ok(completed.particle.found>=1);
  await p.reload();await p.getByRole('heading',{name:'星をみる灯さんの測定記録',exact:true}).waitFor();assert.equal((await read()).trial.completedAt,completed.completedAt);
- await p.screenshot({path:prefix+'-result.png',fullPage:true});await p.getByRole('link',{name:'被験者の測定原票',exact:true}).click();await p.locator('.lab-subject').first().waitFor();assert.equal(await p.locator('.lab-subject').count(),5);await p.locator('.lab-subject').last().locator('summary').click();assert.match(await p.locator('.lab-subject').last().innerText(),/瀬尾 灯|瀬尾\s+灯/);
+  assert.match(await p.locator('.lab-receipt').innerText(),/回付欄[\s\S]*写しには記載なし/);
+ await p.screenshot({path:prefix+'-result.png',fullPage:true});
+ await p.getByRole('link',{name:'被験者の測定原票',exact:true}).click();
+ const subjects=p.locator('.lab-subject');
+ await subjects.first().waitFor();assert.equal(await subjects.count(),5);
+ await subjects.first().locator(':scope>summary').click();
+ assert.match(await subjects.first().innerText(),/機器調整係へ。本人控え交付済/);
+ await subjects.last().locator(':scope>summary').click();
+ assert.match(await subjects.last().innerText(),/居住受付から評価統括へ回付/);
+ await subjects.last().locator('.lab-subject-values>summary').click();
+ assert.equal(await subjects.last().locator('meter:visible').count(),5);
  await p.screenshot({path:prefix+'-subjects.png',fullPage:true});await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await p.screenshot({path:prefix+'-mobile.png',fullPage:true});await p.setViewportSize({width:1440,height:1000});
  console.log('Console passed ('+mode+'): five cards, reload/rename preservation, interruption, 30-second canvas, pointer/keyboard, persisted result, five subjects.');return completed;
 }

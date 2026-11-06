@@ -298,7 +298,14 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const ticket=handover.match(/閲覧票番号\s+(\S+)/)[1],code=handover.match(/照会符号\s+(\S+)/)[1];
  const archivePopup=p.waitForEvent('popup');await p.getByRole('link',{name:/旧基盤・資料照会室/}).click();const archive=await archivePopup;archive.on('pageerror',e=>errors.push(e.message));
  await archive.locator('#ticket').fill(ticket);await archive.locator('#inquiry-code').fill(code);await archive.getByRole('button',{name:'照会室へ'}).click();await until(archive,'移管・保守受領簿');
- if(process.env.PLAYTEST_LAB==='1')await require('./playtest-console.cjs').exerciseConsole(archive,{url:provider('archive','/room/console/'),mode,prefix:'.work/qa/'+mode+'-lab-full'});
+ if(process.env.PLAYTEST_LAB==='1'){
+  await archive.getByRole('link',{name:/測定端末の原票照合/}).click();
+  const terminal=archive.getByRole('link',{name:'適性反応測定端末AP-06',exact:true});
+  const terminalUrl=new URL(await terminal.getAttribute('href'),archive.url()).href;
+  await terminal.click();
+  await archive.getByRole('heading',{name:'測定に使用する呼称',exact:true}).waitFor();
+  await require('./playtest-console.cjs').exerciseConsole(archive,{url:terminalUrl,mode,prefix:'.work/qa/'+mode+'-lab-full'});
+ }
  const healthId=await traceNewspaper(p,archive);
  await archive.goto(provider('archive','/room/records/0005/'));await until(archive,'端末と資料更新の整理');assert.match(await body(archive),/0006/);await archive.goto(provider('archive','/room/records/0006/'));await until(archive,'機関台帳');const registry=await body(archive);
  const institution={id:ymd(registry.match(/加入日([^。]+)/)[1])+registry.match(/台帳番号は(\d{4})/)[1],password:ymd(registry.match(/法人設立日([^。]+)/)[1])};await archive.close();
@@ -317,7 +324,15 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const friendFile=await document(p,friendRecordId);
  assert.match(friendFile,/死亡/);
  assert.match(friendFile,/灯さんの貸出票は返却欄を空けておいてください。夏帆さんの地図帳は別包みです。修理完了にはしないでください/);
- assert.match(await document(p,'YH-2022-017'),/継舟/);
+ const reorganization=await document(p,'YH-2022-017');
+ assert.match(reorganization,/継舟/);
+ if(process.env.PLAYTEST_LAB==='1'){
+  const protocolId=reorganization.match(/AP-2022-\d{3}/)[0];
+  const protocol=await document(p,protocolId);
+  assert.match(protocol,/平均反応時間は参考欄[\s\S]*機器調整係[\s\S]*8月19日の受付時測定分[\s\S]*評価統括へ回付/);
+  const protocolPrint=await download(p,'a[href$="'+protocolId+'.pdf"]','aptitude-protocol.pdf');
+  assert.deepEqual(protocolPrint.data,await fs.readFile('private/record-media/'+protocolId+'.pdf'));
+ }
  const originalOffer=await recruitmentCopy(p,'RE-2022-006',2022);
  const checkId=originalOffer.match(/OBS-2022-\d{3}/)[0];
  const examination=await document(p,checkId);
@@ -402,6 +417,18 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  await p.getByRole('button',{name:/資料を提出/}).click();
  await p.getByText(/添付資料を確認できませんでした/).waitFor();
  await submit(p,complete.file);assert.match(await body(p),/外部への資料移送/);assert.match(await body(p),/本人の希望を個別に確認し、施設外へ移動/);assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
+ if(process.env.PLAYTEST_LAB==='1'){
+  const savedTrial=await p.context().newPage();
+  try{
+   await savedTrial.goto(provider('archive','/room/console/'));
+   await savedTrial.getByRole('heading',{name:'星をみる灯さんの測定記録',exact:true}).waitFor();
+   assert.match(await savedTrial.locator('.lab-receipt').innerText(),/保全用原本へ編入[\s\S]*照会終了／原本保全/);
+   await savedTrial.getByRole('link',{name:'被験者の測定原票',exact:true}).click();
+   const lamp=savedTrial.locator('.lab-subject').filter({hasText:'瀬尾 灯'});
+   await lamp.locator(':scope>summary').click();
+   assert.match(await lamp.locator('.lab-current').innerText(),/本人保護・記録照合中/);
+  }finally{await savedTrial.close();}
+ }
  await login(p,institution.id,institution.password);
  await p.goto(auditReceipt);await until(p,'資料を受領しました');
  assert.match(await body(p),/施設外へ移動/);
