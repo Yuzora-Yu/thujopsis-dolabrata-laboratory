@@ -6,6 +6,7 @@ const source={
  east:'media/f-home-east.webp',
  exterior:'exterior.webp',
  shop:'workshop.webp',
+ atlas:'media/p-yoshino-atlas.webp',
  exhibit:'media/g-metal-lattice.webp',
  moon:'media/lunar-habitat-concept.webp',
  reception:'media/f-central-reception.webp',
@@ -25,6 +26,7 @@ const source={
   const result=await page.evaluate(async data=>{
    const W=1280,H=720,canvas=document.querySelector('canvas'),g=canvas.getContext('2d',{alpha:false});
    const duration=30,cueStart=24.55,cueEnd=25.32;
+   const cuts={exterior:4.6,shop:8.2,atlas:11.5,exhibit:14.5,moon:17,reception:19.5,board:23,end:27};
    const images=Object.fromEntries(await Promise.all(Object.entries(data).map(async([key,url])=>{const img=new Image();img.src=url;await img.decode();return [key,img];})));
    const type=['video/mp4;codecs=avc1.42001f,mp4a.40.2','video/webm;codecs=vp9,opus'].find(x=>MediaRecorder.isTypeSupported(x));
    if(!type)throw new Error('No local video encoder available');
@@ -47,9 +49,9 @@ const source={
      const air=fastAir-slowAir;
      const vent=.041*Math.sin(tau*118*time+.05*Math.sin(tau*.17*time))
        +.023*Math.sin(tau*237*time)+.011*Math.sin(tau*359*time);
-     const outside=windowGain(time,5,9,.36);
+     const outside=windowGain(time,cuts.exterior,cuts.shop,.36);
      const atmosphere=(1-outside)*(.09*air+vent)+outside*.17*air;
-     const tone=(windowGain(time,.4,4.75,1.15)+windowGain(time,14.15,18.8,.7)+windowGain(time,27.1,29.85,.85))
+     const tone=(windowGain(time,.4,4.75,1.15)+windowGain(time,cuts.exhibit,cuts.reception-.4,.7)+windowGain(time,27.1,29.85,.85))
        *(.018*Math.sin(tau*261.63*time)+.011*Math.sin(tau*392*time));
      const handover=1-.72*windowGain(time,cueStart,cueEnd,.075);
      samples[i]=(atmosphere+tone)*handover*windowGain(time,0,duration,.42);
@@ -68,18 +70,18 @@ const source={
     grad.addColorStop(0,'rgba(12,20,21,.94)');grad.addColorStop(1,'rgba(12,20,21,0)');g.fillStyle=grad;g.fillRect(0,0,W,H);
    }
    function lower(label,title){
-    shade();text(label,72,565,18,{color:'#dbe5b8'});text(title,72,631,44);
+    shade();text(label,72,558,30,{color:'#dbe5b8'});text(title,72,631,44);
    }
    function opening(t){
     cover('east',t,.55,.52);
     const grad=g.createLinearGradient(0,0,W*.72,0);
     grad.addColorStop(0,'#1b140fe8');grad.addColorStop(1,'#1b140f00');g.fillStyle=grad;g.fillRect(0,0,W,H);
-    text('あすなろ産業支援交流施設',72,227,23,{color:'#f0e9d6'});
+    text('あすなろ産業支援交流施設',72,227,29,{color:'#f0e9d6'});
     text('ともに、',72,325,56);
     text('明日をつくる。',72,402,56);
-    text('ものづくりと交流の拠点、あすなろ。',72,493,20,{color:'#f0e9d6'});
-    g.fillStyle='#211711c9';g.fillRect(1044,631,182,38);
-    text('4階 食堂・カフェ',1058,657,20,{color:'#f0e9d6'});
+    text('ものづくりと交流の拠点、あすなろ。',72,493,29,{color:'#f0e9d6'});
+    g.fillStyle='#211711c9';g.fillRect(1004,619,222,47);
+    text('4階 食堂・カフェ',1018,652,26,{color:'#f0e9d6'});
    }
    function visitorBoard(t){
     const ink='#263c34',muted='#4c6658';
@@ -98,23 +100,32 @@ const source={
     text('4F',914,331,125,{color:'#3a5949'});
     text('中央受付',925,403,31,{color:ink});
     g.beginPath();g.moveTo(92,585);g.lineTo(1186,585);g.stroke();
-    text('館内掲示',94,627,22,{color:muted});
-    text(t>=cueStart&&t<cueEnd?'17:14　呼出継続':'見学案内　2026年10月版',860,627,22,{color:muted});
+    text('見学案内 第4版',94,627,22,{color:muted});
+    text('2026年10月改訂',780,627,22,{color:muted});
+    text(t>=cueStart&&t<cueEnd?'17:14 呼出継続':'17:06 差替',1015,627,22,{color:muted});
    }
    function frame(t){
-    if(t<5){
+    if(t<cuts.exterior){
      opening(t);
-    }else if(t<9){
-     cover('exterior',t-5,.5,.6);lower('ASUNARO','あすなろ産業支援交流施設');
-    }else if(t<14){
-     cover('shop',t-9,.64,.64);lower('4F / 工房2','道具を、つくってみる。');
-    }else if(t<16.7){
-     cover('exhibit',t-14,.5,.46);lower('4F 企画展示','金属3Dプリンターの試験片');
-    }else if(t<19.2){
-     cover('moon',t-16.7,.68,.5);lower('月面居住区 構想図','月に、暮らしを持っていく。');
-    }else if(t<23){
-     cover('reception',t-19.2,.5,.64);lower('4F / 中央受付','見学は、中央受付へ。');
-    }else if(t<27){
+    }else if(t<cuts.shop){
+     cover('exterior',t-cuts.exterior,.5,.6);
+     lower('あすなろ産業支援交流施設','企業とつくり手が集う場所。');
+    }else if(t<cuts.atlas){
+     cover('shop',t-cuts.shop,.64,.64);
+     lower('4F / 工房2','道具を、つくってみる。');
+    }else if(t<cuts.exhibit){
+     cover('atlas',t-cuts.atlas,.5,.53);
+     lower('工房の製本相談','使い続けるために、直す。');
+    }else if(t<cuts.moon){
+     cover('exhibit',t-cuts.exhibit,.5,.46);
+     lower('4階の企画展示','金属3Dプリンターの試験片');
+    }else if(t<cuts.reception){
+     cover('moon',t-cuts.moon,.68,.5);
+     lower('企画展示 ／ 月面居住区の構想図','月に、暮らしを持っていく。');
+    }else if(t<cuts.board){
+     cover('reception',t-cuts.reception,.5,.64);
+     lower('4F / 中央受付','見学は、中央受付へ。');
+    }else if(t<cuts.end){
      visitorBoard(t);
     }else{
      g.fillStyle='#edf1e4';g.fillRect(0,0,W,H);
@@ -125,7 +136,7 @@ const source={
      text('© YU-ZORA',1015,650,22,{color:'#4f6858'});
     }
    }
-   const samples=[2.4,7.2,11.6,15.2,17.8,21.2,24.1,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
+   const samples=[2.4,6.4,9.8,12.9,15.7,18.2,21.2,24.3,24.95,25.7,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
    frame(0);
    const audio=new AudioContext({sampleRate:48000});
    const audioCapture=audio.createMediaStreamDestination();
