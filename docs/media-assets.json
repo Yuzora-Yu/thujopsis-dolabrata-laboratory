@@ -558,17 +558,21 @@
     ],
     "asset": "public/assets/media/f-home-east.webp",
     "prompt": "Wide 2:1 photograph of the same east-side café, with its curved pale oak banquette, tiled counter, concrete ceiling, tall right windows and city view. From the southwest entrance toward the northeast. Architectural depth, timber rhythms and direct late-afternoon light, with a calm dark left edge for the homepage headline.",
-    "review": "4階東側の食堂・交流スペース。窓側とカウンターの位置を現行図および食堂写真と照合。トップと施設紹介映像で採用。"
+    "review": "4階東側の食堂・カフェ。窓側とカウンターの位置を現行図および食堂写真と照合。トップと施設紹介映像で採用。"
   },
   {
     "key": "lunar-exhibit",
-    "path": "docs/source-images/lunar-exhibit.png",
-    "asset": "public/assets/media/lunar-exhibit.webp",
-    "prompt": "A fictional modern Japanese civic innovation hub, 4F EAST interior exchange area exhibition, with the warm-oak accents of a well-designed community building. Wide architectural editorial photograph of a compact moon habitation exhibition after hours, completely empty of people. Three low connected display plinths on one side of the clear hallway, orderly dark muted blue walls and pale oak casework. Scale model of three credible small linked silver habitat modules in the main case, faint warm window lights in model, single moon-map relief panel behind, two smaller technological specimens on a neighboring display table. Simple wall graphics use abstract lines with NO readable writing, subtle spotlights and honest neutral exposure. A real civic exhibit, not a sci-fi movie set or a giant museum. Plausible case construction. Horizontal wide 3:2 image.",
-    "review": "4階交流スペースでの企画展示。模型の展示ケースと、通路の幅を確認。",
+    "path": "docs/source-images/f-lounge-exhibit.png",
+    "asset": "public/assets/media/f-lounge-exhibit.webp",
+    "prompt": "Use case: precise-object-edit. Produce a single 1536×1024 landscape documentary website photograph for a fictional Japanese innovation facility, circa October 2026. Image 1 is the edit target and the only object reference. Preserve the compact three linked silver round modules, their low clear display case and simple pale oak plinth, the neighboring smaller specimen case, and a single horizontal moon relief graphic. Image 2 is a materials reference only: the same floor's reception corridor with warm cream wall paint, gray resilient floor, small rectangular recessed ceiling fixtures, and flat white ceiling. Image 3 is a neighboring lounge materials reference only. Rebuild the surroundings of image 1 to make this the actual public east passage immediately outside the lounge, not the interior of the lounge. The camera is at eye level near the western end of the passage and looks east along a straight ordinary-width enclosed passage, roughly 4.5 m clear from wall to wall before cases. Left side: against a straight cream wall with a simple freestanding muted navy exhibit backboard only where the cases stand. Right side: a continuous modest solid warm off-white corridor wall and grey skirting, no guard rail, no atrium, no windows, no seating, no plants. One ordinary turn to the left at the far end is enough. The floor is continuous matte warm grey and the ceiling is flat warm white with rectangular lights. Leave a real pedestrian lane on the right. Keep the entire large case, its base contact, model and wall panel in frame, with the clear geometric lines of the passage receding behind, well-balanced photo and a little empty floor in foreground. Retain the realistic compact case design and honest, warm civic facility look. Glass has restrained believable reflections, no duplicate cases or double edges, no floating objects, no people, no text, no logos, no watermark, no special effects, no dramatic vignette or cinematic lighting.",
+    "review": "4階ラウンジ南側の通路を西から東へ。左手の展示ケース、右の歩行帯、中央受付と同系色の床と壁、奥の左折部を確認。",
     "year": 2026,
     "mode": "built-in imagegen",
-    "references": []
+    "references": [
+      "69fb575:public/assets/media/lunar-exhibit.webp",
+      "public/assets/media/f-central-reception.webp",
+      "public/assets/lounge.webp"
+    ]
   },
   {
     "key": "g-latch",

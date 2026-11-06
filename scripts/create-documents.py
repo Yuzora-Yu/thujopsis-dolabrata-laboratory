@@ -118,8 +118,13 @@ def create_plan(old=False):
         text(675,444,'中央受付へ',11,'start',route)
         rect(656,408,8,8,corridor,route,1.5)
         text(648,416,'撮影位置',10,'end',route)
-        line(718,395,736,412,route,.9)
-        text(742,417,'ラウンジ入口',10,'start',route)
+        line(719,385,730,385,route,.9)
+        text(734,389,'ラウンジ入口',10,'start',route)
+        # The temporary cases sit against the lounge wall, outside the room.
+        exhibit='#765333'
+        rect(744,402,109,11,'#eee2cf',exhibit,.85)
+        line(798.5,413,798.5,424,exhibit,.9)
+        text(798.5,439,'企画展示（会期中）',12,color=exhibit)
     text(400,226,'通路',9);text(390,351,'通路',9)
     # Column grid, source proportions and dimensions.
     for x in [85,171,257,343,429,515,601,718,820,896,1049]:
@@ -143,7 +148,7 @@ def create_plan(old=False):
         text(1128,640,'2026.11',10,'end');text(1128,663,'あすなろ運営事務局',10,'end')
     # Cardinal direction only; lower floors are intentionally not shown.
     text(1135,488,'N',11);line(1135,499,1135,533,INK,1);polygon([(1135,495),(1131,505),(1139,505)],INK,INK,.5)
-    text(75,692,('A4-01' if old else 'A4-08')+' / ASUNARO INDUSTRY & EXCHANGE',8,'start')
+    text(75,692,('A4-01' if old else 'A4-09')+' / ASUNARO INDUSTRY & EXCHANGE',8,'start')
     return primitives
 
 def write_svg(primitives,target):

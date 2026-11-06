@@ -259,7 +259,8 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .lunar-exhibit-overview .button-row{margin-bottom:0}
 .lunar-exhibit-view{margin:0}
 .lunar-exhibit-view img{width:100%;height:auto;display:block;aspect-ratio:3/2;object-fit:cover}
-.lunar-exhibit-view figcaption{font-size:.78rem;color:var(--muted);margin-top:.55rem}
+.lunar-exhibit-view figcaption{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.15rem 1rem;font-size:.78rem;color:var(--muted);margin-top:.55rem}
+.lunar-exhibit-view figcaption .text-link{font-size:inherit;min-height:24px;display:inline-flex;align-items:center}
 .lunar-exhibit-works{padding-block:clamp(2rem,6vw,5rem);background:#eef1e9}
 .lunar-exhibit-works h2{margin:.4rem 0 1.35rem;font-size:clamp(1.4rem,3vw,2rem)}
 .lunar-work-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(1rem,2.5vw,1.8rem)}

@@ -219,11 +219,28 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.getByRole('button',{name:/MENU/}).click();
   await mobile.locator('#main-navigation').getByRole('link',{name:'施設・サービス',exact:true}).click();
   await mobile.getByRole('heading',{level:1,name:'施設・サービス',exact:true}).waitFor();
+  await mobile.goto(base+'/');
+  await mobile.locator('.program-promo a').click();
+  await mobile.locator('.lunar-exhibit-view img').evaluate(image=>image.decode());
+  await mobile.getByRole('link',{name:'中央受付から展示までの行き方',exact:true}).click();
+  await mobile.waitForURL(base+'/floor-map/#floor-exhibition');
+  const exhibitionDirections=mobile.locator('#floor-exhibition:target');
+  assert.match(await exhibitionDirections.innerText(),/ガラス扉の手前を右に曲がる.*通路の左手に展示ケース/);
+  const stickyBottom=(await mobile.locator('.site-header').boundingBox()).height;
+  assert.ok((await exhibitionDirections.boundingBox()).y>=stickyBottom);
+  await exhibitionDirections.getByRole('link',{name:'企画展示（ラウンジ前）',exact:true}).click();
+  await mobile.getByRole('link',{name:'展示のご案内',exact:true}).click();
+  await mobile.getByRole('link',{name:'4階の展示場所',exact:true}).click();
+  await mobile.waitForURL(base+'/floor-map/#floor-exhibition');
+  await mobile.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
+  await mobile.getByRole('dialog',{name:'フロアマップを拡大'}).getByRole('img',{name:/A4-09.*企画展示/}).waitFor();
+  await mobile.screenshot({path:'.work/qa/exhibit-focus-mobile.png'});
+  await mobile.keyboard.press('Escape');
   await mobile.goto(base+'/floor-map/');
   assert.match(await mobile.locator('.floor-arrival').innerText(),/右へ進んでください。通路を左に曲がると、正面に中央受付/);
   await mobile.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
   const currentPlan=mobile.getByRole('dialog',{name:'フロアマップを拡大'});
-  await currentPlan.getByRole('img',{name:/A4-08.*408・409・413.*撮影位置/}).waitFor();
+  await currentPlan.getByRole('img',{name:/A4-09.*408・409・413.*撮影位置.*企画展示/}).waitFor();
   const currentViewport=currentPlan.getByRole('region',{name:'拡大画像の表示範囲'});
   assert.ok(await currentViewport.evaluate(node=>node.scrollWidth>=node.clientWidth*3&&node.scrollLeft>0));
   await currentPlan.getByRole('button',{name:'全体',exact:true}).click();
@@ -346,6 +363,6 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await lastStartIs('16:00');
   assert.match(await hint.innerText(),/工房受付は17:00まで/);
   assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
-  assert.deepEqual(errors,[]);console.log('Public program passed: sticky menu, staff, hall exhibit, real equipment, metal gallery filter, tenant materials, linked member records, and date-aware reservation hours.');
+  assert.deepEqual(errors,[]);console.log('Public program passed: sticky menu, staff, hall exhibit and 4F exhibition directions, real equipment, metal gallery filter, tenant materials, linked member records, and date-aware reservation hours.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

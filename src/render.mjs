@@ -169,7 +169,7 @@ function hallExhibition(paused){
   <figure>${img('media/f-hall-exhibition.webp','3階ホールの壁と舞台を使った月面居住の企画展示。客席を外し、模型と試作品を展示台に並べている。','',false,[1536,1024])}
    <figcaption>2026年10月31日 ／ 3階ホール特別展示</figcaption></figure>
   <div><p class="eyebrow">EXHIBITION ARCHIVE</p><h2>企画展示の設営例</h2>
-   <p>「月に、暮らしを持っていく。」の特別公開では、客席を外し、広い通路を挟んで模型と試作品を並べました。${paused?'4階での展示の様子も、企画展示の記録でご覧いただけます。':'現在の企画展示は4階の交流スペースでご覧いただけます。'}</p>
+   <p>「月に、暮らしを持っていく。」の特別公開では、客席を外し、広い通路を挟んで模型と試作品を並べました。${paused?'4階での展示の様子も、企画展示の記録でご覧いただけます。':'現在の企画展示は4階のラウンジ前でご覧いただけます。'}</p>
    ${link('/research/lunar-habitat/','月の企画展示を見る')}</div>
  </section>`;
 }
@@ -244,7 +244,7 @@ export function home(ending=''){
  const hero=closing?`<section class="hero closure-hero" aria-label="施設の利用休止">${img('exterior.webp','あすなろの施設外観','hero-image',true)}<div class="hero-shade"></div><div class="hero-content"><p class="hero-en seed-note-line">ASUNARO${seedNoteButton('/')}</p><h1>施設の利用を<br>休止しております。</h1>${link('/news/closure/','施設のお知らせ','hero-link')}</div></section>`:`<section class="facility-hero" aria-labelledby="facility-hero-title">
  <div class="facility-hero-copy wrap"><p class="eyebrow seed-note-line">あすなろ産業支援交流施設${seedNoteButton('/')}</p><h1 id="facility-hero-title">ともに、<br>明日をつくる。</h1><p>人と技術が出会い、次の一歩が生まれる。<br>ものづくりと交流の拠点、あすなろ。</p>
  <div class="button-row">${link('/about/','あすなろについて','button dark')}${link('/visit/','見学のご案内')}</div></div>
- <figure class="facility-hero-photo">${img('media/f-home-east.webp','4階東側の交流スペース。大きな窓から光が差す、木のベンチとテーブルのある内観。','',true,[1760,880])}<figcaption>4階 食堂・カフェ</figcaption></figure>
+ <figure class="facility-hero-photo">${img('media/f-home-east.webp','4階東側の食堂・カフェ。大きな窓から光が差す、木のベンチとテーブルのある内観。','',true,[1760,880])}<figcaption>4階 食堂・カフェ</figcaption></figure>
  </section>`;
  return layout('あすなろ産業支援交流施設',`${hero}
  <div class="status-bar"><span class="status-dot"></span><p>${closing?'現在、施設の一般利用を休止しております。':'4F ラウンジ・会議室・工房　｜　受付時間は施設ごとにご案内しております。'}</p><a href="${closing?'/news/closure/':'/facilities/'}">${closing?'お知らせ':'施設案内'} </a></div>
@@ -282,8 +282,9 @@ const meetingRooms=[
  ['meeting-d','D',10,meetingDEntrance],
 ];
 const floorDestinations=[
- ['workshop','工房1・2','受付に向かって左手に入口が並んでおります。受付に近い方が工房2、エレベーターに近い方が工房1です。','受付に近い方が工房2、中央エレベーターに近い方が工房1です。'],
+ ['workshop','工房1・2','受付に向かって左手に入口が並んでおります。受付に近い方が工房2、エレベーターに近い方が工房1です。','受付に近い方が工房2、中央エレベーターに近い方が工房1です。','/workshop/'],
  ['coworking','コワーキング・ラウンジ','受付に向かって右手前のガラス扉からお入りください。','受付に向かって右手前に、ラウンジのガラス扉があります。'],
+ ['exhibition','企画展示（ラウンジ前）','中央受付で見学をお申し出ください。受付を正面に見て、ラウンジのガラス扉の手前を右に曲がると、通路の左手に展示ケースがございます。','展示ケースはラウンジの南側の通路にありました。',programPath],
  ['meeting','会議室 A・B・C・D',meetingApproach+'左手にA室・B室・C室の入口が順に並んでおります。D室は、'+meetingDEntrance,'会議室前の通路を東へ進むと、左手にA・B・C室が並びます。D室の入口はC室の角を左に曲がった先の左手です。'],
  ['cafe','食堂・カフェ',meetingApproach+'会議室Cを過ぎてそのまま進むと、左手に入口がございます。','会議室Cを過ぎて直進した先の左手に入口があります。'],
  ['presentation','プレゼンテーションホール','ラウンジの南側の通路を東へ進み、ラウンジを過ぎて左に曲がると、右手に入口がございます。','ラウンジの東隣に位置し、入口はホールの南西側です。'],
@@ -322,7 +323,7 @@ function floorGuide(paused){
  return layout('4階フロアマップ',heading('FLOOR GUIDE','4階フロアマップ',paused?'4階の施設と共用設備の配置をご確認いただけます。':'4階にお着きになりましたら、中央受付へお立ち寄りください。')+(paused?facilityUseNotice():'')+`
   <section class="wrap floor-section">
    <div class="map-toolbar" id="floor-plan"><span>4F　産業支援交流フロア</span><a href="/assets/asunaro-4f.pdf" target="_blank" rel="noopener">PDFを開く<span class="sr-only">（別タブで開きます）</span></a></div>
-   ${mapPreview('floor-4f.svg','4階案内図 A4-08。西側の個室番号は、北から402〜407、408・409・413、414〜416。南寄りに工房1・2。中央受付は中央エレベーターから右へ進み、左折。受付手前の撮影位置から右手にラウンジ入口。','フロアマップを拡大',true)}
+   ${mapPreview('floor-4f.svg','4階案内図 A4-09。西側の個室番号は、北から402〜407、408・409・413、414〜416。南寄りに工房1・2。中央受付は中央エレベーターから右へ進み、左折。受付手前の撮影位置から右手にラウンジ入口。企画展示はラウンジの南側の通路。','フロアマップを拡大',true)}
    <div class="map-legend"><span><i class="legend-office"></i>オフィス・工房</span><span><i class="legend-common"></i>交流・会議スペース</span><span><i class="legend-admin"></i>管理・共用設備</span></div>
    <section class="floor-arrival" id="arrival" aria-labelledby="floor-arrival-title">
     <div><p class="eyebrow">4F RECEPTION</p><h2 id="floor-arrival-title">${paused?'図面上の中央受付':'エレベーターから中央受付へ'}</h2>
@@ -331,7 +332,7 @@ function floorGuide(paused){
    </section>
    <section class="floor-destinations" aria-labelledby="floor-destinations-title">
     <h2 id="floor-destinations-title">${paused?'案内図上の位置':'中央受付から各施設へ'}</h2>
-    <dl>${floorDestinations.map(([id,title,directions,position])=>`<div id="floor-${id}"><dt>${link(id==='workshop'?'/workshop/':'/facilities/'+id+'/',title)}</dt><dd>${paused?position:directions}</dd></div>`).join('')}</dl>
+    <dl>${floorDestinations.map(([id,title,directions,position,href])=>`<div id="floor-${id}"><dt>${link(href??('/facilities/'+id+'/'),title)}</dt><dd>${paused?position:directions}</dd></div>`).join('')}</dl>
     <p>${link('#floor-plan','図面へ戻る')}</p>
    </section>
   </section>`);

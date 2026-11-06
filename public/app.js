@@ -220,8 +220,9 @@ if(photoViewport&&photoButtons.length){
   button.addEventListener('click',()=>{
    const source=button.dataset.imageOpen;
    const focusArrival=button.hasAttribute('data-plan-arrival')&&matchMedia('(max-width: 580px)').matches;
+   const focusExhibition=location.hash==='#floor-exhibition';
    zoom=focusArrival?4:1;
-   openingCenter=focusArrival?{x:.57,y:.57}:middle;
+   openingCenter=focusArrival?{x:focusExhibition ? .63 : .57,y:.57}:middle;
    angle=0;
    photo.hidden=true;
    stage.style.removeProperty('width');

@@ -8,7 +8,7 @@ const source={
  shop:'workshop.webp',
  atlas:'media/p-yoshino-atlas.webp',
  metal:'media/g-metal-lattice.webp',
- exhibit:'media/lunar-exhibit.webp',
+ exhibit:'media/f-lounge-exhibit.webp',
  moon:'media/lunar-habitat-concept.webp',
  reception:'media/f-central-reception.webp',
  logo:'logo.png',
@@ -122,7 +122,7 @@ const source={
      lower('工房でつくった展示品','金属3Dプリンターの試験片');
     }else if(t<cuts.moon){
      cover('exhibit',t-cuts.exhibit,.5,.71);
-     lower('4階 交流スペース','月へ持っていくもの。');
+     lower('4階 ラウンジ前','月へ持っていくもの。');
     }else if(t<cuts.reception){
      cover('moon',t-cuts.moon,.68,.5);
      lower('企画展示 ／ 月面居住区の構想図','月に、暮らしを持っていく。');
