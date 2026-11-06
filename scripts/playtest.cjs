@@ -416,7 +416,11 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  await p.locator('#archive').setInputFiles({name:'原本および移送関係資料.zip',mimeType:'application/zip',buffer:damaged});
  await p.getByRole('button',{name:/資料を提出/}).click();
  await p.getByText(/添付資料を確認できませんでした/).waitFor();
- await submit(p,complete.file);assert.match(await body(p),/外部への資料移送/);assert.match(await body(p),/本人の希望を個別に確認し、施設外へ移動/);assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
+ await submit(p,complete.file);
+ assert.deepEqual(await p.locator('.agency-news>section time').allTextContents(),['2026.11.06','2026.11.12','2026.11.20']);
+ assert.match(await body(p),/B1・B-07で確認[\s\S]*ご本人からの連絡/);
+ assert.match(await body(p),/原型継承試験の実施手続きを停止/);
+ assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
  if(process.env.PLAYTEST_LAB==='1'){
   const savedTrial=await p.context().newPage();
   try{
@@ -431,12 +435,25 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  }
  await login(p,institution.id,institution.password);
  await p.goto(auditReceipt);await until(p,'資料を受領しました');
- assert.match(await body(p),/施設外へ移動/);
+ assert.match(await body(p),/自宅に戻ることを希望し、同日、施設を出ました/);
  assert.match(await body(p),/B1・B-04で所在を確認した方にも/);
- assert.match(await body(p),/吉野さんの地図帳については、ご家族に返却先を確認/);
+ assert.match(await body(p),/吉野夏帆さんの青い布表紙の地図帳[\s\S]*ご家族に返却先を確認/);
+ await p.setViewportSize({width:390,height:844});
+ assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+ const references=await p.locator('.agency-news .case-ref').evaluateAll(nodes=>nodes.map(node=>{
+  const range=document.createRange();range.selectNodeContents(node);return range.getClientRects().length;
+ }));
+ assert.deepEqual(references,[1,1,1,1,1]);
+ await p.screenshot({path:'.work/qa/'+mode+'-audit-progress-mobile.png',fullPage:true});
+ await p.setViewportSize({width:1440,height:1000});
+ await p.goto(main('/members/messages/'));
+ await p.getByRole('heading',{name:'一般利用の受付休止',exact:true}).waitFor();
+ await p.getByRole('heading',{name:'原本照会への回答（保存分）',exact:true}).waitFor();
+ assert.equal(await p.getByText(/B-07に今も灯さんがいます/).isVisible(),false);
+ assert.equal(await p.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).count(),0);
  const wrongReceipt=new URL(auditReceipt);wrongReceipt.searchParams.set('case','wrong');
  await p.goto(wrongReceipt.href);await until(p,'記録保全受付');
- assert.doesNotMatch(await body(p),/施設外へ移動/);
+ assert.doesNotMatch(await body(p),/B1・B-07|引渡しの停止と原本の保全/);
  await p.goto(main('/'));await until(p,'施設の利用を');
  assert.match(await p.locator('.visit-band').innerText(),/見学の受付を休止/);
  await p.goto(main('/visit/'));await p.getByRole('heading',{name:'見学の受付を休止しております。'}).waitFor();
@@ -455,8 +472,11 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  for(const ending of ['end1','end2']){
   const branch=await browser.newContext({viewport:{width:1200,height:900},acceptDownloads:true});const q=await branch.newPage();q.on('pageerror',e=>errors.push(e.message));const received=await evidence(q,institution);
   if(ending==='end1'){
-   let mapTab,zoom;
+   let mapTab,zoom,inbox;
    if(mode==='pages'){
+    inbox=await branch.newPage();
+    await inbox.goto(main('/members/messages/'));
+    await inbox.getByRole('heading',{name:'原本照会への回答',exact:true}).waitFor();
     mapTab=await branch.newPage();
     await mapTab.goto(main('/floor-map/'));
     await mapTab.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
@@ -465,7 +485,22 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
    }
    await q.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).click();
    await submit(q,received.file);
-   assert.match(await body(q),/新たな研究支援事業/);
+   const centerReceipt=q.url();
+   assert.match(await body(q),/所在と支援の引継ぎ[\s\S]*新たな研究支援事業/);
+   assert.doesNotMatch(await body(q),/B1・B-07|引渡しの停止と原本の保全/);
+   if(inbox){
+    await inbox.getByRole('heading',{name:'一般利用の受付休止',exact:true}).waitFor();
+    await inbox.getByRole('heading',{name:'原本照会への回答（保存分）',exact:true}).waitFor();
+    assert.equal(await inbox.getByText(/B-07に今も灯さんがいます/).isVisible(),false);
+    await inbox.getByText('11月2日付の回答を表示',{exact:true}).click();
+    await inbox.getByText(/B-07に今も灯さんがいます/).waitFor();
+    assert.equal(await inbox.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).count(),0);
+    await inbox.close();
+   }
+   await q.goto(main('/members/messages/'));
+   await q.getByRole('link',{name:'資料保全センターの受付控え',exact:true}).click();
+   await q.waitForURL(centerReceipt);
+   await q.getByText(/受付番号：DR-2026-1102/).waitFor();
    if(mapTab){
     await mapTab.locator('[data-site-operation="paused"]').waitFor({state:'attached'});
     assert.equal(await zoom.isVisible(),true);
@@ -492,7 +527,10 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
    assert.equal(await q.getByRole('link',{name:'追加資料を提出する',exact:true}).count(),0);
    await q.goto(main('/members/inquiry/?record=CH-2021-003'));
    await q.getByText(/この窓口での受付は終了しました/).waitFor();
-   await q.goto(main('/members/messages/'));await q.getByText('担当者の変更',{exact:true}).waitFor();await q.goto(main('/people/asakura-tsumugi/'));await until(q,'ページが見つかりません');
+   await q.goto(main('/members/messages/'));await q.getByText('担当者の変更',{exact:true}).waitFor();
+   await q.getByRole('heading',{name:'原本照会への回答（保存分）',exact:true}).waitFor();
+   assert.equal(await q.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).count(),0);
+   await q.goto(main('/people/asakura-tsumugi/'));await until(q,'ページが見つかりません');
    await q.goto(main('/facilities/meeting/'));
    await q.getByRole('link',{name:/会議室Dの利用申請/}).waitFor();
    assert.equal(await q.locator('[data-site-operation="paused"]').count(),0);

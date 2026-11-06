@@ -44,7 +44,7 @@ function assignedNoticeList(role){
   </article>`;
  }).join('');
 }
-function memberHome(account){
+function memberHome(account,paused){
  const workshopNote = account.role==='minamo' ? `<section class="member-workshop-note" aria-labelledby="workshop-note-title">
   <p class="eyebrow"><time datetime="2022-07-08">2022.07.08</time> ／ 工房からの共有（保存分）</p>
   <h2 id="workshop-note-title">瀬尾さんの、次の試作</h2>
@@ -55,14 +55,34 @@ function memberHome(account){
   ? '<a href="/members/personal/">個人保存資料 <small>非共有の研究記録</small></a>'
   : '<a href="/members/organization/">運営団体情報 <small>事業主体・法人情報</small></a>';
  return `<h1>会員トップ</h1>${workshopNote}
-  <div class="notice"><h2>施設からのお知らせ</h2><p>会議室・工房の利用申請は、利用日の前営業日までにお手続きをお願いいたします。</p></div>
+  <div class="notice"><h2>施設からのお知らせ</h2><p>${paused?'施設の一般利用を休止しております。会議室・工房の新規利用申請はお受けしておりません。':'会議室・工房の利用申請は、利用日の前営業日までにお手続きをお願いいたします。'}</p>${paused?'<a class="text-link" href="/news/closure/">施設のお知らせ</a>':''}</div>
   <div class="member-summary">
-   <a href="/members/reservations/">利用申請・予約 <small>会議室・工房など</small></a>
+   <a href="/members/reservations/">利用申請・予約 <small>${paused?'受付休止中':'会議室・工房など'}</small></a>
    <a href="/members/messages/">施設からの連絡 <small>共同事業・事務連絡</small></a>
    <a href="/members/projects/">共同事業・連絡記録 <small>打ち合わせ・資料の受け渡し</small></a>
    <a href="/members/records/">研究資料照会 <small>共同事業に関する登録資料</small></a>
    ${lastLink}
   </div>`;
+}
+function originalInquiryReply({caseId,origins,caseState}){
+ const {ending}=caseState;
+ const answer=`<div class="message-body">このアカウントを現在利用されている方へ。
+
+原本の照会を受け取りました。B-07に今も灯さんがいます。型紙を取りに行くたび、道具と一緒に帰るのだと書かれた紙を渡されます。
+
+こちらでは外部への通信が止められています。施設サイトと旧資料の更新だけが残っています。廃止前のページへ参照を戻したのは私です。今度の引渡しで、この更新権限も失います。
+
+保全した原本をまとめました。手を加えず、ZIP全体を資料保全受付へお渡しください。申出者の情報は同梱の書面にあります。提出後に発行される受付番号は、お手元に控えておいてください。</div>
+  <p data-inquiry-record="CH-2021-003" hidden>最後の手控えにあった、事業を止めてもいいという行も読みました。原文のまま残しています。</p>
+  <p data-inquiry-record="FAB-2026-018" hidden>B-07の交換票から照会されたのですね。部品を届ける時に受け取った本人の紙も、原本に含めました。</p>
+  <a class="download-card" href="/members/download/hozen.zip"><strong>保全資料_20261102.zip ↓</strong><small>申出書・実験記録・継承資料</small></a>`;
+ const submitLink=`<div class="submission-links"><a class="text-link" href="${esc(origins.hozen)}/receive/?case=${esc(caseId)}">資料保全・匿名通報受付</a></div>`;
+ const receivedLink=`<p><a class="text-link" href="${esc(origins.hozen)}/received/?case=${esc(caseId)}">資料保全センターの受付控え</a></p>`;
+ return `<article class="message" data-inquiry-reply><time datetime="2026-11-02">2026.11.02</time> <span class="member-meta">／ 工房保全担当</span>
+  <h2>原本照会への回答${ending?'（保存分）':''}</h2>
+  ${ending?`<details class="message-copy"><summary>11月2日付の回答を表示</summary>${answer}</details>`:answer+submitLink}
+  ${ending==='end1'?receivedLink:''}
+ </article>`;
 }
 export function memberLayout(title,body,{account=null,csrf='',active='',caseId='',record=null,caseState={}}={}){
  const items=[['/members/','会員トップ','home'],['/members/reservations/','利用申請・予約','reservations'],['/members/records/','研究資料照会','records'],['/members/activity/','資料の閲覧履歴','activity'],['/members/messages/','施設からの連絡','messages'],['/members/projects/','共同事業・連絡記録','projects'],['/members/organization/','運営団体情報','organization'],['/members/contact/','運営事務局へのお問い合わせ','contact']];
@@ -87,7 +107,7 @@ function renderDocument(d,ctx){
 
 function renderMemberPage(path,ctx){
  const {account,csrf,caseState,query,origins,caseId}=ctx;
- if(path==='/members/')return memberLayout('会員トップ',memberHome(account),{...ctx,active:'home'});
+ if(path==='/members/')return memberLayout('会員トップ',memberHome(account,generalUsePaused(caseState.ending)),{...ctx,active:'home'});
  if(path==='/members/activity/')return memberLayout('資料の閲覧履歴',`<h1>資料の閲覧履歴</h1><p>この照会端末で表示した資料です。登録名義ごとに表示しております。</p>${caseState.ending==='end3'?'<div class="notice"><h2>本件の確認は終了しております。</h2><p>移送先を含む事業の停止に伴い、外部協力者への継続照会も終了しました。照会資料の控えは引き続き参照いただけます。</p></div>':''}<div data-reading-ledger="current"></div>${account.role==='institution'&&caseState.ending!=='end3'?'<section class="reading-notification" data-after-reading="CH-2021-003 OPS-2026-084" hidden><p class="member-meta">2026.11.02／運営事務局</p><h2>照会名義の確認</h2><p>同一照会端末から、配布先の異なる資料への参照を確認しております。個々の登録における照会を、一件の確認として取りまとめます。</p><p>確認中のため、本件の終了処理は保留しております。原本の受領担当へ照会を引き継ぎます。</p><p class="member-meta" data-reading-reference></p></section>':''}`,{...ctx,active:'activity'});
  if(path==='/members/projects/')return memberLayout('共同事業・連絡記録',`<h1>共同事業・連絡記録</h1><p>参加事業の打ち合わせと、資料の受け渡しに関する記録です。</p><div class="project-list">${projects.filter(p=>p.roles.includes(account.role)).map(p=>`<a href="/members/projects/${p.slug}/"><small>${p.period}</small><h2>${esc(p.title)}</h2><p>${esc(p.members)}</p></a>`).join('')||'<p class="empty-state">参照できる共同事業はありません。</p>'}</div>`,{...ctx,active:'projects'});
  const project=projects.find(p=>path===`/members/projects/${p.slug}/`&&p.roles.includes(account.role));
@@ -108,9 +128,10 @@ function renderMemberPage(path,ctx){
  if(docMatch){const d=documents.find(d=>d.id===docMatch[1]&&d.roles.includes(account.role));return d?renderDocument(d,ctx):null;}
  if(path==='/members/messages/'){
   const assigned=assignedNoticeList(account.role);
-  const privateMessage=account.role==='institution'&&caseState.contact?`<article class="message"><time>2026.11.02 / 工房保全担当</time><h2>原本照会への回答</h2><div class="message-body">このアカウントを現在利用されている方へ。\n\n原本の照会を受け取りました。B-07に今も灯さんがいます。型紙を取りに行くたび、道具と一緒に帰るのだと書かれた紙を渡されます。\n\nこちらでは外部への通信が止められています。施設サイトと旧資料の更新だけが残っています。廃止前のページへ参照を戻したのは私です。今度の引渡しで、この更新権限も失います。\n\n保全した原本をまとめました。手を加えず、ZIP全体を資料保全受付へお渡しください。申出者の情報は同梱の書面にあります。提出後に発行される受付番号は、お手元に控えておいてください。</div><p data-inquiry-record="CH-2021-003" hidden>最後の手控えにあった、事業を止めてもいいという行も読みました。原文のまま残しています。</p><p data-inquiry-record="FAB-2026-018" hidden>B-07の交換票から照会されたのですね。部品を届ける時に受け取った本人の紙も、原本に含めました。</p><a class="download-card" href="/members/download/hozen.zip"><strong>保全資料_20261102.zip ↓</strong><small>申出書・実験記録・継承資料</small></a><div class="submission-links"><a class="text-link" href="${esc(origins.hozen)}/receive/?case=${caseId}">資料保全・匿名通報受付 </a></div></article>`:'';
+  const privateMessage=account.role==='institution'&&caseState.contact?originalInquiryReply(ctx):'';
+  const pausedNotice=generalUsePaused(caseState.ending)?'<article class="message"><time datetime="2026-11-06">2026.11.06</time> <span class="member-meta">／ 運営事務局</span><h2>一般利用の受付休止</h2><p>会議室・工房の新規利用申請の受付を休止しております。</p><p><a class="text-link" href="/news/closure/">施設のお知らせ</a></p></article>':'';
   const changed=caseState.ending==='end2'?'<article class="message"><time>2026.11.06 / 運営事務局</time><h2>担当者の変更</h2><p>工房保全担当への照会は事務局へ移管いたしました。旧担当者の個人登録は終了しました。</p></article>':'';
-  return memberLayout('施設からの連絡',`<h1>施設からの連絡</h1>${changed}${privateMessage}<article class="message"><time datetime="2026-10-01">2026.10.01 / 運営事務局</time><h2>4階共用部の自動扉点検について</h2><p>10月19日（月）の9時から11時まで、4階共用部の自動扉を順次点検いたします。作業中は職員が通行をご案内いたします。会議室とラウンジは通常どおりご利用いただけます。</p></article>${assigned}`,{...ctx,active:'messages'});
+  return memberLayout('施設からの連絡',`<h1>施設からの連絡</h1>${changed}${pausedNotice}${privateMessage}<article class="message"><time datetime="2026-10-01">2026.10.01 / 運営事務局</time><h2>4階共用部の自動扉点検について</h2><p>10月19日（月）の9時から11時まで、4階共用部の自動扉を順次点検いたします。作業中は職員が通行をご案内いたします。会議室とラウンジは通常どおりご利用いただけます。</p></article>${assigned}`,{...ctx,active:'messages'});
  }
  if(path==='/members/inquiry/'){
   if(inquiryClosed(caseState.ending)){
@@ -146,18 +167,51 @@ function renderMemberPage(path,ctx){
  return null;
 }
 
+const continuityUpdates=`
+ <section>
+  <time datetime="2026-11-06">2026.11.06</time><h2>関係施設の利用休止について</h2>
+  <p>あすなろ産業支援交流施設は、調査のため一般利用を休止しました。当センターは、対象者の所在と支援の引継ぎについて施設運営事務局へ照会しております。</p>
+  <p>受領した技術記録を将来に継承するため、新たな研究支援事業の準備を進めています。</p>
+ </section>`;
+
+const independentUpdates=`
+ <section>
+  <time datetime="2026-11-06">2026.11.06</time><h2>一般利用の休止と所在確認</h2>
+  <p>あすなろ産業支援交流施設は一般利用を休止しました。当室の担当者が地下1階に入り、当直引継ぎに記載された3区画でご本人を確認しました。</p>
+  <p><span class="case-ref">P-034</span>・瀬尾灯さんを<span class="case-ref">B1・B-07</span>で確認しました。瀬尾さんは自宅に戻ることを希望し、同日、施設を出ました。<span class="case-ref">B1・B-06</span>の青井真澄さんと、<span class="case-ref">B1・B-04</span>で所在を確認した方にも、それぞれ今後の行き先を伺い、施設外で保護しました。</p>
+ </section>
+ <section>
+  <time datetime="2026-11-12">2026.11.12</time><h2>引渡しの停止と原本の保全</h2>
+  <p>災害技術記録保全センターへの引渡しと、原型継承試験の実施手続きを停止しました。引渡し一覧にあった装置図面と評価モデルは、当室で調査資料として保全しています。</p>
+  <p>募集時の説明票と日次検査の薬剤記録、9月11日の死亡事案と救護要請を照合しています。三枝律氏が送れなかった申出についても原本を保全し、ご遺族への説明を進めています。当直記録にある<span class="case-ref">P-032</span>の所在は、引き続き照会しています。</p>
+  <p>工房で預かっていた吉野夏帆さんの青い布表紙の地図帳は、別包みのまま受領しました。ご家族に返却先を確認しております。</p>
+ </section>
+ <section>
+  <time datetime="2026-11-20">2026.11.20</time><h2>ご本人からの連絡</h2>
+  <p>ご本人のご了承を得て、返却資料の受領連絡を掲載します。</p>
+  <blockquote>
+   <p>道具と、母の料理帳の写しを返していただきました。家に帰って最初にしたのは、母とお昼ご飯を作ることでした。料理帳を開く前に、母が「まず一緒に食べよう」と言いました。</p>
+   <p>三枝さんの紙袋に、途中の型紙が入っていました。完成を見せることはできません。でも、いつも空けてくれていた机の場所を、覚えています。</p>
+   <p>本の道具は、まだ途中です。今度は、母と確かめながら続きを作ります。</p>
+   <footer>瀬尾 灯</footer>
+  </blockquote>
+ </section>`;
+
 function agencyPageContent(kind,path,{caseId='',error='',receipt='',additional=false,consoleTrial=null,origins}){
  const audit=kind==='audit',name=audit?'東都研究監査室':'災害技術記録保全センター',base=audit?origins.audit:origins.hozen;
  let content='';
  const receiptNumber=`<div class="receipt-number">受付番号：${audit?'EA':'DR'}-2026-1102</div>`;
  if(receipt==='loading')content='<p role="status">受付情報を確認しています。</p>';
  else if(receipt==='pending'||receipt==='transferred'){
-  content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1>${receiptNumber}<p>対象者の所在と、施設内の事業について確認を進めます。現時点では、外部への移送指示と、その対象となる原本を照合できていません。</p>
+  content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1>${receiptNumber}<p>${receipt==='transferred'?'当室でお預かりした資料の受付控えです。':'対象者の所在と、施設内の事業について確認を進めます。現時点では、外部への移送指示と、その対象となる原本を照合できていません。'}</p>
    <div class="agency-additional">${receipt==='transferred'
     ?'<h2>追加受付は終了しました</h2><p>この照会に関する記録は、施設運営側の管理へ移管されました。</p>'
     :`<h2>追加資料の受け付け</h2><p>移送先、原本の採否、事業の承継に関する記録がございましたら、同じ受付番号へご提出ください。</p><a class="text-link" href="${esc(base)}/receive/?case=${esc(caseId)}">追加資料を提出する</a>`}</div>`;
  }
- else if(receipt==='received')content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1><p>${audit?'関係する資料を保全し、対象者の所在確認と、施設内外の事業について調査を進めます。':'ご提出いただいた資料を保全し、関係先への照会と事実確認を進めます。'}</p>${receiptNumber}<div class="agency-news"><p class="eyebrow">受領後の経過</p><h2>2026.11.06　関係施設の利用休止について</h2><p>あすなろ産業支援交流施設は、調査のため一般利用を休止しました。対象者の保護と記録の保全が進められています。</p>${audit?'<p>外部への資料移送と、別事業として計画されていた試験も調査対象に含まれています。</p><p>対象者P-034・瀬尾灯さんの所在をB1・B-07で確認しました。本人の希望を個別に確認し、施設外へ移動されました。研究への参加や基準回答への一致を、支援の条件にはしていません。未送信だった三枝律氏の申出も保全し、ご遺族への説明と調査を進めています。</p><p>無償滞在の募集条件、日次検査に伴う未告知の投薬、群内の殺傷と救護要請への対応についても原本を照合しております。</p><p>青井真澄さんを含む生存者の保護と、吉野夏帆さんら亡くなられた方々の記録・私物の返却を進めています。工房でお預かりしていた吉野さんの地図帳については、ご家族に返却先を確認しております。B1・B-04で所在を確認した方にも今後の行き先を個別に伺い、施設外で保護しました。</p><h2>2026.11.20　ご本人からの連絡</h2><p>ご本人のご了承を得て、返却資料の受領連絡を掲載します。</p><blockquote>道具と、母の料理帳の写しを返していただきました。家に帰って最初に作ったのは、自助具ではなく、お昼ご飯でした。母は本より先に「まず一緒に食べよう」と言いました。<br><br>三枝さんの紙袋に、途中の型紙が入っていました。完成を見せることはできません。でも、いつも空けてくれていた机の場所を、覚えています。<br><br>本の道具は、まだ途中です。今度は、母と確かめながら続きを作ります。<br>瀬尾 灯</blockquote>':'<p>当センターは、受領した技術記録を将来に継承するため、新たな研究支援事業の準備を進めています。</p>'}</div>${audit?labThanks(consoleTrial):''}<p><a class="text-link" href="${esc(origins.main)}/news/closure/">施設のお知らせ</a></p>`;
+ else if(receipt==='received')content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1>
+  <p>${audit?'ご提出いただいた原本を保全しました。受領後に確認できた事項を、日付順に掲載します。':'ご提出いただいた資料を保全し、関係先への照会と事実確認を進めます。'}</p>${receiptNumber}
+  <div class="agency-news"><p class="eyebrow">受領後の経過</p>${audit?independentUpdates:continuityUpdates}</div>
+  ${audit?labThanks(consoleTrial):''}<p><a class="text-link" href="${esc(origins.main)}/news/closure/">施設のお知らせ</a></p>`;
  else content=`<p class="eyebrow">${audit?'INDEPENDENT REVIEW':'RECORDS & CONTINUITY'}</p><h1>${audit?'記録保全受付':'資料保全・匿名通報受付'}</h1><p>${audit?'研究事業に関する記録の提供を受け付けています。現運営から独立した立場で、原本と資料の移送先を含めて確認します。':'研究や施設運営に関する資料の提供を受け付けています。お名前の記入は任意です。'}</p>${additional?receiptNumber+'<p>以下の資料をこの受付番号に追加します。</p>':''}${error?`<p class="form-error">${esc(error)}</p>`:''}<form class="form-stack" method="post" action="/receive/" enctype="multipart/form-data"><input type="hidden" name="case" value="${esc(caseId)}"><label for="title">件名</label><input id="title" name="title" required maxlength="150"><label for="statement">内容</label><textarea id="statement" name="statement" required maxlength="5000"></textarea><label for="archive">資料</label><input type="file" id="archive" name="archive" accept=".zip" required><label for="sender">お名前（任意）</label><input id="sender" name="sender" maxlength="100" value="${audit&&consoleTrial?.completedAt?esc(consoleTrial.handle):''}"><button class="button" type="submit">資料を提出する <span>→</span></button></form>`;
  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${name} | 記録保全受付</title><link rel="stylesheet" href="/styles.css">${audit&&receipt==='received'?'<script type="module" src="/lab-console.js"></script>':''}</head><body class="agency-body"><header class="agency-header"><a href="${base}/?case=${esc(caseId)}">${name}</a><span>${audit?'INDEPENDENT RESEARCH REVIEW':'DISASTER TECHNOLOGY RECORDS'}</span></header><main class="agency-main">${content}</main><footer class="agency-footer"><p>${audit?'調査担当：倉橋 真紀乃':'一般社団法人 災害技術記録保全センター／代表理事 榎本 航策'}</p><p>© ${audit?'TOTO RESEARCH REVIEW':'DISASTER TECHNOLOGY RECORDS CENTER'}</p></footer>${fictionFooter()}</body></html>`;
 }

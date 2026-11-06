@@ -74,16 +74,38 @@ async function pausedGuides(c){
   if(route==='/floor-map/')assert.match(text,/floor-4f\.svg[\s\S]*案内図上の位置/);
   if(route==='/news/20120416/')assert.match(text,/floor-4f-2012\.svg/);
  }
+ const home=(await c.get('/members/')).text;
+ assert.match(home,/会議室・工房の新規利用申請はお受けしておりません/);
+ assert.doesNotMatch(home,/利用日の前営業日まで/);
  const reservations=(await c.get('/members/reservations/?space=meeting-d')).text;
  assert.match(reservations,/受付を休止しております。/);
  assert.doesNotMatch(reservations,/data-reservation-form/);
 }
 
+async function savedInquiryReply(c){
+ const messages=(await c.get('/members/messages/')).text;
+ assert.match(messages,/原本照会への回答（保存分）[\s\S]*<details class="message-copy"><summary>11月2日付の回答を表示/);
+ assert.match(messages,/B-07に今も灯さんがいます/);
+ assert.doesNotMatch(messages,/class="submission-links"/);
+ return messages;
+}
+
 test('anonymous reporting leads to closure and continuity notice',async()=>{
- const c=client();const {caseId,zip}=await evidence(c);const r=await submitAgency('hozen',caseId,zip);assert.equal(r.status,303);const receipt=await fetch(`http://127.0.0.1:${port+1}${r.headers.get('location')}`);assert.match(await receipt.text(),/新たな研究支援事業/);assert.match((await c.get('/')).text,/施設の利用休止/);await pausedGuides(c);
+ const c=client();const {caseId,zip}=await evidence(c);
+ const r=await submitAgency('hozen',caseId,zip);assert.equal(r.status,303);
+ const receiptUrl=new URL(r.headers.get('location'),`http://127.0.0.1:${port+1}`).href;
+ const receipt=await (await fetch(receiptUrl)).text();
+ assert.match(receipt,/所在と支援の引継ぎについて施設運営事務局へ照会[\s\S]*新たな研究支援事業/);
+ assert.doesNotMatch(receipt,/B1・B-07|引渡しの停止と原本の保全/);
+ const messages=await savedInquiryReply(c);
+ assert.ok(messages.includes(receiptUrl));
+ assert.match(messages,/一般利用の受付休止/);
+ assert.match((await c.get('/')).text,/施設の利用休止/);await pausedGuides(c);
 });
 test('submission to facility office identifies the informant',async()=>{
- const c=client();const {zip}=await evidence(c);const r=await c.upload('/members/contact/',{subject:'資料の確認',message:'添付資料をご確認ください。'},'資料.zip',zip);assert.equal(r.status,303);assert.equal((await c.get('/people/asakura-tsumugi/')).response.status,404);assert.match((await c.get('/members/messages/')).text,/個人登録は終了/);
+ const c=client();const {zip}=await evidence(c);const r=await c.upload('/members/contact/',{subject:'資料の確認',message:'添付資料をご確認ください。'},'資料.zip',zip);assert.equal(r.status,303);assert.equal((await c.get('/people/asakura-tsumugi/')).response.status,404);
+ const messages=await savedInquiryReply(c);
+ assert.match(messages,/個人登録は終了/);assert.doesNotMatch(messages,/資料保全センターの受付控え|一般利用の受付休止/);
  const guide=(await c.get('/facilities/meeting/')).text;
  assert.match(guide,/OPEN　平日[\s\S]*space=meeting-d/);
  assert.doesNotMatch(guide,/facility-use-pause/);
@@ -93,7 +115,18 @@ test('name search, personal account and independent submission reveal and stop s
  const c=client();const {caseId}=await evidence(c);assert.match((await c.get('/search/?q='+encodeURIComponent('朝倉 紬乃'))).text,/asakura-tsumugi/);assert.match((await c.get('/people/asakura-tsumugi/')).text,/1993年6月18日/);
  await c.login('20120901P0083','19930618');assert.match((await c.get('/members/personal/')).text,/原型継承試験/);assert.match((await c.get('/members/records/AS-2024-002/')).text,/病気の時の言葉/);
  const doc=(await c.get('/members/records/EA-2026-009/')).text;assert.match(doc,/東都研究監査室/);assert.match(doc,/4319/);
- const r=await c.binary('/members/download/complete.zip');const zip=Buffer.from(await r.arrayBuffer());assert.ok(zip.includes(Buffer.from('継承計画.json')));assert.equal((await submitAgency('audit',caseId,zip)).status,303);assert.match((await c.get('/news/closure/')).text,/外部への資料移管/);await pausedGuides(c);
+ const r=await c.binary('/members/download/complete.zip');const zip=Buffer.from(await r.arrayBuffer());assert.ok(zip.includes(Buffer.from('継承計画.json')));
+ const submitted=await submitAgency('audit',caseId,zip);assert.equal(submitted.status,303);
+ const receipt=await (await fetch(new URL(submitted.headers.get('location'),`http://127.0.0.1:${port+2}`))).text();
+ assert.match(receipt,/2026\.11\.06[\s\S]*B1・B-07[\s\S]*同日、施設を出ました[\s\S]*2026\.11\.12[\s\S]*原型継承試験の実施手続きを停止[\s\S]*P-032<\/span>の所在は、引き続き照会[\s\S]*2026\.11\.20[\s\S]*母と確かめながら続きを作ります/);
+ const publicNotice=(await c.get('/news/closure/')).text;
+ assert.match(publicNotice,/外部への資料移管/);
+ assert.doesNotMatch(publicNotice,/瀬尾灯|吉野夏帆|B1・B-07/);
+ await c.login('201204010000','20100615');
+ const messages=await savedInquiryReply(c);
+ assert.match(messages,/一般利用の受付休止/);assert.doesNotMatch(messages,/資料保全センターの受付控え/);
+ assert.equal((await c.binary('/members/download/hozen.zip')).status,200);
+ await pausedGuides(c);
 });
 test('state changes require CSRF verification',async()=>{const r=await fetch(base+'/members/login/',{method:'POST',body:new URLSearchParams({id:'201204010017',password:'20080519'})});assert.equal(r.status,403);});
 
@@ -252,6 +285,7 @@ test('office transfer preserves the audit receipt and ends additional submission
  await c.upload('/members/contact/',{subject:'資料の確認',message:'添付資料をご確認ください。'},'資料.zip',zip);
  const receipt=await fetch(app.origins.audit+'/receive/?case='+caseId).then(r=>r.text());
  assert.match(receipt,/EA-2026-1102[\s\S]*追加受付は終了しました/);
+ assert.doesNotMatch(receipt,/所在と、施設内の事業について確認を進めます/);
  assert.doesNotMatch(receipt,/追加資料を提出する|name="archive"/);
  assert.equal((await submitAgency('audit',caseId,zip)).status,409);
 });

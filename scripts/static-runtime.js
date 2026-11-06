@@ -11,7 +11,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 function stored(key,fallback=null){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch{return fallback;}}
 let state=stored(storageKey);if(!state){state={id:Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,'0')).join(''),contact:false,ending:'',truth:false};localStorage.setItem(storageKey,JSON.stringify(state));}
 function save(){localStorage.setItem(storageKey,JSON.stringify(state));}
-let site,bundle,roomBundle,rendering=false,refreshPublicAfterBoot=false;
+let site,bundle,roomBundle,rendering=false,refreshOutcomeAfterBoot=false;
 async function loadSiteIndex(){
  const response = await fetch(base+'/assets/site-index.json',{cache:'no-store'});
  if (!response.ok) throw new Error('Site index');
@@ -159,6 +159,7 @@ async function boot({restoreFragment=false}={}){
    const documentMatch=current.path.match(/^\/members\/records\/([A-Z0-9-]+)\/$/);
    if(documentMatch){display(account.docs.find(d=>d.id===documentMatch[1])?.html||site.notFound);return;}
    const html=account.stages[stage()]?.[current.path]||account.pages[current.path];display(html||site.notFound);
+   if(current.path==='/members/messages/'&&!state.contact)document.querySelector('[data-inquiry-reply]')?.remove();
    if(current.path==='/members/records/')await documentResults(account,normalizeDocumentId(params.get('document_id')||''));
    if(current.path==='/members/inquiry/'&&!inquiryClosed(state.ending)){const id=normalizeDocumentId(params.get('record')||'');document.querySelector('#record').value=account.docs.some(d=>d.id===id&&d.inquiry)?id:'';}
    if(current.path==='/members/reservations/'){
@@ -225,9 +226,9 @@ async function boot({restoreFragment=false}={}){
  }catch{showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');}
  finally{
   rendering=false;
-  if(refreshPublicAfterBoot){
-   refreshPublicAfterBoot=false;
-   refreshPublicOutcome();
+  if(refreshOutcomeAfterBoot){
+   refreshOutcomeAfterBoot=false;
+   refreshOutcomeViews();
   }
  }
 }
@@ -376,14 +377,16 @@ document.addEventListener('click',async event=>{
   anchor.removeAttribute('aria-busy');
  }
 });
-function refreshPublicOutcome(){
- if(document.body.dataset.publicOutcome!=='true')return;
+function refreshOutcomeViews(){
+ const {kind,path}=route();
+ const memberUpdates=kind==='main'&&['/members/','/members/messages/'].includes(path);
+ if(document.body.dataset.publicOutcome!=='true'&&!memberUpdates)return;
  const dialog=document.querySelector('dialog[open]');
  if(dialog){
-  dialog.addEventListener('close',refreshPublicOutcome,{once:true});
+  dialog.addEventListener('close',refreshOutcomeViews,{once:true});
   return;
  }
- if(rendering)refreshPublicAfterBoot=true;
+ if(rendering)refreshOutcomeAfterBoot=true;
  else void boot();
 }
 window.addEventListener('storage',event=>{
@@ -392,7 +395,7 @@ window.addEventListener('storage',event=>{
  state=stored(storageKey,state);
  if(previousEnding!==state.ending){
   reflectPublicOperation();
-  refreshPublicOutcome();
+  refreshOutcomeViews();
  }
  if(!document.querySelector('[data-lab-root]')&&document.querySelector('[data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({trial:trialView(state.consoleTrial),ending:state.ending}));
 });
