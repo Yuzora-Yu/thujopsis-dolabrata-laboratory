@@ -7,7 +7,8 @@ const source={
  exterior:'exterior.webp',
  shop:'workshop.webp',
  atlas:'media/p-yoshino-atlas.webp',
- exhibit:'media/g-metal-lattice.webp',
+ metal:'media/g-metal-lattice.webp',
+ exhibit:'media/lunar-exhibit.webp',
  moon:'media/lunar-habitat-concept.webp',
  reception:'media/f-central-reception.webp',
  logo:'logo.png',
@@ -26,7 +27,7 @@ const source={
   const result=await page.evaluate(async data=>{
    const W=1280,H=720,canvas=document.querySelector('canvas'),g=canvas.getContext('2d',{alpha:false});
    const duration=30,cueStart=24.55,cueEnd=25.32;
-   const cuts={exterior:4.6,shop:8.2,atlas:11.5,exhibit:14.5,moon:17,reception:19.5,board:23,end:27};
+   const cuts={exterior:4.1,shop:7,atlas:10.15,metal:13.15,exhibit:15.45,moon:17.9,reception:20.1,board:23,end:27};
    const images=Object.fromEntries(await Promise.all(Object.entries(data).map(async([key,url])=>{const img=new Image();img.src=url;await img.decode();return [key,img];})));
    const type=['video/mp4;codecs=avc1.42001f,mp4a.40.2','video/webm;codecs=vp9,opus'].find(x=>MediaRecorder.isTypeSupported(x));
    if(!type)throw new Error('No local video encoder available');
@@ -51,15 +52,15 @@ const source={
        +.023*Math.sin(tau*237*time)+.011*Math.sin(tau*359*time);
      const outside=windowGain(time,cuts.exterior,cuts.shop,.36);
      const atmosphere=(1-outside)*(.09*air+vent)+outside*.17*air;
-     const tone=(windowGain(time,.4,4.75,1.15)+windowGain(time,cuts.exhibit,cuts.reception-.4,.7)+windowGain(time,27.1,29.85,.85))
+     const tone=(windowGain(time,.4,cuts.exterior,1.15)+windowGain(time,cuts.metal,cuts.reception-.4,.7)+windowGain(time,cuts.end+.1,29.85,.85))
        *(.018*Math.sin(tau*261.63*time)+.011*Math.sin(tau*392*time));
      const handover=1-.72*windowGain(time,cueStart,cueEnd,.075);
      samples[i]=(atmosphere+tone)*handover*windowGain(time,0,duration,.42);
     }
     return buffer;
    }
-   function text(value,x,y,size,{color='#f4f5ee',weight=600}={}){
-    g.font=weight+' '+size+'px "Yu Gothic",Meiryo,sans-serif';g.fillStyle=color;g.textBaseline='alphabetic';g.fillText(value,x,y);
+   function text(value,x,y,size,{color='#f4f5ee',weight=600,align='left'}={}){
+    g.font=weight+' '+size+'px "Yu Gothic",Meiryo,sans-serif';g.fillStyle=color;g.textBaseline='alphabetic';g.textAlign=align;g.fillText(value,x,y);
    }
    function cover(key,t=0,x=.5,y=.5){
     const img=images[key],scale=Math.max(W/img.width,H/img.height)*(1+Math.min(t,5)*.005);
@@ -100,9 +101,9 @@ const source={
     text('4F',914,331,125,{color:'#3a5949'});
     text('中央受付',925,403,31,{color:ink});
     g.beginPath();g.moveTo(92,585);g.lineTo(1186,585);g.stroke();
-    text('見学案内 第4版',94,627,22,{color:muted});
-    text('2026年10月改訂',780,627,22,{color:muted});
-    text(t>=cueStart&&t<cueEnd?'17:14 呼出継続':'17:06 差替',1015,627,22,{color:muted});
+    text('見学案内 第4版',94,630,29,{color:muted});
+    text('2026年10月改訂',737,630,29,{color:muted});
+    text(t>=cueStart&&t<cueEnd?'17:14 呼出継続':'17:06 差替',1186,630,29,{color:muted,align:'right'});
    }
    function frame(t){
     if(t<cuts.exterior){
@@ -113,12 +114,15 @@ const source={
     }else if(t<cuts.atlas){
      cover('shop',t-cuts.shop,.64,.64);
      lower('4F / 工房2','道具を、つくってみる。');
-    }else if(t<cuts.exhibit){
+    }else if(t<cuts.metal){
      cover('atlas',t-cuts.atlas,.5,.53);
      lower('工房の製本相談','使い続けるために、直す。');
+    }else if(t<cuts.exhibit){
+     cover('metal',t-cuts.metal,.5,.46);
+     lower('工房でつくった展示品','金属3Dプリンターの試験片');
     }else if(t<cuts.moon){
-     cover('exhibit',t-cuts.exhibit,.5,.46);
-     lower('4階の企画展示','金属3Dプリンターの試験片');
+     cover('exhibit',t-cuts.exhibit,.5,.71);
+     lower('4階 交流スペース','月へ持っていくもの。');
     }else if(t<cuts.reception){
      cover('moon',t-cuts.moon,.68,.5);
      lower('企画展示 ／ 月面居住区の構想図','月に、暮らしを持っていく。');
@@ -136,7 +140,7 @@ const source={
      text('© YU-ZORA',1015,650,22,{color:'#4f6858'});
     }
    }
-   const samples=[2.4,6.4,9.8,12.9,15.7,18.2,21.2,24.3,24.95,25.7,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
+   const samples=[2.4,5.7,8.5,11.7,14.3,16.7,19,21.6,24.3,24.95,25.7,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
    frame(0);
    const audio=new AudioContext({sampleRate:48000});
    const audioCapture=audio.createMediaStreamDestination();
