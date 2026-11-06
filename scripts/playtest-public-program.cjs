@@ -166,19 +166,37 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.locator('#main-navigation').getByRole('link',{name:'施設・サービス',exact:true}).click();
   await mobile.getByRole('heading',{level:1,name:'施設・サービス',exact:true}).waitFor();
   await mobile.goto(base+'/floor-map/');
+  assert.match(await mobile.locator('.floor-arrival').innerText(),/右へ進み、左手の中央受付へ/);
   await mobile.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
-  await mobile.locator('.image-dialog[open] img[src$="/floor-4f.svg"]').evaluate(image=>image.decode());
+  const currentPlan=mobile.getByRole('dialog',{name:'フロアマップを拡大'});
+  await currentPlan.getByRole('img',{name:/A4-07.*408・409・413/}).waitFor();
   await mobile.keyboard.press('Escape');
   await mobile.goto(base+'/search/?q=A4-01');
   await mobile.getByRole('link',{name:/開設時の区画配置について/}).click();
   await mobile.getByRole('button',{name:'開設時の配置図を拡大',exact:true}).click();
-  await mobile.waitForFunction(()=>parseFloat(document.querySelector('.image-dialog[open] .image-stage')?.style.width)>0);
-  await mobile.getByRole('button',{name:'画像を拡大',exact:true}).click();
-  const viewport=mobile.getByRole('region',{name:'拡大画像の表示範囲'});
+  const originalPlan=mobile.getByRole('dialog',{name:'開設時の配置図を拡大'});
+  await originalPlan.getByRole('img',{name:/A4-01.*408〜413/}).waitFor();
+  const enlarge=originalPlan.getByRole('button',{name:'画像を拡大',exact:true});
+  for(let step=0;step<3;step++)await enlarge.click();
+  const viewport=originalPlan.getByRole('region',{name:'拡大画像の表示範囲'});
   assert.ok(await viewport.evaluate(node=>node.scrollWidth>node.clientWidth));
+  await viewport.evaluate(node=>{node.scrollLeft=node.scrollWidth*.18;node.scrollTop=node.scrollHeight*.14;});
+  const center=()=>viewport.evaluate(node=>[
+   (node.scrollLeft+node.clientWidth/2)/node.scrollWidth,
+   (node.scrollTop+node.clientHeight/2)/node.scrollHeight,
+  ]);
+  const beforeZoom=await center();
+  await enlarge.click();
+  const afterZoom=await center();
+  for(let axis=0;axis<2;axis++)assert.ok(Math.abs(afterZoom[axis]-beforeZoom[axis])<.02);
+  await originalPlan.getByRole('button',{name:'画像を回転',exact:true}).click();
+  assert.match(await originalPlan.locator('img').getAttribute('style'),/rotate\(90deg\)/);
+  await originalPlan.getByRole('button',{name:'全体',exact:true}).click();
+  assert.ok(await viewport.evaluate(node=>node.scrollWidth<=node.clientWidth+1&&node.scrollHeight<=node.clientHeight+1));
   await viewport.focus();
   await mobile.keyboard.press('Escape');
   assert.equal(await mobile.locator('.image-dialog[open]').count(),0);
+  assert.equal(await mobile.getByRole('button',{name:'開設時の配置図を拡大'}).evaluate(button=>document.activeElement===button),true);
   await mobile.goto(base+'/members/login/');
   await mobile.locator('#member-id').fill('201204010017');await mobile.locator('#member-password').fill('20080519');
   await mobile.getByRole('button',{name:/ログイン/}).click();await mobile.getByRole('heading',{name:'会員トップ',exact:true}).waitFor();

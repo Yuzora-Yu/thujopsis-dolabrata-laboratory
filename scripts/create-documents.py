@@ -53,7 +53,7 @@ def create_plan(old=False):
     room(718,100,102,108,'会議室 A',COMMON)
     room(820,100,76,58,'会議室 D',COMMON)
     room(820,158,38,50,'B',COMMON);room(858,158,38,50,'C',COMMON)
-    polygon([(910,100),(1044,100),(1123,193),(1095,250),(1035,230),(985,205),(910,205)],'#f4f1e6' if old else COMMON,INK,1.3)
+    polygon([(910,100),(1044,100),(1123,193),(1095,250),(1035,207),(985,205),(910,205)],'#f4f1e6' if old else COMMON,INK,1.3)
     text(1012,154,'食堂・カフェ',12)
     if old:
         for x in [940,980,1020]:
@@ -61,14 +61,15 @@ def create_plan(old=False):
             rect(x,183,7,7,'none',INK,.5)
     rect(718,230,175,170,'#f4f1e6' if old else COMMON,INK,1.3)
     text(805,281,'コワーキング',13);text(805,301,'オープンラウンジ',11)
-    polygon([(941 if old else 952,230),(1032,230),(1078,299),(1032,371),(941 if old else 952,371),(897 if old else 916,299)],'#f4f1e6' if old else COMMON,INK,1.3)
+    polygon([(952,230),(1032,230),(1078,299),(1032,371),(952,371),(916,299)],'#f4f1e6' if old else COMMON,INK,1.3)
     text(988,291,'プレゼンテーション',10);text(988,311,'ホール',12)
     for yy in [321,342,363]:
         line(741,yy,871,yy,INK,.5)
         if old:
             for xx in range(745,870,18):rect(xx,yy-8,10,6,'none',INK,.5)
     # Source plan's lower service spine: vestibules, stairs, lavatories, elevator core.
-    for x,w,label in [(185,85,'階段・EV'),(286,110,'トイレ'),(412,132,'エレベーター'),(561,66,'共用'),(718,115,'トイレ'),(850,130,'階段・EV')]:
+    elevator_label='エレベーター' if old else '中央エレベーター'
+    for x,w,label in [(185,85,'階段・EV'),(286,110,'トイレ'),(412,132,elevator_label),(561,66,'共用'),(718,115,'トイレ'),(850,130,'階段・EV')]:
         rect(x,467,w,73,'#f4f1e6' if old else ADMIN,INK,1.2);text(x+w/2,508,label,10)
         if old:
             for sy in range(475,532,6):line(x+5,sy,x+20,sy,INK,.35)
@@ -86,6 +87,7 @@ def create_plan(old=False):
         line(932,205,958,205,gap,4)
         line(926,319,937,341,gap,4)
         line(601,357,601,378,gap,4);line(601,405,601,426,gap,4)
+        line(465,467,491,467,gap,4)
         line(893,246,893,373,'#6d8f86',2.8)
         route='#47796a'
         line(478,467,478,452,route,2.4);line(478,452,660,452,route,2.4)
@@ -111,7 +113,8 @@ def create_plan(old=False):
         rect(75,578,625,98,'none',INK,.6)
         text(1130,620,'あすなろ開設準備室',12,'end');text(1130,644,'2012.04.01',14,'end');text(1130,668,'図面番号 A4-01',10,'end')
     else:
-        text(85,598,'西側：オフィス・工房',12,'start');text(85,623,'中央：管理事務室・受付',12,'start');text(85,648,'東側：会議室・食堂・ラウンジ・ホール',12,'start')
+        for y,fill,label in [(598,ROOM,'オフィス・工房'),(623,COMMON,'交流・会議スペース'),(648,ADMIN,'管理・共用設備')]:
+            rect(85,y-11,13,13,fill,INK,.5);text(108,y,label,12,'start')
         text(1128,640,'2026.11',10,'end');text(1128,663,'あすなろ運営事務局',10,'end')
     # Cardinal direction only; lower floors are intentionally not shown.
     text(1135,488,'N',11);line(1135,499,1135,533,INK,1);polygon([(1135,495),(1131,505),(1139,505)],INK,INK,.5)
@@ -131,8 +134,11 @@ def write_svg(primitives,target):
 
 def write_plan_pdf(primitives,target,old):
     w,h=landscape(A3);c=canvas.Canvas(str(target),pagesize=(w,h),pageCompression=1)
-    c.setTitle('あすなろ産業支援交流施設 4階配置図'+(' 2012年4月' if old else ''))
+    c.setTitle('あすなろ産業支援交流施設 '+('4階配置図 2012年4月' if old else '4階フロアマップ'))
     c.setAuthor('あすなろ開設準備室' if old else 'あすなろ運営事務局')
+    # The archived drawing retains its issue date on paper. Its PDF copy dates
+    # to the reinstatement logged in PUB-2026-006.
+    c.setDateFormatter(lambda *_: 'D:20261030' if old else 'D:202611')
     scale=min((w-48)/1200,(h-48)/710);ox=(w-1200*scale)/2;oy=(h-710*scale)/2
     def X(x):return ox+x*scale
     def Y(y):return h-oy-y*scale
@@ -166,6 +172,9 @@ if '--statement-only' not in sys.argv:
     old=create_plan(True);current=create_plan(False)
     write_svg(old,OUT/'floor-4f-2012.svg');write_svg(current,OUT/'floor-4f.svg')
     write_plan_pdf(old,OUT/'asunaro-4f-2012.pdf',True);write_plan_pdf(current,OUT/'asunaro-4f.pdf',False)
+    if '--plans-only' in sys.argv:
+        print('Updated both 4F plans.')
+        raise SystemExit(0)
 
 normal=ParagraphStyle('JP',fontName='JP',fontSize=9.8,leading=18,textColor=colors.HexColor(INK),wordWrap='CJK')
 title=ParagraphStyle('Title',parent=normal,fontSize=19,leading=29,spaceAfter=22)

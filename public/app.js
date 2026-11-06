@@ -136,16 +136,95 @@ if(habitat){const modes={
  };const buttons=[...habitat.querySelectorAll('[data-habitat-mode]')];
  for(const button of buttons)button.addEventListener('click',()=>{const key=button.dataset.habitatMode,mode=modes[key];if(!mode)return;habitat.dataset.mode=key;for(const b of buttons)b.setAttribute('aria-pressed',String(b===button));for(const cell of habitat.querySelectorAll('[data-system-status]'))cell.textContent=mode[cell.dataset.systemStatus];habitat.querySelector('[data-habitat-note]').textContent=mode.note;});
 }
-const photoDialog=document.querySelector('.image-dialog');let zoom=1,angle=0,fitWidth=0,fitHeight=0;
+const photoDialog=document.querySelector('.image-dialog');
 const photoViewport=photoDialog?.querySelector('.image-viewport');
-if(photoViewport&&document.querySelector('[data-image-open]')){
+const photoButtons=document.querySelectorAll('[data-image-open]');
+if(photoViewport&&photoButtons.length){
+ const stage=photoViewport.querySelector('.image-stage');
+ const photo=stage.querySelector('img');
+ const middle={x:.5,y:.5};
+ let zoom=1,angle=0,fitWidth=0,fitHeight=0;
+
  photoViewport.tabIndex=0;
  photoViewport.setAttribute('role','region');
  photoViewport.setAttribute('aria-label','拡大画像の表示範囲');
+
+ function viewCenter(){
+  const {clientWidth,clientHeight,scrollLeft,scrollTop}=photoViewport;
+  return {
+   x:stage.clientWidth>clientWidth?(scrollLeft+clientWidth/2)/stage.clientWidth:middle.x,
+   y:stage.clientHeight>clientHeight?(scrollTop+clientHeight/2)/stage.clientHeight:middle.y,
+  };
+ }
+ function paintPhoto(center){
+  const turn=angle%180!==0;
+  const width=(turn?fitHeight:fitWidth)*zoom;
+  const height=(turn?fitWidth:fitHeight)*zoom;
+  stage.style.width=width+'px';
+  stage.style.height=height+'px';
+  photo.style.width=fitWidth*zoom+'px';
+  photo.style.height=fitHeight*zoom+'px';
+  photo.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;
+  photoViewport.scrollLeft=width*center.x-photoViewport.clientWidth/2;
+  photoViewport.scrollTop=height*center.y-photoViewport.clientHeight/2;
+ }
+ function fitPhoto(center){
+  if(!photoDialog.open||!photo.naturalWidth)return;
+  const turn=angle%180!==0;
+  const availableWidth=photoViewport.offsetWidth;
+  const availableHeight=innerHeight*.7;
+  const scale=Math.min(
+   availableWidth/(turn?photo.naturalHeight:photo.naturalWidth),
+   availableHeight/(turn?photo.naturalWidth:photo.naturalHeight),
+   1,
+  );
+  fitWidth=photo.naturalWidth*scale;
+  fitHeight=photo.naturalHeight*scale;
+  photo.hidden=false;
+  paintPhoto(center);
+ }
+ function refitPhoto(){
+  if(!photo.hidden)fitPhoto(viewCenter());
+ }
+ photo.addEventListener('load',()=>fitPhoto(middle));
+ photoDialog.addEventListener('close',()=>window.removeEventListener('resize',refitPhoto));
+ for(const button of photoButtons){
+  button.addEventListener('click',()=>{
+   const source=button.dataset.imageOpen;
+   zoom=1;
+   angle=0;
+   photo.hidden=true;
+   stage.style.removeProperty('width');
+   stage.style.removeProperty('height');
+   photo.alt=button.querySelector('img')?.alt||'';
+   photoDialog.setAttribute('aria-label',button.getAttribute('aria-label')||'画像');
+   photoDialog.querySelector('a').href=source;
+   photoDialog.showModal();
+   window.addEventListener('resize',refitPhoto);
+   photo.src=source;
+   if(photo.complete)fitPhoto(middle);
+  });
+ }
+ for(const button of photoDialog.querySelectorAll('[data-photo-action]')){
+  button.addEventListener('click',()=>{
+   if(photo.hidden)return;
+   const action=button.dataset.photoAction;
+   const center=viewCenter();
+   if(action==='in')zoom=Math.min(12,zoom*1.6);
+   if(action==='out')zoom=Math.max(1,zoom/1.6);
+   if(action==='rotate'){
+    angle=(angle+90)%360;
+    fitPhoto({x:1-center.y,y:center.x});
+   }else if(action==='reset'){
+    zoom=1;
+    angle=0;
+    fitPhoto(middle);
+   }else{
+    paintPhoto(center);
+   }
+  });
+ }
 }
-function paintPhoto(){if(!photoDialog||!fitWidth)return;const photo=photoDialog.querySelector('img'),stage=photoDialog.querySelector('.image-stage');const turn=angle%180!==0;stage.style.width=(turn?fitHeight:fitWidth)*zoom+'px';stage.style.height=(turn?fitWidth:fitHeight)*zoom+'px';photo.style.width=fitWidth*zoom+'px';photo.style.height=fitHeight*zoom+'px';photo.style.transform=`translate(-50%,-50%) rotate(${angle}deg)`;}
-document.querySelectorAll('[data-image-open]').forEach(b=>b.addEventListener('click',()=>{const d=photoDialog,photo=d.querySelector('img'),source=b.dataset.imageOpen;zoom=1;angle=0;fitWidth=0;photo.onload=()=>{const scale=Math.min((d.clientWidth-32)/photo.naturalWidth,(innerHeight*.7)/photo.naturalHeight,1);fitWidth=photo.naturalWidth*scale;fitHeight=photo.naturalHeight*scale;paintPhoto();};photo.alt=b.querySelector('img')?.alt||'';d.querySelector('a').href=source;d.showModal();photo.src=source;}));
-document.querySelectorAll('[data-photo-action]').forEach(b=>b.addEventListener('click',()=>{const action=b.dataset.photoAction;if(action==='in')zoom=Math.min(12,zoom*1.6);if(action==='out')zoom=Math.max(1,zoom/1.6);if(action==='rotate')angle=(angle+90)%360;if(action==='reset'){zoom=1;angle=0;}paintPhoto();}));
 
 };
 window.asunaroInit();
