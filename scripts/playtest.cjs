@@ -421,6 +421,7 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(incident,/吉野夏帆/);
  assert.match(incident,/僕がやった。人を呼んで[\s\S]*07:46、P-032を別室の担当に引き渡し/);
  assert.match(incident,/板二枚を回収。裏に鉛筆の矢印[\s\S]*家族連絡の許可欄は空欄/);
+ assert.match(incident,/建物外への引渡しは、今回の保全分では確認できなかった/);
  assert.match(incident,/工房の修理受付は完了に変更/);
  await p.setViewportSize({width:390,height:844});
  try{
