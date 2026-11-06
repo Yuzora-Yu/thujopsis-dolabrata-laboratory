@@ -12,7 +12,12 @@ function stored(key,fallback=null){try{return JSON.parse(localStorage.getItem(ke
 let state=stored(storageKey);if(!state){state={id:Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,'0')).join(''),contact:false,ending:'',truth:false};localStorage.setItem(storageKey,JSON.stringify(state));}
 function save(){localStorage.setItem(storageKey,JSON.stringify(state));}
 let site,bundle,roomBundle,rendering=false;
-const sitePromise=fetch(base+'/assets/site-index.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('Site index');return r.json();}).then(value=>(site=value));
+async function loadSiteIndex(){
+ const response = await fetch(base+'/assets/site-index.json',{cache:'no-store'});
+ if (!response.ok) throw new Error('Site index');
+ return response.json();
+}
+const sitePromise=loadSiteIndex().then(value=>(site=value));
 function route(){
  let logical=location.pathname.slice(base.length)||'/';if(logical.endsWith('/index.html'))logical=logical.slice(0,-10);
  for(const [kind,prefix]of Object.entries({archive:'/historical-records',hozen:'/records-center',audit:'/independent-review'}))if(logical===prefix||logical.startsWith(prefix+'/'))return {kind,path:logical.slice(prefix.length)||'/'};
@@ -30,16 +35,16 @@ function display(html){
  window.asunaroReading?.refresh();
  if(document.querySelector('[data-lab-root], [data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({bridge:window.asunaroLabBridge,trial:trialView(state.consoleTrial),ending:state.ending})).catch(()=>showError('測定端末を読み込めませんでした。再読み込みしてご確認ください。'));
 }
-async function packedBundle(namespace,id){
+async function packedBundle(namespace,id,edition=site.edition){
  const identifier=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(namespace+':'+id))),b=>b.toString(16).padStart(2,'0')).join('');
  const cacheKey=storageKey+':encrypted-bundle:'+namespace;
- try{const saved=JSON.parse(sessionStorage.getItem(cacheKey));if(saved?.identifier===identifier&&saved.edition===site.edition&&Date.now()-saved.created<28800000)return saved.packed;}catch{}
+ try{const saved=JSON.parse(sessionStorage.getItem(cacheKey));if(saved?.identifier===identifier&&saved.edition===edition&&Date.now()-saved.created<28800000)return saved.packed;}catch{}
  const response=await fetch(base+'/assets/portal/'+identifier+'.json',{cache:'no-store'});if(!response.ok)throw new Error('Unknown account');const packed=await response.json();
- try{sessionStorage.setItem(cacheKey,JSON.stringify({identifier,edition:site.edition,created:Date.now(),packed}));}catch{}
+ try{sessionStorage.setItem(cacheKey,JSON.stringify({identifier,edition,created:Date.now(),packed}));}catch{}
  return packed;
 }
-async function loadBundle(namespace,id,key){
- const packed=await packedBundle(namespace,id);
+async function loadBundle(namespace,id,key,edition=site.edition){
+ const packed=await packedBundle(namespace,id,edition);
  const cryptoKey=await crypto.subtle.importKey('raw',bytes(key),{name:'AES-GCM'},false,['decrypt']);
  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(packed.iv)},cryptoKey,bytes(packed.data))));
 }
@@ -50,9 +55,24 @@ async function authenticate(namespace,id,password){
  const value=JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(packed.iv)},key,bytes(packed.data))));
  return {value,credential:{id,key:b64(await crypto.subtle.exportKey('raw',key)),created:Date.now()}};
 }
+function activeMemberCredential(){
+ const credential = stored(authKey);
+ return credential?.id && credential.key && Date.now()-credential.created<=28800000 ? credential : null;
+}
+function sameCredential(left,right){
+ return !!left && !!right && left.id===right.id && left.key===right.key && left.created===right.created;
+}
 async function currentBundle(){
- if(bundle)return bundle;const saved=stored(authKey);if(!saved||Date.now()-saved.created>28800000)return null;
- try{bundle=await loadBundle('member',saved.id,saved.key);return bundle;}catch{return null;}
+ const credential = activeMemberCredential();
+ if (!credential) return null;
+ const {edition} = site;
+ if (bundle?.edition===edition && sameCredential(credential,bundle.credential)) return bundle.account;
+ try {
+  const account = await loadBundle('member',credential.id,credential.key,edition);
+  if (!sameCredential(credential,activeMemberCredential())) return null;
+  if (site.edition===edition) bundle = {edition,credential,account};
+  return account;
+ } catch { return null; }
 }
 async function outcomeBundle(){
  const current=await currentBundle();if(current?.outcomes?.end1)return current;
@@ -215,27 +235,83 @@ document.addEventListener('submit',async event=>{
  finally{if(submit)submit.disabled=false;}
 });
 
+function downloadAllowed(account,credential,filename){
+ const caseState = stored(storageKey,state);
+ return !!account && sameCredential(credential,activeMemberCredential())
+  && account.account.id===credential.id
+  && document.body.dataset.memberRole===account.account.role
+  && !(caseState.ending==='end2' && account.account.role==='asakura')
+  && (filename!=='hozen.zip' || caseState.contact);
+}
+
+async function readRecordMedia(file){
+ const response = await fetch(file.path);
+ if (response.status===404 || response.status===410) return null;
+ if (!response.ok) throw new Error('Attachment unavailable');
+ const packed = await response.json();
+ const key = await crypto.subtle.importKey('raw',bytes(file.key),{name:'AES-GCM'},false,['decrypt']);
+ return crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(packed.iv)},key,bytes(packed.data));
+}
+
+async function refreshRecordMedia(filename,credential,previousEdition){
+ // A new deployment replaces the ciphertext URLs, but the member key stays valid.
+ const nextSite = await loadSiteIndex();
+ if (nextSite.edition===previousEdition) return null;
+ const account = await loadBundle('member',credential.id,credential.key,nextSite.edition);
+ const file = account.downloads[filename];
+ if (!file?.path || !downloadAllowed(account,credential,filename)) return null;
+ const data = await readRecordMedia(file);
+ if (!data || !downloadAllowed(account,credential,filename)) return null;
+ if (site.edition===previousEdition || site.edition===nextSite.edition) {
+  site = nextSite;
+  bundle = {edition:site.edition,credential,account};
+ }
+ return {data,file};
+}
+
 document.addEventListener('click',async event=>{
- const anchor=event.target.closest?.('a[href]');if(!anchor)return;
- const url=new URL(anchor.href,location.href),path=url.pathname.slice(base.length);if(!path.startsWith('/members/download/'))return;
- event.preventDefault();const account=await currentBundle();state=stored(storageKey,state);if(!account||state.ending==='end2'&&account.account.role==='asakura')return;
- const file=account.downloads[path.split('/').filter(Boolean).at(-1)];if(!file||path.endsWith('hozen.zip')&&!state.contact)return;
- const message=anchor.closest('.record-media')?.querySelector('[data-record-media-message]');
- if(anchor.getAttribute('aria-busy')==='true')return;
+ const anchor = event.target.closest?.('a[href]');
+ if (!anchor) return;
+ const url = new URL(anchor.href,location.href);
+ const path = url.pathname.slice(base.length);
+ if (url.origin!==location.origin || !path.startsWith('/members/download/')) return;
+ event.preventDefault();
+ if (anchor.getAttribute('aria-busy')==='true') return;
  anchor.setAttribute('aria-busy','true');
- if(message)message.textContent='資料を取得しています。';
- try{
-  let data;
-  if(file.path){
-   const response=await fetch(file.path);if(!response.ok)throw new Error('Attachment unavailable');const packed=await response.json();
-   const key=await crypto.subtle.importKey('raw',bytes(file.key),{name:'AES-GCM'},false,['decrypt']);
-   data=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(packed.iv)},key,bytes(packed.data));
-   if(stored(authKey)?.id!==account.account.id||stored(storageKey,state).ending==='end2'&&account.account.role==='asakura')throw new Error('Access changed');
-  }else data=bytes(file.data);
-  const href=URL.createObjectURL(new Blob([data],{type:file.type})),download=document.createElement('a');download.href=href;download.download=file.name;download.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
-  if(message)message.textContent='';
- }catch{if(message)message.textContent='資料を取得できませんでした。ページを開き直してご確認ください。';}
- finally{anchor.removeAttribute('aria-busy');}
+ const message = anchor.closest('.record-media')?.querySelector('[data-record-media-message]');
+ const filename = path.split('/').filter(Boolean).at(-1);
+ const credential = activeMemberCredential();
+ const previousEdition = site.edition;
+ try {
+  const account = await currentBundle();
+  let file = account?.downloads[filename];
+  if (!file || !downloadAllowed(account,credential,filename)) {
+   if (message) message.textContent='閲覧権限を確認できませんでした。ページを開き直してご確認ください。';
+   return;
+  }
+  if (message) message.textContent='資料を取得しています。';
+  let data = file.path ? await readRecordMedia(file) : bytes(file.data);
+  if (!data && downloadAllowed(account,credential,filename)) {
+   const refreshed = await refreshRecordMedia(filename,credential,previousEdition);
+   if (refreshed) ({data,file}=refreshed);
+  }
+  if (!downloadAllowed(account,credential,filename)) {
+   if (message) message.textContent='閲覧権限を確認できませんでした。ページを開き直してご確認ください。';
+   return;
+  }
+  if (!data) throw new Error('Attachment unavailable');
+  const href = URL.createObjectURL(new Blob([data],{type:file.type}));
+  const download = document.createElement('a');
+  download.href = href;
+  download.download = file.name;
+  download.click();
+  setTimeout(()=>URL.revokeObjectURL(href),1000);
+  if (message) message.textContent='';
+ } catch {
+  if (message) message.textContent='資料を取得できませんでした。ページを開き直してご確認ください。';
+ } finally {
+  anchor.removeAttribute('aria-busy');
+ }
 });
 window.addEventListener('storage',event=>{if(event.key===storageKey){state=stored(storageKey,state);if(!document.querySelector('[data-lab-root]')&&document.querySelector('[data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({trial:trialView(state.consoleTrial),ending:state.ending}));}});
 window.addEventListener('pageshow',event=>{if(event.persisted&&!rendering&&site)void boot();});

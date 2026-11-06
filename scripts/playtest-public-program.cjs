@@ -120,14 +120,29 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await member.locator('.member-workshop-note').getByRole('link',{name:'工房でのやり取りを読む',exact:true}).click();
   await member.getByRole('heading',{level:1,name:'生活道具・共同試作の連絡',exact:true}).waitFor();
   assert.match(await member.locator('.project-thread').innerText(),/焼き芋/);
-  await member.getByRole('navigation',{name:'会員メニュー'}).getByRole('link',{name:'施設からの連絡',exact:true}).click();
+  const messages = member.getByRole('navigation',{name:'会員メニュー'}).getByRole('link',{name:'施設からの連絡',exact:true});
+  await messages.click();
+  assert.match(await member.locator('.message').filter({hasText:'循環設備の検収資料について'}).innerText(),/実機の寸法は、別途お渡しする検収表/);
+  await member.locator('[data-assigned-record="YH-2013-014"]').click();
+  await member.locator('.record-media a[href$="YH-2013-014.pdf"]').waitFor();
+  await messages.click();
   await member.locator('[data-assigned-record="YH-2016-032"]').click();
   await member.getByRole('heading',{level:1,name:'第2期居住実証・実施計画',exact:true}).waitFor();
+  const recordText = await member.locator('main').innerText();
+  const [reportId,appendixId] = recordText.match(/YH-2018-041(?:-A)?/g);
+  assert.equal(reportId,'YH-2018-041');
+  assert.equal(appendixId,'YH-2018-041-A');
   await member.screenshot({path:'.work/qa/member-palette-desktop.png'});
-  await member.goto(base+'/members/records/YH-2018-041/');await member.locator('.record-media a').waitFor();assert.equal(media.length,0,'PDF loaded before a player asked for it');
+  await member.locator('#next-document-id').fill(reportId);
+  await member.locator('.record-lookup button').click();
+  await member.locator('.document-result').click();
+  await member.locator('.record-media a').waitFor();assert.equal(media.length,0,'PDF loaded before a player asked for it');
   const waiting=member.waitForEvent('download');await member.locator('.record-media a').click();const file=await waiting;assert.equal(file.suggestedFilename(),'YH-2018-041.pdf');
   assert.equal((await fs.readFile(await file.path())).subarray(0,5).toString(),'%PDF-');assert.equal(media.length,1);
-  await member.goto(base+'/members/records/YH-2018-041-A/');assert.equal(await member.locator('.record-media a').count(),0);
+  await member.locator('#next-document-id').fill(appendixId);
+  await member.locator('.record-lookup button').click();
+  await member.getByText('該当する資料は閲覧できません。',{exact:true}).waitFor();
+  await member.goto(base+'/members/records/'+appendixId+'/');assert.equal(await member.locator('.record-media a').count(),0);
   for (const [id,message] of [
    ['ＹＨ－２０１８－０４１－Ａ','該当する資料は閲覧できません。'],
    ['ZZ-2099-999','該当する資料はありません。'],
