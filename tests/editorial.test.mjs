@@ -53,6 +53,19 @@ test('the mother anchors the founding while her daughter qualifies and disappear
  assert.match(recordText(documents.find(d=>d.id==='CO-2010-001'))+' '+documents.find(d=>d.id==='CO-2010-001').signoff,/FUM-2010-002/);
 });
 
+test('Akari’s trial dates and the two sets of workshop property remain distinct',()=>{
+ const record=id=>documents.find(document=>document.id===id);
+ const trial=record('YH-2022-034');
+ assert.match(recordText(trial),/試用票の期間は8月19日から22日まで/);
+ assert.match(trial.entries.find(entry=>entry.at==='2022年8月22日').text,/継続群へ編入/);
+ assert.match(trial.entries.find(entry=>entry.at==='2022年8月31日').text,/一般制作の利用登録を終了/);
+ assert.match(recordText(record('FAM-2022-009')),/8月19日の外出後は本人と話せず、22日の帰宅予定/);
+ assert.match(archiveItems.find(item=>item.code==='NK-2022-0908').text,/22日に帰宅する予定だったが戻らず/);
+ const receipt=record('PN-2022-034');
+ assert.match(recordText(receipt),/以前からの預かり分（FAB-2022-071）/);
+ assert.doesNotMatch(receipt.tables[0].rows.flat().join(' '),/型紙|料理帳/);
+});
+
 test('public facility routes do not announce the old archive and the first clipping is a direct PDF',()=>{
  for(const route of publicPaths){const html=renderPublic(route)||'';assert.doesNotMatch(html,/href="[^"]*(?:historical-records|127\.0\.0\.1:4176|\/snapshots\/)/,route);}
  assert.doesNotMatch(renderPublic('/about/history/'),/準備期の公開記録/);

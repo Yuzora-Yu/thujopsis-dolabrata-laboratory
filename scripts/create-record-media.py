@@ -141,6 +141,8 @@ def render(record, style_key, target):
     if record.get("signatureClips"):
         flow.extend([p("署名欄の複写（右端）", sub), signature_comparison(record["signatureClips"], font)])
     for entry in record.get("entries", []):
+        if entry["at"] == record.get("printFollowupFrom"):
+            flow.extend([PageBreak(), p("後日受領した書面", title)])
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):
         flow.append(p(record["signoff"], meta))
