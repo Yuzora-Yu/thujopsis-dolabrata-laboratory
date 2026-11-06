@@ -249,6 +249,7 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .hall-exhibition h2{margin:.35rem 0 .8rem}
 .staff-profile cite{display:block;margin-top:.75rem;font-size:.8rem;font-style:normal;color:var(--muted)}
 .gallery-card[hidden]{display:none}
+.legacy-catalog>.legacy-row[hidden]{display:none}
 .gallery-photo-button{position:relative}
 .gallery-zoom-label{position:absolute;right:.8rem;bottom:.8rem;padding:.45rem .7rem;background:#fff;color:#243e37;font-size:.78rem;box-shadow:0 1px 8px #152a2a24}
 .search-scope{font-size:.86rem;color:var(--muted);margin:0 0 .7rem}

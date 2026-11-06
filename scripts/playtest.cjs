@@ -18,6 +18,57 @@ async function company(p,number){
  return p.locator('#profile .detail-list>div').evaluateAll(rows=>Object.fromEntries(rows.map(r=>[r.querySelector('dt').textContent,r.querySelector('dd').textContent])));
 }
 async function download(p,selector,name){const waiting=p.waitForEvent('download');await p.locator(selector).click();const file=await waiting;const target='.work/qa/'+mode+'-'+name;await file.saveAs(target);return {file:target,data:await fs.readFile(target)};}
+async function traceNewspaper(page,archive){
+ await archive.getByRole('link',{name:'収蔵目録',exact:true}).click();
+ const catalog=archive.locator('.legacy-catalog');
+ await catalog.getByRole('link',{name:/公式告知/}).click();
+ assert.match(await body(archive),/病気のため逝去/);
+ await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
+ const correctionCode=await catalog.getByRole('link',{name:/訂正欄/}).locator('small').innerText();
+ const search=async keyword=>{
+  await archive.getByLabel('収蔵番号・資料名').fill(keyword);
+  await archive.getByRole('button',{name:'検索',exact:true}).click();
+ };
+ await search(correctionCode);
+ await archive.getByText('収蔵資料・公開対象 ／ 1件',{exact:true}).waitFor();
+ assert.equal(await catalog.locator('a:visible').count(),1);
+ await catalog.getByRole('link',{name:/訂正欄/}).click();
+ assert.match(await body(archive),/紙面抄録[\s\S]*当該記述を撤回/);
+ const firstPrint=new URL(archive.url());
+ firstPrint.pathname=firstPrint.pathname.replace(/\d{4}\/$/,'0009/');
+ await archive.goto(firstPrint.href);
+ assert.match(await body(archive),/服毒による自殺か/);
+ const firstPrintCode=await archive.locator('.legacy-record-meta').innerText();
+ await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
+ await search(firstPrintCode.match(/NK-\d{4}-\d{4}/)[0]);
+ await catalog.getByText('該当する資料はありません。',{exact:true}).waitFor();
+ assert.equal(await catalog.locator('a:visible').count(),0);
+ await archive.getByRole('link',{name:'資料照会室',exact:true}).click();
+ await archive.getByRole('link',{name:/広報記録の保存/}).click();
+ const receiptNumber=(await body(archive)).match(/受領簿(\d{4})/)[1];
+ await archive.goto(provider('archive','/room/records/'+receiptNumber+'/'));
+ const receipt=await body(archive);
+ assert.doesNotMatch(receipt,/意思確認欄|署名画像|一時間以内/);
+ const comparison=await document(page,receipt.match(/AH-2021-\d{3}/)[0]);
+ const healthId=comparison.match(/HC-2021-\d{3}-R/)[0];
+ await page.locator('#next-document-id').fill(healthId);
+ await page.locator('.record-lookup button').click();
+ await page.getByText('該当する資料は閲覧できません。',{exact:true}).waitFor();
+ return healthId;
+}
+async function verifyHealthRecord(page,id){
+ await document(page,id);
+ const chronology=page.getByRole('region',{name:'2021年11月3日'});
+ const instruction=chronology.getByRole('row').filter({hasText:'08:05'});
+ assert.match(await instruction.innerText(),/初稿作成指示/);
+ assert.doesNotMatch(await instruction.innerText(),/本人による服用/);
+ assert.match(await chronology.getByRole('row').filter({hasText:'時刻記載なし'}).innerText(),/本人による服用/);
+ for(const extension of ['.pdf','-scan.jpg']){
+  const filename=id+extension;
+  const copy=await download(page,'a[href$="'+filename+'"]',filename);
+  assert.deepEqual(copy.data,await fs.readFile('private/record-media/'+filename));
+ }
+}
 function zipEntry(data,wanted='告発書.pdf'){let offset=0;while(data.readUInt32LE(offset)===0x04034b50){const size=data.readUInt32LE(offset+18),length=data.readUInt16LE(offset+26),extra=data.readUInt16LE(offset+28),name=data.subarray(offset+30,offset+30+length).toString('utf8'),start=offset+30+length+extra;if(name===wanted)return data.subarray(start,start+size);offset=start+size;}throw new Error('PDF missing');}
 async function evidence(p,institution){await login(p,institution.id,institution.password);await document(p,'CH-2021-003');await p.getByRole('link',{name:'記録についての照会',exact:true}).click();await p.locator('#note').fill('原本との照合をお願いいたします。');await p.getByRole('button',{name:/照会を送信/}).click();await p.locator('a[href$="hozen.zip"]').waitFor();return download(p,'a[href$="hozen.zip"]','evidence.zip');}
 async function submit(p,file){await p.locator('#title').fill('資料の保全について');await p.locator('#statement').fill('原本と移送の記録をご確認ください。');await p.locator('#archive').setInputFiles(file);await p.getByRole('button',{name:/資料を提出/}).click();await until(p,'資料を受領しました');}
@@ -110,9 +161,10 @@ async function newsInterface(p){
  const archivePopup=p.waitForEvent('popup');await p.getByRole('link',{name:/旧基盤・資料照会室/}).click();const archive=await archivePopup;archive.on('pageerror',e=>errors.push(e.message));
  await archive.locator('#ticket').fill(ticket);await archive.locator('#inquiry-code').fill(code);await archive.getByRole('button',{name:'照会室へ'}).click();await until(archive,'移管・保守受領簿');
  if(process.env.PLAYTEST_LAB==='1')await require('./playtest-console.cjs').exerciseConsole(archive,{url:provider('archive','/room/console/'),mode,prefix:'.work/qa/'+mode+'-lab-full'});
+ const healthId=await traceNewspaper(p,archive);
  await archive.goto(provider('archive','/room/records/0005/'));await until(archive,'端末と資料更新の整理');assert.match(await body(archive),/0006/);await archive.goto(provider('archive','/room/records/0006/'));await until(archive,'機関台帳');const registry=await body(archive);
  const institution={id:ymd(registry.match(/加入日([^。]+)/)[1])+registry.match(/台帳番号は(\d{4})/)[1],password:ymd(registry.match(/法人設立日([^。]+)/)[1])};await archive.close();
- await login(p,institution.id,institution.password);const refusal=await document(p,'RG-2007-011'),originId=refusal.match(/OR-2006-\d{3}/)[0];assert.match(await document(p,originId),/再開案に同意しない/);const founding=await document(p,'CO-2010-001'),motherId=founding.match(/FUM-\d{4}-\d{3}/)[0];assert.match(await document(p,motherId),/もう使わない/);const individual=await document(p,makerRecordId),inquiryId=individual.match(/FAM-\d{4}-\d{3}/)[0];assert.match(await document(p,inquiryId),/本人の継続意思を裏付ける原本/);assert.match(await document(p,friendRecordId),/死亡/);assert.match(await document(p,'YH-2022-017'),/継舟/);const originalOffer=await document(p,'RE-2022-006');await recruitmentCopy(p,'RE-2022-006',2022);const examination=await document(p,originalOffer.match(/OBS-2022-\d{3}/)[0]);const equipment=await document(p,examination.match(/ENV-2022-\d{3}/)[0]);const incident=await document(p,equipment.match(/EV-2022-\d{3}/)[0]);assert.match(incident,/吉野夏帆/);const summary=await document(p,incident.match(/GR-2022-\d{3}/)[0]);assert.match(summary,/自発的淘汰/);assert.match(await document(p,incident.match(/PN-2022-\d{3}/)[0]),/夏帆さんの本/);const personalReviewId=summary.match(/QC-2026-\d{3}/)[0];await p.locator('#next-document-id').fill(personalReviewId);await p.locator('.record-lookup button').click();await p.getByText('該当する資料は閲覧できません。',{exact:true}).waitFor();await document(p,'HC-2021-031-R');await document(p,'CH-2021-003');const operations=await document(p,'OPS-2026-084');
+ await login(p,institution.id,institution.password);const refusal=await document(p,'RG-2007-011'),originId=refusal.match(/OR-2006-\d{3}/)[0];assert.match(await document(p,originId),/再開案に同意しない/);const founding=await document(p,'CO-2010-001'),motherId=founding.match(/FUM-\d{4}-\d{3}/)[0];assert.match(await document(p,motherId),/もう使わない/);const individual=await document(p,makerRecordId),inquiryId=individual.match(/FAM-\d{4}-\d{3}/)[0];assert.match(await document(p,inquiryId),/本人の継続意思を裏付ける原本/);assert.match(await document(p,friendRecordId),/死亡/);assert.match(await document(p,'YH-2022-017'),/継舟/);const originalOffer=await document(p,'RE-2022-006');await recruitmentCopy(p,'RE-2022-006',2022);const examination=await document(p,originalOffer.match(/OBS-2022-\d{3}/)[0]);const equipment=await document(p,examination.match(/ENV-2022-\d{3}/)[0]);const incident=await document(p,equipment.match(/EV-2022-\d{3}/)[0]);assert.match(incident,/吉野夏帆/);const summary=await document(p,incident.match(/GR-2022-\d{3}/)[0]);assert.match(summary,/自発的淘汰/);assert.match(await document(p,incident.match(/PN-2022-\d{3}/)[0]),/夏帆さんの本/);const personalReviewId=summary.match(/QC-2026-\d{3}/)[0];await p.locator('#next-document-id').fill(personalReviewId);await p.locator('.record-lookup button').click();await p.getByText('該当する資料は閲覧できません。',{exact:true}).waitFor();await verifyHealthRecord(p,healthId);await document(p,'CH-2021-003');const operations=await document(p,'OPS-2026-084');
  const eastId=operations.match(/PUB-2023-\d{3}/)[0];
  const eastWork=await document(p,eastId);
  assert.match(eastWork,/東側・会議室Aへの通路/);

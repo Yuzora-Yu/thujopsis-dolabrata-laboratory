@@ -9,6 +9,7 @@ import sys
 
 from PIL import Image, ImageDraw, ImageFilter
 from reportlab.lib import colors
+from reportlab.graphics.shapes import Drawing, Path as InkPath, Rect, String
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
@@ -40,12 +41,39 @@ STYLES = {
     "operations": ("Gothic", "#1f4a44", "#e3ece7", "区画運用報告", "strip"),
 }
 
+def signature_comparison(labels, font):
+    drawing = Drawing(BODY, 72)
+    column = (BODY - 16) / 2
+    # Two extracts reproduce the same fictional fragment. The last stroke has
+    # a small break that remains in both copies, including the older approval.
+    strokes = [
+        (1.25, (4, 25), [(13, 29, 23, 36, 30, 33), (36, 30, 20, 23, 19, 17)]),
+        (1.05, (28, 36), [(24, 28, 23, 18, 32, 15), (39, 12, 48, 16, 52, 25)]),
+        (.90, (34, 23), [(42, 32, 53, 35, 56, 29), (57, 25, 49, 18, 45, 16)]),
+        (1.20, (58, 32), [(58, 25, 55, 16, 63, 14), (69, 13, 75, 17, 78, 20)]),
+        (.78, (82, 23), [(85, 25, 89, 29, 91, 29)]),
+    ]
+    for i, label in enumerate(labels):
+        left = i * (column + 16)
+        drawing.add(String(left, 60, label, fontName=font, fontSize=9))
+        drawing.add(Rect(left, 6, column, 47, fillColor=colors.HexColor("#f6f5ef"),
+                         strokeColor=colors.HexColor("#a2a39e"), strokeWidth=.5))
+        start = left + (column - 95) / 2
+        for weight, (x, y), curves in strokes:
+            ink = InkPath(strokeColor=colors.HexColor("#373933"), strokeWidth=weight,
+                          fillColor=None, strokeLineCap=1)
+            ink.moveTo(start + x, y + 2)
+            for x1, y1, x2, y2, x3, y3 in curves:
+                ink.curveTo(start + x1, y1 + 2, start + x2, y2 + 2, start + x3, y3 + 2)
+            drawing.add(ink)
+    return drawing
+
 
 def render(record, style_key, target):
     font, accent_hex, pale_hex, register, frame = STYLES[style_key]
     accent, pale = colors.HexColor(accent_hex), colors.HexColor(pale_hex)
     dark = colors.HexColor("#232824")
-    compact = record["id"] in {"YH-2013-014", "ENV-2022-031"}
+    compact = record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
     title = ParagraphStyle("title", fontName=font, fontSize=21, leading=29, wordWrap="CJK", textColor=dark, spaceAfter=15)
     base = ParagraphStyle("body", fontName=font, fontSize=10.1 if compact else 10.6, leading=16.1 if compact else 17.6, wordWrap="CJK", textColor=dark, spaceAfter=6 if compact else 9)
     sub = ParagraphStyle("sub", parent=base, fontSize=12.4, leading=18.5, spaceBefore=9 if compact else 12, spaceAfter=4 if compact else 5, textColor=accent, keepWithNext=True)
@@ -88,6 +116,8 @@ def render(record, style_key, target):
     for t in record.get("tables", []):
         flow.append(p(t["caption"] + ("　" + t["date"] if t.get("date") else ""), sub))
         table(t["head"], t["rows"])
+    if record.get("signatureClips"):
+        flow.extend([p("署名欄の複写（右端）", sub), signature_comparison(record["signatureClips"], font)])
     for entry in record.get("entries", []):
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):

@@ -171,9 +171,19 @@ async function boot(){
     });
    }
   }
-  if(current.kind==='archive'&&current.path==='/collections/'&&params.get('q')){
-   const keyword=params.get('q');document.querySelector('#collection-query').value=keyword;
-   document.querySelectorAll('.legacy-row').forEach(row=>{row.hidden=!matchesSearch({title:row.querySelector('strong').textContent,text:row.textContent},keyword);});
+  if(current.kind==='archive'&&current.path==='/collections/'){
+   const summary=document.querySelector('[data-collection-count]');
+   const empty=document.querySelector('[data-collection-empty]');
+   if(!summary||!empty)return;
+   const keyword=(params.get('q')||'').trim();
+   document.querySelector('#collection-query').value=keyword;
+   let count=0;
+   for(const row of document.querySelectorAll('[data-collection-key]')){
+    row.hidden=!!keyword&&!matchesSearch({title:row.querySelector('strong').textContent,text:row.dataset.collectionKey},keyword);
+    if(!row.hidden)count++;
+   }
+   summary.textContent='収蔵資料・公開対象'+(keyword?' ／ '+count+'件':'');
+   empty.hidden=count>0;
   }
  }catch{showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');}
  finally{rendering=false;}
