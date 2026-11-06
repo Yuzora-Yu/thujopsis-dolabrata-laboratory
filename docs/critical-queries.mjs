@@ -11,6 +11,7 @@ export const siteQueries=[
  {word:'榊原惟臣',source:'施設案内、灯の経歴',destination:'/news/20211103/',purpose:'公式な訃報と死因説明を読む。'},
  {word:'A4-01',source:'MX-2019-410',destination:'/news/20120416/',purpose:'一覧から外れた開設時の原図へ進む。'},
  {word:'開設時の区画配置',source:'MX-2019-410',destination:'/news/20120416/',purpose:'A4-01と同じ記事へ至る別の検索語。'},
+ {word:'411号室',source:'原図A4-01／MX-2019-410',destination:'/tenants/0008/',purpose:'旧入居者が2019年9月に入口の名札を返却した記録。公開されている企業紹介だけが対象。'},
  {word:'朝倉紬乃',source:'受領ZIP内の告発書PDF',destination:'/people/asakura-tsumugi/',purpose:'End2になる前に、氏名と生年月日を確認する。'},
 ];
 export const catalogQueries=[

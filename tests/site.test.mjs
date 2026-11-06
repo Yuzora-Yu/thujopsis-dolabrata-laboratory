@@ -108,6 +108,8 @@ test('publication numbers form tight sequences independent of account registrati
 test('public search tolerates spacing and width, and member links open a separate tab',async()=>{
  const c=client();for(const q of ['朝倉紬乃','朝倉 紬乃','朝倉　紬乃','朝 倉  紬'])assert.match((await c.get('/search/?q='+encodeURIComponent(q))).text,/href="\/people\/asakura-tsumugi\//,q);
  assert.match((await c.get('/search/?q='+encodeURIComponent('３Ｄプリンター'))).text,/工房のご案内/);
+ assert.match((await c.get('/search/?q='+encodeURIComponent('４１１ 号室'))).text,/href="\/tenants\/0008\//);
+ assert.doesNotMatch((await c.get('/search/?q='+encodeURIComponent('４１２号室'))).text,/href="\/tenants\/0013\//);
  assert.match((await c.get('/membership/')).text,/href="\/members\/" target="_blank" rel="noopener"/);
  assert.doesNotMatch((await c.get('/')).text,/↗/);
 });

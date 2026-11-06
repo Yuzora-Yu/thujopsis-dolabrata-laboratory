@@ -156,6 +156,8 @@ for entry in payload["media"]:
     else:
         scan(OUT / (entry["id"] + ".pdf"), out, entry["id"])
 
-scan(ROOT / "public/assets/archive/ks-1943-06.pdf",
-     ROOT / "public/assets/archive/ks-1943-06-scan.jpg", "KS-1943-06")
-print(f"Created {len(payload['media'])} protected files and the public KS-1943-06 archival scan.")
+if "--records-only" not in sys.argv:
+    scan(ROOT / "public/assets/archive/ks-1943-06.pdf",
+         ROOT / "public/assets/archive/ks-1943-06-scan.jpg", "KS-1943-06")
+    print("Updated the public KS-1943-06 archival scan.")
+print(f"Created {len(payload['media'])} protected files.")
