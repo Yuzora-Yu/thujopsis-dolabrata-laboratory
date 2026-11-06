@@ -196,11 +196,12 @@
   {
     "key": "g-retrofit",
     "year": 2021,
-    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-1cede010-5710-4786-88b6-5b325fdf53b4.png",
-    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. A small gray 3D printed fixed-angle equipment mounting bracket placed next to an older bracket that has a long adjustment slot. Scale ruler and handwritten illegible workshop checklist, restrained technical delivery photograph. Both brackets buildable, thick layered plastic. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. Photographed with an ordinary 2019-era phone camera, flat office lighting, slight compressed detail and mundane exposure. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
-    "references": [
-      "https://www.scu.edu/media/school-of-engineering/pdfs/maker-lab-resources/Applications-of-Making-From-the-SCU-Maker-Lab.pdf"
-    ],
+    "path": "docs/source-images/g-retrofit.png",
+    "prompt": "Photorealistic-natural documentary workshop photograph, landscape 3:2, 2019–2020 ordinary Japanese fabrication lab web-gallery image, a factual close-up of exactly two dark grey FDM 3D printed prototype support brackets, both on an unmarked matte slate-green cutting mat over a pale birch workbench. Show both complete bracket footprints and their facing vertical flanges from the same slightly oblique overhead camera angle, same real scale and orientation, arranged left and right with calm breathing room. The two are versions of the same small industrial part with a flat rectangular base that rests flush on the mat, and one vertical rectangular flange forming a rigid L shape. Each has two simple through-holes in the base and two fastening features on the upright flange. Left bracket is the original adjustable version, with one round pivot hole below and, well above it, one short horizontally sweeping curved through-slot whose curve is centered on that lower pivot. Right bracket is the revised fixed version: same external dimensions, one matching lower round pivot hole, and one matching upper round hole positioned approximately in the middle of where the slot would be. The rear of each upright may have a subtle straight gusset, but the camera-facing hole surfaces must be clear, with nothing blocking the openings. The opening edges and visible inner walls should obey the perspective, material thickness, and directional light. Realistic subtle parallel print layer lines, slight unevenness at layer seams, unbranded neutral industrial plastic, normal diffuse overcast light from left, grounded contacts and gentle shadows, natural moderate depth of field, modest late-Heisei compact digital camera color and optics. Tight practical work-record framing without dramatic studio lighting. Background contains only a softly out-of-focus section of clean bench, no people, hands, markings, lettering, measurement instruments, diagrams, rulers, screws, cables, computer screen, logos, loose clutter, or graphical overlays. Emphasis on the pair of different hole shapes and physical plausibility.",
+    "references": [],
+    "publicationWidth": 1280,
+    "jpegQuality": 84,
+    "review": "2020年の撮影、2021年掲載。支持部の接地、同じ位置にある下の軸穴、上の円弧状長穴と丸穴を確認した。",
     "asset": "public/assets/media/g-retrofit.webp"
   },
   {
