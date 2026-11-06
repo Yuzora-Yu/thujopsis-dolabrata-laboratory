@@ -204,11 +204,14 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await member.locator('#member-id').fill('201204010017');await member.locator('#member-password').fill('20080519');
   assert.notEqual(await member.locator('.member-header').evaluate(header=>getComputedStyle(header).backgroundColor),publicHeader);
   await member.getByRole('button',{name:/ログイン/}).click();await member.getByRole('heading',{name:'会員トップ',exact:true}).waitFor();
-  await member.locator('.member-workshop-note').getByRole('link',{name:'工房でのやり取りを読む',exact:true}).click();
+  await member.locator('.member-workshop-note').getByRole('link',{name:'当時の共同試作の連絡',exact:true}).click();
   await member.getByRole('heading',{level:1,name:'生活道具・共同試作の連絡',exact:true}).waitFor();
   assert.match(await member.locator('.project-thread').innerText(),/焼き芋/);
   const messages = member.getByRole('navigation',{name:'会員メニュー'}).getByRole('link',{name:'施設からの連絡',exact:true});
   await messages.click();
+  const returnNotice=member.locator('.message').filter({hasText:'瀬尾灯さんの試作品'});
+  assert.match(await returnNotice.innerText(),/川瀬様\s+11月2日の返却窓口の変更/);
+  assert.match(await returnNotice.getByRole('link',{name:'当時の共同試作の連絡'}).getAttribute('href'),/\/members\/projects\/fabrication\/$/);
   assert.match(await member.locator('.message').filter({hasText:'循環設備の検収資料について'}).innerText(),/実機の寸法は、別途お渡しする検収表/);
   await member.locator('[data-assigned-record="YH-2013-014"]').click();
   await member.locator('.record-media a[href$="YH-2013-014.pdf"]').waitFor();

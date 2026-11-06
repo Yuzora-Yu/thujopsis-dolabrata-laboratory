@@ -46,13 +46,17 @@ function assignedNoticeList(role){
   </article>`;
  }).join('');
 }
+function workshopReturnNotice(account,paused,style){
+ if(account.role!=='minamo')return '';
+ return `<article class="${style}" aria-labelledby="workshop-note-title">
+  <p class="eyebrow"><time datetime="2026-10-30">2026.10.30</time> ／ 工房受付${paused?'（保存分）':''}</p>
+  <h2 id="workshop-note-title">瀬尾灯さんの試作品</h2>
+  <p>川瀬様<br>11月2日の返却窓口の変更にあたり、お預かり品の控えを確認しております。瀬尾灯さんが本を開いておく道具を試作した際、滑り止めの材料をご用意いただいた件です。ご本人に品物をお渡しした日が分かる控えがございましたら、工房受付までお知らせください。</p>
+  <a class="text-link" href="/members/projects/fabrication/">当時の共同試作の連絡</a>
+ </article>`;
+}
 function memberHome(account,paused){
- const workshopNote = account.role==='minamo' ? `<section class="member-workshop-note" aria-labelledby="workshop-note-title">
-  <p class="eyebrow"><time datetime="2022-07-08">2022.07.08</time> ／ 工房からの共有（保存分）</p>
-  <h2 id="workshop-note-title">瀬尾さんの、次の試作</h2>
-  <p>鉛筆のグリップを作った瀬尾灯さんの取材が掲載されました。次の試作は、本を開いたままにしておける道具です。机でずれないよう、底に使う材料を川瀬さんにご相談しています。</p>
-  <a class="text-link" href="/members/projects/fabrication/">工房でのやり取りを読む</a>
- </section>` : '';
+ const workshopNote = workshopReturnNotice(account,paused,'member-workshop-note');
  const lastLink = account.role==='asakura'
   ? '<a href="/members/personal/">個人保存資料 <small>非共有の研究記録</small></a>'
   : '<a href="/members/organization/">運営団体情報 <small>事業主体・法人情報</small></a>';
@@ -154,9 +158,11 @@ function renderMemberPage(path,ctx){
  if(path==='/members/messages/'){
   const assigned=assignedNoticeList(account.role);
   const privateMessage=account.role==='institution'&&caseState.contact?originalInquiryReply(ctx):'';
-  const pausedNotice=generalUsePaused(caseState.ending)?'<article class="message"><time datetime="2026-11-06">2026.11.06</time> <span class="member-meta">／ 運営事務局</span><h2>一般利用の受付休止</h2><p>会議室・工房の新規利用申請の受付を休止しております。</p><p><a class="text-link" href="/news/closure/">施設のお知らせ</a></p></article>':'';
+  const paused=generalUsePaused(caseState.ending);
+  const workshopNote=workshopReturnNotice(account,paused,'message');
+  const pausedNotice=paused?'<article class="message"><time datetime="2026-11-06">2026.11.06</time> <span class="member-meta">／ 運営事務局</span><h2>一般利用の受付休止</h2><p>会議室・工房の新規利用申請の受付を休止しております。</p><p><a class="text-link" href="/news/closure/">施設のお知らせ</a></p></article>':'';
   const changed=caseState.ending==='end2'?'<article class="message"><time>2026.11.06 / 運営事務局</time><h2>担当者の変更</h2><p>工房保全担当への照会は事務局へ移管いたしました。旧担当者の個人登録は終了しました。</p></article>':'';
-  return memberLayout('施設からの連絡',`<h1>施設からの連絡</h1>${changed}${pausedNotice}${privateMessage}<article class="message"><time datetime="2026-10-01">2026.10.01 / 運営事務局</time><h2>4階共用部の自動扉点検について</h2><p>10月19日（月）の9時から11時まで、4階共用部の自動扉を順次点検いたします。作業中は職員が通行をご案内いたします。会議室とラウンジは通常どおりご利用いただけます。</p></article>${assigned}`,{...ctx,active:'messages'});
+  return memberLayout('施設からの連絡',`<h1>施設からの連絡</h1>${changed}${pausedNotice}${privateMessage}${workshopNote}<article class="message"><time datetime="2026-10-01">2026.10.01 / 運営事務局</time><h2>4階共用部の自動扉点検について</h2><p>10月19日（月）の9時から11時まで、4階共用部の自動扉を順次点検いたします。作業中は職員が通行をご案内いたします。会議室とラウンジは通常どおりご利用いただけます。</p></article>${assigned}`,{...ctx,active:'messages'});
  }
  if(path==='/members/inquiry/'){
   if(inquiryClosed(caseState.ending)){

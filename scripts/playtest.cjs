@@ -278,11 +278,12 @@ async function newsInterface(p){
  const popup=p.waitForEvent('popup');await p.locator('.member-link').click();const member=await popup;member.on('pageerror',e=>errors.push(e.message));await p.close();p=member;
  await login(p,minamoId,ymd(minamo['設立日']));
  const workshopShare=p.locator('.member-workshop-note');
- assert.match(await workshopShare.innerText(),/工房からの共有（保存分）/);
- await workshopShare.getByRole('link',{name:'工房でのやり取りを読む'}).click();
+ assert.match(await workshopShare.innerText(),/2026\.10\.30[\s\S]*返却窓口の変更[\s\S]*ご本人に品物をお渡しした日/);
+ assert.doesNotMatch(await workshopShare.innerText(),/FAB-2022-071|P-034|B-07/);
+ await workshopShare.getByRole('link',{name:'当時の共同試作の連絡'}).click();
  await until(p,'生活道具・共同試作の連絡');
  const workshopConversation=await p.locator('.project-thread').innerText();
- assert.match(workshopConversation,/焼き芋[\s\S]*川瀬 修邦[\s\S]*金曜の点検[\s\S]*料理帳のコピー[\s\S]*受取欄はまだ空けて/);
+ assert.match(workshopConversation,/焼き芋[\s\S]*川瀬 修邦[\s\S]*金曜の点検[\s\S]*作ってほしいところに付箋[\s\S]*料理帳の写し[\s\S]*貸出・返却票（FAB-2022-071）[\s\S]*受取欄はまだ空けて/);
  const [interview] = await Promise.all([p.waitForEvent('popup'),p.getByRole('link',{name:/母の字で、また手紙を/}).click()]);
  await interview.getByRole('heading',{level:1,name:'母の字で、また手紙を。瀬尾灯さんの道具づくり'}).waitFor();
  assert.match(await body(interview),/来月、家で使ってもらった様子を載せたい/);
