@@ -16,14 +16,14 @@ W,H=A4
 def para(c,text,x,y,width,size=10,leading=18,font='Mincho'):
  p=Paragraph(text,ParagraphStyle('p',fontName=font,fontSize=size,leading=leading,wordWrap='CJK',textColor=colors.HexColor('#302e28')))
  _,height=p.wrap(width,1000);p.drawOn(c,x,y-height);return y-height
-def paper(name,title,date):
- c=canvas.Canvas(str(OUT/name),pagesize=A4);c.setTitle(title);c.setAuthor('産業継続研究資料 保存室')
- c.setFillColor(colors.HexColor('#f5f1e6'));c.rect(0,0,W,H,fill=1,stroke=0)
+def paper(name,title,date,*,height=H):
+ c=canvas.Canvas(str(OUT/name),pagesize=(W,height));c.setTitle(title);c.setAuthor('産業継続研究資料 保存室')
+ c.setFillColor(colors.HexColor('#f5f1e6'));c.rect(0,0,W,height,fill=1,stroke=0)
  c.setFillColor(colors.HexColor('#302e28'));c.setStrokeColor(colors.HexColor('#504a40'))
- c.setFont('JP',8);c.drawString(38,H-30,'産業継続研究資料 保存室　複写収録');c.drawRightString(W-38,H-30,date)
+ c.setFont('JP',8);c.drawString(38,height-30,'産業継続研究資料 保存室　複写収録');c.drawRightString(W-38,height-30,date)
  return c
 
-if '--missing-only' not in sys.argv:
+if not {'--missing-only', '--corrections-only'}.intersection(sys.argv):
     c=paper('ks-1943-06.pdf','第二種国土継続研究 実施概要','収蔵番号 KS-1943-06')
     c.setLineWidth(.7);c.rect(40,55,W-80,H-110)
     c.setFont('Mincho',14);c.drawCentredString(W/2,H-105,'第二種國土繼續研究')
@@ -55,18 +55,70 @@ def newspaper(name,issue,headline,subhead,paragraphs,code):
  c.setFont('JP',8);c.drawString(50,70,'複写元：地域版保存紙面　／　原本の改変なし')
  c.save()
 
+def regional_clipping(name, issue, headline, subhead, paragraphs, code, *, correction=False):
+    height = 405
+    c = paper(name, '夕凪日報 ' + issue, '収蔵番号 ' + code, height=height)
+    c.setDateFormatter(lambda *_: 'D:20211112000000')
+    c.setFont('Mincho', 34)
+    c.drawString(40, height - 87, '夕 凪 日 報')
+    c.setFont('Mincho', 10)
+    c.drawRightString(W - 40, height - 72, issue)
+    c.drawRightString(W - 40, height - 89, '地域面')
+    c.setLineWidth(1)
+    c.line(40, height - 101, W - 40, height - 101)
+
+    if correction:
+        # A single correction box clipped from the regional page.
+        x, top, width = 46, height - 121, 271
+        c.setFont('Mincho', 14)
+        c.drawString(x + 12, top - 23, headline)
+        c.setFont('Mincho', 10)
+        c.drawString(x + 12, top - 42, subhead)
+        y = top - 52
+        for paragraph in paragraphs:
+            y = para(c, '　' + paragraph, x + 12, y, width - 24, 10, 16) - 6
+        c.setLineWidth(.5)
+        c.rect(x, y - 6, width, top - y + 6)
+    else:
+        c.setFont('Mincho', 23)
+        c.drawString(44, height - 137, headline)
+        c.setFont('Mincho', 15)
+        c.drawString(44, height - 163, subhead)
+        top, left, right = height - 179, 45, W / 2 + 10
+        width = W / 2 - 55
+        bottoms = []
+        for x, column in zip((left, right), (paragraphs[:2], paragraphs[2:])):
+            y = top
+            for paragraph in column:
+                y = para(c, '　' + paragraph, x, y, width, 11, 17) - 8
+            bottoms.append(y)
+        y = min(bottoms)
+        c.setLineWidth(.4)
+        c.line(W / 2, top + 2, W / 2, y)
+
+    c.setFont('JP', 8)
+    c.drawString(46, y - 31, '2021年11月12日 受領　／　夕凪日報 地域面の切抜')
+    c.save()
+
+
 if '--missing-only' not in sys.argv:
-    newspaper('younagi-20211104.pdf','2021年11月4日（木） 初刷','交流施設前理事長死亡','服毒による自殺か',[
+    regional_clipping('younagi-20211104.pdf','2021年11月4日（木） 初刷','交流施設前理事長死亡','服毒による自殺か',[
      '産業支援交流施設「あすなろ」の前理事長、榊原惟臣氏（70）が三日朝、施設内で死亡した。施設運営事務局は本紙取材に、本人の服用による可能性があると説明した。',
      '同氏は二〇一〇年にあすなろ産業振興機構を設立。二〇一二年に施設を開設し、生活支援の道具や設備を、企業と利用者が共同で研究する事業を進めてきた。近年は施設内で療養していたという。',
      '一方、家族への詳しい説明は行われておらず、経緯の確認が続いている。施設は三日付で、病気による逝去とする告知を掲載した。',
      '関係者によると、榊原氏は共同事業の記録について運営側に説明を求めていた。事務局は、その内容と今回の死亡との関係について回答していない。',
-    ],'収蔵番号 NK-2021-1104')
-    newspaper('younagi-20211105.pdf','2021年11月5日（金）','おわびと訂正','榊原惟臣氏に関する記事について',[
+    ],'NK-2021-1104')
+    regional_clipping('younagi-20211104-late.pdf','2021年11月4日（木） 後刷','交流施設前理事長死亡','施設が逝去を公表',[
+     '産業支援交流施設「あすなろ」の前理事長、榊原惟臣氏（70）が三日朝、施設内で死亡した。施設は三日付で、病気による逝去とする告知を掲載した。',
+     '同氏は二〇一〇年にあすなろ産業振興機構を設立。二〇一二年に施設を開設し、生活支援の道具や設備を、企業と利用者が共同で研究する事業を進めてきた。近年は施設内で療養していたという。',
+     '家族への詳しい説明は行われていない。本紙は、死亡に至る経緯を確認している。',
+     '関係者によると、榊原氏は共同事業の記録について運営側に説明を求めていた。事務局は、その内容と今回の死亡との関係について回答していない。',
+    ],'NK-2021-1104')
+    regional_clipping('younagi-20211105.pdf','2021年11月5日（金）','おわびと訂正','榊原惟臣氏に関する記事について',[
      '四日付地域版初刷の榊原惟臣氏の死亡に関する記事で、自殺の可能性について記しましたが、死因及び本人の意思を裏付ける確認が取れなかったため、当該記述を撤回します。',
-     '取材時の施設側説明と、確認済みの事実の区別が不十分でした。関係者の皆様におわびいたします。',
+     '四日付後刷では、当該記述を削除しました。取材時の施設側説明と、確認済みの事実の区別が不十分でした。関係者の皆様におわびいたします。',
      '施設からの公式告知は、病気による逝去としております。本紙は、死亡に至る経緯を引き続き確認します。',
-    ],'収蔵番号 NK-2021-1105')
+    ],'NK-2021-1105',correction=True)
 
 
 if '--corrections-only' not in sys.argv:

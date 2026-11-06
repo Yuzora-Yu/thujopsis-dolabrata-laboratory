@@ -23,6 +23,10 @@ async function traceNewspaper(page,archive){
  const catalog=archive.locator('.legacy-catalog');
  await catalog.getByRole('link',{name:/公式告知/}).click();
  assert.match(await body(archive),/病気のため逝去/);
+ await archive.getByRole('link',{name:/施設サイトのお知らせ/}).click();
+ assert.equal(archive.url(),main('/news/20211103/'));
+ assert.match(await body(archive),/病気のため/);
+ await archive.goBack();
  await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
  const correctionCode=await catalog.getByRole('link',{name:/訂正欄/}).locator('small').innerText();
  const search=async keyword=>{
@@ -43,11 +47,22 @@ async function traceNewspaper(page,archive){
  }
  assert.equal(await catalog.locator('a:visible').count(),1);
  await catalog.getByRole('link',{name:/訂正欄/}).click();
- assert.match(await body(archive),/紙面抄録[\s\S]*当該記述を撤回/);
+ assert.match(await body(archive),/紙面抄録[\s\S]*地域版初刷[\s\S]*当該記述を撤回[\s\S]*後刷では、当該記述を削除/);
+ const checkClipping=async filename=>{
+  const pdf=archive.locator('a[href$="/'+filename+'"]');
+  assert.equal(await pdf.getAttribute('target'),'_blank');
+  const response=await archive.request.get(new URL(await pdf.getAttribute('href'),archive.url()).href);
+  assert.ok(response.ok(),filename);
+  assert.deepEqual(await response.body(),await fs.readFile('public/assets/archive/'+filename));
+ };
+ await checkClipping('younagi-20211105.pdf');
+ await checkClipping('younagi-20211104-late.pdf');
+ assert.equal(await archive.locator('a[href$="/0009/"], a[href$="/younagi-20211104.pdf"]').count(),0);
  const firstPrint=new URL(archive.url());
  firstPrint.pathname=firstPrint.pathname.replace(/\d{4}\/$/,'0009/');
  await archive.goto(firstPrint.href);
  assert.match(await body(archive),/服毒による自殺か/);
+ await checkClipping('younagi-20211104.pdf');
  const firstPrintCode=await archive.locator('.legacy-record-meta').innerText();
  await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
  await search(firstPrintCode.match(/NK-\d{4}-\d{4}/)[0]);
@@ -61,7 +76,13 @@ async function traceNewspaper(page,archive){
  await until(archive,'健康管理記録・複写受領');
  const receipt=await body(archive);
  assert.doesNotMatch(receipt,/意思確認欄|署名画像|一時間以内/);
- const comparison=await document(page,receipt.match(/AH-2021-\d{3}/)[0]);
+ const comparisonId=receipt.match(/AH-2021-\d{3}/)[0];
+ const comparison=await document(page,comparisonId);
+ assert.match(comparison,/初刷・後刷（別台紙）/);
+ assert.match(comparison,/後刷の発行時刻は紙面に記載なし/);
+ const filename=comparisonId+'.pdf';
+ const copy=await download(page,'a[href$="'+filename+'"]',filename);
+ assert.deepEqual(copy.data,await fs.readFile('private/record-media/'+filename));
  const healthId=comparison.match(/HC-2021-\d{3}-R/)[0];
  await page.locator('#next-document-id').fill(healthId);
  await page.locator('.record-lookup button').click();
