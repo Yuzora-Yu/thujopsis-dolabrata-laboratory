@@ -372,7 +372,8 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(familyInquiry,/本人の継続意思を裏付ける原本/);
  const operationsId=familyInquiry.match(/OPS-2026-\d{3}/)[0];
  const friendFile=await document(p,friendRecordId);
- assert.match(friendFile,/死亡/);
+ assert.match(friendFile,/死亡確認[\s\S]*公開プロフィールに、当施設での業務を終了した旨を追記/);
+ assert.match(friendFile,/型紙と料理帳の写しが入った紙袋は別に保管/);
  assert.match(friendFile,/灯さんの貸出票は返却欄を空けておいてください。夏帆さんの地図帳は別包みです。修理完了にはしないでください/);
  const reorganization=await document(p,'YH-2022-017');
  assert.match(reorganization,/継舟/);

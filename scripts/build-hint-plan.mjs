@@ -8,7 +8,7 @@ const seedNoteLocations={
  '/about/':'設立者の引用に添えた署名の横',
  '/facilities/':'フロアマップ案内の「4F FLOOR GUIDE」の横',
  '/workshop/':'設置機器の案内の「EQUIPMENT」の横',
- '/gallery/':'制作方法の絞り込みで「表示する」の横',
+ '/gallery/':'ページ見出しの「MADE AT ASUNARO」の横',
  '/news/':'お知らせ一覧の下にある「掲載順」の横',
  '/price/':'料金表の「施設利用料」の横',
  '/membership/':'既存会員向けの案内のボタン列',
@@ -34,7 +34,7 @@ lines.push('## 任意の探索 ／ SEEDの欄外記録','','本筋の資料照�
  }), '',
  `- No.${driftNote.number}を初めて開いた時点で、SEEDの閲覧が${experienceSettings.seedDrift.threshold}回に達したときと同じ異変が起こる。SEEDを離れると閲覧回数はリセットされる。欄外記録の発見はブラウザに残る。`,
  `- 発見順は自由。${seedNoteTotal}件そろうと、最後に開いた記録とフッターに「中央受付の引継ぎ控え」（${seedCollectionPath}）へのリンクが出る。`,
- `- No.${driftNote.number}の控えと引継ぎで、見学証の返却時刻と名簿の扱いを照合できる。結論はヒント本文で先回りして説明しない。`,'');
+ `- No.${driftNote.number}の控えと引継ぎで、見学証の返却時刻、名簿、呼出放送の操作記録を照合できる。結論はヒント本文で先回りして説明しない。`,'');
 lines.push('## 更新時の点検','','- ヒントを追加する前に、根拠となる文章・画像が、その時点の閲覧者に読めるか確認する。','- 段階1だけで答えを渡さず、観察箇所、比較対象、具体的な操作の順に開示する。','- 迂回路は別の入口を用意し、同じ前提を省略してしまわないか確認する。','- 誤認を誘う資料には、後から検証して解釈を更新できる資料を対応させる。','- ヒント設計の根拠と文書間の時系列はtests/editorial.test.mjsで検証する。','- 写真の付箋とPDFは、実物の拡大・抽出結果で確認する。','',
 '## 参考にした構造','','[公式サイト](https://kagamino-jrep.net/)と[攻略チャート](https://yaoroz.hatenablog.com/entry/2024/05/20/000000)、[ページと検索語の対応表](https://yaoroz.hatenablog.com/entry/2024/04/20/000000)を確認。段階ごとの必要情報、任意の補足情報、複数資料の照合を分けて設計する考え方を参考にした。作品固有の人物・用語・文面は使用していない。','');
 await writeFile(new URL('../docs/hint-plan.md',import.meta.url),lines.join('\n'));

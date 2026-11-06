@@ -53,7 +53,7 @@ function seedNoteButton(path){
  const content=mark?`<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${mark}</svg>`:esc(note.stamp||note.label);
  return `<button type="button" class="seed-note seed-note-${note.mark}" aria-haspopup="dialog" aria-label="${esc(note.label)}">${content}</button>`;
 }
-const heading=(en,title,lead='')=>`<div class="page-heading wrap"><div class="breadcrumb"><a href="/">HOME</a><span>/</span>${esc(title)}</div><p class="eyebrow">${en}</p><h1>${title}</h1>${lead?`<p class="page-lead">${lead}</p>`:''}</div>`;
+const heading=(en,title,lead='',notePath='')=>`<div class="page-heading wrap"><div class="breadcrumb"><a href="/">HOME</a><span>/</span>${esc(title)}</div><p class="eyebrow${notePath?' seed-note-line':''}">${en}${seedNoteButton(notePath)}</p><h1>${title}</h1>${lead?`<p class="page-lead">${lead}</p>`:''}</div>`;
 const rows = items=>`<div class="news-rows">${items.map(n=>`<a href="/news/${n.id}/" data-news-year="${n.date.slice(0,4)}" data-news-kind="${esc(n.tag)}"><time datetime="${n.date.replaceAll('.','-')}">${n.date}</time><span class="tag">${n.tag}</span><span class="news-title">${n.title}</span>${arrow}</a>`).join('')}</div>`;
 function newsFilters(items){
  const years=[...new Set(items.map(n=>n.date.slice(0,4)))],kinds=[...new Set(items.map(n=>n.tag))];
@@ -73,10 +73,10 @@ function galleryPage(query){
  const methods = [...new Set(listed.map(work=>work.tag))];
  const method = methods.includes(query) ? query : '';
  const shown = method ? listed.filter(work=>work.tag===method) : listed;
- return layout('工房制作物ギャラリー',heading('MADE AT ASUNARO','工房制作物ギャラリー','暮らしの道具から、事業のための試作品まで。工房から生まれた作品をご紹介いたします。')+`
+ return layout('工房制作物ギャラリー',heading('MADE AT ASUNARO','工房制作物ギャラリー','暮らしの道具から、事業のための試作品まで。工房から生まれた作品をご紹介いたします。','/gallery/')+`
   <section class="wrap section">
    <div class="gallery-tools">
-    <form class="filter-form" method="get" action="/gallery/" data-gallery-filter><label>制作方法 <select name="method"><option value="">すべて</option>${methods.map(value=>`<option${method===value?' selected':''}>${esc(value)}</option>`).join('')}</select></label><button type="submit">表示する</button>${seedNoteButton('/gallery/')}</form>
+    <form class="filter-form" method="get" action="/gallery/" data-gallery-filter><label>制作方法 <select name="method"><option value="">すべて</option>${methods.map(value=>`<option${method===value?' selected':''}>${esc(value)}</option>`).join('')}</select></label><button type="submit">表示する</button></form>
     <p class="gallery-results"><span data-gallery-scope>${esc(method||'すべての制作方法')}</span><span data-gallery-count>${shown.length}件</span></p>
    </div>
    ${galleryCards(shown.slice().reverse())}
@@ -221,22 +221,33 @@ function staffPage(paused){
 }
 
 function receptionCopyPage(){
- return layout('中央受付の引継ぎ控え',heading('RECEPTION','中央受付の引継ぎ控え')+`
-  <section class="wrap article narrow prose" data-seed-collection-page>
-   <p data-seed-collection-locked>この控えは現在表示できません。</p>
-   <template data-seed-collection-copy>
-    <article class="reception-copy" aria-label="中央受付の記録">
-     <p class="eyebrow">複写 ／ 中央受付・遅番</p>
-     <h2>10月1日　引継ぎ</h2>
-     <dl><div><dt>17:00</dt><dd>見学受付終了。</dd></div>
-      <div><dt>17:06</dt><dd>案内板を翌日分へ差し替え。</dd></div>
-      <div><dt>17:14</dt><dd>返却口から見学証を一枚回収。12番。</dd></div>
-      <div><dt>17:26</dt><dd>見学者名簿と照合。12番の貸出欄は空欄。</dd></div>
-      <div><dt>17:32</dt><dd>翌日分の見学証を確認。12番は棚にありました。</dd></div></dl>
-     <p class="reception-copy-note">回収した方は封筒に入れ、名簿の下に置きました。朝番の方へ。西側からの内線は、受付でそのまま取ってください。</p>
-    </article>
+ return layout('控えの照会',`
+  <div data-seed-collection-page>
+   <div data-seed-collection-locked>
+    ${heading('RECEPTION','控えの照会')}
+    <div class="wrap article narrow prose"><p>この控えは現在表示できません。</p></div>
+   </div>
+   <template>
+    <div data-seed-collection-unlocked>
+     ${heading('RECEPTION','中央受付の引継ぎ控え')}
+     <div class="wrap article narrow prose">
+      <article class="reception-copy" aria-label="中央受付の記録">
+       <p class="eyebrow">複写 ／ 中央受付・遅番</p>
+       <h2>10月1日　引継ぎ</h2>
+       <dl>
+        <div><dt>17:00</dt><dd>見学受付終了。</dd></div>
+        <div><dt>17:06</dt><dd>案内板を翌日分へ差し替え。</dd></div>
+        <div><dt>17:14</dt><dd>返却口から見学証を一枚回収。12番。</dd></div>
+        <div><dt>17:26</dt><dd>見学者名簿と照合。12番の貸出欄は空欄。</dd></div>
+        <div><dt>17:32</dt><dd>翌日分の見学証を確認。12番は棚にありました。</dd></div>
+        <div><dt>17:41</dt><dd>呼出履歴を確認。17:14の放送は中央受付の操作記録にありません。</dd></div>
+       </dl>
+       <p class="reception-copy-note">回収した方は封筒に入れ、名簿の下に置きました。朝番の方へ。西側から内線が入ったら、どの部屋か聞いておいてください。</p>
+      </article>
+     </div>
+    </div>
    </template>
-  </section>`);
+  </div>`);
 }
 
 export function home(ending=''){

@@ -39,15 +39,17 @@ function refreshSeedCollection(){
  if (reward) {
   if (complete) reward.href = href;
   else reward.removeAttribute('href');
-  reward.hidden = !complete;
+  reward.parentElement.hidden = !complete;
  }
  const page = document.querySelector('[data-seed-collection-page]');
  if (!page) return;
  const locked = page.querySelector('[data-seed-collection-locked]');
- const copy = page.querySelector('.reception-copy');
+ const copy = page.querySelector('[data-seed-collection-unlocked]');
  locked.hidden = complete;
  if (complete && !copy) page.append(page.querySelector('template').content.cloneNode(true));
  else if (!complete && copy) copy.remove();
+ const visible = complete ? page.querySelector('[data-seed-collection-unlocked]') : locked;
+ document.title = visible.querySelector('h1').textContent + ' | あすなろ産業支援交流施設';
 }
 
 function rememberSeedNote(number){
@@ -76,8 +78,8 @@ function installSeedNotes(){
  dialog.className = note.beginsDrift ? 'seed-note-dialog seed-note-receipt-dialog' : 'seed-note-dialog';
  dialog.id = 'seed-note-dialog';
  dialog.setAttribute('aria-labelledby','seed-note-title');
- dialog.setAttribute('aria-describedby','seed-note-body');
- dialog.innerHTML = '<div class="seed-note-meta"><p class="eyebrow"></p><span class="seed-note-number"></span></div><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><div class="seed-note-actions"><a data-seed-note-source target="_blank" rel="noopener" hidden>参考資料（NASA・別タブ）</a><span data-seed-note-progress></span><a class="text-link" data-seed-note-reward hidden>中央受付の引継ぎ控えへ</a><button type="button" class="button dark">閉じる</button></div>';
+ dialog.setAttribute('aria-describedby','seed-note-body seed-note-progress');
+ dialog.innerHTML = '<div class="seed-note-meta"><p class="eyebrow"></p><span class="seed-note-number"></span></div><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><div class="seed-note-actions"><a data-seed-note-source target="_blank" rel="noopener" hidden>参考資料（NASA・別タブ）</a><span id="seed-note-progress" data-seed-note-progress></span><button type="button" class="button dark">閉じる</button></div><p class="seed-note-unlock" hidden><a class="text-link" data-seed-note-reward>中央受付の引継ぎ控えへ</a></p>';
  dialog.querySelector('.eyebrow').textContent = note.beginsDrift ? '受付控え ／ 複写' : 'あすなろの豆知識';
  const total = seedCollection()?.total;
  if (total && note.number) dialog.querySelector('.seed-note-number').textContent = `No.${note.number}/${total}`;

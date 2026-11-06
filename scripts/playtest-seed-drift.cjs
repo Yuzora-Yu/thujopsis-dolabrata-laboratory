@@ -17,6 +17,7 @@ async function checkMenuNotes(browser){
    const marker=page.locator('main .seed-note');
    assert.equal(await marker.count(),1,path);
    assert.equal(await page.locator('.site-footer .seed-note').count(),0,path);
+   if(path==='/gallery/')assert.equal(await page.locator('.page-heading .seed-note').count(),1);
    labels.add(await marker.getAttribute('aria-label'));
    const before=(await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_'));
    await marker.click();
@@ -39,6 +40,7 @@ async function checkMenuNotes(browser){
   assert.equal(await finalNote.locator('.seed-note-number').innerText(),'No.9/9');
   assert.equal(await finalNote.locator('[data-seed-note-progress]').innerText(),'記録済み 9 / 9');
   await page.locator('body.seed-drift-active').waitFor();
+  await page.screenshot({path:'.work/qa/seed-ninth-unlocked.png'});
   await finalNote.getByRole('link',{name:'中央受付の引継ぎ控えへ'}).click();
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   for (const path of ['/gallery/0021/','/facilities/coworking/','/facilities/staff/','/floor-map/','/guide/access/']) {
@@ -59,6 +61,8 @@ async function checkReceptionCopy(browser){
   await page.getByText('この控えは現在表示できません。').waitFor();
   assert.equal(await page.locator('.reception-copy').count(),0);
   assert.equal(await page.locator('.seed-collection-nav a').count(),0);
+  assert.equal(await page.getByRole('heading',{level:1}).innerText(),'控えの照会');
+  assert.match(await page.title(),/^控えの照会 /);
 
   await page.goto(at('/visit/'));
   assert.equal(await page.locator('.seed-drift-link').count(),0);
@@ -101,16 +105,23 @@ async function checkReceptionCopy(browser){
     await page.locator('.seed-note').click();
     assert.equal(await note.locator('[data-seed-note-progress]').innerText(),'記録済み 2 / 9');
    }
-   if(i<noteRoutes.length-1)await page.keyboard.press('Escape');
+   if(i<noteRoutes.length-1){
+    assert.equal(await note.getByRole('link',{name:'中央受付の引継ぎ控えへ'}).count(),0);
+    await page.keyboard.press('Escape');
+   }
   }
   await other.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   await other.getByText('翌日分の見学証を確認。12番は棚にありました。',{exact:true}).waitFor();
+  await other.getByText('呼出履歴を確認。17:14の放送は中央受付の操作記録にありません。',{exact:true}).waitFor();
+  assert.match(await other.title(),/^中央受付の引継ぎ控え /);
+  const reward=note.getByRole('link',{name:'中央受付の引継ぎ控えへ'});
+  assert.equal(await reward.evaluate(link=>link.getBoundingClientRect().bottom<=link.closest('dialog').getBoundingClientRect().bottom),true);
   await note.getByRole('link',{name:'中央受付の引継ぎ控えへ'}).click();
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   await page.reload();
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   await page.locator('.seed-collection-nav').getByRole('link',{name:'中央受付の引継ぎ控え'}).waitFor();
-  await page.screenshot({path:'.work/qa/seed-reception-reward.png'});
+  await page.screenshot({path:'.work/qa/seed-reception-reward.png',fullPage:true});
   assert.deepEqual(errors,[]);
   savedProgress=await context.storageState();
  } finally {
