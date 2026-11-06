@@ -58,7 +58,7 @@ enrichPublicPeople({gallery,tenants});
 
 export const searchEntries = [
  ...humanSearchEntries,
- {title:programTitle,url:programPath,text:'月面 宇宙開発 居住モジュール 生活継続 A72 地上統合実証 72時間 循環設備 補給停止 公開展示'},
+ {title:programTitle,url:programPath,text:'月面 宇宙 工房 道具 小物入れ 企画展示'},
  {title:'施設・サービス',url:'/facilities/',text:'会議室 オフィス コワーキング 食堂 プレゼンテーションホール フロアマップ'},
  {title:'工房のご案内',url:'/workshop/',text:'3Dプリンター レーザーカッター 試作 ものづくり'},
  {title:'料金のご案内',url:'/price/',text:'利用料金 月額 会議室 工房'},

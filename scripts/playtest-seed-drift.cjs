@@ -7,7 +7,27 @@ let browser;
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
  await page.goto(at('/gallery/'));
- for(let visit=1;visit<14;visit++)await page.reload();
+ await page.waitForFunction(()=>document.querySelectorAll('.seed-note').length===5);
+ const firstCount=(await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_'));
+ const titles=[];
+ for(const marker of await page.locator('.seed-note').all()){
+  await marker.click();
+  const dialog=page.getByRole('dialog');
+  await dialog.waitFor();
+  titles.push(await dialog.getByRole('heading').innerText());
+  await page.keyboard.press('Escape');
+  assert.equal(await marker.evaluate(button=>button===document.activeElement),true);
+ }
+ assert.equal(new Set(titles).size,5);
+ assert.equal(await page.locator('.seed-note-quiet').count(),1);
+ assert.equal((await context.cookies()).find(cookie=>cookie.name===firstCount.name).value,firstCount.value);
+ await page.getByRole('button',{name:'豆知識：地上から届いた工具'}).click();
+ await page.getByRole('dialog').getByRole('link',{name:'工房のご案内'}).click();
+ await page.waitForURL(at('/workshop/'));
+ await page.locator('#main-navigation').getByRole('link',{name:'制作物ギャラリー',exact:true}).click();
+ await page.waitForURL(at('/gallery/'));
+ await page.waitForFunction(name=>document.cookie.split('; ').includes(name+'=3'),firstCount.name);
+ for(let visit=3;visit<14;visit++)await page.reload();
  let seed=(await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_'));
  assert.equal(Number(seed.value),14);assert.equal(await page.locator('.seed-drift-link').count(),0);
  await page.reload();await page.locator('body.seed-drift-active').waitFor();
@@ -30,7 +50,7 @@ let browser;
  assert.equal(await red.locator('.news-title').evaluate(node=>getComputedStyle(node).color),'rgb(155, 32, 40)');
  const response=await Promise.all([page.waitForNavigation(),red.click()]);assert.equal(response[0].status(),404);
  await page.getByRole('heading',{name:'ページが見つかりません。'}).waitFor();await page.locator('#main-navigation a[href$="/tenants/"]').waitFor();
- for(const route of ['/floor-map/','/workshop/','/membership/','/facilities/cafe/']){await page.goto(at(route));await page.locator('.seed-fragment a').waitFor();assert.equal(await page.locator('.seed-fragment a').count(),1,route);}
+ for(const route of ['/floor-map/','/workshop/','/membership/','/facilities/cafe/']){await page.goto(at(route));await page.locator('.seed-fragment a').waitFor();assert.equal(await page.locator('.seed-fragment a').count(),1,route);assert.equal(await page.locator('.seed-note').count(),5,route);}
  await page.goto(at('/gallery/0021/'));await page.locator('article.seed-corrupted').waitFor();
  await page.goto(at('/gallery/0022/'));assert.equal(await page.locator('body').getAttribute('data-asunaro-stage'),'root');
  assert.equal((await context.cookies()).some(cookie=>cookie.name===seed.name),false);

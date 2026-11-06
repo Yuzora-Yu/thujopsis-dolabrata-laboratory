@@ -518,6 +518,9 @@ export const researchRecords = [
     "title": "居住実証区画・運用報告",
     "date": "2026年10月26日",
     "owner": "オルト居住運用設計／居住実証運用室",
+    "links": [
+      {"path":"/research/lunar-habitat/field-notes/","text":"別紙：月面企画展示の作業控え"}
+    ],
     "roles": [
       "institution"
     ],

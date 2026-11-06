@@ -1,4 +1,5 @@
-import {programPath} from './program.mjs';
+import {programPath,programNotesPath} from './program.mjs';
+import {seedNoteData} from './seed-notes.mjs';
 import {gallery,tenants,news,documents} from './content.mjs';
 import {editorialPages} from './world/editorial.mjs';
 import {archiveItems,archiveNotes} from './world/archive-data.mjs';
@@ -29,6 +30,7 @@ const entries=[
  ...['/room/','/room/console/','/room/console/subjects/',...archiveNotes.map(n=>`/room/records/${n.id}/`)].map(path=>({kind:'archive',path,level:4})),
  ...['hozen','audit'].flatMap(kind=>['/receive/','/received/'].map(path=>({kind,path,level:kind==='audit'?6:5}))),
  ...['/news/closure/','/news/staff-change/'].map(path=>({kind:'main',path,level:5})),
+ {kind:'main',path:programNotesPath,level:1},
 ];
 export const pageRegistry=entries.map((entry,index)=>({...entry,number:index+1}));
 const byKey=new Map(pageRegistry.map(p=>[p.kind+':'+p.path,p]));
@@ -42,7 +44,10 @@ export function decoratePage(html,{kind='main',path='/',role}={}){
  if(!html)return html;const position=pagePosition(kind,path,role);
  const growth=growthStages[position?.level]||growthStages[0];
  const counter=experienceSettings.showPageIndex&&position?`<span class="page-index" data-page-number="${position.number}" data-page-total="${position.total}" data-growth-stage="${growth.name.toLowerCase()}" aria-label="ページ${position.number}、全${position.total}ページ${experienceSettings.showGrowthStage?'、探索段階 '+growth.name+'（'+growth.label+'）':''}">${experienceSettings.showGrowthStage?`<span class="index-growth">${growth.name}</span>`:''}<span class="index-number">${String(position.number).padStart(3,'0')} <span>/</span> ${position.total}</span></span>`:'';
+ const seedNotes=kind==='main'&&position?.level===0?`<script type="application/json" data-seed-notes>${seedNoteData(path,position.number)}</script>`:'';
+ const noIndex=kind==='main'&&(path===programNotesPath||path==='/news/20261027/')?'<meta name="robots" content="noindex,nofollow">':'';
  return html.replace('<!--PAGE_INDEX-->',counter)
   .replace(/<body\b([^>]*)>/,`<body$1 data-asunaro-stage="${growth.name.toLowerCase()}" data-seed-drift-enabled="${experienceSettings.seedDrift.enabled}" data-seed-drift-threshold="${experienceSettings.seedDrift.threshold}">`)
-  .replace('</head>','<script defer src="/seed-drift.js"></script></head>');
+  .replace('</body>',seedNotes+'</body>')
+  .replace('</head>',noIndex+'<script defer src="/seed-drift.js"></script></head>');
 }

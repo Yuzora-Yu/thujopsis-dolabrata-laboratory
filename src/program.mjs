@@ -1,14 +1,21 @@
 export const programPath='/research/lunar-habitat/';
-export const programTitle='月面居住技術プログラム';
+export const programTitle='月に、暮らしを持っていく。';
+export const programNotesPath=programPath+'field-notes/';
 
-// Public exhibition labels. This is a schematic of the test, not a floor plan.
-export function programOverview(){
- return `<section class="lunar-overview" aria-labelledby="lunar-overview-title"><div class="wrap lunar-overview-grid"><div><p class="eyebrow">A72 / GROUND HABITAT TEST</p><h2 id="lunar-overview-title">補給が来ない。<br>それでも、朝は来る。</h2></div><div><p>月面では、壊れた部品をすぐに取り寄せることはできません。水を回し、通信を引き継ぎ、必要な道具をその場で作る。あすなろでは、その一つひとつをつないで、暮らしが続くかを地上で確かめます。</p><a class="text-link" href="${programPath}">月面居住技術プログラム</a></div></div></section>`;
+export function programBanner(){
+ return `<aside class="wrap program-promo" aria-label="企画展示"><a href="${programPath}"><img src="/assets/media/lunar-habitat-concept.webp" width="1817" height="866" alt="" loading="lazy" decoding="async"><div><p class="eyebrow">あすなろの企画展示</p><h2>${programTitle}</h2><p>もし月で暮らすなら、どんな道具を持っていきますか。</p><span class="text-link">企画展示を見る</span></div></a></aside>`;
 }
 
+export function programExhibit(){
+ return `<section class="hero lunar-hero" aria-labelledby="lunar-title">
+ <img class="hero-image" src="/assets/media/lunar-habitat-concept.webp" alt="月面の平原に三つの建物をつないだ構想図。窓に暖色の灯りがともっている。" width="1817" height="866" fetchpriority="high" decoding="async">
+ <div class="hero-shade"></div><div class="hero-content"><p class="hero-en">あすなろの企画展示</p><h1 id="lunar-title">月に、暮らしを<br>持っていく。</h1><p>もし月で暮らすなら、どんな道具を持っていきますか。</p></div><p class="lunar-hero-caption">月面居住区 構想図</p></section>
+ <article class="wrap article lunar-program"><div class="lunar-intro"><p class="eyebrow">EXHIBITION / 4F</p><h2>月へ持っていくもの。</h2><p>小さな箱、壊れたときに取り替えられる留め具、次の人へ残すメモ。月で暮らす日を想像しながら、工房でつくった道具の見本を展示しております。</p><div class="button-row"><a class="button dark" href="/news/20261020/">展示のご案内</a><a class="text-link" href="/gallery/0026/">工房の小物ケース</a></div></div></article>`;
+}
+
+// Working notes for the exhibit are linked from the internal operations report.
 export function programBody(){
  return `<article class="wrap article lunar-program">
- <figure class="lunar-concept"><img src="/assets/media/lunar-habitat-concept.webp" alt="月面の平原に三つの居住モジュールをつないだ構想図。窓に暖色の灯りがともっている。" width="1817" height="866" decoding="async"><figcaption>月面居住区 構想図</figcaption></figure>
  <div class="lunar-intro"><p class="eyebrow">A72 / 地上統合実証</p><h2>補給便が遅れた朝、<br>最初に何をしますか。</h2><p>次の便に積んだ部品を待つあいだも、水を使い、食事を作り、翌朝の班に仕事を渡します。A72は、補給を受けられない72時間を想定した地上実証です。水の循環、現地での部品製作、作業記録の引き継ぎを、一つの居住環境で確かめます。</p></div>
  <section class="lunar-demonstrator" aria-labelledby="demo-heading" data-habitat-demo data-mode="normal"><header><div><p class="eyebrow">A72 / SYSTEM EXHIBIT</p><h2 id="demo-heading">補給が止まったら</h2></div><div class="lunar-mode" role="group" aria-label="設備展示の運用状態"><button type="button" data-habitat-mode="normal" aria-pressed="true">通常</button><button type="button" data-habitat-mode="isolated" aria-pressed="false">補給停止</button></div></header>
  <svg class="lunar-system-diagram" viewBox="0 0 860 220" role="img" aria-label="三つの居住モジュールを結ぶ設備の概略図">

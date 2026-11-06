@@ -9,9 +9,14 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   const c=await b.newContext({viewport:{width:1440,height:1000},acceptDownloads:true});
   const p=await c.newPage(),errors=[],media=[];p.on('pageerror',e=>errors.push(e.message));
   p.on('request',r=>{if(r.url().includes('/assets/record-media/'))media.push(r.url());});
-  await p.goto(base+'/');await p.getByRole('heading',{level:1,name:/月に、暮らしを/}).waitFor();
-  await p.locator('.lunar-hero img').evaluate(im=>im.decode());await p.screenshot({path:'.work/qa/nov06-home-desktop.png'});
-  await p.locator('.lunar-hero').getByRole('link',{name:'月面居住技術プログラム',exact:true}).click();
+  await p.goto(base+'/');await p.getByRole('heading',{level:1,name:/ともに、/}).waitFor();
+  await p.locator('.facility-hero img').evaluate(im=>im.decode());await p.screenshot({path:'.work/qa/nov06-home-desktop.png'});
+  await p.locator('.program-promo a').click();
+  await p.getByRole('heading',{level:1,name:/月に、暮らしを/}).waitFor();
+  assert.equal(await p.locator('[data-habitat-demo],a[href*="/field-notes/"]').count(),0);
+  await p.goto(base+'/research/lunar-habitat/field-notes/');
+  assert.equal(await p.locator('body').getAttribute('data-asunaro-stage'),'root');
+  assert.equal(await p.locator('.seed-note').count(),0);
   await p.getByRole('button',{name:'補給停止',exact:true}).click();
   assert.equal(await p.getByRole('button',{name:'補給停止',exact:true}).getAttribute('aria-pressed'),'true');
   assert.match(await p.locator('[data-system-status=water]').innerText(),/予備経路/);
@@ -26,7 +31,7 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await p.locator('figure.technical-diagram img').evaluate(im=>im.decode());
   await p.locator('figure.technical-diagram').screenshot({path:'.work/qa/nov06-flow.png'});
   await p.goto(base+'/research/lunar-habitat/');
-  await p.getByRole('link',{name:'公開展示のご案内',exact:true}).click();
+  await p.getByRole('link',{name:'展示のご案内',exact:true}).click();
   await p.getByRole('link',{name:'見学のご案内',exact:true}).click();
   const [accessResponse]=await Promise.all([
    p.waitForResponse(response=>new URL(response.url()).pathname.endsWith('/guide/access/')&&response.request().isNavigationRequest()),
@@ -47,7 +52,7 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   const mobile=await b.newPage({viewport:{width:390,height:844}});mobile.on('pageerror',e=>errors.push(e.message));
   for(const route of ['/','/research/lunar-habitat/','/news/20261027/','/news/20250509/','/tenants/0003/','/floor-map/']){
    await mobile.goto(base+route);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);
-   if(route==='/'){await mobile.locator('.lunar-hero img').evaluate(im=>im.decode());await mobile.screenshot({path:'.work/qa/nov06-home-mobile.png'});}
+   if(route==='/'){await mobile.locator('.facility-hero img').evaluate(im=>im.decode());await mobile.screenshot({path:'.work/qa/nov06-home-mobile.png'});}
   }
   await mobile.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
   await mobile.locator('.image-dialog[open] img[src$="/floor-4f.svg"]').evaluate(image=>image.decode());
@@ -62,6 +67,6 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await viewport.focus();
   await mobile.keyboard.press('Escape');
   assert.equal(await mobile.locator('.image-dialog[open]').count(),0);
-  assert.deepEqual(errors,[]);console.log('Public program passed: concept hero, interactive exhibit, handover report and return link, flow diagram, tenant profile, 390px layout, lazy authorized PDF download.');
+  assert.deepEqual(errors,[]);console.log('Public program passed: facility hero, visitor exhibit, hidden field notes and return link, maps, 390px layout, lazy authorized PDF download.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});
