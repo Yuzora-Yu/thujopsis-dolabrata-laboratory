@@ -51,20 +51,25 @@ for(const route of archivePublicPaths)await page(route,renderLegacy(route,{...ct
 await page('/room/',legacyLogin('@@CSRF@@'),'archive');
 for(const route of ['/room/console/','/room/console/subjects/'])await page(route,legacyLogin('@@CSRF@@'),'archive');
 for(const n of archiveNotes)await page(`/room/records/${n.id}/`,legacyLogin('@@CSRF@@'),'archive');
-for(const kind of ['hozen','audit'])for(const route of ['/','/receive/','/received/'])await page(route,agencyPage(kind,route,{caseId:'@@CASE@@',origins}),kind);
+for(const kind of ['hozen','audit'])for(const route of ['/','/receive/','/received/'])await page(route,agencyPage(kind,route,{caseId:'@@CASE@@',origins,receipt:route==='/received/'?'loading':''}),kind);
 for(const route of ['/news/closure/','/news/staff-change/'])await page(route,notFound());
 
 const baseZip=(await makeArchive(new URL('../src/archive.mjs',import.meta.url))).toString('base64');
 const completeZip=(await makeArchive(new URL('../src/archive.mjs',import.meta.url),{complete:true})).toString('base64');
 const ended=memberLayout('登録終了','<h1>この登録は終了しました。</h1><p>運営事務局にお問い合わせください。</p>');
 function outcomeViews(ending){
- const state={...ctxBase,caseState:{contact:true,ending,truth:ending==='end3'}};const views={};
- for(const route of ['/','/news/','/news/closure/','/news/staff-change/']){const html=renderPublic(route,{ending,origins});if(html)views['main:'+route]=hosted(html);}
+ const views={};
+ for(const route of ['/','/visit/','/news/','/news/closure/','/news/staff-change/']){const html=renderPublic(route,{ending,origins});if(html)views['main:'+route]=hosted(html);}
  if(ending==='end2')views['main:/people/asakura-tsumugi/']=hosted(notFound());
  const kind=ending==='end3'?'audit':'hozen';
- if(ending!=='end2')views[kind+':/received/']=hosted(agencyPage(kind,'/received/',{caseId:'@@CASE@@',origins,received:true,ending}),kind);
+ if(ending!=='end2')views[kind+':/received/']=hosted(agencyPage(kind,'/received/',{caseId:'@@CASE@@',origins,receipt:'received'}),kind);
  return views;
 }
+const auditForms={
+ additional:hosted(agencyPage('audit','/receive/',{caseId:'@@CASE@@',origins,additional:true}),'audit'),
+ pending:hosted(agencyPage('audit','/received/',{caseId:'@@CASE@@',origins,receipt:'pending'}),'audit'),
+ transferred:hosted(agencyPage('audit','/received/',{caseId:'@@CASE@@',origins,receipt:'transferred'}),'audit'),
+};
 async function encryptedBundle(namespace,id,password,payload){
  const identifier=createHash('sha256').update(namespace+':'+id).digest('hex'),salt=createHash('sha256').update('ASUNARO-PREVIEW-1:'+namespace+':'+id).digest().subarray(0,16);
  const iterations=120000,key=pbkdf2Sync(id+'\0'+password,salt,iterations,32,'sha256'),iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv);
@@ -88,7 +93,7 @@ for(const [id,account] of Object.entries(accounts)){
  const stages={};
  for(const [key,value]of Object.entries(stageValues)){
   stages[key]={};const ctx={...baseContext,caseState:{...value,truth:account.role==='asakura'}};
-  for(const route of ['/members/','/members/messages/','/members/activity/','/members/reservations/','/members/contact/received/'])stages[key][route]=hosted(renderMember(route,ctx));
+  for(const route of ['/members/','/members/messages/','/members/activity/','/members/reservations/','/members/contact/received/','/members/inquiry/'])stages[key][route]=hosted(renderMember(route,ctx));
  }
  const downloads=Object.fromEntries(recordMedia.filter(file=>mayReadRecordMedia(file.filename,account.role)).map(file=>[file.filename,protectedMedia[file.filename]]));
  if(account.role==='institution')downloads['hozen.zip']={name:'保全資料_20261102.zip',type:'application/zip',data:baseZip};
@@ -97,8 +102,7 @@ for(const [id,account] of Object.entries(accounts)){
   for(const name of ['records.json','continuity.json'])downloads[name]={name,type:'application/json',data:(await readFile('private/'+name)).toString('base64')};
  }
  const outcomes=account.role==='institution'||account.role==='asakura'?{end1:outcomeViews('end1'),end2:outcomeViews('end2'),...(account.role==='asakura'?{end3:outcomeViews('end3')}:{})}:{};
- const pending=hosted(agencyPage('audit','/received/',{caseId:'@@CASE@@',origins,received:true,pending:true}),'audit');
- await encryptedBundle('member',id,account.password,{account:{...account,password:undefined,id},pages,docs,stages,downloads,outcomes,pending,ended:hosted(ended)});
+ await encryptedBundle('member',id,account.password,{account:{...account,password:undefined,id},pages,docs,stages,downloads,outcomes,auditForms:outcomes.end1?auditForms:undefined,ended:hosted(ended)});
 }
 const roomPages={};for(const route of ['/room/','/room/console/','/room/console/subjects/',...archiveNotes.map(n=>`/room/records/${n.id}/`)])roomPages[route]=hosted(renderLegacy(route,{...ctxBase,session:{archiveAccess:archiveTicket.id}}),'archive');
 await encryptedBundle('archive',archiveTicket.id,archiveTicket.code,{pages:roomPages,labSubjects:{initial:subjectViews({}),current:subjectViews({contact:true}),end3:subjectViews({ending:'end3'})}});

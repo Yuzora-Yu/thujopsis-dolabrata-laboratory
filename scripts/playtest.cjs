@@ -189,11 +189,38 @@ async function newsInterface(p){
  const personName=pdfText.match(/申出者\s+([^\n]+)/)[1].trim(),personId=pdfText.match(/会員ID\s+([A-Z0-9]+)/)[1];
  await p.goto(main('/search/?q='+encodeURIComponent(personName.replace(/\s+/g,''))));await p.getByRole('link',{name:/制作と活動の記録/}).click();const personalText=await body(p),birth=ymd(personalText);await login(p,personId,birth);await p.getByRole('link',{name:'個人保存資料',exact:true}).first().click();
  await document(p,'AS-2024-002');await document(p,'AS-2026-014');await document(p,'TR-2026-011');const complete=await download(p,'a[href$="complete.zip"]','complete.zip');const groupRecords=JSON.parse(zipEntry(complete.data,'実験記録.json').toString());const originalDocuments=JSON.parse(zipEntry(complete.data,'文書原本.json').toString()).documents;assert.ok(originalDocuments.some(d=>d.id==='CH-2021-003'&&d.entries.length));assert.ok(originalDocuments.some(d=>d.id==='EV-2022-091'&&d.tables.length));assert.ok(originalDocuments.every(d=>!('roles' in d)&&!('audit' in d)));const measurementSheets=JSON.parse(zipEntry(complete.data,'適性測定原票.json').toString());assert.equal(measurementSheets.sheets.length,5);assert.ok(!JSON.stringify(measurementSheets).includes('星をみる灯'));assert.equal(groupRecords.closed_group.victim.id,'P-033');assert.ok(groupRecords.closed_group.sources.includes('GR-2022-009'));assert.ok(groupRecords.subjects.some(subject=>subject.id==='P-031'));assert.match(await document(p,personalReviewId),/本人の移送承諾なし/);await p.screenshot({path:'.work/qa/'+mode+'-group-crosscheck.png',fullPage:true});await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await p.screenshot({path:'.work/qa/'+mode+'-group-mobile.png',fullPage:true});await p.setViewportSize({width:1440,height:1000});const privateRecord=await document(p,'AS-2024-002'),friendPrivateId=privateRecord.match(/AS-2023-\d{3}/)[0];assert.match(await document(p,friendPrivateId),/誰が決めてもいい形/);assert.match(await document(p,'P034-2026-102'),/いま帰りたい/);await document(p,'AS-2026-021');await document(p,'AS-2026-019');if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-assessment]:visible').waitFor();assert.equal(await p.locator('[data-lab-assessment-handle]').innerText(),'星をみる灯');}await p.locator('[data-reading-ledger="combined"] .reading-list li:visible').first().waitFor();const routeNames=await p.locator('[data-reading-ledger="combined"] .reading-source').allTextContents();assert.ok(routeNames.some(x=>x.includes('ミナモ')));assert.ok(routeNames.some(x=>x.includes('オルディス')));await p.screenshot({path:'.work/qa/'+mode+'-reader-path.png',fullPage:true});await document(p,'EA-2026-009');await p.getByRole('link',{name:/東都研究監査室・記録保全受付/}).click();
- await submit(p,original.file);assert.match(await body(p),/追加資料/);await p.getByRole('link',{name:'追加資料を提出する',exact:true}).click();await submit(p,complete.file);assert.match(await body(p),/外部への資料移送/);assert.match(await body(p),/本人の希望を個別に確認し、施設外へ移動/);assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
+ await submit(p,original.file);
+ const auditReceipt=p.url();
+ assert.match(await body(p),/EA-2026-1102/);
+ await p.getByRole('link',{name:'追加資料を提出する',exact:true}).click();
+ assert.match(await body(p),/EA-2026-1102/);
+ await submit(p,complete.file);assert.match(await body(p),/外部への資料移送/);assert.match(await body(p),/本人の希望を個別に確認し、施設外へ移動/);assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
+ await login(p,institution.id,institution.password);
+ await p.goto(auditReceipt);await until(p,'資料を受領しました');
+ assert.match(await body(p),/施設外へ移動/);
+ const wrongReceipt=new URL(auditReceipt);wrongReceipt.searchParams.set('case','wrong');
+ await p.goto(wrongReceipt.href);await until(p,'記録保全受付');
+ assert.doesNotMatch(await body(p),/施設外へ移動/);
+ await p.goto(main('/'));await until(p,'施設の利用を');
+ assert.match(await p.locator('.visit-band').innerText(),/見学の受付を休止/);
+ await p.goto(main('/visit/'));await p.getByRole('heading',{name:'見学の受付を休止しております。'}).waitFor();
+ assert.doesNotMatch(await body(p),/平日9時から17時まで/);
  for(const ending of ['end1','end2']){
   const branch=await browser.newContext({viewport:{width:1200,height:900},acceptDownloads:true});const q=await branch.newPage();q.on('pageerror',e=>errors.push(e.message));const received=await evidence(q,institution);
   if(ending==='end1'){await q.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).click();await submit(q,received.file);assert.match(await body(q),/新たな研究支援事業/);await q.goto(main('/members/reservations/'));await until(q,'利用申請・予約');await q.getByText('受付を休止しております。',{exact:true}).waitFor();}
-  else{await q.goto(main('/members/contact/'));await q.locator('#subject').fill('資料の確認について');await q.locator('#message').fill('原本をご確認ください。');await q.locator('#attachment').setInputFiles(received.file);await q.getByRole('button',{name:/送信する/}).click();await until(q,'お問い合わせを受け付けました');await q.goto(main('/members/messages/'));await q.getByText('担当者の変更',{exact:true}).waitFor();await q.goto(main('/people/asakura-tsumugi/'));await until(q,'ページが見つかりません');}
+  else{
+   const entry=await q.getByRole('link',{name:'資料保全・匿名通報受付',exact:true}).getAttribute('href');
+   const caseQuery=new URL(entry,q.url()).search;
+   await q.goto(provider('audit','/receive/'+caseQuery));
+   await submit(q,received.file);const pending=q.url();
+   await q.goto(main('/members/contact/received/'));
+   await until(q,'運営事務局へのお問い合わせ');await q.locator('#subject').fill('資料の確認について');await q.locator('#message').fill('原本をご確認ください。');await q.locator('#attachment').setInputFiles(received.file);await q.getByRole('button',{name:/送信する/}).click();await until(q,'お問い合わせを受け付けました');
+   await q.goto(pending);await until(q,'資料を受領しました');
+   assert.match(await body(q),/追加受付は終了しました/);
+   assert.equal(await q.getByRole('link',{name:'追加資料を提出する',exact:true}).count(),0);
+   await q.goto(main('/members/inquiry/?record=CH-2021-003'));
+   await q.getByText(/この窓口での受付は終了しました/).waitFor();
+   await q.goto(main('/members/messages/'));await q.getByText('担当者の変更',{exact:true}).waitFor();await q.goto(main('/people/asakura-tsumugi/'));await until(q,'ページが見つかりません');}
   await q.screenshot({path:'.work/qa/'+mode+'-'+ending+'.png',fullPage:true});await branch.close();
  }
  const mobile=await browser.newPage({viewport:{width:390,height:844}});mobile.on('pageerror',e=>errors.push(e.message));for(const route of ['/','/about/identity/','/about/emblem/','/visit/','/workshop/stories/seo-akari/','/people/seo-akari/','/people/seo-fumino/','/people/saegusa-ritsu/','/gallery/0005/','/news/20220218/','/news/20261028/','/news/20220715/','/news/20160520/','/news/20120416/']){await mobile.goto(main(route));assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);}

@@ -24,3 +24,13 @@ export function nextEnding(current,target){
  if(current==='end1'&&target!=='end3')return current;
  return target;
 }
+
+export function agencyReceipt(kind,state){
+ if(kind==='hozen')return state?.ending==='end1'?'received':'';
+ if(state?.ending==='end3')return 'received';
+ if(!state?.auditPending)return '';
+ return state.ending==='end2'?'transferred':'pending';
+}
+
+export const inquiryClosed=ending=>ending==='end2'||ending==='end3';
+export const hasOfficeReceipt=state=>state.officeReceipt||state.ending==='end2';

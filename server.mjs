@@ -11,7 +11,7 @@ import {makeArchive} from './src/archive.mjs';
 import {labContext,labAction} from './src/lab.mjs';
 import {renderLegacy,legacyLogin,legacyLayout} from './src/legacy.mjs';
 import {archiveTicket} from './src/world/archive-data.mjs';
-import {classifyEvidence,nextEnding} from './src/evidence.mjs';
+import {agencyReceipt,classifyEvidence,hasOfficeReceipt,inquiryClosed,nextEnding} from './src/evidence.mjs';
 import {normalizeDocumentId} from './src/search.mjs';
 import {isValidReservation} from './public/assets/reservation-policy.js';
 import {readFileSync} from 'node:fs';
@@ -88,13 +88,17 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     if(!['GET','POST'].includes(req.method))return send(res,405,'Method not allowed');
     if(!['/','/receive/','/received/'].includes(pathname))return send(res,404,agencyPage(kind,'/',{origins,error:'ページが見つかりません。'}));
     if(req.method==='POST'){
-     const {fields,files}=await readBody(req);const state=cases.get(fields.case);const valid=state&&evidenceZip(files.archive)&&String(fields.title||'').trim()&&String(fields.statement||'').trim();
-     if(!valid)return send(res,400,agencyPage(kind,pathname,{caseId:fields.case||'',origins,error:'提出内容とZIP形式の添付資料をご確認ください。'}));
-     if(state.ending==='end2')return send(res,409,agencyPage(kind,pathname,{caseId:fields.case,origins,error:'この照会に関する記録は、施設運営側の管理へ移管されています。受付担当へ別途ご確認ください。'}));
-     if(kind==='audit'&&evidenceZip(files.archive)!=='complete'){state.auditPending=true;persist();return redirect(res,`/received/?case=${fields.case}`);}
+     const {fields,files}=await readBody(req);const state=cases.get(fields.case),evidence=evidenceZip(files.archive);
+     const receipt=agencyReceipt(kind,state),form={caseId:fields.case||'',origins,additional:receipt==='pending'};
+     if(state?.ending==='end2')return send(res,409,agencyPage(kind,pathname,{...form,receipt:receipt==='transferred'?receipt:'',error:'この照会に関する記録は、施設運営側の管理へ移管されています。'}));
+     if(!state||!evidence||!String(fields.title||'').trim()||!String(fields.statement||'').trim())return send(res,400,agencyPage(kind,pathname,{...form,error:'提出内容とZIP形式の添付資料をご確認ください。'}));
+     if(kind==='audit'&&evidence!=='complete'){state.auditPending=true;persist();return redirect(res,`/received/?case=${fields.case}`);}
      state.ending=nextEnding(state.ending,kind==='audit'?'end3':'end1');persist();return redirect(res,(state.ending==='end3'?origins.audit:'')+`/received/?case=${fields.case}`);
     }
-    const caseId=url.searchParams.get('case')||'';const state=cases.get(caseId);if(pathname==='/received/'&&kind==='hozen'&&state?.ending==='end3')return redirect(res,origins.audit+'/received/?case='+caseId);const pending=kind==='audit'&&!!state?.auditPending&&state?.ending!=='end3'&&state?.ending!=='end2';const received=pathname==='/received/'&&(pending||kind==='audit'&&state?.ending==='end3'||kind==='hozen'&&state?.ending==='end1');return send(res,200,agencyPage(kind,pathname,{caseId,origins,received,pending,ending:state?.ending||'',consoleTrial:state?.consoleTrial}));
+    const caseId=url.searchParams.get('case')||'',state=cases.get(caseId),receipt=agencyReceipt(kind,state);
+    if(pathname==='/received/'&&kind==='hozen'&&state?.ending==='end3')return redirect(res,origins.audit+'/received/?case='+caseId);
+    if(pathname==='/receive/'&&receipt==='transferred')return redirect(res,'/received/?case='+caseId);
+    return send(res,200,agencyPage(kind,pathname,{caseId,origins,receipt:pathname==='/received/'?receipt:'',additional:pathname==='/receive/'&&receipt==='pending',consoleTrial:state?.consoleTrial}));
    }
    const session=sessionFor(req,res),caseState=cases.get(session.caseId),account=Date.now()-(session.authenticatedAt||session.created)<28800000?accounts[session.accountId]:null;const ctx={account,csrf:session.csrf,caseState,caseId:session.caseId,query:url.searchParams,origins};
    if(req.method==='POST'){
@@ -109,6 +113,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     if(account.role==='asakura'&&caseState.ending==='end2')return send(res,403,memberLayout('登録終了','<h1>この登録は終了しました。</h1><p>運営事務局にお問い合わせください。</p>',ctx));
     if(pathname==='/members/logout/'){session.accountId=null;session.csrf=token();persist();return redirect(res,'/members/login/');}
     if(pathname==='/members/inquiry/'){
+     if(inquiryClosed(caseState.ending))return send(res,409,renderMember(pathname,ctx));
      const id=normalizeDocumentId(fields.record);const d=documents.find(d=>d.id===id&&d.roles.includes(account.role)&&d.inquiry);
      if(!d)return send(res,400,renderMember('/members/inquiry/',{...ctx,error:'文書IDと照会先をご確認ください。'}));
      caseState.contact=true;caseState.inquiryRecord=id;persist();return redirect(res,'/members/messages/');
@@ -120,7 +125,8 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     }
     if(pathname==='/members/contact/'){
      if(!String(fields.subject||'').trim()||!String(fields.message||'').trim())return send(res,400,renderMember(pathname,{...ctx,error:'件名と内容をご記入ください。'}));
-     if(evidenceZip(files.attachment)){caseState.ending=nextEnding(caseState.ending,'end2');persist();}
+     if(evidenceZip(files.attachment))caseState.ending=nextEnding(caseState.ending,'end2');
+     caseState.officeReceipt=true;persist();
      return redirect(res,'/members/contact/received/');
     }
     return send(res,404,notFound());
@@ -130,6 +136,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     if(pathname==='/members/login/')return send(res,200,loginPage(session.csrf,{next:safeNext(url.searchParams.get('next'))}));
     if(!account)return redirect(res,'/members/login/?next='+encodeURIComponent(pathname+url.search));
     if(account.role==='asakura'&&caseState.ending==='end2')return send(res,403,memberLayout('登録終了','<h1>この登録は終了しました。</h1><p>運営事務局にお問い合わせください。</p>',ctx));
+    if(pathname==='/members/contact/received/'&&!hasOfficeReceipt(caseState))return redirect(res,'/members/contact/');
     if(account.role==='asakura'&&pathname==='/members/personal/')caseState.truth=true;
     if(pathname.startsWith('/members/download/')){
      if(pathname.startsWith(recordMediaPrefix)){

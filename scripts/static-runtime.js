@@ -1,6 +1,6 @@
 import {matchesSearch,normalizeDocumentId,documentLookupMessages} from './search-engine.js';
 import {isValidReservation,updateReservationHours} from './assets/reservation-policy.js';
-import {classifyEvidence,nextEnding} from './evidence.js';
+import {agencyReceipt,classifyEvidence,hasOfficeReceipt,inquiryClosed,nextEnding} from './evidence.js';
 import {advanceTrial,trialView} from './lab-core.js';
 
 const base=document.querySelector('meta[name="asunaro-base"]')?.content||'';
@@ -74,9 +74,11 @@ async function currentBundle(){
   return account;
  } catch { return null; }
 }
-async function outcomeBundle(){
- const current=await currentBundle();if(current?.outcomes?.end1)return current;
- const saved=state.capability;if(!saved)return null;try{return await loadBundle('member',saved.id,saved.key);}catch{return null;}
+async function outcomeBundle(ending='end1'){
+ const current=await currentBundle();if(current?.outcomes?.[ending])return current;
+ const saved=ending==='end3'?(state.auditCapability||state.capability):state.capability;
+ if(!saved)return null;
+ try{const account=await loadBundle('member',saved.id,saved.key);return account.outcomes?.[ending]?account:null;}catch{return null;}
 }
 function stage(){return state.ending|| (state.contact?'contact':'initial');}
 function showError(message){
@@ -143,11 +145,12 @@ async function boot(){
    if(current.path==='/members/login/'){display(site.login);const next=params.get('next');if(next)document.querySelector('input[name=next]').value=next;return;}
    const account=await currentBundle();if(!account){display(site.login);document.querySelector('input[name=next]').value=current.path+location.search;return;}
    if(state.ending==='end2'&&account.account.role==='asakura'){display(account.ended);return;}
+   if(current.path==='/members/contact/received/'&&!hasOfficeReceipt(state)){go('/members/contact/');return;}
    const documentMatch=current.path.match(/^\/members\/records\/([A-Z0-9-]+)\/$/);
    if(documentMatch){display(account.docs.find(d=>d.id===documentMatch[1])?.html||site.notFound);return;}
    const html=account.stages[stage()]?.[current.path]||account.pages[current.path];display(html||site.notFound);
    if(current.path==='/members/records/')await documentResults(account,normalizeDocumentId(params.get('document_id')||''));
-   if(current.path==='/members/inquiry/'){const id=normalizeDocumentId(params.get('record')||'');document.querySelector('#record').value=account.docs.some(d=>d.id===id&&d.inquiry)?id:'';}
+   if(current.path==='/members/inquiry/'&&!inquiryClosed(state.ending)){const id=normalizeDocumentId(params.get('record')||'');document.querySelector('#record').value=account.docs.some(d=>d.id===id&&d.inquiry)?id:'';}
    if(current.path==='/members/reservations/'){
     const form=document.querySelector('[data-reservation-form]');
     if(form){
@@ -164,15 +167,32 @@ async function boot(){
    display(roomBundle?.pages[current.path]||site.archiveLogin);return;
   }
   if(current.kind==='audit'||current.kind==='hozen'){
-   if(current.path==='/received/'){
-    if(state.ending==='end3'&&current.kind==='hozen'){go('/received/?case='+state.id,'audit');return;}
-    const capable=await outcomeBundle();const html=state.auditPending&&current.kind==='audit'&&state.ending!=='end3'?capable?.pending:capable?.outcomes[state.ending]?.[current.kind+':/received/'];
-    display(html||site.agency[current.kind]);
-   }else display(site.agency[current.kind]);
+   const activeCase=params.get('case')===state.id,receipt=activeCase?agencyReceipt(current.kind,state):'';
+   if(activeCase&&current.path==='/received/'&&current.kind==='hozen'&&state.ending==='end3'){go('/received/?case='+state.id,'audit');return;}
+   if(current.path==='/receive/'&&receipt==='transferred'){go('/received/?case='+state.id,'audit');return;}
+   let html;
+   if(current.path==='/received/'&&receipt==='received'){
+    const capable=await outcomeBundle(state.ending);
+    html=capable?.outcomes[state.ending]?.[current.kind+':/received/'];
+    if(!html){
+     document.querySelector('.agency-main [role=status]')?.remove();
+     showError('受領控えを表示できませんでした。提出時の会員名義でログインしてから、もう一度ご確認ください。');return;
+    }
+   }else if(current.path==='/received/'&&receipt){
+    html=(await outcomeBundle())?.auditForms?.[receipt];
+   }else if(current.path==='/receive/'&&receipt==='pending'){
+    html=(await outcomeBundle())?.auditForms?.additional;
+   }
+   display(html||site.agency[current.kind]);
+   const caseField=document.querySelector('input[name=case]');if(caseField&&!activeCase)caseField.value='';
    const sender=document.querySelector('#sender');if(current.kind==='audit'&&sender&&trialView(state.consoleTrial)?.complete)sender.value=state.consoleTrial.handle;
    return;
   }
-  if(state.ending){const capable=await outcomeBundle();const html=capable?.outcomes[state.ending]?.['main:'+current.path];if(html)display(html);}
+  if(state.ending){
+   let ending=state.ending,capable=await outcomeBundle(ending);
+   if(!capable&&ending==='end3'){ending='end1';capable=await outcomeBundle();}
+   const html=capable?.outcomes[ending]?.['main:'+current.path];if(html)display(html);
+  }
   if(current.kind==='main'&&current.path==='/search/'){
    const keyword=params.get('q')||'';const input=document.querySelector('main input[name=q]');if(input)input.value=keyword;
    const results=site.entries.filter(x=>matchesSearch(x,keyword)&&(state.ending!=='end2'||x.url!=='/people/asakura-tsumugi/'));
@@ -205,7 +225,10 @@ document.addEventListener('submit',async event=>{
     state=stored(storageKey,state);
     if(state.ending==='end2'&&result.value.account.role==='asakura')throw new Error('Ended account');
     localStorage.setItem(authKey,JSON.stringify(result.credential));
-    if(result.value.outcomes.end1)state.capability=result.credential;if(result.value.account.role==='asakura')state.truth=true;save();
+    if(result.value.outcomes.end3){state.auditCapability=result.credential;state.truth=true;}
+    else if(state.ending==='end3'&&!state.auditCapability)state.auditCapability=state.capability;
+    if(result.value.outcomes.end1)state.capability=result.credential;
+    save();
     let next=String(values.get('next')||'/members/');if(next.startsWith(base+'/'))next=next.slice(base.length);go(/^\/members\/(?!\/)/.test(next)?next:'/members/');
    }catch{display(site.loginError);}
    return;
@@ -215,9 +238,10 @@ document.addEventListener('submit',async event=>{
   }
   if(current.kind==='archive'&&action.endsWith('/room/logout/')){localStorage.removeItem(archiveKey);go('/room/','archive');return;}
   if(current.kind==='hozen'||current.kind==='audit'){
+   state=stored(storageKey,state);
+   if(values.get('case')!==state.id||new URLSearchParams(location.search).get('case')!==state.id||!await outcomeBundle()){showError('受付情報を確認できませんでした。資料を受領した際の照会画面からお手続きください。');return;}
    const file=values.get('archive'),kind=file instanceof File&&/\.zip$/i.test(file.name)?classifyEvidence(await file.arrayBuffer()):null;
-   if(!kind){showError('提出内容とZIP形式の添付資料をご確認ください。');return;}
-   if(!await outcomeBundle()){showError('受付情報を確認できませんでした。資料を受領した際の照会画面からお手続きください。');return;}
+   if(!kind||!String(values.get('title')||'').trim()||!String(values.get('statement')||'').trim()){showError('提出内容とZIP形式の添付資料をご確認ください。');return;}
    state=stored(storageKey,state);
    if(state.ending==='end2'){showError('この照会に関する記録は、施設運営側の管理へ移管されています。');return;}
    if(current.kind==='audit'&&kind!=='complete')state.auditPending=true;else state.ending=nextEnding(state.ending,current.kind==='audit'?'end3':'end1');save();go('/received/?case='+state.id,state.ending==='end3'?'audit':current.kind);return;
@@ -226,6 +250,7 @@ document.addEventListener('submit',async event=>{
   state=stored(storageKey,state);
   if(action==='/members/logout/'){localStorage.removeItem(authKey);go('/members/login/');return;}
   if(current.path==='/members/inquiry/'){
+   if(inquiryClosed(state.ending)){await boot();return;}
    const id=normalizeDocumentId(values.get('record')||'');if(!account.docs.some(d=>d.id===id&&d.inquiry)){showError('文書IDと照会先をご確認ください。');return;}
    state.contact=true;state.inquiryRecord=id;save();go('/members/messages/');return;
   }
@@ -242,7 +267,11 @@ document.addEventListener('submit',async event=>{
    go('/members/reservations/?received=1');return;
   }
   if(current.path==='/members/contact/'){
-   const file=values.get('attachment'),valid=file instanceof File&&/\.zip$/i.test(file.name)&&classifyEvidence(await file.arrayBuffer());state=stored(storageKey,state);if(valid)state.ending=nextEnding(state.ending,'end2');save();go('/members/contact/received/');return;
+   if(!String(values.get('subject')||'').trim()||!String(values.get('message')||'').trim()){showError('件名と内容をご記入ください。');return;}
+   const file=values.get('attachment'),valid=file instanceof File&&/\.zip$/i.test(file.name)&&classifyEvidence(await file.arrayBuffer());
+   state=stored(storageKey,state);
+   if(valid)state.ending=nextEnding(state.ending,'end2');
+   state.officeReceipt=true;save();go('/members/contact/received/');return;
   }
  }catch{showError('お手続きを完了できませんでした。ページを再読み込みしてご確認ください。');}
  finally{if(submit)submit.disabled=false;}

@@ -161,13 +161,34 @@ test('ordinary restart preserves authentication and the received-evidence state'
 
 test('receipt URLs cannot claim an ending for the wrong recipient or undo protection',async()=>{
  const c=client(),{caseId,zip}=await evidence(c);
+ assert.equal((await c.get('/members/contact/received/')).response.headers.get('location'),'/members/contact/');
  await submitAgency('hozen',caseId,zip);
  const premature=await fetch(`http://127.0.0.1:${port+2}/received/?case=${caseId}`);assert.doesNotMatch(await premature.text(),/B-07で確認|施設外へ移動されました/);
+ assert.match((await c.get('/visit/')).text,/見学の受付を休止しております/);
+ const pending=await submitAgency('audit',caseId,zip);
+ const pendingText=await fetch(app.origins.audit+pending.headers.get('location')).then(r=>r.text());
+ assert.match(pendingText,/EA-2026-1102/);
+ const additional=await fetch(app.origins.audit+'/receive/?case='+caseId).then(r=>r.text());
+ assert.match(additional,/EA-2026-1102[\s\S]*name="archive"/);
  await c.login('20120901P0083','19930618');const full=Buffer.from(await (await c.binary('/members/download/complete.zip')).arrayBuffer());
  await submitAgency('audit',caseId,full);const again=await submitAgency('hozen',caseId,zip);assert.equal(again.status,303);assert.ok(again.headers.get('location').startsWith(app.origins.audit));
  await c.upload('/members/contact/',{subject:'原本再提出',message:'重複した資料です。'},'原本.zip',zip);
  assert.equal(app.cases.get(caseId).ending,'end3');assert.equal((await c.get('/people/asakura-tsumugi/')).response.status,200);
  assert.match((await c.get('/members/activity/')).text,/本件の確認は終了しております/);
+ const closedInquiry=await c.post('/members/inquiry/',{record:'FAB-2026-018'});
+ assert.equal(closedInquiry.status,409);
+ assert.match(await closedInquiry.text(),/受付は終了しました/);
+ assert.equal(app.cases.get(caseId).inquiryRecord,'CH-2021-003');
+});
+
+test('office transfer preserves the audit receipt and ends additional submissions',async()=>{
+ const c=client(),{caseId,zip}=await evidence(c);
+ await submitAgency('audit',caseId,zip);
+ await c.upload('/members/contact/',{subject:'資料の確認',message:'添付資料をご確認ください。'},'資料.zip',zip);
+ const receipt=await fetch(app.origins.audit+'/receive/?case='+caseId).then(r=>r.text());
+ assert.match(receipt,/EA-2026-1102[\s\S]*追加受付は終了しました/);
+ assert.doesNotMatch(receipt,/追加資料を提出する|name="archive"/);
+ assert.equal((await submitAgency('audit',caseId,zip)).status,409);
 });
 
 
