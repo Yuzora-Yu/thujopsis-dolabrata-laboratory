@@ -118,10 +118,27 @@ window.asunaroLabBridge=async(action,input={})=>{
  if(action!=='context'){state.consoleTrial=advanceTrial(state.consoleTrial,action,input);save();}
  const trial=trialView(state.consoleTrial);return {trial,csrf:'preview-session',ending:state.ending||'',subjects:trial?.complete?roomBundle.labSubjects[state.ending==='end3'?'end3':state.contact||state.truth||state.ending?'current':'initial']:null};
 };
+function filterArchiveCatalogue(params){
+ const field=document.querySelector('#collection-query');
+ const summary=document.querySelector('[data-collection-count]');
+ const empty=document.querySelector('[data-collection-empty]');
+ if(!field||!summary||!empty)return;
+ const keyword=(params.get('q')||'').trim();
+ if(keyword&&field.value===field.defaultValue)field.value=keyword;
+ let count=0;
+ for(const row of document.querySelectorAll('[data-collection-key]')){
+  row.hidden=!!keyword&&!matchesSearch({title:row.querySelector('strong').textContent,text:row.dataset.collectionKey},keyword);
+  if(!row.hidden)count++;
+ }
+ summary.textContent='収蔵資料・公開対象'+(keyword?' ／ '+count+'件':'');
+ empty.hidden=count>0;
+}
 async function boot(){
  if(rendering)return;rendering=true;
  try{
-  await sitePromise;state=stored(storageKey,state);const current=route(),params=new URLSearchParams(location.search);
+  const current=route(),params=new URLSearchParams(location.search);
+  if(current.kind==='archive'&&current.path==='/collections/')filterArchiveCatalogue(params);
+  await sitePromise;state=stored(storageKey,state);
   if(current.kind==='main'&&current.path.startsWith('/members/')){
    if(current.path==='/members/login/'){display(site.login);const next=params.get('next');if(next)document.querySelector('input[name=next]').value=next;return;}
    const account=await currentBundle();if(!account){display(site.login);document.querySelector('input[name=next]').value=current.path+location.search;return;}
@@ -170,20 +187,6 @@ async function boot(){
      card.hidden = card.dataset.galleryMethod !== method;
     });
    }
-  }
-  if(current.kind==='archive'&&current.path==='/collections/'){
-   const summary=document.querySelector('[data-collection-count]');
-   const empty=document.querySelector('[data-collection-empty]');
-   if(!summary||!empty)return;
-   const keyword=(params.get('q')||'').trim();
-   document.querySelector('#collection-query').value=keyword;
-   let count=0;
-   for(const row of document.querySelectorAll('[data-collection-key]')){
-    row.hidden=!!keyword&&!matchesSearch({title:row.querySelector('strong').textContent,text:row.dataset.collectionKey},keyword);
-    if(!row.hidden)count++;
-   }
-   summary.textContent='収蔵資料・公開対象'+(keyword?' ／ '+count+'件':'');
-   empty.hidden=count>0;
   }
  }catch{showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');}
  finally{rendering=false;}

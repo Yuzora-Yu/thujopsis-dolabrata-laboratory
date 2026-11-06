@@ -28,9 +28,19 @@ async function traceNewspaper(page,archive){
  const search=async keyword=>{
   await archive.getByLabel('収蔵番号・資料名').fill(keyword);
   await archive.getByRole('button',{name:'検索',exact:true}).click();
+  await archive.waitForURL(url=>url.searchParams.get('q')===keyword);
  };
- await search(correctionCode);
- await archive.getByText('収蔵資料・公開対象 ／ 1件',{exact:true}).waitFor();
+ let releaseIndex;
+ const indexHold=new Promise(resolve=>{releaseIndex=resolve;});
+ const indexPattern='**/assets/site-index.json';
+ await archive.route(indexPattern,async route=>{await indexHold;await route.continue();});
+ try {
+  await search(correctionCode);
+  await archive.getByText('収蔵資料・公開対象 ／ 1件',{exact:true}).waitFor({timeout:8000});
+ } finally {
+  releaseIndex();
+  await archive.unrouteAll({behavior:'wait'});
+ }
  assert.equal(await catalog.locator('a:visible').count(),1);
  await catalog.getByRole('link',{name:/訂正欄/}).click();
  assert.match(await body(archive),/紙面抄録[\s\S]*当該記述を撤回/);
@@ -45,8 +55,10 @@ async function traceNewspaper(page,archive){
  assert.equal(await catalog.locator('a:visible').count(),0);
  await archive.getByRole('link',{name:'資料照会室',exact:true}).click();
  await archive.getByRole('link',{name:/広報記録の保存/}).click();
+ await until(archive,'広報記録の保存');
  const receiptNumber=(await body(archive)).match(/受領簿(\d{4})/)[1];
  await archive.goto(provider('archive','/room/records/'+receiptNumber+'/'));
+ await until(archive,'健康管理記録・複写受領');
  const receipt=await body(archive);
  assert.doesNotMatch(receipt,/意思確認欄|署名画像|一時間以内/);
  const comparison=await document(page,receipt.match(/AH-2021-\d{3}/)[0]);
