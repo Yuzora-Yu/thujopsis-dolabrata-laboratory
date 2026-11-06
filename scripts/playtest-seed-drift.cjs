@@ -41,7 +41,9 @@ async function checkMenuNotes(browser){
   assert.equal(await finalNote.locator('[data-seed-note-progress]').innerText(),'記録済み 9 / 9');
   await page.locator('body.seed-drift-active').waitFor();
   await page.screenshot({path:'.work/qa/seed-ninth-unlocked.png'});
-  await finalNote.getByRole('link',{name:'中央受付の引継ぎ控えへ'}).click();
+  const finalReward=finalNote.getByRole('link',{name:'中央受付の引継ぎ控えへ'});
+  assert.equal(await finalReward.evaluate(link=>link===document.activeElement),true);
+  await finalReward.click();
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   for (const path of ['/gallery/0021/','/facilities/coworking/','/facilities/staff/','/floor-map/','/guide/access/']) {
    await page.goto(at(path));
@@ -52,7 +54,7 @@ async function checkMenuNotes(browser){
  }
 }
 async function checkReceptionCopy(browser){
- const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
+ const context=await browser.newContext({viewport:{width:320,height:568},reducedMotion:'reduce'});
  let savedProgress;
  try {
   const page=await context.newPage(),errors=[];
@@ -115,8 +117,16 @@ async function checkReceptionCopy(browser){
   await other.getByText('呼出履歴を確認。17:14の放送は中央受付の操作記録にありません。',{exact:true}).waitFor();
   assert.match(await other.title(),/^中央受付の引継ぎ控え /);
   const reward=note.getByRole('link',{name:'中央受付の引継ぎ控えへ'});
-  assert.equal(await reward.evaluate(link=>link.getBoundingClientRect().bottom<=link.closest('dialog').getBoundingClientRect().bottom),true);
-  await note.getByRole('link',{name:'中央受付の引継ぎ控えへ'}).click();
+  assert.equal(await reward.evaluate(link=>{
+   const bounds=link.getBoundingClientRect();
+   const dialog=link.closest('dialog');
+   return link===document.activeElement && bounds.bottom<=dialog.getBoundingClientRect().bottom
+     && bounds.bottom<=dialog.querySelector('button').getBoundingClientRect().top;
+  }),true);
+  await page.keyboard.press('Escape');
+  const footerReward=page.locator('.seed-collection-nav').getByRole('link',{name:'中央受付の引継ぎ控え'});
+  assert.equal(await footerReward.evaluate(link=>link.getBoundingClientRect().height>=44),true);
+  await footerReward.click();
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   await page.reload();
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();

@@ -359,7 +359,8 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .seed-note-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.45rem}
 .seed-note-actions a{font-size:.8rem;text-decoration:underline;text-underline-offset:3px}
 .seed-note-unlock{margin:1.2rem 0 0;padding-top:1.05rem;border-top:1px solid #b5c0b5}
-.seed-note-unlock a{display:inline-block;font-size:.92rem}
+.seed-note-unlock a{display:inline-block;font-size:.95rem;font-weight:700}
+.seed-collection-nav a{display:inline-flex;align-items:center;min-height:44px;font-size:.875rem;text-decoration:underline;text-underline-offset:3px}
 .seed-note-receipt-dialog .seed-note-unlock{border-color:#c6b6ab}
 .seed-note-receipt-dialog{background:#f5efe5;color:#262420;border-color:#897468}
 .seed-note-receipt-dialog .eyebrow{color:#704840}

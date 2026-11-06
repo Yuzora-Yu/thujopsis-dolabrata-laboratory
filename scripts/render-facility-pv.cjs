@@ -116,7 +116,7 @@ const source={
      lower('4F / 工房2','道具を、つくってみる。');
     }else if(t<cuts.metal){
      cover('atlas',t-cuts.atlas,.5,.53);
-     lower('工房の製本相談','使い続けるために、直す。');
+     lower('工房の製本相談 ／ 2022年4月','使い続けるために、直す。');
     }else if(t<cuts.exhibit){
      cover('metal',t-cuts.metal,.5,.46);
      lower('工房でつくった展示品','金属3Dプリンターの試験片');

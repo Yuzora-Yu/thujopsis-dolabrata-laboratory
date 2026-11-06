@@ -79,7 +79,7 @@ function installSeedNotes(){
  dialog.id = 'seed-note-dialog';
  dialog.setAttribute('aria-labelledby','seed-note-title');
  dialog.setAttribute('aria-describedby','seed-note-body seed-note-progress');
- dialog.innerHTML = '<div class="seed-note-meta"><p class="eyebrow"></p><span class="seed-note-number"></span></div><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><div class="seed-note-actions"><a data-seed-note-source target="_blank" rel="noopener" hidden>参考資料（NASA・別タブ）</a><span id="seed-note-progress" data-seed-note-progress></span><button type="button" class="button dark">閉じる</button></div><p class="seed-note-unlock" hidden><a class="text-link" data-seed-note-reward>中央受付の引継ぎ控えへ</a></p>';
+ dialog.innerHTML = '<div class="seed-note-meta"><p class="eyebrow"></p><span class="seed-note-number"></span></div><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><p class="seed-note-unlock" hidden><a class="text-link" data-seed-note-reward>中央受付の引継ぎ控えへ</a></p><div class="seed-note-actions"><a data-seed-note-source target="_blank" rel="noopener" hidden>参考資料（NASA・別タブ）</a><span id="seed-note-progress" data-seed-note-progress></span><button type="button" class="button dark">閉じる</button></div>';
  dialog.querySelector('.eyebrow').textContent = note.beginsDrift ? '受付控え ／ 複写' : 'あすなろの豆知識';
  const total = seedCollection()?.total;
  if (total && note.number) dialog.querySelector('.seed-note-number').textContent = `No.${note.number}/${total}`;
@@ -98,6 +98,7 @@ function installSeedNotes(){
   related.hidden = false;
  }
  const close = dialog.querySelector('button');
+ const reward = dialog.querySelector('[data-seed-note-reward]');
  close.addEventListener('click', () => dialog.close());
  dialog.addEventListener('close', () => button.focus({preventScroll:true}));
  button.setAttribute('aria-controls',dialog.id);
@@ -105,7 +106,8 @@ function installSeedNotes(){
   const discovered = rememberSeedNote(note.number);
   if (discovered && note.beginsDrift) window.asunaroDrift?.revealFromCopy();
   dialog.showModal();
-  close.focus();
+  if (discovered && reward.hasAttribute('href')) reward.focus();
+  else close.focus();
  });
  document.body.append(dialog);
 }
