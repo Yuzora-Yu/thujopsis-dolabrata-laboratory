@@ -7,12 +7,19 @@ const editions=[
  ['YH-2018-041','evaluation'],['YH-2018-041-A','individual',true],['RM-2020-019','minutes'],
  ['MX-2019-410','ledger',true],['PUB-2023-014','maintenance'],
  ['OR-2006-004','memo',true],['RG-2007-011','letter',true],['AH-2021-006','ledger'],['HC-2021-031-R','ledger',true],
+ ['CONS-2016-005','consent'],['OBS-2022-044','daily-check',true],
  ['ENV-2022-031','transfer'],['AP-2022-028','evaluation'],['OPS-2026-084','operations'],
  ['AS-2023-008','memo'],['FAB-2022-071','workshop-receipt'],['PN-2022-034','workshop-receipt',true],
 ];
+const printLabels={
+ ledger:'保存複写（PDF）',
+ 'workshop-receipt':'保存複写（PDF）',
+ consent:'参加同意書の交付控え（PDF）',
+ 'daily-check':'本人控えと別管理欄（PDF）',
+};
 export const recordMedia=editions.flatMap(([id,style,scan])=>[
- {id,style,filename:id+'.pdf',type:'application/pdf',label:['ledger','workshop-receipt'].includes(style)?'保存複写（PDF）':'配布資料（PDF）'},
- ...(scan?[{id,style,filename:id+'-scan.jpg',type:'image/jpeg',label:'保存複写（画像）'}]:[]),
+ {id,style,filename:id+'.pdf',type:'application/pdf',label:printLabels[style]||'配布資料（PDF）'},
+ ...(scan?[{id,style,filename:id+'-scan.jpg',type:'image/jpeg',label:style==='daily-check'?'本人控えの複写（画像）':'保存複写（画像）'}]:[]),
 ]);
 const byFilename=new Map(recordMedia.map(item=>[item.filename,item]));
 export const recordMediaPrefix='/members/download/records/';

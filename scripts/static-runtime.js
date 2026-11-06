@@ -205,9 +205,15 @@ async function boot({restoreFragment=false}={}){
    if(html){
     display(html);
     if(restoreFragment&&location.hash){
-     let id=location.hash.slice(1);
+     const hash=location.hash;
+     let id=hash.slice(1);
      try{id=decodeURIComponent(id);}catch{}
-     document.getElementById(id)?.scrollIntoView({block:'start',behavior:'instant'});
+     const restore=()=>requestAnimationFrame(()=>{
+      if(location.hash===hash)document.getElementById(id)?.scrollIntoView({block:'start',behavior:'instant'});
+     });
+     // The original page may still have a fragment scroll queued while the closure view loads.
+     if(document.readyState==='complete')restore();
+     else window.addEventListener('load',restore,{once:true});
     }
    }
   }

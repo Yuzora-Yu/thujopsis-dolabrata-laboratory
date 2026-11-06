@@ -29,12 +29,20 @@ async function verifyPausedGuide(p,path,content){
  await p.locator('.facility-use-pause').getByRole('link',{name:'休止のお知らせ',exact:true}).waitFor();
  assert.match(await body(p),content);
  assert.equal(await p.locator('main a[href*="/members/reservations/"]').count(),0);
- if(path.includes('#'))await p.waitForFunction(()=>{
-  const target=document.getElementById(location.hash.slice(1));
-  const header=document.querySelector('.site-header').getBoundingClientRect();
-  const top=target?.getBoundingClientRect().top;
-  return top>=header.bottom-1&&top<innerHeight/2;
- });
+ if(path.includes('#')){
+  const target=p.locator(new URL(main(path)).hash);
+  const header=p.locator('.site-header');
+  try{
+   await p.waitForFunction(()=>{
+    const top=document.getElementById(location.hash.slice(1))?.getBoundingClientRect().top;
+    const bottom=document.querySelector('.site-header').getBoundingClientRect().bottom;
+    return top>=bottom-1&&top<innerHeight/2;
+   });
+  }catch(error){
+   console.error('Paused guide fragment:',path,await target.boundingBox(),await header.boundingBox());
+   throw error;
+  }
+ }
  if(p.viewportSize().width<=390){
   const [label,member]=await Promise.all([status.boundingBox(),p.locator('.site-header .member-link').boundingBox()]);
   assert.ok(label.y>=member.y+member.height-1,'mobile status overlaps member navigation');
@@ -231,7 +239,15 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  for(const number of missing)unlistedTenants.push(await company(p,String(number).padStart(4,'0')));
  const ordis=unlistedTenants.find(tenant=>tenant['代表者'].replace(/\s+/g,'')===evaluationManager);
  assert.ok(ordis);await login(p,ymd(ordis['入居日'])+ordis['登録番号'],ymd(ordis['設立日']));
- const originalConsent=await document(p,'CONS-2016-005');await recruitmentCopy(p,originalConsent.match(/RE-2016-\d{3}/)[0],2016);
+ const originalConsent=await document(p,'CONS-2016-005');
+ assert.match(originalConsent,/その都度ご承諾/);
+ const consentCopy=await download(p,'a[href$="CONS-2016-005.pdf"]','consent-copy.pdf');
+ assert.deepEqual(consentCopy.data,await fs.readFile('private/record-media/CONS-2016-005.pdf'));
+ await recruitmentCopy(p,originalConsent.match(/RE-2016-\d{3}/)[0],2016);
+ await p.locator('.member-sidebar').getByRole('link',{name:'共同事業・連絡記録'}).click();
+ await p.getByRole('link',{name:/居住環境実証・説明資料の確認/}).click();
+ await until(p,'居住環境実証・説明資料の確認');
+ assert.match(await body(p),/17時に受付を通ってお帰り[\s\S]*来週火曜の工房予約はそのまま/);
  const makerEvaluation=await document(p,makerRecordId);
  assert.match(makerEvaluation,/瀬尾\s*灯[\s\S]*帰宅希望として受領/);
  assert.doesNotMatch(makerEvaluation,/B-07|2026年|現所在/);
@@ -303,7 +319,33 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(friendFile,/灯さんの貸出票は返却欄を空けておいてください。夏帆さんの地図帳は別包みです。修理完了にはしないでください/);
  assert.match(await document(p,'YH-2022-017'),/継舟/);
  const originalOffer=await recruitmentCopy(p,'RE-2022-006',2022);
- const examination=await document(p,originalOffer.match(/OBS-2022-\d{3}/)[0]);
+ const checkId=originalOffer.match(/OBS-2022-\d{3}/)[0];
+ const examination=await document(p,checkId);
+ const recipientCopy=p.getByRole('region',{name:'9月10日の日次確認票・本人控え'});
+ assert.match(await recipientCopy.innerText(),/日曜に妹に渡す[\s\S]*9月10日 08:42[\s\S]*9月11日 08:40/);
+ assert.doesNotMatch(await recipientCopy.innerText(),/薬剤|拒否傾向/);
+ assert.match(await p.getByRole('row').filter({hasText:'P-032：検査の中止と帰宅時期を確認したい'}).innerText(),/拒否傾向[\s\S]*条件維持/);
+ await p.setViewportSize({width:390,height:844});
+ try{
+  const dates=p.locator('.record-table[data-date-column] tbody td:first-child');
+  assert.deepEqual(await dates.evaluateAll(cells=>cells.map(cell=>{
+   const textRange=document.createRange();textRange.selectNodeContents(cell);
+   return textRange.getClientRects().length;
+  })),[1,1,1,1]);
+  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+ }finally{await p.setViewportSize({width:1440,height:1000});}
+ for(const [suffix,name] of [['.pdf','本人控えと別管理欄（PDF）'],['-scan.jpg','本人控えの複写（画像）']]){
+  const filename=checkId+suffix;
+  await p.getByRole('link',{name}).waitFor();
+  const copy=await download(p,'a[href$="'+filename+'"]',filename);
+  assert.deepEqual(copy.data,await fs.readFile('private/record-media/'+filename));
+ }
+ const participant=examination.match(/P-032\s+([^。\s]+)。/)[1],profile=await p.context().newPage();
+ try{
+  await profile.goto(main('/search/?q='+encodeURIComponent(participant)));
+  await profile.getByRole('link',{name:/仕事の合間の小さな製作/}).click();
+  assert.match(await body(profile),/妹に渡したら/);
+ }finally{await profile.close();}
  const equipment=await document(p,examination.match(/ENV-2022-\d{3}/)[0]);
  const incident=await document(p,equipment.match(/EV-2022-\d{3}/)[0]);
  assert.match(incident,/吉野夏帆/);
