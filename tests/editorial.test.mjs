@@ -89,6 +89,17 @@ test('published navigation does not directly expose nonlisted gallery objects',(
  for(const p of publicPaths.filter(p=>!/^\/gallery\/\d/.test(p)&&!/^\/tenants\/\d/.test(p))){const html=renderPublic(p)||'';for(const m of html.matchAll(/href="\/gallery\/(\d+)\//g))assert.ok(!hidden.has(m[1]),p+' -> '+m[1]);}
 });
 
+test('unlisted discoveries stay off external indexes while direct and internal discovery work',()=>{
+ for(const url of ['/tenants/0003/','/gallery/0022/','/news/20120416/']){
+  assert.match(renderPublic(url),/<meta name="robots" content="noindex,nofollow">/,url);
+ }
+ for(const url of ['/tenants/0002/','/gallery/0021/','/news/20120401/']){
+  assert.doesNotMatch(renderPublic(url),/name="robots"/,url);
+ }
+ assert.ok(searchEntries.some(entry=>entry.url==='/news/20120416/'&&matchesSearch(entry,'A4-01')));
+ assert.ok(!searchEntries.some(entry=>entry.url==='/tenants/0003/'));
+});
+
 test('page numbering and growth stages share a registry and sit beside the copyright',()=>{
  assert.equal(new Set(pageRegistry.map(p=>p.kind+':'+p.path)).size,pageRegistry.length);
  assert.deepEqual(pageRegistry.map(p=>p.number),Array.from({length:pageRegistry.length},(_,i)=>i+1));
@@ -127,7 +138,7 @@ test('dated archive receipt notes do not cite documents or receipts before they 
 
 test('every planned hint has in-world evidence and the prerequisite graph reaches each ending',async()=>{
  const ids=new Set(hintPlan.map(h=>h.id));
- for(const h of hintPlan){assert.equal(h.hints.length,3,h.id);for(const id of [...h.requires,...h.leads])assert.ok(ids.has(id),id);
+ for(const h of hintPlan){assert.equal(h.hints.length,3,h.id);for(const id of [...h.requires,...(h.requiresAny||[]),...h.leads])assert.ok(ids.has(id),id);
   for(const witness of h.evidence){
    if(witness.kind==='private'){assert.equal((await readFile('private/expose.pdf')).subarray(0,5).toString(),'%PDF-');continue;}
    if(witness.kind==='asset'){assert.ok(witness.path.startsWith('/assets/'));assert.equal((await readFile('public'+witness.path)).subarray(0,5).toString(),'%PDF-');continue;}
@@ -137,7 +148,16 @@ test('every planned hint has in-world evidence and the prerequisite graph reache
    for(const word of witness.words)assert.ok(normalizeSearch(html).includes(normalizeSearch(word)),h.id+': '+witness.path+' lacks '+word);
   }
  }
- const reached=new Set();let changed=true;while(changed){changed=false;for(const h of hintPlan)if(!reached.has(h.id)&&h.requires.every(id=>reached.has(id))){reached.add(h.id);changed=true;}}
+ const reached=new Set();
+ let changed=true;
+ while(changed){
+  changed=false;
+  for(const h of hintPlan){
+   if(reached.has(h.id)||!h.requires.every(id=>reached.has(id)))continue;
+   if(h.requiresAny?.length&&!h.requiresAny.some(id=>reached.has(id)))continue;
+   reached.add(h.id);changed=true;
+  }
+ }
  assert.equal(reached.size,hintPlan.length);assert.ok(reached.has('report')&&reached.has('independent'));
 });
 

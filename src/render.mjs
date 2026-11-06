@@ -105,7 +105,7 @@ function tenantHeading(tenant){
   <div class="breadcrumb"><a href="/">HOME</a><span>/</span><a href="/tenants/">入居者紹介</a><span>/</span>${esc(tenant.name)}</div>
   <div class="tenant-identity">
    ${tenantLogo(tenant,`${tenant.name}のロゴ`)}
-   <div class="tenant-identity-copy"><p class="eyebrow">TENANT PROFILE</p><h1>${esc(tenant.name)}</h1><p class="profile-index">No. ${tenant.page} / ${esc(tenant.period)}</p></div>
+   <div class="tenant-identity-copy"><p class="eyebrow">TENANT PROFILE</p><h1>${esc(tenant.name)}</h1><p class="profile-index">掲載No. ${tenant.page} ／ ${esc(tenant.period)}</p></div>
   </div>
  </div>`;
 }
@@ -113,10 +113,10 @@ function tenantProfile(tenant){
  const visualKind=tenant.image?.endsWith('.svg')?'図':'写真';
  const visualActivity=tenant.activities.find(activity=>activity.image===tenant.image);
  const companyVisual=tenant.logoOnly||!tenant.image?'':`<figure class="company-image">
-  <button type="button" class="photo-button" data-image-open="/assets/${tenant.image}" aria-label="${esc(tenant.name)}の${visualKind}を拡大">${img(tenant.image,`${tenant.name}の研究・製品の記録`,'tenant-photo',true)}</button>
+  <button type="button" class="photo-button" data-image-open="/assets/${tenant.image}" aria-label="${esc(tenant.name)}の${visualKind}を拡大">${img(tenant.image,`${tenant.name}の研究・製品の記録`,'tenant-photo',true)}<span class="tenant-photo-action" aria-hidden="true">${visualKind}を拡大</span></button>
   <figcaption>${esc(tenant.photoDate||visualActivity?.date||'')}　${esc(visualActivity?.title||'研究・製品の記録')}</figcaption>
  </figure>`;
- const details=[['代表者',tenant.person],['設立',tenant.established],['入居',tenant.joined],['登録番号',tenant.id],['区画',tenant.room+'号室'],['入居期間',tenant.period]];
+ const details=[['代表者',tenant.person],['設立日',tenant.established],['入居日',tenant.joined],['登録番号',tenant.id],['区画',tenant.room+'号室'],['入居期間',tenant.period]];
  return layout(tenant.name,tenantHeading(tenant)+`<article class="wrap article tenant-profile">
   <nav class="profile-tabs tenant-profile-tabs" aria-label="企業情報"><a href="#profile">企業紹介</a><a href="#activities">活動報告</a><a href="#reading-history">活動に関する資料</a></nav>
   <section id="profile">${companyVisual}<div class="prose">
@@ -125,7 +125,7 @@ function tenantProfile(tenant){
    <dl class="detail-list">${details.map(([label,value])=>`<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>
   </div></section>
   <section id="activities" class="prose"><h2>活動報告</h2>${tenant.activities.map(activity=>`<article class="company-activity">
-   <time>${activity.date}</time><h3>${esc(activity.title)}</h3><p>${esc(activity.body)}</p>${activity.image&&activity.image!==tenant.image?`<button type="button" class="photo-button" data-image-open="/assets/${activity.image}" aria-label="${esc(activity.title)}の写真を拡大">${img(activity.image,`${tenant.name} ${activity.date}の活動記録`,'activity-photo',false,activity.credential?[6144,4096]:null)}</button>`:''}
+   <time>${activity.date}</time><h3>${esc(activity.title)}</h3><p>${esc(activity.body)}</p>${activity.image&&activity.image!==tenant.image?`<button type="button" class="photo-button" data-image-open="/assets/${activity.image}" aria-label="${esc(activity.title)}の写真を拡大">${img(activity.image,`${tenant.name} ${activity.date}の活動記録`,'activity-photo',false,activity.credential?[6144,4096]:null)}<span class="tenant-photo-action" aria-hidden="true">写真を拡大</span></button>`:''}
   </article>`).join('')}</section>
   ${tenantRelatedMaterials(tenant)}${link('/tenants/','入居者紹介へ')}
  </article>`);
@@ -135,7 +135,7 @@ function tenantCards(items){
   <a class="tenant-card" href="/tenants/${tenant.page}/">
    ${tenantLogo(tenant)}
    <div class="tenant-card-copy">
-    <div class="tenant-card-meta"><span class="tenant-id">No. ${tenant.page}</span><span class="tag">${esc(tenant.status)}</span></div>
+    <div class="tenant-card-meta"><span class="tenant-id">掲載No. ${tenant.page}</span><span class="tag">${esc(tenant.status)}</span></div>
     <h2>${esc(tenant.name)}</h2><p>${esc(tenant.business)}</p>
     <small>${esc(tenant.period)} ／ ${esc(tenant.room)}号室</small>
    </div>

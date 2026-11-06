@@ -4,7 +4,7 @@ import {startServers} from '../server.mjs';
 import {publicPaths,renderPublic} from '../src/render.mjs';
 import {readFile,mkdir,unlink} from 'node:fs/promises';
 import path from 'node:path';
-import {gallery,tenants,news} from '../src/content.mjs';
+import {accounts,gallery,tenants,news} from '../src/content.mjs';
 
 let app;const port=4317,base=`http://127.0.0.1:${port}`;
 before(async()=>{app=await startServers({port});});after(async()=>{await app.close();});
@@ -100,7 +100,16 @@ test('reservation requests respect the selected facility’s start time and keep
 test('publication numbers form tight sequences independent of account registration',()=>{
  assert.deepEqual(gallery.map(g=>Number(g.id)),Array.from({length:34},(_,i)=>i+1));
  assert.deepEqual(tenants.map(t=>Number(t.page)),Array.from({length:18},(_,i)=>i+1));
- assert.equal(tenants.find(t=>t.page==='0003').id,'0017');
+ const keyPages={minamo:'0003',ashita:'0010',ordis:'0013'};
+ const digits=date=>date.match(/\d+/g).map(part=>part.padStart(2,'0')).join('');
+ for(const [role,page] of Object.entries(keyPages)){
+  const tenant=tenants.find(t=>t.page===page);
+  const [login,account]=Object.entries(accounts).find(([,item])=>item.role===role);
+  assert.equal(tenant.id,account.member);
+  assert.equal(login,digits(tenant.joined)+tenant.id);
+  assert.equal(account.password,digits(tenant.established));
+  assert.equal(tenant.listed,false);
+ }
  assert.equal(new Set(gallery.map(g=>g.image)).size,gallery.length);
  assert.equal(new Set(news.map(n=>n.id)).size,news.length);
 });

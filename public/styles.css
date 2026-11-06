@@ -318,6 +318,15 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .tenant-card-copy{padding:clamp(.95rem,2vw,1.4rem)}
 .tenant-card-meta{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
 .tenant-card .tenant-id{font-size:.75rem;color:#596962}
+.tenant-photo-action{
+ display:block;
+ margin-top:.5rem;
+ color:var(--ink);
+ font-size:.8rem;
+ text-align:right;
+ text-decoration:underline;
+ text-underline-offset:.22em;
+}
 .tenant-card h2{font-size:clamp(1rem,1.75vw,1.25rem);line-height:1.55;margin:.85rem 0 .35rem}
 .tenant-card-copy p{margin:.2rem 0 .7rem;font-size:.86rem;color:#364940}
 .tenant-card-copy small{color:var(--muted);font-size:.76rem}
@@ -333,7 +342,16 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
  .tenant-identity-copy .profile-index{font-size:.65rem}
 }
 @media(max-width:910px){.tenant-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:540px){.tenant-grid{grid-template-columns:1fr;gap:1.3rem}}
+@media(min-width:375px) and (max-width:540px){
+ .tenant-grid{gap:.85rem}
+ .tenant-card-copy{padding:.75rem .65rem .9rem}
+ .tenant-card-meta{gap:.3rem;flex-wrap:wrap}
+ .tenant-card .tenant-id{font-size:.7rem}
+ .tenant-card h2{font-size:.95rem;margin:.55rem 0 .35rem}
+ .tenant-card-copy p{font-size:.78rem}
+ .tenant-card-copy small{font-size:.7rem}
+}
+@media(max-width:374px){.tenant-grid{grid-template-columns:1fr;gap:1.3rem}}
 
 .member-body{
  --ink:#22354b;

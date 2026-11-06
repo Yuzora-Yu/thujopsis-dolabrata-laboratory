@@ -1,11 +1,11 @@
 export const additionalTenants = [
- {id:'0025',name:'ツキノワ給食技研株式会社',room:'403',business:'小規模施設の食事・保冷設備',established:'2011年2月16日',joined:'2013年4月1日',period:'2013–2017',status:'過去入居',person:'月岡 史葉',description:'大きな厨房を持たない場所でも、温かい食事を用意できる仕組みを研究しています。小規模施設の配膳、保冷、洗浄の工程を一緒に考えます。',listed:true},
- {id:'0027',name:'青庭種苗研究室',room:'407',business:'少量栽培・種子の保管',established:'2012年9月10日',joined:'2014年4月1日',period:'2014–2019',status:'過去入居',person:'青野 里枝',description:'土地と暮らしに合った小さな栽培の仕組みを提案しています。種子の保管、発芽の記録、少量の栽培試験を行う個人事業の研究室です。',listed:true},
- {id:'0029',name:'トリム部品設計合同会社',room:'411',business:'修理部品・小量生産の設計',established:'2013年1月24日',joined:'2014年10月1日',period:'2014–2019',status:'過去入居',person:'鳥居 岳路',description:'製造が終わった道具を、部品から支える設計事務所です。現物の採寸と小量の試作を通じて、修理しながら使う選択肢を増やします。',listed:true},
- {id:'0040',name:'白波記録保存株式会社',room:'415',business:'聞き書き・研究映像の整理保存',established:'2016年3月18日',joined:'2017年10月1日',period:'2017–2020',status:'過去入居',person:'白井 波子',description:'人の言葉と、その言葉が交わされた状況を記録します。聞き書き、研究映像、会議記録の整理を、利用範囲の確認と一緒に進めています。',listed:true},
- {id:'0049',name:'リエゾン給養計画株式会社',room:'403',business:'閉鎖環境の食事計画・資源評価',established:'2018年5月22日',joined:'2019年4月1日',period:'2019–',status:'入居中',person:'有村 智',description:'施設単位の食事供給と資源配分を評価します。継続的な運用記録から、必要な設備と供給計画を整理しています。',listed:true},
- {id:'0051',name:'逓路設備管理株式会社',room:'410',business:'閉域ネットワーク・設備監視',established:'2018年11月6日',joined:'2020年4月1日',period:'2020–',status:'入居中',person:'手嶋 路生',description:'研究設備の通信と監視系を、施設運用に合わせて設計します。閉域配信、記録の集約、既存設備の保守を一体で支援しています。',listed:false},
- {id:'0058',name:'イデア規格工学合同会社',room:'407',business:'評価系の互換性・基準化',established:'2022年4月12日',joined:'2023年4月1日',period:'2023–',status:'入居中',person:'狭間 一',description:'異なる評価系で得られた記録の互換性を検証します。判定手順と出力形式を揃え、長期運用できる基準を構築しています。',listed:true},
+ {page:'0006',id:'0025',name:'ツキノワ給食技研株式会社',room:'403',business:'小規模施設の食事・保冷設備',established:'2011年2月16日',joined:'2013年4月1日',period:'2013–2017',status:'過去入居',person:'月岡 史葉',description:'大きな厨房を持たない場所でも、温かい食事を用意できる仕組みを研究しています。小規模施設の配膳、保冷、洗浄の工程を一緒に考えます。',listed:true},
+ {page:'0007',id:'0027',name:'青庭種苗研究室',room:'407',business:'少量栽培・種子の保管',established:'2012年9月10日',joined:'2014年4月1日',period:'2014–2019',status:'過去入居',person:'青野 里枝',description:'土地と暮らしに合った小さな栽培の仕組みを提案しています。種子の保管、発芽の記録、少量の栽培試験を行う個人事業の研究室です。',listed:true},
+ {page:'0008',id:'0029',name:'トリム部品設計合同会社',room:'411',business:'修理部品・小量生産の設計',established:'2013年1月24日',joined:'2014年10月1日',period:'2014–2019',status:'過去入居',person:'鳥居 岳路',description:'製造が終わった道具を、部品から支える設計事務所です。現物の採寸と小量の試作を通じて、修理しながら使う選択肢を増やします。',listed:true},
+ {page:'0011',id:'0040',name:'白波記録保存株式会社',room:'415',business:'聞き書き・研究映像の整理保存',established:'2016年3月18日',joined:'2017年10月1日',period:'2017–2020',status:'過去入居',person:'白井 波子',description:'人の言葉と、その言葉が交わされた状況を記録します。聞き書き、研究映像、会議記録の整理を、利用範囲の確認と一緒に進めています。',listed:true},
+ {page:'0015',id:'0049',name:'リエゾン給養計画株式会社',room:'403',business:'閉鎖環境の食事計画・資源評価',established:'2018年5月22日',joined:'2019年4月1日',period:'2019–',status:'入居中',person:'有村 智',description:'施設単位の食事供給と資源配分を評価します。継続的な運用記録から、必要な設備と供給計画を整理しています。',listed:true},
+ {page:'0016',id:'0051',name:'逓路設備管理株式会社',room:'410',business:'閉域ネットワーク・設備監視',established:'2018年11月6日',joined:'2020年4月1日',period:'2020–',status:'入居中',person:'手嶋 路生',description:'研究設備の通信と監視系を、施設運用に合わせて設計します。閉域配信、記録の集約、既存設備の保守を一体で支援しています。',listed:false},
+ {page:'0018',id:'0058',name:'イデア規格工学合同会社',room:'407',business:'評価系の互換性・基準化',established:'2022年4月12日',joined:'2023年4月1日',period:'2023–',status:'入居中',person:'狭間 一',description:'異なる評価系で得られた記録の互換性を検証します。判定手順と出力形式を揃え、長期運用できる基準を構築しています。',listed:true},
 ];
 
 const activity=(date,title,body,options={})=>({date,title,body,...options});
@@ -93,7 +93,7 @@ export const tenantDetails = {
       {
         "date": "2019.03.29",
         "title": "外部連携へ移行します",
-        "body": "実配管の試験場所を外部拠点へ移しました。あすなろとの共同事業は連携会員として続けます。持ち帰った装置の写真が足りず、移転前に撮った机の写真も掲載しています。川瀬修邦"
+        "body": "3月末で406号室を返却いたします。実配管の試験は外部拠点へ移し、あすなろの循環設備の保守と共同試験は、外部連携会員として続けます。既設機の交換部品は、次回の点検まで工房に預けております。川瀬修邦"
       }
     ]
   },

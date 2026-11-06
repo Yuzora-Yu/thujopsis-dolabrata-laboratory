@@ -1,10 +1,14 @@
 import {writeFile} from 'node:fs/promises';
 import {hintPlan} from '../docs/hint-plan.mjs';
 import {pagePosition,pageRegistry,growthStages} from '../src/experience.mjs';
+const prerequisites=({requires,requiresAny=[]},separator='、')=>[
+ ...requires,
+ ...(requiresAny.length?[`いずれか（${requiresAny.join('、')}）`]:[]),
+].join(separator);
 const lines=['# 攻略・ヒント設計（作者用）','','ゲーム内へ配信しない設計資料。段階別ヒントの公開用サイトは、この資料を基に後から構築できる。','','ページ番号・総数・成長段階はsrc/experience.mjsから取得する。総数は'+pageRegistry.length+'。','',
-'| 段階 | 到達目標 | 事前に成立すべき段階 | |','| --- | --- | --- | --- |',...hintPlan.map((h,i)=>`| ${i+1} | ${h.goal} | ${h.requires.join(', ')||'入口から確認可能'} | ${h.id} |`),''];
+'| 段階 | 到達目標 | 事前に成立すべき段階 | |','| --- | --- | --- | --- |',...hintPlan.map((h,i)=>`| ${i+1} | ${h.goal} | ${prerequisites(h,', ')||'入口から確認可能'} | ${h.id} |`),''];
 for(const [index,hint]of hintPlan.entries()){
- lines.push(`## ${index+1}. ${hint.goal}`,'',`前提：${hint.requires.join('、')||'なし'}。`,'','根拠と、その時点で読めるページ：','');
+ lines.push(`## ${index+1}. ${hint.goal}`,'',`前提：${prerequisites(hint)||'なし'}。`,'','根拠と、その時点で読めるページ：','');
  for(const e of hint.evidence){const page=pagePosition(e.kind==='member'?'main':e.kind,e.path,e.role);lines.push(`- ${e.path}${page?` — ${growthStages[page.level].name} · ${String(page.number).padStart(3,'0')} / ${page.total}`:''}${e.role?'／閲覧者 '+e.role:''}${e.state?.contact?'／原本照会後':''}。確認する記載：${e.words.join('、')}。`);}
  lines.push('','段階別ヒント案：','',...hint.hints.map((text,i)=>`${i+1}. ${text}`),'',`作者用の解答・解釈：${hint.answer}`,'',`次に接続する段階：${hint.leads.join('、')||'結末へ'}`,'');
  if(hint.visual)lines.push(`画像での確認先：${hint.visual}`,'');

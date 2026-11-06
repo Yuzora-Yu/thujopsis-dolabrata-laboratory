@@ -20,9 +20,9 @@ const mainPages=['/','/about/',programPath,'/facilities/','/facilities/coworking
 const memberPages=['/members/login/','/members/','/members/reservations/','/members/records/','/members/activity/','/members/messages/','/members/projects/','/members/organization/','/members/contact/','/members/contact/received/','/members/inquiry/','/members/personal/'];
 const entries=[
  ...mainPages.map(path=>({kind:'main',path,level:0})),
- ...news.filter(n=>n.available).sort((a,b)=>a.id.localeCompare(b.id)).map(n=>({kind:'main',path:`/news/${n.id}/`,level:n.restored?1:0})),
- ...tenants.map(t=>({kind:'main',path:`/tenants/${t.page}/`,level:t.listed?0:1})),
- ...gallery.map(g=>({kind:'main',path:`/gallery/${g.id}/`,level:g.listed?0:1})),
+ ...news.filter(n=>n.available).sort((a,b)=>a.id.localeCompare(b.id)).map(n=>({kind:'main',path:`/news/${n.id}/`,level:n.restored?1:0,noIndex:!n.listed})),
+ ...tenants.map(t=>({kind:'main',path:`/tenants/${t.page}/`,level:t.listed?0:1,noIndex:!t.listed})),
+ ...gallery.map(g=>({kind:'main',path:`/gallery/${g.id}/`,level:g.listed?0:1,noIndex:!g.listed})),
  ...memberPages.map(path=>({kind:'main',path,level:path.endsWith('/login/')?1:path.endsWith('/personal/')?6:2,accountScoped:true})),
  ...projects.map(p=>({kind:'main',path:`/members/projects/${p.slug}/`,level:Math.min(...p.roles.map(r=>roleLevels[r]))})),
  ...documents.map(d=>({kind:'main',path:`/members/records/${d.id}/`,level:Math.min(...d.roles.map(r=>roleLevels[r]))})),
@@ -49,7 +49,7 @@ export function decoratePage(html,{kind='main',path='/',role}={}){
  const counter=experienceSettings.showPageIndex&&position?`<span class="page-index" data-page-number="${position.number}" data-page-total="${position.total}" data-growth-stage="${growth.name.toLowerCase()}" aria-label="ページ${position.number}、全${position.total}ページ${experienceSettings.showGrowthStage?'、探索段階 '+growth.name+'（'+growth.label+'）':''}">${experienceSettings.showGrowthStage?`<span class="index-growth">${growth.name}</span>`:''}<span class="index-number">${String(position.number).padStart(3,'0')} <span>/</span> ${position.total}</span></span>`:'';
  const note = kind==='main' && position?.level===0 ? seedNoteData(path) : '';
  const seedNotes = note ? `<script type="application/json" data-seed-notes>${note}</script>` : '';
- const noIndex=kind==='main'&&(path===programNotesPath||path===seedCollectionPath||path==='/news/20261027/'||/^\/tenants\/\d+\/materials\//.test(path))?'<meta name="robots" content="noindex,nofollow">':'';
+ const noIndex=kind==='main'&&(position?.noIndex||path===programNotesPath||path===seedCollectionPath||/^\/tenants\/\d+\/materials\//.test(path))?'<meta name="robots" content="noindex,nofollow">':'';
  return html.replace('<!--PAGE_INDEX-->',counter)
   .replace(/<body\b([^>]*)>/,`<body$1 data-asunaro-stage="${growth.name.toLowerCase()}" data-seed-drift-enabled="${experienceSettings.seedDrift.enabled}" data-seed-drift-threshold="${experienceSettings.seedDrift.threshold}">`)
   .replace('</body>',seedNotes+'</body>')
