@@ -8,6 +8,7 @@ export const siteQueries=[
  {word:'瀬尾灯',source:'制作物0021、取材記事',destination:'/people/seo-akari/',purpose:'経歴と活動終了を確認し、会員側の共同試作記録へつなぐ。'},
  {word:'瀬尾文乃',source:'灯のプロフィール／施設名に込めた願い',destination:'/people/seo-fumino/',purpose:'母の生活と、設立前の聞き取りを読む。'},
  {word:'三枝律',source:'取材記事／共同試作の連絡',destination:'/people/saegusa-ritsu/',purpose:'公開上の業務終了日を、非公開原本と照合する。'},
+ {word:'久世圭',source:'FAB-2022-071の取次欄／YH-2018-041',destination:'/tenants/0012/',purpose:'活動報告で同じ日に入居した会社を確かめ、公開一覧の同時期の欠番を絞る。'},
  {word:'榊原惟臣',source:'施設案内、灯の経歴',destination:'/news/20211103/',purpose:'公式な訃報と死因説明を読む。'},
  {word:'A4-01',source:'MX-2019-410',destination:'/news/20120416/',purpose:'一覧から外れた開設時の原図へ進む。'},
  {word:'A4-09',source:'現行4階フロアマップの図面番号',destination:'/floor-map/',purpose:'現行の来館案内を番号で引き直す。'},

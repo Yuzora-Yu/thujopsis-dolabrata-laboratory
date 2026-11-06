@@ -24,7 +24,7 @@ export const tenants = [
   {page:'0009',id:'0032',name:'株式会社ケイロ計測',room:'408',business:'環境・生体・行動計測',established:'2012年2月20日',joined:'2015年4月1日',period:'2015–',status:'入居中',person:'片岡 亮規',description:'環境と人の関係を、計測技術で可視化します。センサーの開発からデータ処理、継続的な運用まで対応しています。',listed:true},
   {page:'0010',id:'0038',name:'株式会社アシタ記録技研',room:'416',business:'技術記録・データ保全',established:'2016年12月4日',joined:'2017年4月1日',period:'2017–2022',status:'過去入居',person:'榎本 航策',description:'災害時にも失われない技術記録を。研究資料の整理、長期保存、事業承継時のデータ移管を支援しています。',listed:false},
   {page:'0012',id:'0045',name:'ライテック材料評価株式会社',room:'409',business:'材料評価・環境適応試験',established:'2016年7月12日',joined:'2018年4月1日',period:'2018–',status:'入居中',person:'新井 達弦',description:'材料の経時変化と環境適応性を評価しています。少量試作から継続試験まで、開発段階に応じた測定に対応します。',listed:true},
-  {page:'0013',id:'0046',name:'株式会社オルディス認知工学',room:'412',business:'認知負荷・意思決定の評価',established:'2015年11月12日',joined:'2018年4月1日',period:'2018–',status:'入居中',person:'久世 圭',description:'生活環境と意思決定の関係を研究しています。操作系の評価、認知負荷の計測、閉鎖環境下の行動分析を通じ、安定した運用を支援します。',listed:false},
+  {page:'0013',id:'0046',name:'株式会社オルディス認知工学',room:'412',business:'認知負荷・意思決定の評価',established:'2015年11月12日',joined:'2018年4月1日',period:'2018–',status:'入居中',person:'久世 圭',description:'共同で使う設備の操作盤や警報表示を評価しています。初めて使う方でも操作を覚えられるか、保護具を着けたまま異常に気づけるかを確かめ、表示や手順の設計へ反映します。',listed:false},
   {page:'0014',id:'0047',name:'センシア動態解析株式会社',room:'413',business:'動態計測・統計解析',established:'2017年1月23日',joined:'2018年6月1日',period:'2018–',status:'入居中',person:'鴨下 梓',description:'継続的な行動計測から、生活環境の改善を支援します。機器の設置、データの取得、解析まで一貫した体制を整えています。',listed:true},
   {page:'0017',id:'0054',name:'合同会社オルト居住運用設計',room:'414',business:'居住設備・区画運用の設計支援',established:'2020年8月1日',joined:'2021年4月1日',period:'2021–',status:'入居中',person:'深町 玲司',description:'宿泊設備や研修施設で、利用を続けながら設備を更新する計画を作ります。館内の動線、清掃や補給、工事中に使える設備を、運用の担当者と一緒に整理します。',listed:true},
   ...additionalTenants,
@@ -78,7 +78,7 @@ export const searchEntries = [
  {title:'4階フロアマップ',url:'/floor-map/',text:`${floorGuideCode} フロアマップ 案内図 中央受付 会議室 ラウンジ`,summary:`4階案内図 ${floorGuideCode}。中央受付や会議室、ラウンジへの行き方をご確認いただけます。`},
  {title:'入居者紹介',url:'/tenants/',text:'入居企業 過去入居 企業紹介 活動報告'},
  ...tenants.filter(t=>t.listed).map(t=>({
-  title:t.name,url:`/tenants/${t.page}/`,text:`${t.room}号室　${t.business}　${t.description}`,
+  title:t.name,url:`/tenants/${t.page}/`,text:[`${t.room}号室`,t.business,t.description,...t.activities.flatMap(({title,body})=>[title,body])].join(' '),
   summary:`${t.room}号室 ／ ${t.status}（${t.period}）　${t.business}`,
  })),
  ...news.filter(n=>n.listed||n.searchable).map(n=>({

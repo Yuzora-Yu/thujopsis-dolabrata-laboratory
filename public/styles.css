@@ -343,6 +343,7 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .gallery-method{color:#52615a;font-size:.72rem}
 @media(max-width:520px){.gallery-tools+.gallery-grid .image-wrap{height:auto;aspect-ratio:4/3}}
 .gallery-card,.tenant-card{scroll-margin-top:8rem}
+@media(max-width:520px){.tenant-card{scroll-margin-top:0}}
 .gallery-card:target,.tenant-card:target{outline:2px solid #889f91;outline-offset:3px}
 .gallery-card[hidden]{display:none}
 .legacy-catalog>.legacy-row[hidden]{display:none}

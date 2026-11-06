@@ -214,6 +214,11 @@ test('public search tolerates spacing, width and full publication dates; member 
   assert.ok(result.includes(`href="${expected}"`),query);
   assert.ok(!result.includes(`href="${other}"`),query);
  }
+ for(const query of ['久世圭','久世 圭','久世　圭']){
+  const result=(await c.get('/search/?q='+encodeURIComponent(query))).text;
+  assert.match(result,/href="\/tenants\/0012\/"[\s\S]*?ライテック材料評価/,query);
+  assert.doesNotMatch(result,/href="\/tenants\/0013\//,query);
+ }
  assert.doesNotMatch((await c.get('/search/?q='+encodeURIComponent('４１２号室'))).text,/href="\/tenants\/0013\//);
  for(const q of ['2012年4月16日掲載','２０１２ 年 ４ 月 １６ 日','2012/4/16','2012.04.16','2012-04-16','20120416']){
   const result=(await c.get('/search/?q='+encodeURIComponent(q))).text;
