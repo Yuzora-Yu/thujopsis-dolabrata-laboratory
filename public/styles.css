@@ -251,6 +251,7 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .price-note{text-align:left;font-weight:600;padding-bottom:.25rem}
 .visit-form-edition{border-top:1px solid var(--line);padding-top:.45rem;color:#647069;font-size:.73rem}
 .visit-guide>h2:first-child{margin-top:0}
+.seed-drift-active .visit-guide .button[href$="/guide/access/"]{color:#ff9c93}
 .visit-form-edition .seed-note-receipt{color:inherit;padding:0 .3rem;font-size:inherit;letter-spacing:inherit;font-variant-numeric:tabular-nums}
 @media(min-width:801px){.facility-hero .seed-note-sun{--note-ink:#eedcba}}
 .closure-hero .seed-note-sun{--note-ink:#eedcba}

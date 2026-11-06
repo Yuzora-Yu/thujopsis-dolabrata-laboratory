@@ -79,7 +79,7 @@ function installSeedNotes(){
  dialog.id = 'seed-note-dialog';
  dialog.setAttribute('aria-labelledby','seed-note-title');
  dialog.setAttribute('aria-describedby','seed-note-body seed-note-progress');
- dialog.innerHTML = '<div class="seed-note-meta"><p class="eyebrow"></p><span class="seed-note-number"></span></div><h2 id="seed-note-title"></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><p class="seed-note-unlock" hidden><a class="text-link" data-seed-note-reward>中央受付の引継ぎ控えへ</a></p><div class="seed-note-actions"><a data-seed-note-source target="_blank" rel="noopener" hidden>参考資料（NASA・別タブ）</a><span id="seed-note-progress" data-seed-note-progress></span><button type="button" class="button dark">閉じる</button></div>';
+ dialog.innerHTML = '<div class="seed-note-meta"><p class="eyebrow"></p><span class="seed-note-number"></span></div><h2 id="seed-note-title" tabindex="-1" autofocus></h2><p id="seed-note-body"></p><a class="text-link seed-note-related" hidden></a><p class="seed-note-unlock" hidden><a class="text-link" data-seed-note-reward>中央受付の引継ぎ控えへ</a></p><div class="seed-note-actions"><a data-seed-note-source target="_blank" rel="noopener" hidden>参考資料（NASA・別タブ）</a><span id="seed-note-progress" data-seed-note-progress></span><button type="button" class="button dark">閉じる</button></div>';
  dialog.querySelector('.eyebrow').textContent = note.beginsDrift ? '受付控え ／ 複写' : 'あすなろの豆知識';
  const total = seedCollection()?.total;
  if (total && note.number) dialog.querySelector('.seed-note-number').textContent = `No.${note.number}/${total}`;
@@ -106,8 +106,11 @@ function installSeedNotes(){
   const discovered = rememberSeedNote(note.number);
   if (discovered && note.beginsDrift) window.asunaroDrift?.revealFromCopy();
   dialog.showModal();
-  if (discovered && reward.hasAttribute('href')) reward.focus();
-  else close.focus();
+  dialog.scrollTop = 0;
+  const action = discovered && reward.hasAttribute('href') ? reward : close;
+  if (action.getBoundingClientRect().bottom <= dialog.getBoundingClientRect().bottom) {
+   action.focus({preventScroll:true});
+  }
  });
  document.body.append(dialog);
 }

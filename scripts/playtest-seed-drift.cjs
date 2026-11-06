@@ -35,15 +35,23 @@ async function checkMenuNotes(browser){
   await page.getByRole('main').getByRole('link',{name:'見学のご案内',exact:true}).click();
   await page.waitForURL(at('/visit/'));
   assert.equal(await page.locator('body.seed-drift-active').count(),0);
+  await page.setViewportSize({width:568,height:320});
   await page.getByRole('button',{name:'17:06 差替',exact:true}).click();
   const finalNote=page.getByRole('dialog');
   assert.equal(await finalNote.locator('.seed-note-number').innerText(),'No.9/9');
   assert.equal(await finalNote.locator('[data-seed-note-progress]').innerText(),'記録済み 9 / 9');
   await page.locator('body.seed-drift-active').waitFor();
+  assert.equal(await finalNote.evaluate(dialog=>{
+   const heading=dialog.querySelector('h2');
+   const number=dialog.querySelector('.seed-note-number');
+   return dialog.scrollTop===0 && heading===document.activeElement
+    && number.getBoundingClientRect().top>=dialog.getBoundingClientRect().top;
+  }),true);
   await page.screenshot({path:'.work/qa/seed-ninth-unlocked.png'});
   const finalReward=finalNote.getByRole('link',{name:'中央受付の引継ぎ控えへ'});
+  await page.keyboard.press('Tab');
   assert.equal(await finalReward.evaluate(link=>link===document.activeElement),true);
-  await finalReward.click();
+  await page.keyboard.press('Enter');
   await page.getByRole('heading',{name:'10月1日　引継ぎ'}).waitFor();
   for (const path of ['/gallery/0021/','/facilities/coworking/','/facilities/staff/','/floor-map/','/guide/access/']) {
    await page.goto(at(path));
@@ -68,6 +76,8 @@ async function checkReceptionCopy(browser){
 
   await page.goto(at('/visit/'));
   assert.equal(await page.locator('.seed-drift-link').count(),0);
+  const visitAccess=page.locator('.visit-guide').getByRole('link',{name:'アクセス',exact:true});
+  const normalAccessColor=await visitAccess.evaluate(link=>getComputedStyle(link).color);
   const receipt=page.getByRole('button',{name:'17:06 差替',exact:true});
   assert.equal(await receipt.innerText(),'17:06 差替');
   await receipt.focus();
@@ -81,6 +91,7 @@ async function checkReceptionCopy(browser){
   await page.locator('body.seed-drift-active').waitFor();
   await page.keyboard.press('Escape');
   await page.locator('.seed-drift-link').waitFor();
+  assert.equal(await visitAccess.evaluate(link=>getComputedStyle(link).color),'rgb(255, 156, 147)');
   assert.equal(await receipt.evaluate(button=>button===document.activeElement),true);
   await page.goto(at('/gallery/'));
   await page.locator('.seed-corrupted img').first().waitFor();
@@ -89,6 +100,7 @@ async function checkReceptionCopy(browser){
   assert.equal((await context.cookies()).some(cookie=>cookie.name.startsWith('asunaro_seed_')),false);
 
   await page.goto(at('/visit/'));
+  assert.equal(await visitAccess.evaluate(link=>getComputedStyle(link).color),normalAccessColor);
   await receipt.click();
   assert.equal(await note.locator('[data-seed-note-progress]').innerText(),'記録済み 1 / 9');
   assert.equal(await page.locator('.seed-drift-link').count(),0);
