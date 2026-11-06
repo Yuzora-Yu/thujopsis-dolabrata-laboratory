@@ -36,6 +36,7 @@ STYLES = {
     "memo": ("Mincho", "#484337", "#f3f0e7", "手控え", "memo"),
     "letter": ("Mincho", "#483c30", "#f0ece2", "回答書控え", "formal"),
     "ledger": ("Office", "#414c4e", "#eaeeee", "管理簿複写", "form"),
+    "maintenance": ("Gothic", "#3f5861", "#e8eff0", "施設保守・作業完了", "strip"),
     "operations": ("Gothic", "#1f4a44", "#e3ece7", "区画運用報告", "strip"),
 }
 
