@@ -419,11 +419,12 @@
   },
   {
     "key": "f-presentation",
-    "year": 2018,
-    "prompt": "Use case: photorealistic-natural. Original fictional facility website record photo. A Japanese community industry exchange facility presentation space, a wide flat open room with approximately sixty movable chairs facing a plain white screen, folding lectern, modest windows at the right and a few stacked chairs behind. No stage theatrics. Photograph as taken in 2018 with an ordinary compact camera, late-Heisei image quality: landscape 3:2, deep focus, moderate JPEG softness, slightly cool fluorescent/window mixed lighting, natural mundane exposure, restrained colors. Empty facility. Buildable believable architecture, no dramatic luxury lighting or text overlays, no brands.",
-    "references": [],
-    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-d07feed4-f222-4dd8-9818-a17eb47a1f4b.png",
-    "asset": "public/assets/media/f-presentation.webp"
+    "year": 2026,
+    "mode": "built-in imagegen",
+    "path": "docs/source-images/f-presentation.png",
+    "asset": "public/assets/media/f-presentation.webp",
+    "prompt": "Use case: photorealistic-natural original architectural facility photograph for a fictional Japanese public research institution. A compact fourth-floor presentation room in the interior of a building, a wide irregular hexagonal footprint approximately 11 by 9 meters, with angled side walls and short visibly bevelled corners. Camera at a recessed southwest doorway at eye level, looking diagonally toward the north presentation wall. The room is completely internal: matte pale solid partitions, a visible forty-five-degree wall transition at the right-hand corner, no view of the outside. Low everyday acoustic ceiling with simple rectangular LED panels. On the north flat wall a single plain fixed projection screen displaying a restrained abstract blueprint of three linked rounded lunar modules, no text, no logos. Three short rows of simple dark stackable chairs with aligned separate legs and a generous empty aisle, understated gray carpet, a modest movable lectern near the screen. No other theatrical rig or decor. The geometry of the angled corner and doorway is immediately legible. Soft consistent indoor lighting, straightforward contemporary 2026 facility record photograph, realistic scale and texture, wide horizontal 3:2 framing, no people.",
+    "review": "4階発表室。南西側入口から北向き、外窓なし。屈曲した壁、床との接地、椅子の脚を確認。"
   },
   {
     "key": "f-hall",

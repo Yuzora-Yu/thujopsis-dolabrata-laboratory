@@ -80,6 +80,8 @@ def create_plan(old=False):
         # the unlabelled western zone; this is not a technical service plan.
         gap='#ffffff'
         line(788,400,821,400,gap,4)
+        line(783,208,806,208,gap,4)
+        line(926,319,937,341,gap,4)
         line(601,357,601,378,gap,4);line(601,405,601,426,gap,4)
         line(893,246,893,373,'#6d8f86',2.8)
         route='#47796a'
