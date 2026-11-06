@@ -96,6 +96,16 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .floor-arrival figcaption{color:var(--muted);font-size:.8rem;margin-top:.5rem}
 .facility-photo{margin:0}
 .facility-photo figcaption{color:var(--muted);font-size:.8rem;margin-top:.65rem}
+.meeting-rooms{max-width:68rem;padding-bottom:clamp(3rem,7vw,6rem);scroll-margin-top:8.5rem}
+.meeting-rooms h2{font-size:clamp(1.3rem,2.7vw,2rem);line-height:1.45}
+.meeting-rooms>p{margin:.8rem 0 1.25rem;font-size:.93rem;line-height:1.8}
+.meeting-rooms dl{margin:0;border-top:1px solid var(--line)}
+.meeting-rooms dl>div{display:grid;grid-template-columns:8rem minmax(0,1fr) max-content;gap:.55rem 1.5rem;align-items:baseline;padding:1rem .6rem;border-bottom:1px solid var(--line)}
+.meeting-rooms dt{font-weight:700}
+.meeting-rooms dt small{display:block;margin-top:.2rem;color:var(--muted);font-weight:400}
+.meeting-rooms dd{margin:0;font-size:.93rem;line-height:1.8}
+.meeting-rooms .text-link{display:inline-flex;align-items:center;min-height:44px}
+@media(max-width:640px){.meeting-rooms dl>div{grid-template-columns:1fr;gap:.3rem}}
 .floor-destinations{
  max-width:60rem;
  margin-top:clamp(2.75rem,6vw,5rem);

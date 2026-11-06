@@ -75,7 +75,16 @@ test('state changes require CSRF verification',async()=>{const r=await fetch(bas
 
 test('reservation requests respect the selected facility’s start time and keep the draft on error',async()=>{
  const c=client();
- assert.equal((await c.login('201204010017','20080519')).status,303);
+ const roomD='/members/reservations/?space=meeting-d';
+ assert.match((await c.get('/facilities/meeting/')).text,/href="\/members\/reservations\/\?space=meeting-d" target="_blank"/);
+ const jump=(await c.get(roomD)).response;
+ assert.equal(jump.status,303);
+ const login=(await c.get(jump.headers.get('location'))).text;
+ assert.ok(login.includes('name="next" value="'+roomD+'"'));
+ const signedIn=await c.post('/members/login/',{id:'201204010017',password:'20080519',next:roomD});
+ assert.equal(signedIn.status,303);
+ assert.equal(signedIn.headers.get('location'),roomD);
+ assert.match((await c.get(roomD)).text,/<option value="meeting-d" selected>会議室 D/);
  const route='/members/reservations/';
  const form=(await c.get(route+'?space=workshop')).text;
  assert.match(form,/<option value="workshop" selected>工房/);

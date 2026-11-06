@@ -220,7 +220,7 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.locator('#main-navigation').getByRole('link',{name:'施設・サービス',exact:true}).click();
   await mobile.getByRole('heading',{level:1,name:'施設・サービス',exact:true}).waitFor();
   await mobile.goto(base+'/floor-map/');
-  assert.match(await mobile.locator('.floor-arrival').innerText(),/右へ進み、左手の中央受付へ/);
+  assert.match(await mobile.locator('.floor-arrival').innerText(),/右へ進んでください。通路を左に曲がると、正面に中央受付/);
   await mobile.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
   const currentPlan=mobile.getByRole('dialog',{name:'フロアマップを拡大'});
   await currentPlan.getByRole('img',{name:/A4-08.*408・409・413.*撮影位置/}).waitFor();
@@ -237,10 +237,40 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.getByText('4階 工房2 ／ 入口側から撮影',{exact:true}).waitFor();
   await mobile.getByRole('link',{name:'中央受付からの行き方',exact:true}).click();
   await mobile.waitForURL(base+'/floor-map/#floor-workshop');
-  await mobile.locator('#floor-meeting').getByRole('link',{name:'会議室 A・B・C・D',exact:true}).click();
+  const meetingDirections=mobile.locator('#floor-meeting');
+  assert.match(await meetingDirections.innerText(),/会議室の手前で右に曲がって[\s\S]*A室・B室・C室[\s\S]*C室の角を左に曲がった先、左手に入口/);
+  await meetingDirections.getByRole('link',{name:'会議室 A・B・C・D',exact:true}).click();
   await mobile.getByText('4階 会議室A',{exact:true}).waitFor();
+  await mobile.getByRole('link',{name:'会議室を選ぶ',exact:true}).click();
+  await mobile.waitForURL(base+'/facilities/meeting/#meeting-rooms');
+  const roomChoices=mobile.getByRole('region',{name:'会議室を選ぶ'});
+  const rooms=[['A',24],['B',6],['C',6],['D',10]];
+  for(const [letter,capacity] of rooms){
+   const name=new RegExp('会議室'+letter+'の利用申請');
+   const row=roomChoices.locator('dl>div').filter({has:mobile.getByRole('link',{name})});
+   const action=row.getByRole('link',{name});
+   const destination=new URL(base+'/members/reservations/?space=meeting-'+letter.toLowerCase());
+   assert.equal(await action.getAttribute('href'),destination.pathname+destination.search);
+   assert.equal(await action.getAttribute('target'),'_blank');
+   assert.match(await row.innerText(),new RegExp('定員 '+capacity+'名'));
+  }
+  const roomDLink=roomChoices.getByRole('link',{name:/会議室Dの利用申請/});
+  const [reservation] = await Promise.all([mobile.waitForEvent('popup'),roomDLink.click()]);
+  const loginButton=reservation.getByRole('button',{name:/ログイン/});
+  await reservation.locator('#member-id').fill('201204010017');
+  await reservation.locator('#member-password').fill('20080519');
+  await loginButton.click();
+  await reservation.waitForURL(base+'/members/reservations/?space=meeting-d');
+  await reservation.locator('#space').waitFor();
+  assert.equal(await reservation.locator('#space').inputValue(),'meeting-d');
+  assert.equal(mobile.url(),base+'/facilities/meeting/#meeting-rooms');
+  await reservation.close();
   await mobile.getByRole('link',{name:'中央受付からの行き方',exact:true}).click();
   await mobile.waitForURL(base+'/floor-map/#floor-meeting');
+  await mobile.waitForFunction(()=>{
+   const destination=document.querySelector('#floor-meeting').getBoundingClientRect();
+   return destination.top>=document.querySelector('.site-header').getBoundingClientRect().bottom-1&&destination.bottom<innerHeight;
+  });
   assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
   await mobile.locator('.floor-arrival img').evaluate(image=>image.decode());
   await mobile.screenshot({path:'.work/qa/visitor-floor-mobile.png',fullPage:true});

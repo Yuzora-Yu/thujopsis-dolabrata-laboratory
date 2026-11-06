@@ -257,26 +257,49 @@ const facilityDetails={
  presentation:['4階東側のプレゼンテーションホールは、発表会や勉強会、交流会にご利用いただけます。レイアウトの変更については、利用申請時にご相談ください。','南西側入口から見た投影壁と客席。','4階 プレゼンテーションホール ／ 客席の設営例'],
  hall:['3階ホールは、最大500名規模の講演会、展示会、発表会に対応しております。音響、映像設備を備え、用途に合わせたレイアウトでご利用いただけます。','舞台と客席を備えた3階ホール。','3階 ホール ／ 講演会の設営例'],
 };
+const meetingApproach='受付カウンターの右脇を奥へ進み、会議室の手前で右に曲がってください。';
+const meetingDEntrance='C室の角を左に曲がった先、左手に入口がございます。';
+const meetingRooms=[
+ ['meeting-a','A',24,'会議室前の通路を進み、左手の1番目の入口です。'],
+ ['meeting-b','B',6,'会議室前の通路を進み、左手の2番目の入口です。'],
+ ['meeting-c','C',6,'会議室前の通路を進み、左手の3番目の入口です。'],
+ ['meeting-d','D',10,meetingDEntrance],
+];
 const floorDestinations=[
  ['workshop','工房1・2','受付に向かって左手に入口が並んでおります。受付に近い方が工房2、エレベーターに近い方が工房1です。'],
  ['coworking','コワーキング・ラウンジ','受付に向かって右手前のガラス扉からお入りください。'],
- ['meeting','会議室 A・B・C・D','受付の右脇にある通路を奥へお進みください。会議室は北側にございます。D室へは、B・C室の先で左へお進みください。'],
- ['cafe','食堂・カフェ','会議室前の通路を右へ進んだ先、左手に入口がございます。'],
- ['presentation','プレゼンテーションホール','ラウンジ手前の通路を東へ進み、ラウンジの角を左に曲がると、右手に入口がございます。'],
+ ['meeting','会議室 A・B・C・D',meetingApproach+'左手にA室・B室・C室の入口が順に並んでおります。D室は、'+meetingDEntrance],
+ ['cafe','食堂・カフェ',meetingApproach+'会議室Cを過ぎてそのまま進むと、左手に入口がございます。'],
+ ['presentation','プレゼンテーションホール','ラウンジの南側の通路を東へ進み、ラウンジを過ぎて左に曲がると、右手に入口がございます。'],
  ['office','個室オフィス','個室オフィスは西側にございます。ご来訪の際は、中央受付でお訪ねになる企業名か号室をお伝えください。'],
 ];
+
+function meetingRoomChoices(){
+ return `<section class="wrap meeting-rooms" id="meeting-rooms" aria-labelledby="meeting-rooms-title">
+  <h2 id="meeting-rooms-title">会議室を選ぶ</h2>
+  <p>${meetingApproach}</p>
+  <dl>${meetingRooms.map(([space,letter,capacity,direction])=>`<div>
+   <dt>会議室${letter}<small>定員 ${capacity}名</small></dt>
+   <dd>${direction}</dd>
+   <dd>${link('/members/reservations/?space='+space,'会議室'+letter+'の利用申請')}</dd>
+  </div>`).join('')}</dl>
+ </section>`;
+}
 
 function facilityPage([id,image,title,lead]){
  const info=facilityInfo[id], [description,imageAlt,caption]=facilityDetails[id];
  const location=id==='hall'?link('/floor-map/#arrival','4階中央受付の位置'):link('/floor-map/#floor-'+id,'中央受付からの行き方');
+ const action=id==='meeting'
+  ?link('#meeting-rooms','会議室を選ぶ','button dark')
+  :info.space?link('/members/reservations/?space='+info.space,'会員サイトで利用申請','button dark'):link('/membership/','会員のご案内','button dark');
  return layout(title,heading('FACILITY',title,lead)+`
   <section class="wrap facility-detail">
    ${facilityPhoto(image,imageAlt,caption)}
    <div class="prose"><h2>${title}のご利用について</h2><p>${description}</p><p>${info.notes}</p>
     <dl class="detail-list"><div><dt>ご利用時間</dt><dd>${info.hours}</dd></div><div><dt>ご利用方法</dt><dd>${info.method}</dd></div></dl>
-    <div class="button-row">${info.space?link('/members/reservations/?space='+info.space,'会員サイトで利用申請','button dark'):link('/membership/','会員のご案内','button dark')}${link('/price/','料金のご案内','button outline')}${location}</div>
+    <div class="button-row">${action}${link('/price/','料金のご案内','button outline')}${location}</div>
    </div>${id==='hall'?hallExhibition():''}
-  </section>`);
+  </section>${id==='meeting'?meetingRoomChoices():''}`);
 }
 
 function floorGuide(){
@@ -287,7 +310,7 @@ function floorGuide(){
    <div class="map-legend"><span><i class="legend-office"></i>オフィス・工房</span><span><i class="legend-common"></i>交流・会議スペース</span><span><i class="legend-admin"></i>管理・共用設備</span></div>
    <section class="floor-arrival" id="arrival" aria-labelledby="floor-arrival-title">
     <div><p class="eyebrow">4F RECEPTION</p><h2 id="floor-arrival-title">エレベーターから中央受付へ</h2>
-     <p>中央のエレベーターで4階にお着きになりましたら、右へ進み、左手の中央受付へお越しください。案内図の「撮影位置」からは、正面に受付、右手前にラウンジのガラス扉が見えます。会議室への通路は、受付カウンターのすぐ右脇です。</p></div>
+     <p>中央のエレベーターで4階にお着きになりましたら、右へ進んでください。通路を左に曲がると、正面に中央受付がございます。案内図の「撮影位置」からは、正面に受付、右手前にラウンジのガラス扉が見えます。会議室へは、受付カウンターの右脇の通路をお進みください。</p></div>
     <figure>${img('media/f-central-reception.webp','正面の緑のカウンターに「中央受付」の表示。手前右のガラス扉と、奥に続く受付右脇の通路。','',false,[1280,853])}<figcaption>案内図の撮影位置から中央受付を望む</figcaption></figure>
    </section>
    <section class="floor-destinations" aria-labelledby="floor-destinations-title">
