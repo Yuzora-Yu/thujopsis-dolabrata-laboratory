@@ -59,7 +59,7 @@ function tenantExhibit(id){
  const fields=e.style==='method'?`<ol class="tenant-method">${e.facts.map(([label,value])=>`<li><b>${esc(label)}</b><span>${esc(value)}</span></li>`).join('')}</ol>`:`<dl class="tenant-exhibit-fields">${e.facts.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl>`;
  return `<section class="tenant-exhibit exhibit-${e.style}"><p class="exhibit-label">${esc(e.label)}</p><h3>${esc(e.title)}</h3><p>${esc(e.intro)}</p>${fields}${e.link?link(e.link[0],esc(e.link[1])):''}</section>`;
 }
-function galleryCards(items){return `<div class="gallery-grid">${items.map(g=>`<a class="gallery-card" href="/gallery/${g.id}/" data-gallery-method="${esc(g.tag)}"><div class="image-wrap">${img(g.image,g.title)}</div><div class="card-meta"><time>${g.date}</time><span>${g.tag}</span></div><h3>${g.title}</h3><span class="card-number">No. ${g.id}</span></a>`).join('')}</div>`;}
+function galleryCards(items){return `<div class="gallery-grid">${items.map(g=>`<a class="gallery-card" id="work-${g.id}" href="/gallery/${g.id}/" data-gallery-method="${esc(g.tag)}"><div class="image-wrap">${img(g.image,'')}</div><div class="card-meta"><time datetime="${g.date.replaceAll('.','-')}">${g.date}</time><span>${g.tag}</span></div><h3>${g.title}</h3><span class="card-number">No. ${g.id}</span></a>`).join('')}</div>`;}
 function galleryPage(query){
  const listed = gallery.filter(work=>work.listed);
  const methods = [...new Set(listed.map(work=>work.tag))];
@@ -67,7 +67,10 @@ function galleryPage(query){
  const shown = method ? listed.filter(work=>work.tag===method) : listed;
  return layout('工房制作物ギャラリー',heading('MADE AT ASUNARO','工房制作物ギャラリー','暮らしの道具から、事業のための試作品まで。工房から生まれた作品をご紹介いたします。')+`
   <section class="wrap section">
-   <form class="filter-form" method="get"><label>制作方法 <select name="method"><option value="">すべて</option>${methods.map(value=>`<option${method===value?' selected':''}>${esc(value)}</option>`).join('')}</select></label><button type="submit">表示する</button>${seedNoteButton('/gallery/')}</form>
+   <div class="gallery-tools">
+    <form class="filter-form" method="get" action="/gallery/" data-gallery-filter><label>制作方法 <select name="method"><option value="">すべて</option>${methods.map(value=>`<option${method===value?' selected':''}>${esc(value)}</option>`).join('')}</select></label><button type="submit">表示する</button>${seedNoteButton('/gallery/')}</form>
+    <p class="gallery-results"><span data-gallery-scope>${esc(method||'すべての制作方法')}</span><span data-gallery-count>${shown.length}件</span></p>
+   </div>
    ${galleryCards(shown.slice().reverse())}
   </section>`);
 }
@@ -100,9 +103,9 @@ function tenantMaterialPage(material){
   <div class="tenant-material-return">${link('/tenants/'+tenant.page+'/#reading-history',esc(tenant.name)+'の活動資料へ戻る')}</div>
  </article>`);
 }
-function tenantHeading(tenant){
+function tenantHeading(tenant,directory){
  return `<div class="page-heading wrap tenant-heading">
-  <div class="breadcrumb"><a href="/">HOME</a><span>/</span><a href="/tenants/">入居者紹介</a><span>/</span>${esc(tenant.name)}</div>
+  <div class="breadcrumb"><a href="/">HOME</a><span>/</span><a href="${directory}">入居者紹介</a><span>/</span>${esc(tenant.name)}</div>
   <div class="tenant-identity">
    ${tenantLogo(tenant,`${tenant.name}のロゴ`)}
    <div class="tenant-identity-copy"><p class="eyebrow">TENANT PROFILE</p><h1>${esc(tenant.name)}</h1><p class="profile-index">掲載No. ${tenant.page} ／ ${esc(tenant.period)}</p></div>
@@ -110,6 +113,7 @@ function tenantHeading(tenant){
  </div>`;
 }
 function tenantProfile(tenant){
+ const directory=tenant.listed?'/tenants/#tenant-'+tenant.page:'/tenants/';
  const visualKind=tenant.image?.endsWith('.svg')?'図':'写真';
  const visualActivity=tenant.activities.find(activity=>activity.image===tenant.image);
  const companyVisual=tenant.logoOnly||!tenant.image?'':`<figure class="company-image">
@@ -117,7 +121,7 @@ function tenantProfile(tenant){
   <figcaption>${esc(tenant.photoDate||visualActivity?.date||'')}　${esc(visualActivity?.title||'研究・製品の記録')}</figcaption>
  </figure>`;
  const details=[['代表者',tenant.person],['設立日',tenant.established],['入居日',tenant.joined],['登録番号',tenant.id],['区画',tenant.room+'号室'],['入居期間',tenant.period]];
- return layout(tenant.name,tenantHeading(tenant)+`<article class="wrap article tenant-profile">
+ return layout(tenant.name,tenantHeading(tenant,directory)+`<article class="wrap article tenant-profile">
   <nav class="profile-tabs tenant-profile-tabs" aria-label="企業情報"><a href="#profile">企業紹介</a><a href="#activities">活動報告</a><a href="#reading-history">活動に関する資料</a></nav>
   <section id="profile">${companyVisual}<div class="prose">
    <h2>${esc(tenant.tagline)}</h2><p>${esc(tenant.description)}</p>
@@ -127,12 +131,12 @@ function tenantProfile(tenant){
   <section id="activities" class="prose"><h2>活動報告</h2>${tenant.activities.map(activity=>`<article class="company-activity">
    <time>${activity.date}</time><h3>${esc(activity.title)}</h3><p>${esc(activity.body)}</p>${activity.image&&activity.image!==tenant.image?`<button type="button" class="photo-button" data-image-open="/assets/${activity.image}" aria-label="${esc(activity.title)}の写真を拡大">${img(activity.image,`${tenant.name} ${activity.date}の活動記録`,'activity-photo',false,activity.credential?[6144,4096]:null)}<span class="tenant-photo-action" aria-hidden="true">写真を拡大</span></button>`:''}
   </article>`).join('')}</section>
-  ${tenantRelatedMaterials(tenant)}${link('/tenants/','入居者紹介へ')}
+  ${tenantRelatedMaterials(tenant)}${link(directory,'入居者紹介へ')}
  </article>`);
 }
 function tenantCards(items){
  return `<div class="tenant-grid">${items.map(tenant=>`
-  <a class="tenant-card" href="/tenants/${tenant.page}/">
+  <a class="tenant-card" id="tenant-${tenant.page}" href="/tenants/${tenant.page}/">
    ${tenantLogo(tenant)}
    <div class="tenant-card-copy">
     <div class="tenant-card-meta"><span class="tenant-id">掲載No. ${tenant.page}</span><span class="tag">${esc(tenant.status)}</span></div>
@@ -329,7 +333,11 @@ function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCH
  if(path==='/workshop/')return workshopPage();
  if(path==='/gallery/')return galleryPage(q);
  const g=gallery.find(g=>path===`/gallery/${g.id}/`);
- if(g)return layout(g.title,heading('FABRICATION GALLERY',g.title)+`<article class="wrap article"><div class="article-meta"><time>${g.date}</time><span class="tag">${g.tag}</span><span>No. ${g.id}</span></div><button type="button" class="photo-button gallery-photo-button" data-image-open="/assets/${g.image}" aria-label="写真を拡大">${img(g.image,g.imageAlt||g.title,'article-photo',true)}<span class="gallery-zoom-label" aria-hidden="true">写真を拡大</span></button><div class="prose"><p>${g.body}</p><dl class="detail-list"><div><dt>製作方法</dt><dd>${g.tag}</dd></div><div><dt>製作場所</dt><dd>${g.key==='metal-lattice'?'専用加工室（職員管理）':'4階 工房'}</dd></div>${g.record?`<div><dt>照合資料番号</dt><dd>${g.record}${g.recordUpdated?`<small class="record-revision">参照欄の更新：${g.recordUpdated}</small>`:""}</dd></div>`:''}</dl></div><div class="button-row gallery-detail-links">${(g.links||[]).map(l=>link(l.path,l.text,'button dark')).join('')}${link('/gallery/','制作物ギャラリーへ戻る','button outline')}</div></article>`);
+ if(g){
+  const list=g.listed?'/gallery/#work-'+g.id:'/gallery/';
+  const returnContext=g.listed?` data-gallery-return="${esc(g.tag)}"`:'';
+  return layout(g.title,heading('FABRICATION GALLERY',g.title)+`<article class="wrap article"><div class="article-meta"><time>${g.date}</time><span class="tag">${g.tag}</span><span>No. ${g.id}</span></div><button type="button" class="photo-button gallery-photo-button" data-image-open="/assets/${g.image}" aria-label="写真を拡大">${img(g.image,g.imageAlt||g.title,'article-photo',true)}<span class="gallery-zoom-label" aria-hidden="true">写真を拡大</span></button><div class="prose"><p>${g.body}</p><dl class="detail-list"><div><dt>製作方法</dt><dd>${g.tag}</dd></div><div><dt>製作場所</dt><dd>${g.key==='metal-lattice'?'専用加工室（職員管理）':'4階 工房'}</dd></div>${g.record?`<div><dt>照合資料番号</dt><dd>${g.record}${g.recordUpdated?`<small class="record-revision">参照欄の更新：${g.recordUpdated}</small>`:""}</dd></div>`:''}</dl></div><div class="button-row gallery-detail-links">${(g.links||[]).map(l=>link(l.path,l.text,'button dark')).join('')}<a class="button outline" href="${list}"${returnContext}>制作物ギャラリーへ戻る</a></div></article>`);
+ }
  if(path==='/floor-map/')return floorGuide();
  if(path==='/news/')return layout('お知らせ',heading('INFORMATION','お知らせ')+`<section class="wrap section news-archive">${ending?`<a class="closure-notice" href="/news/${ending==='end2'?'staff-change':'closure'}/">${ending==='end2'?'工房技術相談の担当変更について':'施設の利用休止について'} </a>`:''}${newsFilters(news.filter(n=>n.listed))}${rows(news.filter(n=>n.listed))}<nav class="news-pagination" aria-label="お知らせのページ"></nav><p class="seed-note-line news-index-note">掲載順${seedNoteButton('/news/')}</p></section>`);
  const n=news.find(n=>path===`/news/${n.id}/`);

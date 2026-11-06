@@ -70,7 +70,7 @@ npm test
 
 [GitHub Pages確認版](https://yuzora-yu.github.io/thujopsis-dolabrata-laboratory/)はmainへのPushで自動更新します。会員資料も含めた探索を確認できます。
 
-`npm run build:pages`で220ページの静的確認版を生成します。`npm run preview:pages`でプロジェクト配下のURLもローカル検証できます。公開版は架空会員の資料を認証情報で復号し、進行をブラウザー内へ保存します。
+`npm run build:pages`で静的確認版を生成します。`npm run preview:pages`でプロジェクト配下のURLもローカル検証できます。公開版は架空会員の資料を認証情報で復号し、進行をブラウザー内へ保存します。
 
 Cloudflare公開用の入口は`worker/index.ts`、設定は`wrangler.jsonc`。`npm run build:worker`、`npm run typecheck`、`npm run dev:cloudflare`で準備・検証します。プレイヤーごとのDurable Objectsで進行を保存します。yu-zora.comのドメイン設定は変更していません。詳細は[公開先の運用](docs/publishing.md)を参照してください。
 
@@ -78,9 +78,9 @@ Cloudflare公開用の入口は`worker/index.ts`、設定は`wrangler.jsonc`。`
 
 ## ページ番号と攻略設計
 
-`src/experience.mjs`でページ番号・総数・成長段階の表示を一括管理します。現在の登録は217ページ。`showPageIndex`と`showGrowthStage`で表示を切り替えられます。
+`src/experience.mjs`でページ番号・総数・成長段階の表示を一括管理します。登録数は生成された攻略・ヒント設計で確認できます。`showPageIndex`と`showGrowthStage`で表示を切り替えられます。
 
-作者用の[攻略・ヒント設計](docs/hint-plan.md)は31段階。必要情報、根拠ページ、段階別ヒント、解答、次の接続を整理しています。`npm run build:hints`でページ番号を同期します。
+作者用の[攻略・ヒント設計](docs/hint-plan.md)に、必要情報、根拠ページ、段階別ヒント、解答、次の接続を整理しています。`npm run build:hints`でページ番号を同期します。
 
 管理用の[クリティカルな検索語・文書ID・入力一覧](docs/critical-search-words.md)も同時に生成します。根拠となるページと必要権限を記載し、公開アセットには含めません。
 

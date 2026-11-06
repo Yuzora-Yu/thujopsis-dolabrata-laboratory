@@ -108,8 +108,37 @@ function installSeedNotes(){
  document.body.append(dialog);
 }
 
+function prepareGallery(){
+ const form=document.querySelector('[data-gallery-filter]');
+ if(form){
+  const select=form.elements.method;
+  const requested=new URLSearchParams(location.search).get('method')||'';
+  const method=Array.from(select.options).some(option=>option.value===requested)?requested:'';
+  select.value=method;
+  let count=0;
+  for(const card of document.querySelectorAll('[data-gallery-method]')){
+   card.hidden=Boolean(method&&card.dataset.galleryMethod!==method);
+   if(!card.hidden)count++;
+  }
+  document.querySelector('[data-gallery-scope]').textContent=method||'すべての制作方法';
+  document.querySelector('[data-gallery-count]').textContent=count+'件';
+  const target=document.getElementById(location.hash.slice(1));
+  if(target?.matches('.gallery-card:not([hidden])'))requestAnimationFrame(()=>target.scrollIntoView({block:'start'}));
+ }
+ const returnLink=document.querySelector('[data-gallery-return]');
+ if(!returnLink||!document.referrer)return;
+ const previous=new URL(document.referrer),destination=new URL(returnLink.href);
+ if(previous.origin!==destination.origin||previous.pathname.replace(/\/index\.html$/,'/')!==destination.pathname)return;
+ const previousMethod=previous.searchParams.get('method');
+ if(previousMethod===returnLink.dataset.galleryReturn){
+  destination.searchParams.set('method',previousMethod);
+  returnLink.href=destination.href;
+ }
+}
+
 window.asunaroInit=function(){
 installSeedNotes();
+prepareGallery();
 refreshSeedCollection();
 const searchDialog=document.querySelector('.search-dialog');
 document.querySelector('[data-search-open]')?.addEventListener('click',()=>{searchDialog.showModal();searchDialog.querySelector('input').focus();});

@@ -271,6 +271,12 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .hall-exhibition{padding:clamp(1.25rem,4vw,2.6rem);background:#f1f2eb}
 .hall-exhibition h2{margin:.35rem 0 .8rem}
 .staff-profile cite{display:block;margin-top:.75rem;font-size:.8rem;font-style:normal;color:var(--muted)}
+.gallery-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem 1.5rem;margin:-.7rem 0 1.65rem}
+.gallery-tools .filter-form{margin:0;flex-wrap:wrap}
+@media(max-width:360px){.gallery-tools .filter-form{gap:.4rem}.gallery-tools select{max-width:134px;margin-left:6px;padding-inline:.4rem .9rem}}
+.gallery-results{display:flex;align-items:baseline;gap:.55rem;margin:0;color:var(--muted);font-size:.78rem}
+.gallery-card,.tenant-card{scroll-margin-top:8rem}
+.gallery-card:target,.tenant-card:target{outline:2px solid #889f91;outline-offset:3px}
 .gallery-card[hidden]{display:none}
 .legacy-catalog>.legacy-row[hidden]{display:none}
 .gallery-photo-button{position:relative}

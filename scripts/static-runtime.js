@@ -198,16 +198,6 @@ async function boot(){
    const results=site.entries.filter(x=>matchesSearch(x,keyword)&&(state.ending!=='end2'||x.url!=='/people/asakura-tsumugi/'));
    const summary=document.querySelector('.search-results');if(summary){summary.innerHTML=keyword?results.map(x=>`<a href="${urlFor(x.url)}"><h2>${esc(x.title)}</h2><p>${esc(x.text.slice(0,100))}…</p></a>`).join('')||'<p>該当するページはありません。</p>':'';summary.previousElementSibling.textContent=keyword?'「'+keyword+'」の検索結果　'+results.length+'件':'';}
   }
-  if(current.kind==='main'&&current.path==='/gallery/'&&params.get('method')){
-   const select = document.querySelector('select[name=method]');
-   const method = params.get('method');
-   if (select && [...select.options].some(option=>option.value===method)) {
-    select.value = method;
-    document.querySelectorAll('[data-gallery-method]').forEach(card => {
-     card.hidden = card.dataset.galleryMethod !== method;
-    });
-   }
-  }
  }catch{showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');}
  finally{rendering=false;}
 }

@@ -159,7 +159,8 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
    }
    if(pathname==='/people/asakura-tsumugi/'&&caseState.ending==='end2')return send(res,404,notFound());
    if(pathname==='/index.html')pathname='/';
-   const page=renderPublic(pathname,{q:url.searchParams.get('q')||url.searchParams.get('method')||'',ending:caseState.ending,origins});return page?send(res,200,page):send(res,404,notFound());
+   const q=url.searchParams.get(pathname==='/gallery/'?'method':'q')||'';
+   const page=renderPublic(pathname,{q,ending:caseState.ending,origins});return page?send(res,200,page):send(res,404,notFound());
   }catch(error){console.error('Request failed:',error.message);if(!res.headersSent)send(res,error.message==='body too large'?413:500,'お手続きを完了できませんでした。時間をおいて再度お試しください。','text/plain; charset=utf-8');else res.end();}
  }
  return {handler,sessions,cases,origins,flush:()=>persistence};

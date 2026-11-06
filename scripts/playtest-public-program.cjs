@@ -47,9 +47,49 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   assert.match(await p.locator('.workshop-access').innerText(),/無料.*ご利用/);
   await p.getByRole('link',{name:'制作物ギャラリーを見る',exact:true}).click();
   await p.getByLabel('制作方法').selectOption('金属3Dプリンター');
+  let releaseGalleryIndex;
+  const pendingGalleryIndex=new Promise(resolve=>releaseGalleryIndex=resolve);
+  const indexPattern='**/assets/site-index.json';
+  await p.route(indexPattern,async route=>{await pendingGalleryIndex;await route.continue();});
+  try {
+   await p.getByRole('button',{name:'表示する',exact:true}).click();
+   await p.locator('[data-gallery-scope]').filter({hasText:'金属3Dプリンター'}).waitFor();
+   assert.equal(await p.locator('[data-gallery-count]').innerText(),'1件');
+   assert.deepEqual(await p.locator('.gallery-card:visible').evaluateAll(cards=>cards.map(card=>card.dataset.galleryMethod)),['金属3Dプリンター']);
+  } finally {
+   releaseGalleryIndex();
+   await p.unrouteAll({behavior:'wait'});
+  }
+  await p.locator('#work-0033').click();
+  assert.equal(new URL(p.url()).search,'');
+  const galleryReturn=p.getByRole('link',{name:'制作物ギャラリーへ戻る',exact:true});
+  const galleryTarget=new URL(await galleryReturn.getAttribute('href'),p.url());
+  assert.equal(galleryTarget.searchParams.get('method'),'金属3Dプリンター');
+  assert.equal(galleryTarget.hash,'#work-0033');
+  await galleryReturn.click();
+  await p.waitForURL(url=>url.searchParams.get('method')==='金属3Dプリンター'&&url.hash==='#work-0033');
+  await p.locator('#work-0033:target:visible').waitFor();
+  assert.equal(await p.locator('.gallery-card:visible').count(),1);
+  await p.getByLabel('制作方法').selectOption('');
   await p.getByRole('button',{name:'表示する',exact:true}).click();
-  await p.waitForFunction(()=>document.querySelector('select[name=method]').value==='金属3Dプリンター');
-  assert.deepEqual(await p.locator('.gallery-card:visible').evaluateAll(cards=>cards.map(card=>card.dataset.galleryMethod)),['金属3Dプリンター']);
+  await p.waitForURL(url=>url.searchParams.get('method')===''&&url.hash==='');
+  await p.locator('[data-gallery-scope]').filter({hasText:'すべての制作方法'}).waitFor();
+  assert.ok(await p.locator('.gallery-card:visible').count()>1);
+  await p.goto(base+'/gallery/0029/');
+  const unlistedReturn=new URL(await galleryReturn.getAttribute('href'),p.url());
+  assert.equal(unlistedReturn.search+unlistedReturn.hash,'');
+  await galleryReturn.click();
+  assert.equal(await p.locator('#work-0029').count(),0);
+
+  await p.goto(base+'/tenants/');
+  await p.locator('#tenant-0008').click();
+  await p.getByRole('link',{name:'入居者紹介へ',exact:true}).click();
+  await p.waitForURL(base+'/tenants/#tenant-0008');
+  await p.locator('#tenant-0008:target:visible').waitFor();
+  await p.goto(base+'/tenants/0003/');
+  await p.getByRole('link',{name:'入居者紹介へ',exact:true}).click();
+  await p.waitForURL(base+'/tenants/');
+  assert.equal(await p.locator('#tenant-0003').count(),0);
   await p.goto(base+'/research/lunar-habitat/field-notes/');
   assert.equal(await p.locator('body').getAttribute('data-asunaro-stage'),'root');
   assert.equal(await p.locator('.seed-note').count(),0);
