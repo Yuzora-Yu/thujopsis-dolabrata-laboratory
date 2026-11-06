@@ -261,7 +261,11 @@ async function newsInterface(p){
  await workshopShare.getByRole('link',{name:'工房でのやり取りを読む'}).click();
  await until(p,'生活道具・共同試作の連絡');
  const workshopConversation=await p.locator('.project-thread').innerText();
- assert.match(workshopConversation,/焼き芋[\s\S]*料理帳のコピー[\s\S]*受取欄はまだ空けて/);
+ assert.match(workshopConversation,/焼き芋[\s\S]*川瀬 修邦[\s\S]*金曜の点検[\s\S]*料理帳のコピー[\s\S]*受取欄はまだ空けて/);
+ const [interview] = await Promise.all([p.waitForEvent('popup'),p.getByRole('link',{name:/母の字で、また手紙を/}).click()]);
+ await interview.getByRole('heading',{level:1,name:'母の字で、また手紙を。瀬尾灯さんの道具づくり'}).waitFor();
+ assert.match(await body(interview),/来月、家で使ってもらった様子を載せたい/);
+ await interview.close();
  assert.doesNotMatch(workshopConversation,/YH-2022-034|SA-2023-012|P-034|B-07/);
  makerLoanId=workshopConversation.match(/FAB-\d{4}-\d{3}/)[0];
  await p.getByRole('navigation',{name:'共同事業の関連ページ'}).getByRole('link',{name:'研究資料照会'}).click();

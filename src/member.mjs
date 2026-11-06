@@ -2,6 +2,7 @@ import {generalUsePaused,inquiryClosed} from './evidence.mjs';
 import {mediaForRecord,recordMediaPrefix} from './record-media.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
 import {projects} from './world/projects.mjs';
+import {humanPages} from './world/people.mjs';
 import {labThanks,labAssessment} from './lab.mjs';
 import {firstReservationDate,lastReservationDate,reservationSpaces,reservationHours,reservationHoursHint} from '../public/assets/reservation-policy.js';
 import {normalizeDocumentId,documentLookupMessages} from './search.mjs';
@@ -48,7 +49,7 @@ function memberHome(account,paused){
  const workshopNote = account.role==='minamo' ? `<section class="member-workshop-note" aria-labelledby="workshop-note-title">
   <p class="eyebrow"><time datetime="2022-07-08">2022.07.08</time> ／ 工房からの共有（保存分）</p>
   <h2 id="workshop-note-title">瀬尾さんの、次の試作</h2>
-  <p>鉛筆の持ち手を作った瀬尾灯さんが、片手で本を開いておける道具を試すそうです。お母さまに家で一週間使っていただいて、8月に工房へ持ってくるとのことです。</p>
+  <p>鉛筆のグリップを作った瀬尾灯さんの取材が掲載されました。次の試作は、本を開いたままにしておける道具です。机でずれないよう、底に使う材料を川瀬さんにご相談しています。</p>
   <a class="text-link" href="/members/projects/fabrication/">工房でのやり取りを読む</a>
  </section>` : '';
  const lastLink = account.role==='asakura'
@@ -58,8 +59,8 @@ function memberHome(account,paused){
   <div class="notice"><h2>施設からのお知らせ</h2><p>${paused?'施設の一般利用を休止しております。会議室・工房の新規利用申請はお受けしておりません。':'会議室・工房の利用申請は、利用日の前営業日までにお手続きをお願いいたします。'}</p>${paused?'<a class="text-link" href="/news/closure/">施設のお知らせ</a>':''}</div>
   <div class="member-summary">
    <a href="/members/reservations/">利用申請・予約 <small>${paused?'受付休止中':'会議室・工房など'}</small></a>
-   <a href="/members/messages/">施設からの連絡 <small>共同事業・事務連絡</small></a>
-   <a href="/members/projects/">共同事業・連絡記録 <small>打ち合わせ・資料の受け渡し</small></a>
+   <a href="/members/messages/">施設からの連絡 <small>配布文書・事務連絡</small></a>
+   <a href="/members/projects/">共同事業・連絡記録 <small>事業ごとの打ち合わせ・資料の受け渡し</small></a>
    <a href="/members/records/">研究資料照会 <small>共同事業に関する登録資料</small></a>
    ${lastLink}
   </div>`;
@@ -85,9 +86,14 @@ function originalInquiryReply({caseId,origins,caseState}){
  </article>`;
 }
 export function memberLayout(title,body,{account=null,csrf='',active='',caseId='',record=null,caseState={}}={}){
- const items=[['/members/','会員トップ','home'],['/members/reservations/','利用申請・予約','reservations'],['/members/records/','研究資料照会','records'],['/members/activity/','資料の閲覧履歴','activity'],['/members/messages/','施設からの連絡','messages'],['/members/projects/','共同事業・連絡記録','projects'],['/members/organization/','運営団体情報','organization'],['/members/contact/','運営事務局へのお問い合わせ','contact']];
+ const items=[['/members/','会員トップ','home'],['/members/reservations/','利用申請・予約','reservations'],['/members/records/','研究資料照会','records'],['/members/activity/','資料の閲覧履歴','activity'],['/members/messages/','施設からの連絡','messages','配布文書'],['/members/projects/','共同事業・連絡記録','projects','打ち合わせ'],['/members/organization/','運営団体情報','organization'],['/members/contact/','運営事務局へのお問い合わせ','contact']];
  if(account?.role==='asakura')items.splice(4,0,['/members/personal/','個人保存資料','personal']);
- return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)} | あすなろ会員サイト</title><link rel="icon" href="/assets/logo.png"><link rel="stylesheet" href="/styles.css"><script type="module" src="/member-reading.js"></script>${record?.id==='AS-2026-019'?'<script type="module" src="/lab-console.js"></script>':''}</head><body class="member-body"${account?` data-member-role="${esc(account.role)}" data-member-label="${esc(account.name)}" data-member-case="${esc(caseId)}" data-member-inquiry="${esc(caseState.inquiryRecord||'')}"`:""}${record?` data-member-record="${esc(record.id)}" data-member-record-title="${esc(record.title)}"`:""}><header class="member-header">${brand()}<span class="member-heading">会員サイト / MEMBER SERVICES</span></header>${account?`<div class="member-shell"><aside class="member-sidebar"><div class="account-box"><b>${esc(account.name)}</b><small>登録番号 ${esc(account.member)}</small></div><nav aria-label="会員メニュー">${items.map(([url,label,key])=>`<a href="${url}" class="${key===active?'active':''}">${label}</a>`).join('')}</nav><form method="post" action="/members/logout/" class="logout-form">${fieldToken(csrf)}<button type="submit">ログアウト</button></form></aside><main class="member-main"><p class="eyebrow">MEMBER SERVICES</p>${body}</main></div>`:`<main>${body}</main>`}<footer class="member-footer">© ASUNARO INDUSTRY & EXCHANGE　<a href="/">施設サイトへ</a></footer>${fictionFooter()}</body></html>`;
+ const menuLinks=items.map(([url,label,key,description])=>{
+  const a11y=description?` aria-label="${label}" aria-describedby="member-nav-${key}"`:'';
+  const title=description?`<span>${label}</span><small class="member-nav-description" id="member-nav-${key}">${description}</small>`:label;
+  return `<a href="${url}" class="${key===active?'active':''}"${a11y}>${title}</a>`;
+ }).join('');
+ return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)} | あすなろ会員サイト</title><link rel="icon" href="/assets/logo.png"><link rel="stylesheet" href="/styles.css"><script type="module" src="/member-reading.js"></script>${record?.id==='AS-2026-019'?'<script type="module" src="/lab-console.js"></script>':''}</head><body class="member-body"${account?` data-member-role="${esc(account.role)}" data-member-label="${esc(account.name)}" data-member-case="${esc(caseId)}" data-member-inquiry="${esc(caseState.inquiryRecord||'')}"`:""}${record?` data-member-record="${esc(record.id)}" data-member-record-title="${esc(record.title)}"`:""}><header class="member-header">${brand()}<span class="member-heading">会員サイト / MEMBER SERVICES</span></header>${account?`<div class="member-shell"><aside class="member-sidebar"><div class="account-box"><b>${esc(account.name)}</b><small>登録番号 ${esc(account.member)}</small></div><nav aria-label="会員メニュー">${menuLinks}</nav><form method="post" action="/members/logout/" class="logout-form">${fieldToken(csrf)}<button type="submit">ログアウト</button></form></aside><main class="member-main"><p class="eyebrow">MEMBER SERVICES</p>${body}</main></div>`:`<main>${body}</main>`}<footer class="member-footer">© ASUNARO INDUSTRY & EXCHANGE　<a href="/">施設サイトへ</a></footer>${fictionFooter()}</body></html>`;
 }
 
 export function loginPage(csrf,{error='',next='/members/'}={}){return decoratePage(memberLayout('ログイン',`<section class="login-panel"><p class="eyebrow">MEMBER LOGIN</p><h1>会員サイト</h1>${error?`<p class="form-error" role="alert">${esc(error)}</p>`:''}<form method="post" action="/members/login/" class="form-stack">${fieldToken(csrf)}<input type="hidden" name="next" value="${esc(next)}"><label for="member-id">会員ID</label><input id="member-id" name="id" inputmode="text" autocomplete="username" required maxlength="40"><label for="member-password">パスワード</label><input id="member-password" name="password" type="password" autocomplete="current-password" required maxlength="100"><button type="submit" class="button dark">ログイン <span>→</span></button></form><p class="member-note">登録済みの会員の方にご利用いただけます。</p></section>`,{csrf}),{kind:'main',path:'/members/login/'});}
@@ -111,7 +117,13 @@ function renderMemberPage(path,ctx){
  if(path==='/members/activity/')return memberLayout('資料の閲覧履歴',`<h1>資料の閲覧履歴</h1><p>この照会端末で表示した資料です。登録名義ごとに表示しております。</p>${caseState.ending==='end3'?'<div class="notice"><h2>本件の確認は終了しております。</h2><p>移送先を含む事業の停止に伴い、外部協力者への継続照会も終了しました。照会資料の控えは引き続き参照いただけます。</p></div>':''}<div data-reading-ledger="current"></div>${account.role==='institution'&&caseState.ending!=='end3'?'<section class="reading-notification" data-after-reading="CH-2021-003 OPS-2026-084" hidden><p class="member-meta">2026.11.02／運営事務局</p><h2>照会名義の確認</h2><p>同一照会端末から、配布先の異なる資料への参照を確認しております。個々の登録における照会を、一件の確認として取りまとめます。</p><p>確認中のため、本件の終了処理は保留しております。原本の受領担当へ照会を引き継ぎます。</p><p class="member-meta" data-reading-reference></p></section>':''}`,{...ctx,active:'activity'});
  if(path==='/members/projects/')return memberLayout('共同事業・連絡記録',`<h1>共同事業・連絡記録</h1><p>参加事業の打ち合わせと、資料の受け渡しに関する記録です。</p><div class="project-list">${projects.filter(p=>p.roles.includes(account.role)).map(p=>`<a href="/members/projects/${p.slug}/"><small>${p.period}</small><h2>${esc(p.title)}</h2><p>${esc(p.members)}</p></a>`).join('')||'<p class="empty-state">参照できる共同事業はありません。</p>'}</div>`,{...ctx,active:'projects'});
  const project=projects.find(p=>path===`/members/projects/${p.slug}/`&&p.roles.includes(account.role));
- if(project)return memberLayout(project.title,`<h1>${esc(project.title)}</h1><p class="member-meta">${esc(project.members)}<br>記録期間：${project.period}</p><div class="project-thread">${project.posts.map(([date,by,text])=>`<article class="project-post"><header><b>${esc(by)}</b><time>${date}</time></header><p>${esc(text)}</p></article>`).join('')}</div>${(project.links||[]).map(l=>`<p><a class="text-link" href="${esc(origins[l.origin]+l.path)}" target="_blank" rel="noopener">${esc(l.text)}</a></p>`).join('')}<nav class="button-row" aria-label="共同事業の関連ページ"><a class="text-link" href="/members/projects/">共同事業一覧へ</a><a class="text-link" href="/members/records/">研究資料照会</a></nav>`,{...ctx,active:'projects'});
+ if(project){
+  const posts=project.posts.map(([date,by,text,interview])=>{
+   const reference=interview?`<p class="project-reference"><a class="text-link" href="${esc(interview)}" target="_blank" rel="noopener">${esc(humanPages[interview].title)}<span class="sr-only">（別タブで開きます）</span></a></p>`:'';
+   return `<article class="project-post"><header><b>${esc(by)}</b><time>${date}</time></header><p>${esc(text)}</p>${reference}</article>`;
+  }).join('');
+  return memberLayout(project.title,`<h1>${esc(project.title)}</h1><p class="member-meta">${esc(project.members)}<br>記録期間：${project.period}</p><div class="project-thread">${posts}</div>${(project.links||[]).map(l=>`<p><a class="text-link" href="${esc(origins[l.origin]+l.path)}" target="_blank" rel="noopener">${esc(l.text)}</a></p>`).join('')}<nav class="button-row" aria-label="共同事業の関連ページ"><a class="text-link" href="/members/projects/">共同事業一覧へ</a><a class="text-link" href="/members/records/">研究資料照会</a></nav>`,{...ctx,active:'projects'});
+ }
  if(path==='/members/organization/')return memberLayout('運営団体情報',`<h1>運営団体情報</h1><dl class="detail-list"><div><dt>法人名</dt><dd>${facility.foundation}</dd></div><div><dt>法人設立</dt><dd>2010年6月15日</dd></div><div><dt>施設開設</dt><dd>2012年4月1日</dd></div><div><dt>代表者</dt><dd>深町 玲司</dd></div></dl><h2>事業</h2><p>産業支援、交流施設の運営、共同研究および実証事業の企画・管理。</p>`,{...ctx,active:'organization'});
  if(path==='/members/records/'){
   const id = normalizeDocumentId(query.get('document_id') || '');

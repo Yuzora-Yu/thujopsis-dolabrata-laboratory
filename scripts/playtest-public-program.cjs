@@ -257,6 +257,20 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
    await mobile.goto(base+route);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,route);
    if(route==='/'){await mobile.locator('.facility-hero img').evaluate(im=>im.decode());await mobile.screenshot({path:'.work/qa/nov06-home-mobile.png'});}
   }
+  await mobile.goto(base+'/tenants/0003/');
+  await mobile.locator('[data-image-open$="minamo-desk.webp"]').click();
+  const workshopPhoto=mobile.getByRole('dialog',{name:/406号室への移転作業/});
+  const workshopImage=workshopPhoto.getByRole('img');
+  const photoZoom=workshopPhoto.getByRole('button',{name:'画像を拡大',exact:true});
+  await workshopImage.waitFor();
+  const initialPhotoWidth=(await workshopImage.boundingBox()).width;
+  assert.ok(initialPhotoWidth<=390,'archival photo opens with its full scene');
+  for(let step=0;step<8;step++)await photoZoom.click();
+  assert.ok(await workshopImage.evaluate(img=>img.clientWidth>img.naturalWidth),'phone zoom can inspect the full-resolution photograph');
+  await workshopPhoto.getByRole('button',{name:'全体',exact:true}).click();
+  assert.equal((await workshopImage.boundingBox()).width,initialPhotoWidth);
+  await mobile.keyboard.press('Escape');
+  await mobile.goto(base+'/gallery/0021/');
   const galleryActions=mobile.locator('.gallery-detail-links');
   assert.equal(await galleryActions.getByRole('link').count(),2);
   assert.ok(await galleryActions.evaluate(row=>parseFloat(getComputedStyle(row).gap)>0));
@@ -368,6 +382,8 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.locator('#member-id').fill('201204010017');await mobile.locator('#member-password').fill('20080519');
   await mobile.getByRole('button',{name:/ログイン/}).click();await mobile.getByRole('heading',{name:'会員トップ',exact:true}).waitFor();
   const memberNav=mobile.getByRole('navigation',{name:'会員メニュー'});
+  await memberNav.getByRole('link',{name:'施設からの連絡',exact:true}).getByText('配布文書',{exact:true}).waitFor();
+  await memberNav.getByRole('link',{name:'共同事業・連絡記録',exact:true}).getByText('打ち合わせ',{exact:true}).waitFor();
   assert.equal(await memberNav.evaluate(nav=>nav.scrollWidth<=nav.clientWidth+1),true,'member navigation scrolls sideways');
   await memberNav.getByRole('link',{name:'研究資料照会',exact:true}).click();
   await mobile.getByRole('heading',{name:'研究資料照会',exact:true}).waitFor();

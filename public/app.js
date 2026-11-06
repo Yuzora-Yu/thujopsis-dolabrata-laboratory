@@ -267,7 +267,11 @@ if(photoViewport&&photoButtons.length){
    if(photo.hidden)return;
    const action=button.dataset.photoAction;
    const center=viewCenter();
-   if(action==='in')zoom=Math.min(12,zoom*1.6);
+   if(action==='in'){
+    // Small screens can need more than 12× fit to inspect the source pixels.
+    const limit=Math.max(12,Math.min(40,2*photo.naturalWidth/fitWidth));
+    zoom=Math.min(limit,zoom*1.6);
+   }
    if(action==='out')zoom=Math.max(1,zoom/1.6);
    if(action==='rotate'){
     angle=(angle+90)%360;
