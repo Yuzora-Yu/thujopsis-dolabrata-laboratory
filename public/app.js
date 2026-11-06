@@ -197,7 +197,16 @@ if(photoViewport&&photoButtons.length){
  const stage=photoViewport.querySelector('.image-stage');
  const photo=stage.querySelector('img');
  const middle={x:.5,y:.5};
- const mapFocusX={'#arrival':.475,'#floor-exhibition':.63};
+ const mapOverview={x:.53,y:.57};
+ const mapFocus={
+  '#arrival':{x:.475,y:.57},
+  '#floor-workshop':{x:.475,y:.57},
+  '#floor-coworking':{x:.65,y:.57},
+  '#floor-exhibition':{x:.63,y:.57},
+  '#floor-meeting':{x:.66,y:.42},
+  '#floor-cafe':{x:.83,y:.42},
+  '#floor-presentation':{x:.82,y:.52},
+ };
  let zoom=1,angle=0,fitWidth=0,fitHeight=0,openingCenter=middle;
 
  photoViewport.tabIndex=0;
@@ -247,8 +256,9 @@ if(photoViewport&&photoButtons.length){
   button.addEventListener('click',()=>{
    const source=button.dataset.imageOpen;
    const focusArrival=button.hasAttribute('data-plan-arrival')&&matchMedia('(max-width: 580px)').matches;
-   zoom=focusArrival?4:1;
-   openingCenter=focusArrival?{x:mapFocusX[location.hash]??.57,y:.57}:middle;
+   const destination=mapFocus[location.hash];
+   zoom=focusArrival?(destination?4:2.6):1;
+   openingCenter=focusArrival?(destination??mapOverview):middle;
    angle=0;
    photo.hidden=true;
    stage.style.removeProperty('width');

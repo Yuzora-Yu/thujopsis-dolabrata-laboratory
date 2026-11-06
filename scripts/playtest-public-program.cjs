@@ -292,7 +292,7 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.getByRole('link',{name:'中央受付から展示までの行き方',exact:true}).click();
   await mobile.waitForURL(base+'/floor-map/#floor-exhibition');
   const exhibitionDirections=mobile.locator('#floor-exhibition:target');
-  assert.match(await exhibitionDirections.innerText(),/ガラス扉の手前を右に曲がる.*通路の左手に展示ケース/);
+  assert.match(await exhibitionDirections.innerText(),/エレベーター側へお戻りいただき、左手のガラス扉を過ぎた先で左に曲がって.*南側に沿う通路の左手に展示ケース/);
   const stickyBottom=(await mobile.locator('.site-header').boundingBox()).height;
   assert.ok((await exhibitionDirections.boundingBox()).y>=stickyBottom);
   await exhibitionDirections.getByRole('link',{name:'企画展示（ラウンジ前）',exact:true}).click();
@@ -309,7 +309,12 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   const currentPlan=mobile.getByRole('dialog',{name:'フロアマップを拡大'});
   await currentPlan.getByRole('img',{name:/A4-09.*408・409・413.*撮影位置.*企画展示/}).waitFor();
   const currentViewport=currentPlan.getByRole('region',{name:'拡大画像の表示範囲'});
-  assert.ok(await currentViewport.evaluate(node=>node.scrollWidth>=node.clientWidth*3&&node.scrollLeft>0));
+  assert.ok(await currentViewport.evaluate(node=>{
+   const planWidth=node.querySelector('img').clientWidth;
+   const visibleLeft=node.scrollLeft/planWidth*1200;
+   const visibleRight=(node.scrollLeft+node.clientWidth)/planWidth*1200;
+   return visibleLeft<=412&&visibleRight>=853;
+  }),'the initial mobile view includes the elevator and the full exhibit case');
   await currentPlan.getByRole('button',{name:'全体',exact:true}).click();
   assert.ok(await currentViewport.evaluate(node=>node.scrollWidth<=node.clientWidth+1));
   await mobile.keyboard.press('Escape');
