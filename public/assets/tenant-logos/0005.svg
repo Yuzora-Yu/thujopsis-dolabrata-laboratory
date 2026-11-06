@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">SONORA — SIGN SYSTEMS</title>
+ <rect width="360" height="192" fill="#f0edf8"/>
+ <g transform="translate(43 67) scale(1.08)" color="#47376e" style="--accent:#8972bb"><path d="M10 36V12l20 12-20 12z" fill="currentColor"/><path d="M30 15a13 13 0 0 1 0 18M35 8a22 22 0 0 1 0 32" stroke="var(--accent)" stroke-width="2.8" stroke-linecap="round" fill="none"/><circle cx="7" cy="24" r="2" fill="var(--accent)"/></g>
+ <g text-anchor="start" fill="#47376e">
+  <text x="111" y="100" font-family="Arial, Yu Gothic, sans-serif" font-size="27" font-weight="800" letter-spacing="2.4">SONORA</text>
+  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">SIGN SYSTEMS</text>
+ </g>
+</svg>

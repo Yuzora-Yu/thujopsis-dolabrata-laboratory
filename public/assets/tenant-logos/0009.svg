@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">KEIRO — INSTRUMENTS</title>
+ <rect width="360" height="192" fill="#eaf0fa"/>
+ <g transform="translate(43 67) scale(1.08)" color="#244878" style="--accent:#568dc7"><path d="M5 8h38v32H5z" fill="none" stroke="var(--accent)" stroke-width="2"/><path d="M8 26h7l5-13 7 22 5-12h8" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/></g>
+ <g text-anchor="start" fill="#244878">
+  <text x="111" y="100" font-family="Consolas, Yu Gothic, monospace" font-size="27" font-weight="700" letter-spacing="1.05">KEIRO</text>
+  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">INSTRUMENTS</text>
+ </g>
+</svg>

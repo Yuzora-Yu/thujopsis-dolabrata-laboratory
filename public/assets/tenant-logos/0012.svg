@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">LITECH — MATERIAL EVALUATION</title>
+ <rect width="360" height="192" fill="#f0edf8"/>
+ <g transform="translate(43 67) scale(1.08)" color="#463660" style="--accent:#8b78be"><path d="m6 15 18-10 18 10v18L24 43 6 33z" fill="currentColor"/><path d="m6 15 18 9 18-9L24 5z" fill="var(--accent)"/><path d="M24 24v19M6 15l18 9 18-9" fill="none" stroke="#f0edf8" stroke-width="1.5"/></g>
+ <g text-anchor="start" fill="#463660">
+  <text x="111" y="100" font-family="Consolas, Yu Gothic, monospace" font-size="27" font-weight="700" letter-spacing="1.05">LITECH</text>
+  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">MATERIAL EVALUATION</text>
+ </g>
+</svg>

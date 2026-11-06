@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">LIAISON — PROVISION PLANNING</title>
+ <rect width="360" height="192" fill="#f0f1df"/>
+ <g transform="translate(154 24) scale(1.08)" color="#4e5c2d" style="--accent:#9da35d"><path d="M7 27a17 17 0 0 0 34 0" fill="none" stroke="currentColor" stroke-width="3.2"/><path d="M5 23h38" stroke="currentColor" stroke-width="2"/><circle cx="13" cy="15" r="4" fill="var(--accent)"/><circle cx="24" cy="10" r="4" fill="var(--accent)"/><circle cx="35" cy="15" r="4" fill="var(--accent)"/></g>
+ <g text-anchor="middle" fill="#4e5c2d">
+  <text x="180" y="119" font-family="Yu Mincho, YuMincho, Georgia, serif" font-size="24" font-weight="650" letter-spacing="0.9">LIAISON</text>
+  <text x="180" y="143" font-family="Arial, Yu Gothic, sans-serif" font-size="10.8" font-weight="600" letter-spacing="1.65">PROVISION PLANNING</text>
+ </g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">白波記録保存 — SHIRANAMI RECORDS</title>
+ <rect width="360" height="192" fill="#eaf1f2"/>
+ <g transform="translate(154 24) scale(1.08)" color="#275664" style="--accent:#6a9e9f"><path d="M5 17c10-9 18-9 28 0l10 8M5 24c10-9 18-9 28 0l10 8M5 31c10-9 18-9 28 0l10 8" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round"/><circle cx="36" cy="12" r="4" fill="var(--accent)"/></g>
+ <g text-anchor="middle" fill="#275664">
+  <text x="180" y="119" font-family="Yu Mincho, YuMincho, Georgia, serif" font-size="29" font-weight="650" letter-spacing="0.9">白波記録保存</text>
+  <text x="180" y="143" font-family="Arial, Yu Gothic, sans-serif" font-size="10.8" font-weight="600" letter-spacing="1.65">SHIRANAMI RECORDS</text>
+ </g>
+</svg>

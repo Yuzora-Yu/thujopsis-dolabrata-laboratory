@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">HARUNIRE — LIFE DESIGN</title>
+ <rect width="360" height="192" fill="#edf2e8"/>
+ <g transform="translate(43 67) scale(1.08)" color="#244e39" style="--accent:#65926f"><path d="M8 32c5 7 12 11 19 9l14-12c3-3 0-7-3-5l-8 5M13 30l12 2 3-3c1-2 0-4-2-4l-8-3c-4-2-8-1-11 2" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round"/><path d="M22 17C22 6 34 5 40 6c0 7-5 15-14 15l-4 4v-8z" fill="var(--accent)"/></g>
+ <g text-anchor="start" fill="#244e39">
+  <text x="111" y="100" font-family="Yu Mincho, YuMincho, Georgia, serif" font-size="27" font-weight="650" letter-spacing="0.9">HARUNIRE</text>
+  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">LIFE DESIGN</text>
+ </g>
+</svg>

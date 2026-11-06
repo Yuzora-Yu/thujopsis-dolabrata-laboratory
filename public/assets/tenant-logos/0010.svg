@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">ASHITA — RECORD ENGINEERING</title>
+ <rect width="360" height="192" fill="#eaeef4"/>
+ <g transform="translate(43 67) scale(1.08)" color="#253952" style="--accent:#7d92a9"><path d="M7 15h28v29H7z" fill="var(--accent)"/><path d="M13 9h29v29H13z" fill="currentColor"/><path d="M19 15h17v4H19zm0 8h17v2H19zm0 6h10v2H19z" fill="#eaeef4"/></g>
+ <g text-anchor="start" fill="#253952">
+  <text x="111" y="100" font-family="Consolas, Yu Gothic, monospace" font-size="27" font-weight="700" letter-spacing="1.05">ASHITA</text>
+  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">RECORD ENGINEERING</text>
+ </g>
+</svg>

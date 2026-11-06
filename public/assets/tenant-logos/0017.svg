@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">ORTO — HABITAT DESIGN</title>
+ <rect width="360" height="192" fill="#f7ebe2"/>
+ <g transform="translate(43 67) scale(1.08)" color="#754932" style="--accent:#ba7c57"><path d="M5 38V17L24 6l19 11v21L24 27 5 38zM24 6v21M5 17l19 11 19-11" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="m14 33 10-6 10 6-10 7z" fill="var(--accent)"/></g>
+ <g text-anchor="start" fill="#754932">
+  <text x="111" y="100" font-family="Arial, Yu Gothic, sans-serif" font-size="27" font-weight="800" letter-spacing="2.4">ORTO</text>
+  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">HABITAT DESIGN</text>
+ </g>
+</svg>

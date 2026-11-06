@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">MOKUNOWA — 木と空間のデザイン</title>
+ <rect width="360" height="192" fill="#f5ede1"/>
+ <g transform="translate(154 24) scale(1.08)" color="#614127" style="--accent:#a2693e"><path d="M24 3c14 0 21 8 21 20S35 44 23 45 4 37 3 25 10 5 24 3zM24 10c9 0 15 6 15 14s-6 14-16 14-14-5-14-13S16 11 24 10zM24 17c5 0 8 3 8 8s-4 7-8 7-8-3-8-7 4-8 8-8z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M25 24l15-16" stroke="var(--accent)" stroke-width="2"/></g>
+ <g text-anchor="middle" fill="#614127">
+  <text x="180" y="119" font-family="Yu Mincho, YuMincho, Georgia, serif" font-size="24" font-weight="650" letter-spacing="0.9">MOKUNOWA</text>
+  <text x="180" y="143" font-family="Arial, Yu Gothic, sans-serif" font-size="10.8" font-weight="600" letter-spacing="1.65">木と空間のデザイン</text>
+ </g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">ナギサ編集室 — NAGISA EDITORIAL</title>
+ <rect width="360" height="192" fill="#faf0e9"/>
+ <g transform="translate(154 24) scale(1.08)" color="#222527" style="--accent:#b35543"><path d="M10 4h24v6H16v28h18v6H10z" fill="currentColor"/><path d="M21 16h17v4H21zm0 8h13v4H21z" fill="var(--accent)"/></g>
+ <g text-anchor="middle" fill="#222527">
+  <text x="180" y="119" font-family="Yu Mincho, YuMincho, Georgia, serif" font-size="29" font-weight="650" letter-spacing="0.9">ナギサ編集室</text>
+  <text x="180" y="143" font-family="Arial, Yu Gothic, sans-serif" font-size="10.8" font-weight="600" letter-spacing="1.65">NAGISA EDITORIAL</text>
+ </g>
+</svg>

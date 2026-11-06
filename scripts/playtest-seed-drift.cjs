@@ -2,8 +2,46 @@ const {chromium}=require(process.env.ASUNARO_NODE_MODULES?process.env.ASUNARO_NO
 const assert=require('node:assert/strict'),fs=require('node:fs/promises');
 const base=(process.env.BASE_URL||'http://127.0.0.1:4417').replace(/\/$/,''),at=path=>base+path;
 let browser;
+async function followPublicLinks(browser){
+ const context=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce'});
+ const page=await context.newPage();
+ const steps=[
+  ['/',''],
+  ['/about/','.facility-hero'],
+  ['/about/history/','#main'],
+  ['/news/20120401/','#main'],
+  ['/about/identity/','#main'],
+  ['/facilities/','#main-navigation'],
+  ['/facilities/coworking/','#main'],
+  ['/floor-map/','#main'],
+  ['/workshop/','#main-navigation'],
+  ['/gallery/','#main'],
+  ['/gallery/0021/','#main'],
+  ['/workshop/stories/seo-akari/','#main'],
+  ['/people/seo-akari/','#main'],
+  ['/people/seo-fumino/','#main'],
+  ['/news/','#main-navigation'],
+ ];
+ try{
+  for(const [index,[path,section]] of steps.entries()){
+   if(index===0)await page.goto(at(path));
+   else{
+    const href=new URL(at(path)).pathname;
+    await page.locator(section).locator('a[href="'+href+'"]').click();
+    await page.waitForURL(at(path));
+   }
+   const count=index+1;
+   await page.waitForFunction(expected=>document.cookie.split('; ').some(cookie=>cookie.startsWith('asunaro_seed_')&&cookie.endsWith('='+expected)),count);
+   assert.equal(await page.locator('body').getAttribute('data-asunaro-stage'),'seed',path);
+   if(count<15)assert.equal(await page.locator('.seed-drift-link,.seed-drift-news').count(),0,path);
+  }
+  await page.getByRole('link',{name:/第5次居住実証 参加者募集について/}).waitFor();
+  await page.screenshot({path:'.work/qa/seed-drift-from-navigation.png',fullPage:true});
+ }finally{await context.close();}
+}
 (async()=>{
  await fs.mkdir('.work/qa',{recursive:true});browser=await chromium.launch({headless:true,channel:'msedge'});
+ await followPublicLinks(browser);
  const context=await browser.newContext({viewport:{width:1280,height:900}}),page=await context.newPage(),errors=[];
  page.on('pageerror',error=>errors.push(error.message));
  await page.goto(at('/gallery/'));
@@ -69,5 +107,5 @@ let browser;
  const reduced=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});await reduced.addCookies([{...seed,value:'14'}]);const mobile=await reduced.newPage();mobile.on('pageerror',error=>errors.push(error.message));await mobile.goto(at('/gallery/'));await mobile.locator('body.seed-drift-active').waitFor();
  assert.equal(await mobile.locator('.seed-noise').count(),0);assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
  await mobile.locator('.seed-corrupted img').evaluateAll(images=>Promise.all(images.map(image=>image.decode())));await mobile.screenshot({path:'.work/qa/seed-drift-mobile.png',fullPage:true});await reduced.close();assert.deepEqual(errors,[]);
- console.log('SEED playtest passed: 14/15 boundary, reloads, back navigation, two altered works, 404 footer, ROOT reset, cross-tab reset, preserved login/progress, reduced motion/mobile.');
+ console.log('SEED playtest passed: 15 distinct pages through public links, 14/15 reload boundary, back navigation, altered works, 404, ROOT and cross-tab reset, preserved progress, mobile.');
 })().catch(error=>{console.error(error);process.exitCode=1;}).finally(async()=>{await browser?.close();});

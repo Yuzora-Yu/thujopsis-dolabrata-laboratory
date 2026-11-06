@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">TEIRO — FACILITY NETWORKS</title>
+ <rect width="360" height="192" fill="#e7f0ed"/>
+ <g transform="translate(43 67) scale(1.08)" color="#2d514b" style="--accent:#bc7850"><path d="M8 38V10h30v13H22v15h16" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/><circle cx="8" cy="38" r="4.1" fill="var(--accent)"/><circle cx="38" cy="38" r="4.1" fill="var(--accent)"/><circle cx="38" cy="10" r="3" fill="currentColor"/></g>
+ <g text-anchor="start" fill="#2d514b">
+  <text x="111" y="100" font-family="Consolas, Yu Gothic, monospace" font-size="27" font-weight="700" letter-spacing="1.05">TEIRO</text>
+  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">FACILITY NETWORKS</text>
+ </g>
+</svg>

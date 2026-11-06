@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
+ <title id="brand">MINAMO — CIRCULATION</title>
+ <rect width="360" height="192" fill="#e9f5f2"/>
+ <g transform="translate(43 67) scale(1.08)" color="#135f63" style="--accent:#37a594"><path d="M4 19c10 0 12-8 20-8s10 8 20 8M4 28c10 0 12-8 20-8s10 8 20 8M4 37c10 0 12-8 20-8s10 8 20 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="5" r="2.5" fill="var(--accent)"/></g>
+ <g text-anchor="start" fill="#135f63">
+  <text x="111" y="100" font-family="Meiryo, Yu Gothic, sans-serif" font-size="27" font-weight="750" letter-spacing="0.55">MINAMO</text>
+  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">CIRCULATION</text>
+ </g>
+</svg>

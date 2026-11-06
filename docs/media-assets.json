@@ -533,15 +533,16 @@
     "review": "4階のエレベーター側から北向き。正面に中央受付、右手に東側通路とラウンジ入口、左端に工房側の壁。外窓なし。"
   },
   {
-    "key": "f-home-lounge",
+    "key": "f-home-east",
     "year": 2026,
     "mode": "built-in imagegen",
-    "path": "docs/source-images/f-home-lounge.png",
+    "path": "docs/source-images/f-home-east.png",
     "references": [
-      "docs/source-images/lounge.png"
+      "120cc93:public/assets/lounge.webp",
+      "public/assets/cafe.webp"
     ],
-    "asset": "public/assets/media/f-home-lounge.webp",
-    "prompt": "The same 4F lounge as lounge.png from the south entrance, looking slightly northeast across the oak table. Keep the six chairs, solid north wall, two armchairs, and the interior glass partition on the east side. Natural warm institutional lighting, no people or exterior windows. Wide facility homepage photograph.",
-    "review": "同じ4階ラウンジの別角度。家具と東側のガラス間仕切りを照合し、トップの内観として採用。"
+    "asset": "public/assets/media/f-home-east.webp",
+    "prompt": "Wide 2:1 photograph of the same east-side café, with its curved pale oak banquette, tiled counter, concrete ceiling, tall right windows and city view. From the southwest entrance toward the northeast. Architectural depth, timber rhythms and direct late-afternoon light, with a calm dark left edge for the homepage headline.",
+    "review": "4階東側の食堂・交流スペース。窓側とカウンターの位置を現行図および食堂写真と照合。トップと施設紹介映像で採用。"
   }
 ]
