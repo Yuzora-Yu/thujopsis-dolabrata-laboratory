@@ -1,14 +1,13 @@
 import {fictionFooter,decoratePage} from './experience.mjs';
-import {archiveItems,archiveNotes} from './world/archive-data.mjs';
+import {archiveItems,archiveNotes,noticeCapture} from './world/archive-data.mjs';
 import {esc} from './render.mjs';
-import {news} from './content.mjs';
 import {matchesSearch} from './search.mjs';
 import {consoleContent} from './lab.mjs';
 
-const snapshotNewsIds=['20120401','20120903','20161003','20170714'];
-export const archivePublicPaths=['/','/collections/','/snapshots/','/snapshots/2009/','/snapshots/2011/','/snapshots/2017/',...archiveItems.map(i=>`/collections/items/${i.id}/`),...snapshotNewsIds.map(id=>`/snapshots/2017/news/${id}/`)];
+export const archivePublicPaths=['/','/collections/','/snapshots/','/snapshots/2009/','/snapshots/2011/','/snapshots/2017/',...archiveItems.map(i=>`/collections/items/${i.id}/`),...noticeCapture.pages.map(notice=>notice.path)];
 
 const linked=(url,text)=>`<a href="${esc(url)}">${esc(text)}</a>`;
+const snapshotDate=iso=>`<time datetime="${iso}">${iso.replaceAll('-','.')}</time>`;
 const archivePdf=(file,label)=>`<p><a href="/assets/archive/${esc(file)}" target="_blank" rel="noopener">${esc(label)}（PDF）<span class="sr-only">・別タブで開きます</span></a></p>`;
 export function legacyLayout(title,body,{privateRoom=false,consolePage=false}={}){
  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}｜産業継続研究資料 保存室</title><link rel="stylesheet" href="/styles.css">${consolePage?'<script type="module" src="/lab-console.js"></script>':''}</head><body class="legacy-body"><a class="skip" href="#legacy-main">本文へ移動</a><header class="legacy-header"><p>INDUSTRIAL CONTINUITY RECORDS</p><a href="/">産業継続研究資料 保存室</a><small>旧産業継続研究準備室・部分保存資料</small></header><nav class="legacy-nav" aria-label="資料保存室"><a href="/collections/">収蔵目録</a><a href="/snapshots/">公開画面の保存</a><a href="/room/">資料照会室</a></nav><main id="legacy-main" class="legacy-main">${privateRoom?'<p class="legacy-classification">資料照会室 ／ 移管・保守</p>':''}<h1>${esc(title)}</h1>${body}</main><footer class="legacy-footer">資料管理：旧基盤保存担当 ／ 公開保存資料と継続照会の更新日は各資料に記載</footer>${fictionFooter()}</body></html>`;
@@ -38,14 +37,24 @@ function renderLegacyPage(path,ctx){
   const year=snapshot[1];const bodies={
    '2009':'<h2>産業継続研究準備室</h2><p>災害と資源途絶の後にも、生活基盤と技術を継続するための施設整備を検討しています。</p><h3>事業案の検討</h3><p>榊原惟臣氏から、旧継舟計画の対象者区分を引き継がないことを条件とする回答がありました。既存案を凍結し、設備側の支援を中心とする新たな設立案を協議しています。</p><p>回答書：RG-2007-011</p>',
    '2011':'<h2>あすなろ施設・設立準備記録</h2><p>2010年6月15日、新法人を設立しました。旧事業の承継を行わず、支援を必要とする人に合わせた設備研究を進めます。</p><h3>公開終了について</h3><p>施設開設準備に伴い、本サイトの公開を終了します。旧計画の史料は外部保管し、研究は凍結を維持します。公開サイトへの再掲載は認められていません。</p>',
-   '2017':`<h2>保存資料事業のご案内</h2><p>三田佳代が保存した旧基盤の部分複写を、アシタ記録技研が引き継ぎました。固定保存画面のほか、既存契約の資料照会業務を継続します。</p><p>管理資料 AH-2017-009</p><h3>併せて保存した施設の公開記録</h3><ul>${snapshotNewsIds.map(id=>`<li>${linked('/snapshots/2017/news/'+id+'/',news.find(n=>n.id===id).date+'　'+news.find(n=>n.id===id).title)}</li>`).join('')}</ul>`,
+   '2017':`<h2>保存資料事業のご案内</h2><p>三田佳代が保存した旧基盤の部分複写を、アシタ記録技研が引き継ぎました。固定保存画面のほか、既存契約の資料照会業務を継続します。</p><p>管理資料 AH-2017-009</p><h3>併せて保存した施設の公開記録</h3><ul>${noticeCapture.pages.map(notice=>`<li>${snapshotDate(notice.published)}　${linked(notice.path,notice.title)}</li>`).join('')}</ul>`,
   };
   return legacyLayout(`${year}年の公開保存画面`,`<p class="snapshot-stamp">取得記録：${year}年 ／ 固定保存</p><article class="snapshot-page">${bodies[year]}</article><p><a href="/snapshots/">保存画面一覧</a></p>`);
  }
- const archivedNews=path.match(/^\/snapshots\/2017\/news\/(\d{8})\/$/);
- if(archivedNews&&snapshotNewsIds.includes(archivedNews[1])){
- const n=news.find(n=>n.id===archivedNews[1]);
- return legacyLayout(n.title,`<p class="snapshot-stamp">保存日：2017年7月14日 ／ 原掲載日：${n.date}</p><article class="snapshot-page"><p>${esc(n.body)}</p>${n.id==='20120903'?'<img src="/assets/media/g-boat.webp" alt="開設記念の木製ボート">':''}${n.id==='20170714'?'<p>保存担当：三田佳代 ／ 保守移管：アシタ記録技研</p>':''}</article><p><a href="/snapshots/2017/">保存事業案内へ</a></p>`);
+ const notice=noticeCapture.pages.find(saved=>path===saved.path);
+ if(notice){
+  const photo=notice.image;
+  return legacyLayout(notice.title,`<div class="snapshot-stamp snapshot-notice-stamp">
+   <span>原掲載 ${snapshotDate(notice.published)}</span><span>取得 ${snapshotDate(noticeCapture.capturedOn)}</span>
+   <span>採録範囲 ${esc(notice.scope)}</span>
+  </div>
+  <article class="snapshot-page snapshot-notice">
+   <p class="snapshot-source">あすなろ産業支援交流施設　お知らせ</p>
+   ${notice.paragraphs.map(paragraph=>`<p>${esc(paragraph)}</p>`).join('')}
+   ${photo?`<figure><img src="/assets/media/${esc(photo.file)}" alt="${esc(photo.alt)}"><figcaption>${esc(photo.caption)}</figcaption></figure>`:''}
+  </article>
+  ${notice.custody?`<p class="snapshot-stamp">${esc(notice.custody)}</p>`:''}
+  <p><a href="/snapshots/2017/">保存事業案内へ</a></p>`);
  }
  if(path.startsWith('/room/')){
   if(!session.archiveAccess)return legacyLogin(csrf);

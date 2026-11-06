@@ -2,7 +2,7 @@ import {programPath,programNotesPath} from './program.mjs';
 import {seedNoteData,seedCollectionPath} from './seed-notes.mjs';
 import {gallery,tenants,news,documents,tenantMaterialEntries} from './content.mjs';
 import {editorialPages} from './world/editorial.mjs';
-import {archiveItems,archiveNotes} from './world/archive-data.mjs';
+import {archiveItems,archiveNotes,noticeCapture} from './world/archive-data.mjs';
 import {projects} from './world/projects.mjs';
 
 export const experienceSettings={showPageIndex:true,showGrowthStage:true,showDisclaimer:true,copyright:'ⓒYU-ZORA',seedDrift:{enabled:true,threshold:15}};
@@ -26,7 +26,7 @@ const entries=[
  ...memberPages.map(path=>({kind:'main',path,level:path.endsWith('/login/')?1:path.endsWith('/personal/')?6:2,accountScoped:true})),
  ...projects.map(p=>({kind:'main',path:`/members/projects/${p.slug}/`,level:Math.min(...p.roles.map(r=>roleLevels[r]))})),
  ...documents.map(d=>({kind:'main',path:`/members/records/${d.id}/`,level:Math.min(...d.roles.map(r=>roleLevels[r]))})),
- ...['/','/collections/','/snapshots/','/snapshots/2009/','/snapshots/2011/','/snapshots/2017/',...archiveItems.map(i=>`/collections/items/${i.id}/`),...['20120401','20120903','20161003','20170714'].map(id=>`/snapshots/2017/news/${id}/`)].map(path=>({kind:'archive',path,level:2})),
+ ...['/','/collections/','/snapshots/','/snapshots/2009/','/snapshots/2011/','/snapshots/2017/',...archiveItems.map(i=>`/collections/items/${i.id}/`),...noticeCapture.pages.map(notice=>notice.path)].map(path=>({kind:'archive',path,level:2})),
  ...['/room/','/room/console/','/room/console/subjects/',...archiveNotes.map(n=>`/room/records/${n.id}/`)].map(path=>({kind:'archive',path,level:4})),
  ...['hozen','audit'].flatMap(kind=>['/receive/','/received/'].map(path=>({kind,path,level:kind==='audit'?6:5}))),
  ...['/news/closure/','/news/staff-change/'].map(path=>({kind:'main',path,level:5})),

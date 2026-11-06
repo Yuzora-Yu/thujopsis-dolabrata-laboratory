@@ -12,7 +12,7 @@ import {hintPlan} from '../docs/hint-plan.mjs';
 import {seoFamily} from '../src/world/people.mjs';
 import {recordText} from '../src/world/records.mjs';
 import {siteQueries,catalogQueries} from '../docs/critical-queries.mjs';
-import {archiveItems,archiveNotes} from '../src/world/archive-data.mjs';
+import {archiveItems,archiveNotes,noticeCapture} from '../src/world/archive-data.mjs';
 import {normalizeSearch,matchesSearch} from '../src/search.mjs';
 import {hostingOrigins,providerRoute,rewriteHostedHtml} from '../src/hosting.mjs';
 import {classifyEvidence} from '../src/evidence.mjs';
@@ -74,12 +74,29 @@ test('news retention applies to visibility, direct URLs and the public search in
  assert.doesNotMatch(renderPublic('/news/'),/href="\/news\/20120416\/"/);
  assert.ok(searchEntries.filter(e=>matchesSearch(e,'A4-01')).some(e=>e.url==='/news/20120416/'));
  assert.ok(!searchEntries.filter(e=>matchesSearch(e,'フロアマップ')).some(e=>e.url==='/news/20120416/'));
+ const archiveContext={origins,session:{}};
+ const catalogue=renderLegacy('/snapshots/2017/',archiveContext);
+ for(const notice of noticeCapture.pages){
+  assert.ok(notice.published<=noticeCapture.capturedOn,notice.path);
+  assert.ok(catalogue.includes(notice.path),notice.path);
+  const page=renderLegacy(notice.path,archiveContext);
+  assert.ok(page.includes(`datetime="${notice.published}"`),notice.path);
+  assert.ok(page.includes(`datetime="${noticeCapture.capturedOn}"`),notice.path);
+  assert.ok(page.includes(`採録範囲 ${notice.scope}`),notice.path);
+  assert.doesNotMatch(page,/RE-2022-006|2026-10-30|5年で非公開/);
+ }
+ const secondPhase=renderLegacy('/snapshots/2017/news/20161003/',archiveContext);
+ assert.match(secondPhase,/10月3日から17日まで[\s\S]*1階・2階[\s\S]*期間の途中でも参加を終了できます/);
+ assert.equal(renderPublic('/news/20161003/'),null);
+ assert.ok(!searchEntries.some(entry=>entry.url==='/news/20161003/'));
 });
 
 test('opening links to naming and emblem essays while the old plan remains a later discovery',()=>{
  const opening=renderPublic('/news/20120401/');assert.match(opening,/href="\/about\/identity\/"/);assert.match(opening,/href="\/about\/emblem\/"/);assert.doesNotMatch(opening,/20120903|floor-4f-2012/);
  for(const p of ['/','/about/','/gallery/','/gallery/0002/','/news/','/about/identity/','/about/emblem/'])assert.doesNotMatch(renderPublic(p),/floor-4f-2012|asunaro-4f-2012/);
- assert.match(renderPublic('/news/20120416/'),/floor-4f-2012/);
+ const planCopy=renderPublic('/news/20120416/');
+ assert.match(planCopy,/datetime="2012-04-16"[\s\S]*floor-4f-2012[\s\S]*配置図作成 <time datetime="2012-04-01"[\s\S]*PDF再収録 <time datetime="2026-10-30"/);
+ assert.match(renderPublic('/about/identity/'),/原掲載[\s\S]*2012年9月の開設記念展示後に写真を追加/);
  const footer=notFound().match(/<div class="footer-links">([\s\S]*?)<\/div>/)[1];assert.ok(footer.indexOf('/tenants/')<footer.indexOf('/gallery/'));
  assert.match(renderPublic('/gallery/0005/'),/入居者紹介/);assert.ok(searchEntries.some(e=>e.url==='/tenants/'));
 });

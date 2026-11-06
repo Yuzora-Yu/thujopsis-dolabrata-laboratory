@@ -58,6 +58,23 @@ async function checkArchivePdf(archive,filename,label){
  assert.deepEqual(await response.body(),await fs.readFile('public/assets/archive/'+filename));
 }
 
+async function traceArchivedPublicNotices(archive){
+ await archive.getByRole('link',{name:'公開画面の保存',exact:true}).click();
+ await archive.getByRole('link',{name:/2017年7月14日取得/}).click();
+ const snapshot=archive.locator('.snapshot-notice-stamp');
+ await archive.getByRole('link',{name:'あすなろ産業支援交流施設を開設いたしました',exact:true}).click();
+ assert.match(await snapshot.innerText(),/原掲載 2012\.04\.01[\s\S]*取得 2017\.07\.14[\s\S]*採録範囲 本文冒頭/);
+ assert.equal(await archive.locator('.snapshot-notice a').count(),0);
+ await archive.getByRole('link',{name:'保存事業案内へ',exact:true}).click();
+ await archive.getByRole('link',{name:'開設記念の模型を展示いたしました',exact:true}).click();
+ assert.match(await snapshot.innerText(),/原掲載 2012\.09\.03[\s\S]*採録範囲 本文と掲載写真/);
+ await archive.getByRole('img',{name:'薄板を組み合わせた開設記念の木製ボート'}).evaluate(image=>image.decode());
+ await archive.getByRole('link',{name:'保存事業案内へ',exact:true}).click();
+ await archive.getByRole('link',{name:'居住環境実証の第2期を開始',exact:true}).click();
+ assert.match(await snapshot.innerText(),/原掲載 2016\.10\.03[\s\S]*取得 2017\.07\.14/);
+ assert.match(await archive.locator('.snapshot-notice').innerText(),/10月3日から17日まで[\s\S]*朝夕の聞き取り[\s\S]*期間の途中でも参加を終了できます/);
+ await archive.screenshot({path:'.work/qa/'+mode+'-captured-notice.png',fullPage:true});
+}
 async function traceHistoricalRegisters(archive){
  await archive.getByRole('link',{name:'収蔵目録',exact:true}).click();
  const catalog=archive.locator('.legacy-catalog');
@@ -317,6 +334,11 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(await datedNotice.innerText(),/開設準備の際に作成した4階配置図/);
  await datedNotice.click();
  await p.locator('img[src*="floor-4f-2012.svg"]').waitFor();
+ const archivedPlanButton=p.getByRole('button',{name:'開設時の配置図を拡大',exact:true});
+ assert.equal(await archivedPlanButton.innerText(),'開設時の配置図を拡大');
+ assert.ok(await archivedPlanButton.evaluate(button=>button.clientWidth>=button.closest('article').clientWidth-2));
+ assert.equal(await p.locator('.article-meta time').getAttribute('datetime'),'2012-04-16');
+ assert.deepEqual(await p.locator('.archive-plan-copy time').evaluateAll(times=>times.map(time=>time.dateTime)),['2012-04-01','2026-10-30']);
  await p.screenshot({path:'.work/qa/'+mode+'-old-map.png',fullPage:true});
  await p.getByRole('button',{name:'サイト内検索を開く'}).click();
  const siteSearch=p.locator('.search-dialog');
@@ -350,6 +372,7 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
   await archive.getByRole('heading',{name:'測定に使用する呼称',exact:true}).waitFor();
   await require('./playtest-console.cjs').exerciseConsole(archive,{url:terminalUrl,mode,prefix:'.work/qa/'+mode+'-lab-full'});
  }
+ await traceArchivedPublicNotices(archive);
  await traceHistoricalRegisters(archive);
  const healthId=await traceNewspaper(p,archive);
  await archive.goto(provider('archive','/room/records/0005/'));await until(archive,'端末と資料更新の整理');assert.match(await body(archive),/0006/);await archive.goto(provider('archive','/room/records/0006/'));await until(archive,'機関台帳');const registry=await body(archive);

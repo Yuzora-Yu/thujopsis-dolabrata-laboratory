@@ -5,7 +5,7 @@ export function newsIsAvailable(n){const [year,...rest]=storyToday.split('-');co
 export function newsIsListed(n){return newsIsAvailable(n)&&!n.restored&&n.listed!==false;}
 
 export const editorialNews=[
- {id:'20120416',date:'2012.04.16',tag:'施設案内',title:'開設時の区画配置について',restored:true,listed:false,searchable:true,keywords:'A4-01 配置原図 開設時の区画配置',body:'開設準備の際に作成した4階配置図を掲載いたします。個室オフィスの区画番号、共用部と製作設備の位置をご確認いただけます。掲載図は2012年4月1日時点のものです。',link:'/assets/asunaro-4f-2012.pdf',linkText:'4階配置原図 A4-01（PDF）',oldMap:true},
+ {id:'20120416',date:'2012.04.16',tag:'施設案内',title:'開設時の区画配置について',restored:true,listed:false,searchable:true,keywords:'A4-01 配置原図 開設時の区画配置',body:'開設準備の際に作成した4階配置図を掲載いたします。個室オフィスの区画番号、共用部と製作設備の位置をご確認いただけます。掲載図は2012年4月1日時点のものです。',link:'/assets/asunaro-4f-2012.pdf',linkText:'4階配置原図 A4-01（PDF）',oldMap:{made:'2012-04-01',copied:'2026-10-30'}},
  {id:'20230616',date:'2023.06.16',tag:'施設案内',title:'受付前の通路整備と誘導灯の点検について',body:'受付から東側の会議室へ続く通路について、什器の配置を調整いたしました。併せて誘導灯の点検を実施しております。会議室は通常どおりご利用いただけます。',link:'/facilities/meeting/',linkText:'会議室のご案内'},
  {id:'20250509',date:'2025.05.09',tag:'活動報告',title:'片方が止まっても、水は戻る――循環設備の切り替え試験',
   body:'2013年8月の共同試作では、一方の配管を点検する際に、もう一方の流れを保てるかを確かめました。水を使う場所が一つの設備を共用する場合、点検のたびにすべての場所で作業を止めずに済むよう、配管を途中で二つに分けています。',
@@ -19,7 +19,7 @@ export const editorialNews=[
 import {humanPages} from './people.mjs';
 export const editorialPages={
  ...humanPages,
- '/about/identity/':{title:'施設名に込めた願い',en:'OUR NAME',date:'2012.04.01',image:'media/p-founder.webp',caption:'写真は2012年9月の開設記念展示から。模型を囲む榊原惟臣と参加者',sections:[
+ '/about/identity/':{title:'施設名に込めた願い',en:'OUR NAME',date:'2012.04.01',dateLabel:'原掲載',image:'media/p-founder.webp',caption:'2012年9月の開設記念展示後に写真を追加。模型を囲む榊原惟臣と参加者。',sections:[
   ['明日を願う木','あすなろは、針葉樹「アスナロ」の名から取りました。「明日は檜になろう」という言葉とともに語られてきた名前です。けれど、この施設で願う明日は、誰かと同じ形になることだけを意味しません。'],
   ['アスナロは、アスナロとして育つ','檜に似ていても、アスナロにはアスナロの葉があり、育つ場所があります。別の木になれないことは、その木の欠けたところではありません。私たちは、成長を願う気持ちと、いまの自分を否定することを、同じものにしたくないと考えています。'],
   ['場所の側に、できることがある','握りにくい道具があれば、持ち手の形を変える。文字が伝わりにくければ、音や触れる形を足す。ひとつの物差しに人を合わせる前に、道具や場所の側にできることがあります。ここに集まる技術を、そのために役立てていきます。'],
