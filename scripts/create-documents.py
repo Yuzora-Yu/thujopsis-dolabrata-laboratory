@@ -48,7 +48,7 @@ def create_plan(old=False):
     room(480,393,121,49,'工房 1')
     room(619,235,83,94,'管理事務室',ADMIN)
     rect(619,329,83,25,'#f3f0e4' if old else '#315e52',INK,1.2)
-    text(660,346,'受付',10,color=INK if old else '#ffffff')
+    text(660,346,'受付' if old else '中央受付',10,color=INK if old else '#ffffff')
     # Four meeting rooms in the east, cafe, coworking, hexagonal presentation space.
     room(718,100,102,108,'会議室 A',COMMON)
     room(820,100,76,58,'会議室 D',COMMON)
@@ -80,7 +80,7 @@ def create_plan(old=False):
         # Draw only ordinary visitor access. Retain the room footprints and
         # the unlabelled western zone; this is not a technical service plan.
         gap='#ffffff'
-        line(788,400,821,400,gap,4)
+        line(718,375,718,397,gap,4)
         line(783,208,806,208,gap,4)
         line(831,208,847,208,gap,4);line(868,208,884,208,gap,4)
         line(896,123,896,143,gap,4)
@@ -94,7 +94,10 @@ def create_plan(old=False):
         line(660,452,660,369,route,2.4)
         polygon([(660,361),(655,371),(665,371)],route,route,.4)
         text(675,444,'中央受付へ',11,'start',route)
-        text(799,424,'ラウンジ入口',10,color=route)
+        rect(656,408,8,8,gap,route,1.5)
+        text(648,416,'撮影位置',10,'end',route)
+        line(718,395,736,412,route,.9)
+        text(742,417,'ラウンジ入口',10,'start',route)
     text(400,226,'通路',9);text(390,351,'通路',9)
     # Column grid, source proportions and dimensions.
     for x in [85,171,257,343,429,515,601,718,820,896,1049]:
@@ -118,7 +121,7 @@ def create_plan(old=False):
         text(1128,640,'2026.11',10,'end');text(1128,663,'あすなろ運営事務局',10,'end')
     # Cardinal direction only; lower floors are intentionally not shown.
     text(1135,488,'N',11);line(1135,499,1135,533,INK,1);polygon([(1135,495),(1131,505),(1139,505)],INK,INK,.5)
-    text(75,692,('A4-01' if old else 'A4-07')+' / ASUNARO INDUSTRY & EXCHANGE',8,'start')
+    text(75,692,('A4-01' if old else 'A4-08')+' / ASUNARO INDUSTRY & EXCHANGE',8,'start')
     return primitives
 
 def write_svg(primitives,target):

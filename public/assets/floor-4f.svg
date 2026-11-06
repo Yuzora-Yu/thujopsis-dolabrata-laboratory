@@ -35,7 +35,7 @@
 <rect x="619" y="235" width="83" height="94" fill="#d9e1e1" stroke="#263635" stroke-width="1.35"/>
 <text x="660.5" y="285.0" font-size="11" text-anchor="middle" fill="#263635">管理事務室</text>
 <rect x="619" y="329" width="83" height="25" fill="#315e52" stroke="#263635" stroke-width="1.2"/>
-<text x="660" y="346" font-size="10" text-anchor="middle" fill="#ffffff">受付</text>
+<text x="660" y="346" font-size="10" text-anchor="middle" fill="#ffffff">中央受付</text>
 <rect x="718" y="100" width="102" height="108" fill="#e9edc8" stroke="#263635" stroke-width="1.35"/>
 <text x="769.0" y="157.0" font-size="11" text-anchor="middle" fill="#263635">会議室 A</text>
 <rect x="820" y="100" width="76" height="58" fill="#e9edc8" stroke="#263635" stroke-width="1.35"/>
@@ -67,7 +67,7 @@
 <text x="775.5" y="508" font-size="10" text-anchor="middle" fill="#263635">トイレ</text>
 <rect x="850" y="467" width="130" height="73" fill="#d9e1e1" stroke="#263635" stroke-width="1.2"/>
 <text x="915.0" y="508" font-size="10" text-anchor="middle" fill="#263635">階段・EV</text>
-<line x1="788" y1="400" x2="821" y2="400" fill="none" stroke="#ffffff" stroke-width="4"/>
+<line x1="718" y1="375" x2="718" y2="397" fill="none" stroke="#ffffff" stroke-width="4"/>
 <line x1="783" y1="208" x2="806" y2="208" fill="none" stroke="#ffffff" stroke-width="4"/>
 <line x1="831" y1="208" x2="847" y2="208" fill="none" stroke="#ffffff" stroke-width="4"/>
 <line x1="868" y1="208" x2="884" y2="208" fill="none" stroke="#ffffff" stroke-width="4"/>
@@ -83,7 +83,10 @@
 <line x1="660" y1="452" x2="660" y2="369" fill="none" stroke="#47796a" stroke-width="2.4"/>
 <polygon points="660,361 655,371 665,371" fill="#47796a" stroke="#47796a" stroke-width="0.4"/>
 <text x="675" y="444" font-size="11" text-anchor="start" fill="#47796a">中央受付へ</text>
-<text x="799" y="424" font-size="10" text-anchor="middle" fill="#47796a">ラウンジ入口</text>
+<rect x="656" y="408" width="8" height="8" fill="#ffffff" stroke="#47796a" stroke-width="1.5"/>
+<text x="648" y="416" font-size="10" text-anchor="end" fill="#47796a">撮影位置</text>
+<line x1="718" y1="395" x2="736" y2="412" fill="none" stroke="#47796a" stroke-width="0.9"/>
+<text x="742" y="417" font-size="10" text-anchor="start" fill="#47796a">ラウンジ入口</text>
 <text x="400" y="226" font-size="9" text-anchor="middle" fill="#263635">通路</text>
 <text x="390" y="351" font-size="9" text-anchor="middle" fill="#263635">通路</text>
 <rect x="81" y="96" width="8" height="8" fill="#f8f7f2" stroke="#263635" stroke-width="1"/>
@@ -108,5 +111,5 @@
 <text x="1135" y="488" font-size="11" text-anchor="middle" fill="#263635">N</text>
 <line x1="1135" y1="499" x2="1135" y2="533" fill="none" stroke="#263635" stroke-width="1"/>
 <polygon points="1135,495 1131,505 1139,505" fill="#263635" stroke="#263635" stroke-width="0.5"/>
-<text x="75" y="692" font-size="8" text-anchor="start" fill="#263635">A4-07 / ASUNARO INDUSTRY &amp; EXCHANGE</text>
+<text x="75" y="692" font-size="8" text-anchor="start" fill="#263635">A4-08 / ASUNARO INDUSTRY &amp; EXCHANGE</text>
 </g></svg>

@@ -11,8 +11,11 @@ export const esc = (v='') => String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'
 export const arrow = '';
 const img = (name,alt,cls='',eager=false,dimensions=null) => `<img class="${cls}" src="/assets/${name}" alt="${esc(alt)}" ${eager?'fetchpriority="high"':'loading="lazy"'}${dimensions?` width="${dimensions[0]}" height="${dimensions[1]}"`:''} decoding="async">`;
 const link = (url,text,cls='text-link')=>`<a class="${cls}" href="${url}"${url.startsWith('/members/')?' target="_blank" rel="noopener"':''}>${text}${url.startsWith('/members/')?'<span class="sr-only">（別タブで開きます）</span>':''}${arrow}</a>`;
-function mapPreview(file,description,label){
- return `<button type="button" class="photo-button map-image" data-image-open="/assets/${file}" aria-label="${esc(label)}">${img(file,description,'',false,[1200,710])}<span class="map-preview-label" aria-hidden="true">図面を拡大</span></button>`;
+function mapPreview(file,description,label,focusArrival=false){
+ return `<button type="button" class="photo-button map-image" data-image-open="/assets/${file}"${focusArrival?' data-plan-arrival':''} aria-label="${esc(label)}">${img(file,description,'',false,[1200,710])}<span class="map-preview-label" aria-hidden="true">図面を拡大</span></button>`;
+}
+function facilityPhoto(file,description,caption,dimensions){
+ return `<figure class="facility-photo">${img(file,description,'detail-hero',true,dimensions)}<figcaption>${esc(caption)}</figcaption></figure>`;
 }
 export function brand(){return `<a class="brand" href="/" aria-label="あすなろ産業支援交流施設 トップページ">${img('logo.png','', '',true)}<span><b>あすなろ</b><small>産業支援交流施設</small></span></a>`;}
 
@@ -164,11 +167,12 @@ function workshopPage(){
  const featured = ['latch','flexure-panel'].map(key => gallery.find(work => work.key===key));
  return layout('工房のご案内',heading('FABRICATION','工房のご案内','考えを、かたちに。身近な道具から、事業に向けた試作まで。材料と作り方を工房スタッフと一緒に考えます。')+`
   <section class="wrap facility-detail workshop-overview">
-   ${img('workshop.webp','4階の工房2。中央の木の作業台と、右手の造形機器。','detail-hero',true,[1536,1024])}
+   ${facilityPhoto('workshop.webp','木の作業台と右手の樹脂造形機器。','4階 工房2 ／ 入口側から撮影',[1536,1024])}
    <div class="workshop-access" aria-labelledby="workshop-access-title">
     <div><p class="eyebrow">ご利用の流れ</p><h2 id="workshop-access-title">入居企業・登録会員は無料でご利用いただけます。</h2>
      <p>機器と施設指定の材料を使った少量の試作は、無料で承ります。初めてご利用になる方は、用途が分かる写真や現物をお持ちください。</p>
-     <p>受付は9:00〜17:00です。工房のご利用は予約制で、16:00までに作業を始められる枠をお申し込みください。</p></div>
+     <p>受付は9:00〜17:00です。工房のご利用は予約制で、16:00までに作業を始められる枠をお申し込みください。</p>
+     ${link('/floor-map/#floor-workshop','中央受付からの行き方')}</div>
     ${link('/members/reservations/?space=workshop','工房利用の申請','button dark')}
    </div>
   </section>
@@ -240,6 +244,55 @@ export function home(ending=''){
 }
 
 const facilityCards=[['coworking','lounge.webp','コワーキング・ラウンジ','日々の仕事から、新しい出会いまで。'],['meeting','media/f-meeting.webp','会議室','打ち合わせや勉強会に合わせた4つの会議室。'],['office','media/f-office.webp','個室オフィス','研究・開発に集中できる独立したワークスペース。'],['cafe','cafe.webp','食堂・カフェ','ひと息つきながら、会話が広がる場所。'],['presentation','media/f-presentation.webp','プレゼンテーションホール','発表会や交流のためのフラットなスペース。'],['hall','media/f-hall.webp','3階ホール','最大500名規模の講演会・展示会に。']];
+const facilityDetails={
+ coworking:['自由席を中心とした月額会員制のワークスペースです。集中したいときのデスク席、打ち合わせに使えるラウンジ席など、仕事のスタイルに合わせてご利用いただけます。','木の吸音壁と個人席。右のガラスの向こうは館内の通路。','4階 コワーキング・ラウンジ ／ 入口から入ったところ'],
+ meeting:['少人数でのお打ち合わせから、セミナーまで。会議室A・B・C・Dの4室をご用意しております。','窓際に長机を並べた会議室Aの利用例。','4階 会議室A'],
+ office:['西側に位置する独立した個室オフィスです。事業や研究の規模に合わせた区画をご用意しております。','机と収納を備えた個室オフィス。','4階 個室オフィス ／ 一室の例'],
+ cafe:['食堂・カフェは東側の交流エリアにございます。お食事や休憩、利用者同士の交流にご利用いただけます。飲食物は所定のスペースでお召し上がりください。','木の曲面ベンチ、窓際のテーブル、奥の飲食カウンター。','4階 食堂・カフェ ／ 客席からカウンターを望む'],
+ presentation:['4階東側のプレゼンテーションホールは、発表会や勉強会、交流会にご利用いただけます。レイアウトの変更については、利用申請時にご相談ください。','南西側入口から見た投影壁と客席。','4階 プレゼンテーションホール ／ 客席の設営例'],
+ hall:['3階ホールは、最大500名規模の講演会、展示会、発表会に対応しております。音響、映像設備を備え、用途に合わせたレイアウトでご利用いただけます。','舞台と客席を備えた3階ホール。','3階 ホール ／ 講演会の設営例'],
+};
+const floorDestinations=[
+ ['workshop','工房1・2','受付に向かって左へ。中央受付側に、工房1と工房2の扉がございます。'],
+ ['coworking','コワーキング・ラウンジ','受付に向かって右手前のガラス扉からお入りください。'],
+ ['meeting','会議室 A・B・C・D','受付の右脇にある通路を奥へお進みください。会議室は北側に並んでおります。'],
+ ['cafe','食堂・カフェ','会議室前の通路を右へ進んだ先、左手に入口がございます。'],
+ ['presentation','プレゼンテーションホール','ラウンジ手前の通路を東へ進み、ラウンジの角を左に曲がると、右手に入口がございます。'],
+ ['office','個室オフィス','西側にございます。入居企業を訪問される方は、中央受付へお立ち寄りください。'],
+];
+
+function facilityPage([id,image,title,lead]){
+ const info=facilityInfo[id], [description,imageAlt,caption]=facilityDetails[id];
+ const location=id==='hall'?link('/floor-map/#arrival','4階中央受付の位置'):link('/floor-map/#floor-'+id,'中央受付からの行き方');
+ return layout(title,heading('FACILITY',title,lead)+`
+  <section class="wrap facility-detail">
+   ${facilityPhoto(image,imageAlt,caption)}
+   <div class="prose"><h2>${title}のご利用について</h2><p>${description}</p><p>${info.notes}</p>
+    <dl class="detail-list"><div><dt>ご利用時間</dt><dd>${info.hours}</dd></div><div><dt>ご利用方法</dt><dd>${info.method}</dd></div></dl>
+    <div class="button-row">${info.space?link('/members/reservations/?space='+info.space,'会員サイトで利用申請','button dark'):link('/membership/','会員のご案内','button dark')}${link('/price/','料金のご案内','button outline')}${location}</div>
+   </div>${id==='hall'?hallExhibition():''}
+  </section>`);
+}
+
+function floorGuide(){
+ return layout('4階フロアマップ',heading('FLOOR GUIDE','4階フロアマップ','4階にお着きになりましたら、中央受付へお立ち寄りください。')+`
+  <section class="wrap floor-section">
+   <div class="map-toolbar" id="floor-plan"><span>4F　産業支援交流フロア</span><a href="/assets/asunaro-4f.pdf" target="_blank" rel="noopener">PDFを開く<span class="sr-only">（別タブで開きます）</span></a></div>
+   ${mapPreview('floor-4f.svg','4階案内図 A4-08。西側の個室番号は、北から402〜407、408・409・413、414〜416。南寄りに工房1・2。中央受付は中央エレベーターから右へ進み、左折。受付手前の撮影位置から右手にラウンジ入口。','フロアマップを拡大',true)}
+   <div class="map-legend"><span><i class="legend-office"></i>オフィス・工房</span><span><i class="legend-common"></i>交流・会議スペース</span><span><i class="legend-admin"></i>管理・共用設備</span></div>
+   <section class="floor-arrival" id="arrival" aria-labelledby="floor-arrival-title">
+    <div><p class="eyebrow">4F RECEPTION</p><h2 id="floor-arrival-title">エレベーターから中央受付へ</h2>
+     <p>中央のエレベーターで4階にお着きになりましたら、右へ進み、左手の中央受付へお越しください。案内図の「撮影位置」からは、正面に受付、右手前にラウンジのガラス扉が見えます。会議室への通路は、受付カウンターのすぐ右脇です。</p></div>
+    <figure>${img('media/f-central-reception.webp','正面の緑のカウンターに「中央受付」の表示。手前右のガラス扉と、奥に続く受付右脇の通路。','',false,[1280,853])}<figcaption>案内図の撮影位置から中央受付を望む</figcaption></figure>
+   </section>
+   <section class="floor-destinations" aria-labelledby="floor-destinations-title">
+    <h2 id="floor-destinations-title">中央受付から各施設へ</h2>
+    <dl>${floorDestinations.map(([id,title,directions])=>`<div id="floor-${id}"><dt>${link(id==='workshop'?'/workshop/':'/facilities/'+id+'/',title)}</dt><dd>${directions}</dd></div>`).join('')}</dl>
+    <p>${link('#floor-plan','図面へ戻る')}</p>
+   </section>
+  </section>`);
+}
+
 export const publicPaths=[...Object.keys(editorialPages),'/','/about/',programPath,programNotesPath,'/facilities/','/facilities/staff/','/workshop/','/gallery/','/news/','/floor-map/','/price/','/membership/','/visit/',seedCollectionPath,'/privacy/','/tenants/','/people/asakura-tsumugi/','/people/inaba-mio/','/404/',...facilityCards.map(f=>`/facilities/${f[0]}/`),...news.filter(n=>n.available).map(n=>`/news/${n.id}/`),...tenants.map(t=>`/tenants/${t.page}/`),...gallery.map(g=>`/gallery/${g.id}/`),...tenantMaterialEntries.map(material=>material.path)];
 
 function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCHIVE_ORIGIN||'http://127.0.0.1:4176'}}={}){
@@ -253,20 +306,12 @@ function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCH
  if(path==='/facilities/') return layout('施設・サービス',heading('SPACE & SERVICE','施設・サービス','働く、集う、試してみる。用途に合わせた空間をご用意しております。')+`<section class="wrap section facility-grid">${facilityCards.map(f=>`<a href="/facilities/${f[0]}/" class="facility-card">${img(f[1],f[2])}<div><h2>${f[2]} ${arrow}</h2><p>${f[3]}</p></div></a>`).join('')}</section><aside class="wrap facility-workshop-highlight"><div><p class="eyebrow">4F / WORKSHOP</p><h2>工房・試作サポート</h2><p>材料や加工方法を、作りたいものに合わせてご相談いただけます。</p></div>${link('/workshop/','工房のご案内','button dark')}</aside><aside class="wrap staff-callout"><div><p class="eyebrow">OUR TEAM</p><h2>施設職員紹介</h2><p>見学や試作をご案内する、受付と工房の職員をご紹介いたします。</p></div>${link('/facilities/staff/','職員紹介を見る','button outline')}</aside><section class="wrap floor-callout"><p class="eyebrow seed-note-line seed-note-line-center">4F FLOOR GUIDE${seedNoteButton('/facilities/')}</p><h2>フロアマップ</h2><p>4階の各施設と共用設備をご確認いただけます。</p>${link('/floor-map/','フロアマップを見る','button dark')}</section>`);
  if(path==='/facilities/staff/')return staffPage();
  const f=facilityCards.find(f=>path===`/facilities/${f[0]}/`);
- if(f){const info=facilityInfo[f[0]];const descriptions={coworking:'自由席を中心とした月額会員制のワークスペースです。集中したいときのデスク席、打ち合わせに使えるラウンジ席など、仕事のスタイルに合わせてご利用いただけます。',meeting:'少人数でのお打ち合わせから、セミナーまで。会議室A・B・C・Dの4室をご用意しております。',office:'西側に位置する独立した個室オフィスです。事業や研究の規模に合わせた区画をご用意しております。',cafe:'食堂・カフェは東側の交流エリアにございます。お食事や休憩、利用者同士の交流にご利用いただけます。飲食物は所定のスペースでお召し上がりください。',presentation:'4階東側のプレゼンテーションホールは、発表会や勉強会、交流会にご利用いただけます。レイアウトの変更については、利用申請時にご相談ください。',hall:'3階ホールは、最大500名規模の講演会、展示会、発表会に対応しております。音響、映像設備を備え、用途に合わせたレイアウトでご利用いただけます。'};return layout(f[2],heading('FACILITY',f[2],f[3])+`<section class="wrap facility-detail">${img(f[1],f[0]==='presentation'?'4階プレゼンテーションホール。南西側入口から見た投影壁と客席':f[0]==='meeting'?'4階北側の会議室A':f[2],'detail-hero',true)}<div class="prose"><h2>${f[2]}のご利用について</h2><p>${descriptions[f[0]]}</p><p>${info.notes}</p><dl class="detail-list"><div><dt>ご利用時間</dt><dd>${info.hours}</dd></div><div><dt>ご利用方法</dt><dd>${info.method}</dd></div></dl><div class="button-row">${info.space?link('/members/reservations/?space='+info.space,'会員サイトで利用申請','button dark'):link('/membership/','会員のご案内','button dark')}${link('/price/','料金のご案内','button outline')}${f[0]==='hall'?link('/floor-map/#arrival','4階中央受付の位置'):link('/floor-map/','4階フロアマップ')}</div></div>${f[0]==='hall'?hallExhibition():''}</section>`);}
+ if(f)return facilityPage(f);
  if(path==='/workshop/')return workshopPage();
  if(path==='/gallery/')return galleryPage(q);
  const g=gallery.find(g=>path===`/gallery/${g.id}/`);
  if(g)return layout(g.title,heading('FABRICATION GALLERY',g.title)+`<article class="wrap article"><div class="article-meta"><time>${g.date}</time><span class="tag">${g.tag}</span><span>No. ${g.id}</span></div><button type="button" class="photo-button gallery-photo-button" data-image-open="/assets/${g.image}" aria-label="写真を拡大">${img(g.image,g.imageAlt||g.title,'article-photo',true)}<span class="gallery-zoom-label" aria-hidden="true">写真を拡大</span></button><div class="prose"><p>${g.body}</p><dl class="detail-list"><div><dt>製作方法</dt><dd>${g.tag}</dd></div><div><dt>製作場所</dt><dd>${g.key==='metal-lattice'?'専用加工室（職員管理）':'4階 工房'}</dd></div>${g.record?`<div><dt>照合資料番号</dt><dd>${g.record}${g.recordUpdated?`<small class="record-revision">参照欄の更新：${g.recordUpdated}</small>`:""}</dd></div>`:''}</dl></div><div class="button-row gallery-detail-links">${(g.links||[]).map(l=>link(l.path,l.text,'button dark')).join('')}${link('/gallery/','制作物ギャラリーへ戻る','button outline')}</div></article>`);
- if(path==='/floor-map/')return layout('4階フロアマップ',heading('FLOOR GUIDE','4階フロアマップ','4階にお着きになりましたら、中央受付へお立ち寄りください。')+`
- <section class="wrap floor-section">
- <div class="map-toolbar"><span>4F　産業支援交流フロア</span><a href="/assets/asunaro-4f.pdf" target="_blank" rel="noopener">PDFを開く<span class="sr-only">（別タブで開きます）</span></a></div>
- ${mapPreview('floor-4f.svg','4階案内図 A4-07。西側の個室番号は、北から402〜407、408・409・413、414〜416。南寄りに工房1・2。中央に受付、東側に会議室と交流スペース。','フロアマップを拡大')}
- <div class="map-legend"><span><i class="legend-office"></i>オフィス・工房</span><span><i class="legend-common"></i>交流・会議スペース</span><span><i class="legend-admin"></i>管理・共用設備</span></div>
- <section class="floor-arrival" id="arrival" aria-labelledby="floor-arrival-title">
- <div><p class="eyebrow">4F RECEPTION</p><h2 id="floor-arrival-title">エレベーターから中央受付へ</h2><p>中央のエレベーターで4階にお着きになりましたら、右へ進み、左手の中央受付へお越しください。受付に向かって左が工房、右手のガラス扉がラウンジの入口です。会議室へは、受付とラウンジの間の通路を奥へお進みください。</p></div>
- <figure>${img('media/f-reception.webp','正面に緑色の受付カウンター。右手のガラス扉がラウンジの入口で、その左側に会議室へ続く通路。','',false,[1280,853])}<figcaption>中央受付手前の通路から撮影</figcaption></figure>
- </section></section>`);
+ if(path==='/floor-map/')return floorGuide();
  if(path==='/news/')return layout('お知らせ',heading('INFORMATION','お知らせ')+`<section class="wrap section news-archive">${ending?`<a class="closure-notice" href="/news/${ending==='end2'?'staff-change':'closure'}/">${ending==='end2'?'工房技術相談の担当変更について':'施設の利用休止について'} </a>`:''}${newsFilters(news.filter(n=>n.listed))}${rows(news.filter(n=>n.listed))}<nav class="news-pagination" aria-label="お知らせのページ"></nav><p class="seed-note-line news-index-note">掲載順${seedNoteButton('/news/')}</p></section>`);
  const n=news.find(n=>path===`/news/${n.id}/`);
  if(n&&n.available)return layout(n.title,heading('INFORMATION',n.title)+`<article class="wrap article narrow"><div class="article-meta"><time datetime="${n.date.replaceAll('.','-')}">${n.date}</time><span class="tag">${n.tag}</span></div><div class="prose">${newsContent(n,origins)}</div><div class="article-return">${link('/news/','お知らせ一覧へ')}</div></article>`,{legacy:n.legacyAccess});

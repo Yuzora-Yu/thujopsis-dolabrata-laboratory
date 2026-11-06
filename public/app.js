@@ -142,7 +142,7 @@ if(photoViewport&&photoButtons.length){
  const stage=photoViewport.querySelector('.image-stage');
  const photo=stage.querySelector('img');
  const middle={x:.5,y:.5};
- let zoom=1,angle=0,fitWidth=0,fitHeight=0;
+ let zoom=1,angle=0,fitWidth=0,fitHeight=0,openingCenter=middle;
 
  photoViewport.tabIndex=0;
  photoViewport.setAttribute('role','region');
@@ -185,12 +185,14 @@ if(photoViewport&&photoButtons.length){
  function refitPhoto(){
   if(!photo.hidden)fitPhoto(viewCenter());
  }
- photo.addEventListener('load',()=>fitPhoto(middle));
+ photo.addEventListener('load',()=>fitPhoto(openingCenter));
  photoDialog.addEventListener('close',()=>window.removeEventListener('resize',refitPhoto));
  for(const button of photoButtons){
   button.addEventListener('click',()=>{
    const source=button.dataset.imageOpen;
-   zoom=1;
+   const focusArrival=button.hasAttribute('data-plan-arrival')&&matchMedia('(max-width: 580px)').matches;
+   zoom=focusArrival?4:1;
+   openingCenter=focusArrival?{x:.57,y:.57}:middle;
    angle=0;
    photo.hidden=true;
    stage.style.removeProperty('width');
@@ -201,7 +203,7 @@ if(photoViewport&&photoButtons.length){
    photoDialog.showModal();
    window.addEventListener('resize',refitPhoto);
    photo.src=source;
-   if(photo.complete)fitPhoto(middle);
+   if(photo.complete)fitPhoto(openingCenter);
   });
  }
  for(const button of photoDialog.querySelectorAll('[data-photo-action]')){

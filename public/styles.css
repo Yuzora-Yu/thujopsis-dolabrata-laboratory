@@ -94,7 +94,30 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 .floor-arrival p:not(.eyebrow){line-height:1.9;margin-top:1rem}
 .floor-arrival figure{margin:0}
 .floor-arrival figcaption{color:var(--muted);font-size:.8rem;margin-top:.5rem}
+.facility-photo{margin:0}
+.facility-photo figcaption{color:var(--muted);font-size:.8rem;margin-top:.65rem}
+.floor-destinations{
+ max-width:60rem;
+ margin-top:clamp(2.75rem,6vw,5rem);
+}
+.floor-destinations h2{font-size:clamp(1.3rem,2.7vw,2rem);line-height:1.45}
+.floor-destinations dl{margin:1.15rem 0 0;border-top:1px solid var(--line)}
+.floor-destinations dl>div{
+ display:grid;
+ grid-template-columns:minmax(12rem,1fr) minmax(0,2.5fr);
+ gap:.45rem 1.5rem;
+ align-items:baseline;
+ border-bottom:1px solid var(--line);
+ padding:1.05rem .65rem;
+ scroll-margin-top:8.5rem;
+}
+.floor-destinations dl>div:target{background:#f0f3e9}
+.floor-destinations dt{font-weight:700}
+.floor-destinations .text-link{font-size:inherit}
+.floor-destinations dd{margin:0;font-size:.93rem;line-height:1.8}
+#floor-plan{scroll-margin-top:8.5rem}
 @media(max-width:720px){.floor-arrival{grid-template-columns:1fr}}
+@media(max-width:580px){.floor-destinations dl>div{grid-template-columns:1fr}}
 
 .facility-hero{
  position:relative;

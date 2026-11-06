@@ -8,7 +8,7 @@ const source={
  shop:'workshop.webp',
  exhibit:'media/g-metal-lattice.webp',
  moon:'media/lunar-habitat-concept.webp',
- reception:'media/f-reception.webp',
+ reception:'media/f-central-reception.webp',
  logo:'logo.png',
 };
 
