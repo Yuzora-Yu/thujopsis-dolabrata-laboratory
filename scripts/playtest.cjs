@@ -531,6 +531,7 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const recipientCopy=p.getByRole('region',{name:'9月10日の日次確認票・本人控え'});
  assert.match(await recipientCopy.innerText(),/日曜に妹に渡す[\s\S]*9月10日 08:42[\s\S]*9月11日 08:40/);
  assert.doesNotMatch(await recipientCopy.innerText(),/薬剤|拒否傾向/);
+ assert.match(examination,/2022年9月2日 08:10[\s\S]*P-032。変更群の薬剤を投与済み[\s\S]*実施欄の本人確認は空欄/);
  assert.match(await p.getByRole('row').filter({hasText:'P-032：検査の中止と帰宅時期を確認したい'}).innerText(),/拒否傾向[\s\S]*条件維持/);
  await p.setViewportSize({width:390,height:844});
  try{
@@ -553,10 +554,18 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
   await profile.getByRole('link',{name:/仕事の合間の小さな製作/}).click();
   assert.match(await body(profile),/妹に渡したら[\s\S]*板の裏に組む向きを鉛筆で書いておきます/);
  }finally{await profile.close();}
- const equipment=await document(p,examination.match(/ENV-2022-\d{3}/)[0]);
+ const equipmentId=examination.match(/ENV-2022-\d{3}/)[0];
+ const equipment=await document(p,equipmentId);
+ const dispatch=p.getByRole('region',{name:'9月10日 11:20の配信控え／個別通知'});
+ assert.match(await dispatch.innerText(),/P-032の端末[\s\S]*P-033の未承認/);
+ assert.equal(await dispatch.getByRole('row').filter({hasText:'端末応答'}).getByRole('cell').last().innerText(),'受領');
+ assert.equal(await dispatch.getByRole('row').filter({hasText:'閲覧時刻'}).getByRole('cell').last().innerText(),'');
+ const dispatchPrint=await download(p,'a[href$="'+equipmentId+'.pdf"]',equipmentId+'.pdf');
+ assert.deepEqual(dispatchPrint.data,await fs.readFile('private/record-media/'+equipmentId+'.pdf'));
  const incidentId=equipment.match(/EV-2022-\d{3}/)[0];
  const incident=await document(p,incidentId);
  assert.match(incident,/吉野夏帆/);
+ assert.match(incident,/9月10日11:20の端末配信控え[\s\S]*9月11日の当直連絡/);
  assert.match(incident,/僕がやった。人を呼んで[\s\S]*07:46、P-032を別室の担当に引き渡し/);
  assert.match(incident,/板二枚を回収。裏に鉛筆の矢印[\s\S]*家族連絡の許可欄は空欄/);
  assert.match(incident,/建物外への引渡しは、今回の保全分では確認できなかった/);

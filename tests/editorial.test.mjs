@@ -75,6 +75,28 @@ test('Akari’s trial dates and the two sets of workshop property remain distinc
  assert.doesNotMatch(receipt.tables[0].rows.flat().join(' '),/型紙|料理帳/);
 });
 
+test('cohort records distinguish the participant copy, dispatch and night duty',()=>{
+ const observation=documents.find(document=>document.id==='OBS-2022-044');
+ const participant=Object.fromEntries(observation.tables.find(table=>table.participantCopy).rows);
+ assert.match(participant['受付記入欄'],/9月10日 08:42.*受領/);
+ assert.doesNotMatch(Object.values(participant).join(' '),/薬剤|未承認|拒否傾向/);
+ const [ , administration]=observation.sections.find(([title])=>title.includes('9月2日 08:10'));
+ assert.match(administration,/P-032.*投与済み.*本人確認は空欄/);
+ const equipment=documents.find(document=>document.id==='ENV-2022-031');
+ const sent=equipment.tables.find(table=>table.caption.startsWith('9月10日 11:20'));
+ const fields=Object.fromEntries(sent.rows);
+ assert.equal(fields['宛先'],'P-032の端末');
+ assert.equal(fields['端末応答'],'受領');
+ assert.equal(fields['閲覧時刻'],'');
+ assert.match(fields['配信文'],/P-033の未承認/);
+ assert.match(fields['運用室の注記'],/実際の申出や署名は参照していない/);
+ assert.doesNotMatch(renderMember('/members/records/OBS-2022-044/',context('ordis')),/P-033の未承認|11:20/);
+ assert.equal(renderMember('/members/records/ENV-2022-031/',context('ordis')),null);
+ const incident=documents.find(document=>document.id==='EV-2022-091');
+ assert.match(recordText(incident),/9月10日11:20の端末配信控え（ENV-2022-031）.*9月11日の当直連絡/);
+ assert.equal(incident.tables[0].rows.at(-1)[1],'P-033の死亡を確認');
+});
+
 test('public facility routes do not announce the old archive and the first clipping is a direct PDF',()=>{
  for(const route of publicPaths){const html=renderPublic(route)||'';assert.doesNotMatch(html,/href="[^"]*(?:historical-records|127\.0\.0\.1:4176|\/snapshots\/)/,route);}
  assert.doesNotMatch(renderPublic('/about/history/'),/準備期の公開記録/);

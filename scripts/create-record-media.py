@@ -145,6 +145,8 @@ def render(record, style_key, target):
     for t in tables:
         if t is participant_sheet:
             continue
+        if t.get("printPageTitle"):
+            flow.extend([PageBreak(), p(t["printPageTitle"], title)])
         flow.append(p(t["caption"] + ("　" + t["date"] if t.get("date") else ""), sub))
         widths = [BODY * weight for weight in (.33, .32, .35)] if style_key == "group-review" else None
         table(t["head"], t["rows"], widths)
