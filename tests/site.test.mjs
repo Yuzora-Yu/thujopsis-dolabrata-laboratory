@@ -217,8 +217,10 @@ test('document viewer can query another document from its footer and preserves p
  const doc=(await c.get('/members/records/YH-2018-041/')).text;
  assert.match(doc,/<section class="record-lookup"[\s\S]*action="\/members\/records\/"[\s\S]*id="next-document-id"/);
  assert.match((await c.get('/members/records/?document_id=YH-2018-041-A')).text,/該当する資料は閲覧できません。/);
- assert.doesNotMatch((await c.get('/members/organization/')).text,/0000/);
- assert.doesNotMatch((await c.get('/members/records/YH-2013-014/')).text,/0000/);
+ // A random case or CSRF token can contain the same digits as part of its value.
+ const institutionNumber=/\b(?:0000|201204010000)\b/;
+ assert.doesNotMatch((await c.get('/members/organization/')).text,institutionNumber);
+ assert.doesNotMatch((await c.get('/members/records/YH-2013-014/')).text,institutionNumber);
 });
 
 test('archive traversal reveals handover evidence only after ticket authentication',async()=>{
