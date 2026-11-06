@@ -44,6 +44,7 @@ STYLES = {
     "workshop-receipt": ("Office", "#574937", "#f1ebe2", "工房受付／預かり控え", "form"),
     "maintenance": ("Gothic", "#3f5861", "#e8eff0", "施設保守・作業完了", "strip"),
     "operations": ("Gothic", "#1f4a44", "#e3ece7", "区画運用報告", "strip"),
+    "decision": ("Gothic", "#313c52", "#eceef2", "事業再編／決裁原議", "strip"),
 }
 
 def signature_comparison(labels, font):
@@ -78,7 +79,7 @@ def render(record, style_key, target):
     font, accent_hex, pale_hex, register, frame = STYLES[style_key]
     accent, pale = colors.HexColor(accent_hex), colors.HexColor(pale_hex)
     dark = colors.HexColor("#232824")
-    compact = style_key in {"individual", "workshop-receipt", "daily-check"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
+    compact = style_key in {"individual", "workshop-receipt", "daily-check", "decision"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
     tables = record.get("tables", [])
     participant_sheet = next((item for item in tables if item.get("participantCopy")), None)
     issue_date = datetime.strptime(record.get("updated", record["date"]), "%Y年%m月%d日").strftime("%Y%m%d")
@@ -139,6 +140,8 @@ def render(record, style_key, target):
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):
         flow.append(p(record["signoff"], meta))
+    if style_key == "decision" and record.get("addenda"):
+        flow.extend([PageBreak(), p("決裁後の追記", title)])
     for note in record.get("addenda", []):
         flow.append(p("追記　" + note["date"] + "　" + note["by"], sub))
         sections(note.get("sections", []))
@@ -206,7 +209,9 @@ for entry in payload["media"]:
         scan(OUT / (entry["id"] + ".pdf"), out, entry["id"])
 
 if "--records-only" not in sys.argv:
-    scan(ROOT / "public/assets/archive/ks-1943-06.pdf",
-         ROOT / "public/assets/archive/ks-1943-06-scan.jpg", "KS-1943-06")
-    print("Updated the public KS-1943-06 archival scan.")
+    archive = ROOT / "public/assets/archive"
+    for record in ("KS-1943-06", "KS-1945-02"):
+        name = record.lower()
+        scan(archive / (name + ".pdf"), archive / (name + "-scan.jpg"), record)
+    print("Updated the public historical scans.")
 print(f"Created {len(payload['media'])} protected files.")

@@ -5,7 +5,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.styles import ParagraphStyle
-from reportlab.platypus import Paragraph
+from reportlab.platypus import Paragraph, Table, TableStyle
 from reportlab.lib import colors
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -23,7 +23,85 @@ def paper(name,title,date,*,height=H):
  c.setFont('JP',8);c.drawString(38,height-30,'産業継続研究資料 保存室　複写収録');c.drawRightString(W-38,height-30,date)
  return c
 
+
+def register_table(c, rows, widths, top, font, shade):
+    table=Table(rows,colWidths=widths,rowHeights=[27]+[37]*(len(rows)-1))
+    table.setStyle(TableStyle([
+        ('FONTNAME',(0,0),(-1,-1),font),
+        ('FONTSIZE',(0,0),(-1,-1),10),
+        ('TEXTCOLOR',(0,0),(-1,-1),colors.HexColor('#302e28')),
+        ('BACKGROUND',(0,0),(-1,0),colors.HexColor(shade)),
+        ('GRID',(0,0),(-1,-1),.5,colors.HexColor('#6e6a5e')),
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+        ('LEFTPADDING',(0,0),(-1,-1),12),
+    ]))
+    width,height=table.wrapOn(c,W,H)
+    table.drawOn(c,(W-width)/2,top-height)
+    return top-height
+
+
+def historical_registers():
+    c=paper('ks-1945-02.pdf','継舟計画・研究凍結処理簿','収蔵番号 KS-1945-02')
+    c.setDateFormatter(lambda *_: 'D:20170714000000')
+    c.setLineWidth(.6)
+    c.rect(51,93,W-102,H-158,stroke=1,fill=0)
+    c.setFont('Mincho',18)
+    c.drawCentredString(W/2,H-138,'繼舟計畫　研究凍結處理簿')
+    c.setFont('Mincho',11)
+    c.drawRightString(W-76,H-186,'昭和二十年九月　繼舟計畫整理班')
+    c.line(74,H-203,W-74,H-203)
+    para(c,'本日以後、新規ノ觀察及試驗ヲ停止ス。設備及記録ノ取扱ハ表ノ通リトス。',74,H-227,W-148,11,21)
+    y=register_table(c,[
+        ['項目','處置','整理先'],
+        ['新規觀察及試驗','停止','各試驗係ニ通知'],
+        ['設備及器具','返納','機材係'],
+        ['個人別區分票','別置','所在受領簿ニ記載'],
+    ],[125,90,W-363],H-309,'Mincho','#ebe6d6')
+    para(c,'個人別區分票ハ研究繼續ノ爲ニ移管スベカラズ。所在ヲ記シタル受領簿ハ別綴トス。',74,y-42,W-148,11,21)
+    c.setFont('Mincho',10)
+    c.drawRightString(W-76,151,'整理班　取扱主任')
+    c.setFont('JP',8)
+    c.drawString(51,61,'保存室注記　2017年7月14日　紙資料から複写収録')
+    c.save()
+
+    c=paper('ks-1986-04.pdf','旧継続研究資料・整理記録','収蔵番号 KS-1986-04')
+    c.setDateFormatter(lambda *_: 'D:20170714000000')
+    c.setFillColor(colors.HexColor('#f8f7ef'))
+    c.rect(49,104,W-98,H-170,stroke=0,fill=1)
+    c.setStrokeColor(colors.HexColor('#4c514a'))
+    c.setFillColor(colors.HexColor('#302e28'))
+    c.setFont('JP',17)
+    c.drawString(74,H-124,'旧継続研究資料　整理記録')
+    c.setFont('JP',10)
+    c.drawString(74,H-158,'受入　昭和61年4月')
+    c.drawRightString(W-74,H-158,'資料整理係')
+    c.line(74,H-178,W-74,H-178)
+    para(c,'受入区分　史料保存<br/>引渡元　　旧保管者（民間保管）',74,H-198,W-148,10,18,'JP')
+    y=register_table(c,[
+        ['資料名','数量','受入確認'],
+        ['第二種国土継続研究・実施概要','1冊','照合済'],
+        ['継舟計画・研究凍結処理簿','1綴','照合済'],
+        ['個人別区分票','-','未受領'],
+    ],[248,57,W-453],H-270,'JP','#e8ebe3')
+    c.setFont('JP',10)
+    c.drawString(74,y-41,'取扱事項')
+    para(c,'研究再開の承認書は受領していない。<br/>旧台帳の欠落箇所には、推定による個人情報の補記を行わない。',74,y-56,W-148,10,18,'JP')
+    c.setStrokeColor(colors.HexColor('#777b70'))
+    c.line(74,163,W-74,163)
+    c.drawString(74,141,'受領処理　資料整理係')
+    c.setFont('JP',8)
+    c.drawString(51,61,'保存室注記　2017年7月14日　紙資料から複写収録')
+    c.save()
+
+
+if '--registers-only' in sys.argv:
+    historical_registers()
+    print('Created two historical registers.')
+    raise SystemExit(0)
+
+
 if not {'--missing-only', '--corrections-only'}.intersection(sys.argv):
+    historical_registers()
     c=paper('ks-1943-06.pdf','第二種国土継続研究 実施概要','収蔵番号 KS-1943-06')
     c.setLineWidth(.7);c.rect(40,55,W-80,H-110)
     c.setFont('Mincho',14);c.drawCentredString(W/2,H-105,'第二種國土繼續研究')

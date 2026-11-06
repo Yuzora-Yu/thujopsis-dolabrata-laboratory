@@ -950,6 +950,16 @@ export const hintPlan = [
       },
       {
         "kind": "archive",
+        "path": "/collections/items/0002/",
+        "words": ["移管を禁じる", "ks-1945-02.pdf"]
+      },
+      {
+        "kind": "archive",
+        "path": "/collections/items/0003/",
+        "words": ["個人別区分票", "今回の受入に含まれない", "ks-1986-04.pdf"]
+      },
+      {
+        "kind": "archive",
         "path": "/snapshots/2011/",
         "words": [
           "旧事業の承継を行わず"
@@ -1024,7 +1034,7 @@ export const hintPlan = [
   },
   {
     "id": "renewal",
-    "goal": "どの時点で旧研究が再開されたかを知る",
+    "goal": "旧区分を現行評価に使うと決めた日と範囲を知る",
     "requires": [
       "institution",
       "old-project"
@@ -1043,7 +1053,9 @@ export const hintPlan = [
         "path": "/members/records/YH-2022-017/",
         "words": [
           "継舟",
-          "設立経緯"
+          "設立経緯",
+          "今回の測定値",
+          "2022年8月19日"
         ],
         "role": "institution"
       }
@@ -1053,7 +1065,7 @@ export const hintPlan = [
       "資料の存在だけでは、榊原が再開を承認したとは言えない。",
       "2007年の拒絶と2022年の再編決裁を照合する。"
     ],
-    "answer": "死後の理事会が旧区分を現行評価へ接続した。",
+    "answer": "2022年8月19日付で深町・久世が旧区分を新しい測定結果に適用した。1945年の個票と1986年の受領範囲を分けて読む。決裁前にも旧区分との比較は行われていた。",
     "leads": [
       "death",
       "prototype"

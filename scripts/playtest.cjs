@@ -49,6 +49,35 @@ async function verifyPausedGuide(p,path,content){
   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
  }
 }
+async function checkArchivePdf(archive,filename,label){
+ const pdf=archive.getByRole('link',{name:label});
+ assert.ok((await pdf.getAttribute('href')).endsWith('/'+filename));
+ assert.equal(await pdf.getAttribute('target'),'_blank');
+ const response=await archive.request.get(new URL(await pdf.getAttribute('href'),archive.url()).href);
+ assert.ok(response.ok(),filename);
+ assert.deepEqual(await response.body(),await fs.readFile('public/assets/archive/'+filename));
+}
+
+async function traceHistoricalRegisters(archive){
+ await archive.getByRole('link',{name:'収蔵目録',exact:true}).click();
+ const catalog=archive.locator('.legacy-catalog');
+ assert.equal(await catalog.locator('a[href$="/0004/"]').count(),0);
+ await catalog.getByRole('link',{name:/第二種国土継続研究・実施概要/}).click();
+ const overview=await body(archive);
+ const freezeCode=overview.match(/KS-1945-\d{2}/)[0];
+ await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
+ await catalog.getByRole('link',{name:new RegExp(freezeCode)}).click();
+ const freeze=await body(archive);
+ assert.match(freeze,/新規の観察と試験を停止[\s\S]*研究の継続を目的とする移管を禁じる/);
+ await checkArchivePdf(archive,'ks-1945-02.pdf',/処理簿の複写（PDF）/);
+ await archive.locator('.archival-scan img').evaluate(img=>img.decode());
+ const accessionCode=freeze.match(/KS-1986-\d{2}/)[0];
+ await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
+ await catalog.getByRole('link',{name:new RegExp(accessionCode)}).click();
+ assert.match(await body(archive),/実施概要1冊、研究凍結処理簿1綴を受領[\s\S]*今回の受入に含まれない/);
+ await checkArchivePdf(archive,'ks-1986-04.pdf',/受領記録の複写（PDF）/);
+}
+
 async function traceNewspaper(page,archive){
  await archive.getByRole('link',{name:'収蔵目録',exact:true}).click();
  const catalog=archive.locator('.legacy-catalog');
@@ -79,22 +108,14 @@ async function traceNewspaper(page,archive){
  assert.equal(await catalog.locator('a:visible').count(),1);
  await catalog.getByRole('link',{name:/訂正欄/}).click();
  assert.match(await body(archive),/紙面抄録[\s\S]*地域版初刷[\s\S]*当該記述を撤回[\s\S]*後刷では、当該記述を削除/);
- const checkClipping=async (filename,label)=>{
-  const pdf=archive.getByRole('link',{name:label});
-  assert.ok((await pdf.getAttribute('href')).endsWith('/'+filename));
-  assert.equal(await pdf.getAttribute('target'),'_blank');
-  const response=await archive.request.get(new URL(await pdf.getAttribute('href'),archive.url()).href);
-  assert.ok(response.ok(),filename);
-  assert.deepEqual(await response.body(),await fs.readFile('public/assets/archive/'+filename));
- };
- await checkClipping('younagi-20211105.pdf',/11月5日地域版 訂正欄（PDF）/);
- await checkClipping('younagi-20211104-late.pdf',/11月4日地域版 後刷（PDF）/);
+ await checkArchivePdf(archive,'younagi-20211105.pdf',/11月5日地域版 訂正欄（PDF）/);
+ await checkArchivePdf(archive,'younagi-20211104-late.pdf',/11月4日地域版 後刷（PDF）/);
  assert.equal(await archive.locator('a[href$="/0009/"], a[href$="/younagi-20211104.pdf"]').count(),0);
  const firstPrint=new URL(archive.url());
  firstPrint.pathname=firstPrint.pathname.replace(/\d{4}\/$/,'0009/');
  await archive.goto(firstPrint.href);
  assert.match(await body(archive),/服毒による自殺か/);
- await checkClipping('younagi-20211104.pdf',/11月4日地域版 初刷（PDF）/);
+ await checkArchivePdf(archive,'younagi-20211104.pdf',/11月4日地域版 初刷（PDF）/);
  const firstPrintCode=await archive.locator('.legacy-record-meta').innerText();
  await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
  await search(firstPrintCode.match(/NK-\d{4}-\d{4}/)[0]);
@@ -329,6 +350,7 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
   await archive.getByRole('heading',{name:'測定に使用する呼称',exact:true}).waitFor();
   await require('./playtest-console.cjs').exerciseConsole(archive,{url:terminalUrl,mode,prefix:'.work/qa/'+mode+'-lab-full'});
  }
+ await traceHistoricalRegisters(archive);
  const healthId=await traceNewspaper(p,archive);
  await archive.goto(provider('archive','/room/records/0005/'));await until(archive,'端末と資料更新の整理');assert.match(await body(archive),/0006/);await archive.goto(provider('archive','/room/records/0006/'));await until(archive,'機関台帳');const registry=await body(archive);
  const institution={id:ymd(registry.match(/加入日([^。]+)/)[1])+registry.match(/台帳番号は(\d{4})/)[1],password:ymd(registry.match(/法人設立日([^。]+)/)[1])};await archive.close();
@@ -354,6 +376,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(friendFile,/灯さんの貸出票は返却欄を空けておいてください。夏帆さんの地図帳は別包みです。修理完了にはしないでください/);
  const reorganization=await document(p,'YH-2022-017');
  assert.match(reorganization,/継舟/);
+ assert.match(reorganization,/KS-1986-04[\s\S]*今回の測定値[\s\S]*旧個人別区分票の照合は本件に含めない/);
+ const decisionCopy=await download(p,'a[href$="YH-2022-017.pdf"]','reorganization-decision.pdf');
+ assert.deepEqual(decisionCopy.data,await fs.readFile('private/record-media/YH-2022-017.pdf'));
  if(process.env.PLAYTEST_LAB==='1'){
   const protocolId=reorganization.match(/AP-2022-\d{3}/)[0];
   const protocol=await document(p,protocolId);

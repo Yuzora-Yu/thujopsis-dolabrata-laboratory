@@ -30,7 +30,7 @@
 | 22 | 旧資料基盤へ進む | second-login | transfer |
 | 23 | 継舟計画と新施設の断絶を読む | transfer | old-project |
 | 24 | 施設自身の会員領域へ入る | transfer | institution |
-| 25 | どの時点で旧研究が再開されたかを知る | institution, old-project | renewal |
+| 25 | 旧区分を現行評価に使うと決めた日と範囲を知る | institution, old-project | renewal |
 | 26 | 病気・自殺という説明の奥にある記録を照合する | institution | death |
 | 27 | 生存している工房担当者へ原本照会を送る | institution | current |
 | 28 | 受け取った資料の提出先を選ぶ | current | report |
@@ -482,6 +482,8 @@
 根拠と、その時点で読めるページ：
 
 - /members/records/AH-2017-009/ — BRANCH · 162 / 263／閲覧者 ashita。確認する記載：旧基盤・資料照会室。
+- /collections/items/0002/ — SPROUT · 203 / 263。確認する記載：移管を禁じる、ks-1945-02.pdf。
+- /collections/items/0003/ — SPROUT · 204 / 263。確認する記載：個人別区分票、今回の受入に含まれない、ks-1986-04.pdf。
 - /snapshots/2011/ — SPROUT · 200 / 263。確認する記載：旧事業の承継を行わず。
 - /collections/items/0004/ — SPROUT · 205 / 263。確認する記載：辞退、RG-2007-011。
 
@@ -515,14 +517,14 @@
 
 次に接続する段階：death、current、renewal
 
-## 25. どの時点で旧研究が再開されたかを知る
+## 25. 旧区分を現行評価に使うと決めた日と範囲を知る
 
 前提：institution、old-project。
 
 根拠と、その時点で読めるページ：
 
 - /members/records/RG-2007-011/ — CANOPY · 164 / 263／閲覧者 institution。確認する記載：同意しません。
-- /members/records/YH-2022-017/ — CANOPY · 166 / 263／閲覧者 institution。確認する記載：継舟、設立経緯。
+- /members/records/YH-2022-017/ — CANOPY · 166 / 263／閲覧者 institution。確認する記載：継舟、設立経緯、今回の測定値、2022年8月19日。
 
 段階別ヒント案：
 
@@ -530,7 +532,7 @@
 2. 資料の存在だけでは、榊原が再開を承認したとは言えない。
 3. 2007年の拒絶と2022年の再編決裁を照合する。
 
-作者用の解答・解釈：死後の理事会が旧区分を現行評価へ接続した。
+作者用の解答・解釈：2022年8月19日付で深町・久世が旧区分を新しい測定結果に適用した。1945年の個票と1986年の受領範囲を分けて読む。決裁前にも旧区分との比較は行われていた。
 
 次に接続する段階：death、prototype
 

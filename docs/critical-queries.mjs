@@ -17,6 +17,8 @@ export const siteQueries=[
  {word:'朝倉紬乃',source:'受領ZIP内の告発書PDF',destination:'/people/asakura-tsumugi/',purpose:'End2になる前に、氏名と生年月日を確認する。'},
 ];
 export const catalogQueries=[
+ {word:'KS-1945-02',source:'1943年実施概要の保存注記',destination:'/collections/items/0002/',purpose:'研究停止と個票・設備の取扱いを処理簿で照合する。'},
+ {word:'KS-1986-04',source:'1945年処理簿の目録ページ／YH-2022-017',destination:'/collections/items/0003/',purpose:'1986年に受け入れた二点と、受領の範囲外を確かめる。'},
  {word:'NK-2022-0908',source:'FAB-2022-071の新聞切抜／旧基盤入口はAH-2017-009',destination:'/collections/items/0011/',purpose:'活動終了と、家族が確認できない所在の食い違い。'},
  {word:'NK-2023-0622',source:'FAM-2022-009／旧基盤入口はAH-2017-009',destination:'/collections/items/0012/',purpose:'三枝の業務終了と、本人不在を報じる続報。'},
  {word:'NK-2021-1105',source:'新聞初刷、保存目録',destination:'/collections/items/0010/',purpose:'自殺説の撤回を確認する。初刷0009は目録の欠番から直接開く。'},
