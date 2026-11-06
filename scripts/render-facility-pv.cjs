@@ -2,7 +2,15 @@
 const {chromium}=require(process.env.ASUNARO_NODE_MODULES?process.env.ASUNARO_NODE_MODULES+'/playwright':'playwright');
 const fs=require('node:fs/promises'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'.work','qa','pv');
-const source={east:'media/f-home-east.webp',exterior:'exterior.webp',shop:'workshop.webp',moon:'media/lunar-habitat-concept.webp',reception:'media/f-reception.webp',logo:'logo.png'};
+const source={
+ east:'media/f-home-east.webp',
+ exterior:'exterior.webp',
+ shop:'workshop.webp',
+ exhibit:'media/g-metal-lattice.webp',
+ moon:'media/lunar-habitat-concept.webp',
+ reception:'media/f-reception.webp',
+ logo:'logo.png',
+};
 
 (async()=>{
  await fs.mkdir(out,{recursive:true});
@@ -16,7 +24,7 @@ const source={east:'media/f-home-east.webp',exterior:'exterior.webp',shop:'works
   await page.setContent('<body style="margin:0;background:#101616"><canvas width="1280" height="720"></canvas></body>');
   const result=await page.evaluate(async data=>{
    const W=1280,H=720,canvas=document.querySelector('canvas'),g=canvas.getContext('2d',{alpha:false});
-   const duration=30,blankStart=24.55,blankEnd=25.32;
+   const duration=30,cueStart=24.55,cueEnd=25.32;
    const images=Object.fromEntries(await Promise.all(Object.entries(data).map(async([key,url])=>{const img=new Image();img.src=url;await img.decode();return [key,img];})));
    const type=['video/mp4;codecs=avc1.42001f,mp4a.40.2','video/webm;codecs=vp9,opus'].find(x=>MediaRecorder.isTypeSupported(x));
    if(!type)throw new Error('No local video encoder available');
@@ -41,9 +49,9 @@ const source={east:'media/f-home-east.webp',exterior:'exterior.webp',shop:'works
        +.023*Math.sin(tau*237*time)+.011*Math.sin(tau*359*time);
      const outside=windowGain(time,5,9,.36);
      const atmosphere=(1-outside)*(.09*air+vent)+outside*.17*air;
-     const tone=(windowGain(time,.4,4.75,1.15)+windowGain(time,14.15,17.9,.7)+windowGain(time,27.1,29.85,.85))
+     const tone=(windowGain(time,.4,4.75,1.15)+windowGain(time,14.15,18.8,.7)+windowGain(time,27.1,29.85,.85))
        *(.018*Math.sin(tau*261.63*time)+.011*Math.sin(tau*392*time));
-     const handover=1-.978*windowGain(time,blankStart,blankEnd,.055);
+     const handover=1-.72*windowGain(time,cueStart,cueEnd,.075);
      samples[i]=(atmosphere+tone)*handover*windowGain(time,0,duration,.42);
     }
     return buffer;
@@ -73,17 +81,25 @@ const source={east:'media/f-home-east.webp',exterior:'exterior.webp',shop:'works
     g.fillStyle='#211711c9';g.fillRect(1044,631,182,38);
     text('4階 食堂・カフェ',1058,657,20,{color:'#f0e9d6'});
    }
-   function status(t){
-    g.fillStyle='#152927';g.fillRect(0,0,W,H);
-    g.strokeStyle='#536f62';g.lineWidth=1;g.strokeRect(78,82,1124,552);
-    text('あすなろ産業支援交流施設  /  4F',120,146,23,{color:'#c8dac5'});
-    text('見学のご案内',120,258,54);
-    g.beginPath();g.moveTo(120,301);g.lineTo(1154,301);g.stroke();
-    text('受付場所',120,376,29);text('受付時間',120,455,29);
-    text('4階 中央受付',410,376,29,{color:'#dce8be'});text('平日 9:00–17:00',410,455,29,{color:'#dce8be'});
-    g.strokeRect(830,335,324,184);text('受付確認',856,392,23,{color:'#bdd0bf'});
-    if(t<blankStart||t>=blankEnd)text(t<blankStart?'確認中':'受付済',856,465,34);
-    text('ご来館ありがとうございます。',120,584,20,{color:'#c8dac5'});
+   function visitorBoard(t){
+    const ink='#263c34',muted='#4c6658';
+    g.fillStyle='#f3f3ea';g.fillRect(0,0,W,H);
+    g.fillStyle='#dce4d0';g.fillRect(846,76,340,458);
+    g.drawImage(images.logo,92,83,48,48);
+    text('あすなろ産業支援交流施設',158,116,25,{color:ink});
+    text('見学のご案内',92,252,62,{color:ink});
+    g.strokeStyle='#98aa98';g.lineWidth=1;
+    g.beginPath();g.moveTo(92,286);g.lineTo(790,286);g.stroke();
+    text('受付場所',94,374,26,{color:muted});
+    text('4階 中央受付',284,374,36,{color:ink});
+    text('受付時間',94,447,26,{color:muted});
+    text('平日 9:00–17:00',284,447,36,{color:ink});
+    text('ラウンジと共用エリアをご案内します。',94,531,25,{color:ink});
+    text('4F',914,331,125,{color:'#3a5949'});
+    text('中央受付',925,403,31,{color:ink});
+    g.beginPath();g.moveTo(92,585);g.lineTo(1186,585);g.stroke();
+    text('館内掲示',94,627,22,{color:muted});
+    text(t>=cueStart&&t<cueEnd?'17:14　呼出継続':'見学案内　2026年10月版',860,627,22,{color:muted});
    }
    function frame(t){
     if(t<5){
@@ -92,22 +108,24 @@ const source={east:'media/f-home-east.webp',exterior:'exterior.webp',shop:'works
      cover('exterior',t-5,.5,.6);lower('ASUNARO','あすなろ産業支援交流施設');
     }else if(t<14){
      cover('shop',t-9,.64,.64);lower('4F / 工房2','道具を、つくってみる。');
-    }else if(t<18){
-     cover('moon',t-14,.68,.5);lower('あすなろの企画展示','月に、暮らしを持っていく。');
-     text('月面居住区 構想図',1020,672,20,{color:'#e5e5da'});
+    }else if(t<16.7){
+     cover('exhibit',t-14,.5,.46);lower('4F 企画展示','金属3Dプリンターの試験片');
+    }else if(t<19.2){
+     cover('moon',t-16.7,.68,.5);lower('月面居住区 構想図','月に、暮らしを持っていく。');
     }else if(t<23){
-     cover('reception',t-18,.5,.64);lower('4F / 中央受付','見学は、中央受付へ。');
+     cover('reception',t-19.2,.5,.64);lower('4F / 中央受付','見学は、中央受付へ。');
     }else if(t<27){
-     status(t);
+     visitorBoard(t);
     }else{
      g.fillStyle='#edf1e4';g.fillRect(0,0,W,H);
      g.drawImage(images.logo,100,227,104,104);
      text('あすなろ産業支援交流施設',228,296,49,{color:'#21382f'});
      text('ともに、明日をつくる。',229,362,29,{color:'#4f6858'});
-     text('この映像は作品内の架空の施設を紹介するものです。',100,651,18,{color:'#4f6858'});
+     text('この映像は、架空の施設を紹介する作品です。',100,650,29,{color:'#354e40'});
+     text('© YU-ZORA',1015,650,22,{color:'#4f6858'});
     }
    }
-   const samples=[2.4,7.2,11.6,15.6,20.5,25,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
+   const samples=[2.4,7.2,11.6,15.2,17.8,21.2,24.1,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
    frame(0);
    const audio=new AudioContext({sampleRate:48000});
    const audioCapture=audio.createMediaStreamDestination();
