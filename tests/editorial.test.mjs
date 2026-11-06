@@ -79,7 +79,13 @@ test('public facility routes do not announce the old archive and the first clipp
 
 test('author search inventory names real results in the appropriate search surface',()=>{
  for(const item of siteQueries)assert.ok(searchEntries.filter(entry=>matchesSearch(entry,item.word)).some(entry=>entry.url===item.destination),item.word);
- for(const item of catalogQueries)assert.ok(archiveItems.filter(entry=>entry.listed&&matchesSearch({title:entry.title,text:entry.code+' '+entry.year},item.word)).some(entry=>item.destination===`/collections/items/${entry.id}/`),item.word);
+ for(const item of catalogQueries){
+  const catalogue=renderLegacy('/collections/',{origins,session:{},query:new URLSearchParams({q:item.word})});
+  assert.ok(catalogue.includes(`href="${item.destination}"`),item.word);
+ }
+ const late=renderLegacy('/collections/',{origins,session:{},query:new URLSearchParams({q:'ＮＫ−２０２１–１１０４'})});
+ assert.match(late,/同封　11月4日地域版 後刷（NK-2021-1104）/);
+ assert.doesNotMatch(late,/href="\/collections\/items\/0009\/"/);
 });
 
 test('news retention applies to visibility, direct URLs and the public search index',()=>{

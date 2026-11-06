@@ -206,7 +206,14 @@ test('publication numbers form tight sequences independent of account registrati
 test('public search tolerates spacing, width and full publication dates; member links open a separate tab',async()=>{
  const c=client();for(const q of ['朝倉紬乃','朝倉 紬乃','朝倉　紬乃','朝 倉  紬'])assert.match((await c.get('/search/?q='+encodeURIComponent(q))).text,/href="\/people\/asakura-tsumugi\//,q);
  assert.match((await c.get('/search/?q='+encodeURIComponent('３Ｄプリンター'))).text,/工房のご案内/);
- assert.match((await c.get('/search/?q='+encodeURIComponent('４１１ 号室'))).text,/href="\/tenants\/0008\//);
+ assert.match((await c.get('/search/?q='+encodeURIComponent('４１１ 号室'))).text,/href="\/tenants\/0008\/[\s\S]*?過去入居（2014–2019）/);
+ for(const [query,expected,other] of [
+  ['Ａ４−０１','/news/20120416/','/floor-map/'],['Ａ４–０９','/floor-map/','/news/20120416/'],
+ ]){
+  const result=(await c.get('/search/?q='+encodeURIComponent(query))).text.split('<div class="search-results">')[1].split('</div>')[0];
+  assert.ok(result.includes(`href="${expected}"`),query);
+  assert.ok(!result.includes(`href="${other}"`),query);
+ }
  assert.doesNotMatch((await c.get('/search/?q='+encodeURIComponent('４１２号室'))).text,/href="\/tenants\/0013\//);
  for(const q of ['2012年4月16日掲載','２０１２ 年 ４ 月 １６ 日','2012/4/16','2012.04.16','2012-04-16','20120416']){
   const result=(await c.get('/search/?q='+encodeURIComponent(q))).text;

@@ -10,6 +10,7 @@ export const siteQueries=[
  {word:'三枝律',source:'取材記事／共同試作の連絡',destination:'/people/saegusa-ritsu/',purpose:'公開上の業務終了日を、非公開原本と照合する。'},
  {word:'榊原惟臣',source:'施設案内、灯の経歴',destination:'/news/20211103/',purpose:'公式な訃報と死因説明を読む。'},
  {word:'A4-01',source:'MX-2019-410',destination:'/news/20120416/',purpose:'一覧から外れた開設時の原図へ進む。'},
+ {word:'A4-09',source:'現行4階フロアマップの図面番号',destination:'/floor-map/',purpose:'現行の来館案内を番号で引き直す。'},
  {word:'開設時の区画配置',source:'MX-2019-410',destination:'/news/20120416/',purpose:'A4-01と同じ記事へ至る別の検索語。'},
  {word:'2012年4月16日掲載',source:'MX-2019-410／YH-2016-032の追記',destination:'/news/20120416/',purpose:'掲載日をそのまま転記して同じ記事へ至る。'},
  {word:'2023年6月16日',source:'PUB-2023-014の広報欄',destination:'/news/20230616/',purpose:'東側通路の整備を告知した掲載日の記事へ。'},
@@ -22,6 +23,7 @@ export const catalogQueries=[
  {word:'NK-2022-0908',source:'FAB-2022-071の新聞切抜／旧基盤入口はAH-2017-009',destination:'/collections/items/0011/',purpose:'活動終了と、家族が確認できない所在の食い違い。'},
  {word:'NK-2023-0622',source:'FAM-2022-009／旧基盤入口はAH-2017-009',destination:'/collections/items/0012/',purpose:'三枝の業務終了と、本人不在を報じる続報。'},
  {word:'NK-2021-1105',source:'新聞初刷、保存目録',destination:'/collections/items/0010/',purpose:'自殺説の撤回を確認する。初刷0009は目録の欠番から直接開く。'},
+ {word:'NK-2021-1104',source:'公開されている11月4日地域版後刷の紙面',destination:'/collections/items/0010/',purpose:'同じ収蔵番号の公開後刷を、同封先の訂正欄で引き直す。'},
 ];
 export const directInputs=[
  {kind:'旧募集記事URL',input:'/news/20160520/',source:'CONS-2016-005 → RE-2016-002の原掲載URL',purpose:'無償滞在・館内利用と、参加の取り消しによる退出を確認。通常一覧と検索からは出ない。'},

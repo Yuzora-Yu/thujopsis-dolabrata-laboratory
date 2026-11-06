@@ -6,6 +6,8 @@ import {expandNews} from './world/news.mjs';
 import {extraAccounts} from './world/accounts.mjs';
 import {researchRecords} from './world/records.mjs';
 import {enrichPublicPeople,humanSearchEntries} from './world/people.mjs';
+export const floorGuideCode='A4-09';
+
 export const facility = {
   name: 'あすなろ産業支援交流施設',
   en: 'ASUNARO INDUSTRY & EXCHANGE',
@@ -73,9 +75,12 @@ export const searchEntries = [
  {title:'工房のご案内',url:'/workshop/',text:'3Dプリンター レーザーカッター 試作 ものづくり'},
  {title:'料金のご案内',url:'/price/',text:'利用料金 月額 会議室 工房'},
  {title:'月額会員・入会のご案内',url:'/membership/',text:'入会 会員 新規受付'},
- {title:'4階フロアマップ',url:'/floor-map/',text:'フロアマップ 案内図 会議室 ラウンジ'},
+ {title:'4階フロアマップ',url:'/floor-map/',text:`${floorGuideCode} フロアマップ 案内図 中央受付 会議室 ラウンジ`,summary:`4階案内図 ${floorGuideCode}。中央受付や会議室、ラウンジへの行き方をご確認いただけます。`},
  {title:'入居者紹介',url:'/tenants/',text:'入居企業 過去入居 企業紹介 活動報告'},
- ...tenants.filter(t=>t.listed).map(t=>({title:t.name,url:`/tenants/${t.page}/`,text:`${t.room}号室　${t.business}　${t.description}`})),
+ ...tenants.filter(t=>t.listed).map(t=>({
+  title:t.name,url:`/tenants/${t.page}/`,text:`${t.room}号室　${t.business}　${t.description}`,
+  summary:`${t.room}号室 ／ ${t.status}（${t.period}）　${t.business}`,
+ })),
  ...news.filter(n=>n.listed||n.searchable).map(n=>({
   title:n.title,url:`/news/${n.id}/`,published:n.date.replaceAll('.','-'),summary:n.body,
   text:n.restored?(n.keywords??''):[n.body,...(n.sections||[]).flat(),...(n.facts||[]).flat()].join(' '),

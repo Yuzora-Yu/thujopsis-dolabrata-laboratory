@@ -345,6 +345,8 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .gallery-card:target,.tenant-card:target{outline:2px solid #889f91;outline-offset:3px}
 .gallery-card[hidden]{display:none}
 .legacy-catalog>.legacy-row[hidden]{display:none}
+.legacy-row>.catalogue-supplement{grid-column:3;font-family:inherit;font-size:.78rem;color:#4d6058}
+@media(max-width:520px){.legacy-row>.catalogue-supplement{grid-column:1/-1}}
 .gallery-photo-button{position:relative}
 .gallery-zoom-label{position:absolute;right:.8rem;bottom:.8rem;padding:.45rem .7rem;background:#fff;color:#243e37;font-size:.78rem;box-shadow:0 1px 8px #152a2a24}
 .search-scope{font-size:.86rem;color:var(--muted);margin:0 0 .7rem}

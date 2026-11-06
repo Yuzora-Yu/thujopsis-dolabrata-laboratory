@@ -1,13 +1,15 @@
+const dashVariants=/[‐‑‒–—−]/gu;
+
 export function normalizeSearch(value='') {
   return String(value).normalize('NFKC').toLocaleLowerCase('ja-JP')
     .replace(/[\s\u200b\ufeff・·]+/gu,'')
+    .replace(dashVariants,'-')
     .replace(/[ァ-ヶ]/g,char=>String.fromCharCode(char.charCodeAt(0)-0x60));
 }
 
 function publicationDate(term){
  const date=term.replace(/(?:掲載|公開)$/u,'')
-  .replace(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/u,'$1-$2-$3')
-  .replace(/[‐‑‒–—−]/gu,'-');
+  .replace(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/u,'$1-$2-$3');
  const parts=date.match(/^(\d{4})([./-])(\d{1,2})\2(\d{1,2})$/u);
  if(parts)return `${parts[1]}-${parts[3].padStart(2,'0')}-${parts[4].padStart(2,'0')}`;
  return date.replace(/^(\d{4})(\d{2})(\d{2})$/u,'$1-$2-$3');
@@ -28,7 +30,7 @@ export function searchExcerpt({summary,text}){
 }
 
 export function normalizeDocumentId(value=''){
- return String(value).normalize('NFKC').toUpperCase().replace(/[‐‑‒–—−]/gu,'-').replace(/\s+/gu,'');
+ return String(value).normalize('NFKC').toUpperCase().replace(dashVariants,'-').replace(/\s+/gu,'');
 }
 
 export const documentLookupMessages = {

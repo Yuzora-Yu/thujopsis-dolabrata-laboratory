@@ -149,7 +149,14 @@ async function traceNewspaper(page,archive){
  assert.match(await correctionLink.getAttribute('href'),/\/collections\/items\/0010\/$/);
  const firstPrintCode=await archive.locator('.legacy-record-meta').innerText();
  await archive.getByRole('link',{name:'収蔵目録へ',exact:true}).click();
- await search(firstPrintCode.match(/NK-\d{4}-\d{4}/)[0]);
+ await search(firstPrintCode.match(/NK-\d{4}-\d{4}/)[0].replaceAll('-','−'));
+ await archive.getByText('収蔵資料・公開対象 ／ 1件',{exact:true}).waitFor();
+ const backPrintResult=catalog.locator('a:visible');
+ assert.equal(await backPrintResult.count(),1);
+ assert.match(await backPrintResult.getAttribute('href'),/\/collections\/items\/0010\/$/);
+ assert.match(await backPrintResult.innerText(),/同封　11月4日地域版 後刷（NK-2021-1104）/);
+ assert.equal(await catalog.locator('a[href$="/0009/"]').count(),0);
+ await search('11月4日地域版 初刷');
  await catalog.getByText('該当する資料はありません。',{exact:true}).waitFor();
  assert.equal(await catalog.locator('a:visible').count(),0);
  await archive.getByRole('link',{name:'資料照会室',exact:true}).click();
@@ -382,7 +389,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const siteSearch=p.locator('.search-dialog');
  await siteSearch.getByRole('searchbox').fill(oldRoom+'号室');
  await siteSearch.getByRole('button',{name:'検索',exact:true}).click();
- await p.locator('.search-results').getByRole('link',{name:/トリム部品設計/}).click();
+ const oldTenant=p.locator('.search-results').getByRole('link',{name:/トリム部品設計/});
+ assert.match(await oldTenant.innerText(),/411号室 ／ 過去入居（2014–2019）/);
+ await oldTenant.click();
  assert.match(await p.locator('#activities').innerText(),/2019\.09\.20[\s\S]*名札を受付へ返しました/);
  await p.goto(main('/news/'));assert.equal(await p.locator('.news-rows a[href*="20120416"]').count(),0);assert.equal(await p.locator('.news-rows a[href*="20120903"]').count(),0);
  const fabricationId=observation.match(/FAB-2020-\d{3}/)[0];

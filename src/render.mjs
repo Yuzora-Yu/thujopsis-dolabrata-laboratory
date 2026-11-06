@@ -2,7 +2,7 @@ import {programPath,programTitle,programNotesPath,programBanner,programExhibit,p
 import {tenantExhibits} from './world/tenant-exhibits.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
 import {editorialPages,facilityInfo} from './world/editorial.mjs';
-import {facility, gallery, tenants, news, searchEntries, tenantMaterialEntries} from './content.mjs';
+import {facility, floorGuideCode, gallery, tenants, news, searchEntries, tenantMaterialEntries} from './content.mjs';
 import {matchesSearch,searchExcerpt} from './search.mjs';
 import {seedNotes,seedNoteTotal,seedCollectionPath} from './seed-notes.mjs';
 import {workshopEquipment} from './world/workshop-equipment.mjs';
@@ -345,7 +345,7 @@ function floorGuide(paused){
  return layout('4階フロアマップ',heading('FLOOR GUIDE','4階フロアマップ',paused?'4階の施設と共用設備の配置をご確認いただけます。':'4階にお着きになりましたら、中央受付へお立ち寄りください。')+(paused?facilityUseNotice():'')+`
   <section class="wrap floor-section">
    <div class="map-toolbar" id="floor-plan"><span>4F　産業支援交流フロア</span><a href="/assets/asunaro-4f.pdf" target="_blank" rel="noopener">PDFを開く<span class="sr-only">（別タブで開きます）</span></a></div>
-   ${mapPreview('floor-4f.svg','4階案内図 A4-09。西側の個室番号は、北から402〜407、408・409・413、414〜416。南寄りに工房1・2。中央受付は中央エレベーターから右へ進み、左折。受付手前の撮影位置から右手にラウンジ入口。企画展示はラウンジの南側の通路。','フロアマップを拡大',true)}
+   ${mapPreview('floor-4f.svg',`4階案内図 ${floorGuideCode}。西側の個室番号は、北から402〜407、408・409・413、414〜416。南寄りに工房1・2。中央受付は中央エレベーターから右へ進み、左折。受付手前の撮影位置から右手にラウンジ入口。企画展示はラウンジの南側の通路。`,'フロアマップを拡大',true)}
    <div class="map-legend"><span><i class="legend-office"></i>オフィス・工房</span><span><i class="legend-common"></i>交流・会議スペース</span><span><i class="legend-admin"></i>管理・共用設備</span></div>
    <section class="floor-arrival" id="arrival" aria-labelledby="floor-arrival-title">
     <div><p class="eyebrow">4F RECEPTION</p><h2 id="floor-arrival-title">${paused?'図面上の中央受付':'エレベーターから中央受付へ'}</h2>

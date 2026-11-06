@@ -25,8 +25,14 @@ function renderLegacyPage(path,ctx){
  if(path==='/')return legacyLayout('資料の保存について','<p>当保存室は、旧産業継続研究準備室が管理していた資料の一部を保存しております。収蔵目録は保存単位ごとに掲載しています。</p><dl class="legacy-info"><dt>公開画面の保存</dt><dd>取得時点の固定記録です。現在の事業案内とは異なる場合がございます。</dd><dt>資料照会室</dt><dd>移管・保守契約に基づく継続業務の窓口です。公開保存画面とは別に管理しております。</dd></dl><p><a href="/collections/">収蔵目録</a></p><p><a href="/snapshots/">公開画面の保存</a></p>');
  if(path==='/collections/'){
  const keyword=ctx.query?.get('q')?.trim()||'';
- const items=archiveItems.filter(i=>i.listed&&(!keyword||matchesSearch({title:i.title,text:i.code+' '+i.year},keyword)));
- return legacyLayout('収蔵目録',`<form method="get" action="/collections/" class="record-form"><label for="collection-query">収蔵番号・資料名</label><div class="search-box"><input id="collection-query" name="q" value="${esc(keyword)}"><button type="submit">検索</button></div></form><p class="small" data-collection-count>収蔵資料・公開対象${keyword?' ／ '+items.length+'件':''}</p><div class="legacy-catalog">${items.map(i=>`<a class="legacy-row" data-collection-key="${esc(i.code+' '+i.year)}" href="/collections/items/${i.id}/"><span>No.${i.id}</span><time>${i.year}</time><strong>${esc(i.title)}</strong><small>${i.code}</small></a>`).join('')}<p data-collection-empty${items.length?' hidden':''}>該当する資料はありません。</p></div>`);
+ const items=archiveItems.filter(item=>item.listed).map(item=>{
+  const related=item.relatedEdition;
+  const relatedCode=pressClippings[related?.clipping]?.code;
+  const text=[item.code,item.year,related?.label,relatedCode].filter(Boolean).join(' ');
+  const supplement=related?`<span class="catalogue-supplement">同封　${esc(related.label)}${relatedCode?`（${esc(relatedCode)}）`:''}</span>`:'';
+  return {item,text,supplement};
+ }).filter(({item,text})=>!keyword||matchesSearch({title:item.title,text},keyword));
+ return legacyLayout('収蔵目録',`<form method="get" action="/collections/" class="record-form"><label for="collection-query">収蔵番号・資料名</label><div class="search-box"><input id="collection-query" name="q" value="${esc(keyword)}"><button type="submit">検索</button></div></form><p class="small" data-collection-count>収蔵資料・公開対象${keyword?' ／ '+items.length+'件':''}</p><div class="legacy-catalog">${items.map(({item,text,supplement})=>`<a class="legacy-row" data-collection-key="${esc(text)}" href="/collections/items/${item.id}/"><span>No.${item.id}</span><time>${item.year}</time><strong>${esc(item.title)}</strong><small>${esc(item.code)}</small>${supplement}</a>`).join('')}<p data-collection-empty${items.length?' hidden':''}>該当する資料はありません。</p></div>`);
  }
  const item=archiveItems.find(i=>path===`/collections/items/${i.id}/`);
  if(item){
