@@ -193,7 +193,9 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 }
 
 .site-header{position:sticky;top:0;z-index:20}
-@media(max-width:800px){#main-navigation.open{max-height:calc(100dvh - 82px);overflow-y:auto}}
+@media(max-width:800px){#main-navigation.open{max-height:calc(100dvh - 82px);overflow-y:auto}
+#main-navigation .mobile-nav-link{display:none}
+@media(max-width:800px){#main-navigation .mobile-nav-link{display:block}}}
 .seed-note-line:not(caption){display:flex;align-items:center;flex-wrap:wrap;gap:.15rem .25rem}
 .seed-note-line-center,.news-index-note{justify-content:center}
 .seed-note,.filter-form .seed-note{

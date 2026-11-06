@@ -7,8 +7,13 @@ async function checkMenuNotes(browser){
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
  try {
   const page=await context.newPage(),titles=new Set(),labels=new Set();
+  await page.goto(at('/'));
   for (const path of noteRoutes) {
-   await page.goto(at(path));
+   if(path!=='/'){
+    await page.getByRole('button',{name:/MENU/}).click();
+    await page.locator('#main-navigation a[href="'+new URL(at(path)).pathname+'"]').click();
+    await page.waitForURL(at(path));
+   }
    const marker=page.locator('main .seed-note');
    assert.equal(await marker.count(),1,path);
    assert.equal(await page.locator('.site-footer .seed-note').count(),0,path);
@@ -26,7 +31,8 @@ async function checkMenuNotes(browser){
   assert.equal(titles.size,noteRoutes.length);
   assert.equal(labels.size,noteRoutes.length);
   assert.equal(await page.locator('.seed-collection-nav a').count(),0);
-  await page.goto(at('/visit/'));
+  await page.getByRole('main').getByRole('link',{name:'見学のご案内',exact:true}).click();
+  await page.waitForURL(at('/visit/'));
   assert.equal(await page.locator('body.seed-drift-active').count(),0);
   await page.getByRole('button',{name:'17:06 差替',exact:true}).click();
   const finalNote=page.getByRole('dialog');
