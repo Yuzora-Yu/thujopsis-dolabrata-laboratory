@@ -1,3 +1,4 @@
+import {recordMedia,mayReadRecordMedia} from '../src/record-media.mjs';
 import {readFile,writeFile,mkdir,cp,unlink} from 'node:fs/promises';
 import {createHash,createCipheriv,pbkdf2Sync,randomBytes} from 'node:crypto';
 import path from 'node:path';
@@ -64,6 +65,16 @@ async function encryptedBundle(namespace,id,password,payload){
  const encrypted=Buffer.concat([cipher.update(JSON.stringify(payload),'utf8'),cipher.final(),cipher.getAuthTag()]);
  await writeFile(path.join(out,'assets/portal',identifier+'.json'),JSON.stringify({format:1,iterations,salt:salt.toString('base64'),iv:iv.toString('base64'),data:encrypted.toString('base64')}));
 }
+// Large attachments have separate ciphertext; the credential bundle carries
+// keys only for the editions accessible to that role. Fetch on explicit click.
+const protectedMedia={};await mkdir(path.join(out,'assets/record-media'),{recursive:true});
+for(const file of recordMedia){
+ const key=randomBytes(32),iv=randomBytes(12),relative='assets/record-media/'+randomBytes(20).toString('hex')+'.json';
+ const cipher=createCipheriv('aes-256-gcm',key,iv),clear=await readFile('private/record-media/'+file.filename);
+ const encrypted=Buffer.concat([cipher.update(clear),cipher.final(),cipher.getAuthTag()]);
+ await writeFile(path.join(out,relative),JSON.stringify({iv:iv.toString('base64'),data:encrypted.toString('base64')}));generated.push(relative);
+ protectedMedia[file.filename]={name:file.filename,type:file.type,path:base+'/'+relative,key:key.toString('base64')};
+}
 for(const [id,account] of Object.entries(accounts)){
  const baseContext={...ctxBase,account};const pages={};
  for(const route of portalPaths.filter(p=>!p.includes('/records/')||p==='/members/records/')){const html=renderMember(route,baseContext);if(html)pages[route]=hosted(html);}
@@ -73,7 +84,7 @@ for(const [id,account] of Object.entries(accounts)){
   stages[key]={};const ctx={...baseContext,caseState:{...value,truth:account.role==='asakura'}};
   for(const route of ['/members/','/members/messages/','/members/activity/','/members/reservations/','/members/contact/received/'])stages[key][route]=hosted(renderMember(route,ctx));
  }
- const downloads={};
+ const downloads=Object.fromEntries(recordMedia.filter(file=>mayReadRecordMedia(file.filename,account.role)).map(file=>[file.filename,protectedMedia[file.filename]]));
  if(account.role==='institution')downloads['hozen.zip']={name:'保全資料_20261102.zip',type:'application/zip',data:baseZip};
  if(account.role==='asakura'){
   downloads['complete.zip']={name:'原本および移送関係資料.zip',type:'application/zip',data:completeZip};
@@ -89,4 +100,4 @@ await writeFile(path.join(out,'assets/site-index.json'),JSON.stringify({edition:
 const manifest=path.join(out,'pages-manifest.json');let previous=[];try{previous=JSON.parse(await readFile(manifest,'utf8'));}catch(e){if(e.code!=='ENOENT')throw e;}
 for(const old of previous.filter(f=>!generated.includes(f))){const target=path.resolve(out,old);if(!target.startsWith(out+path.sep))throw new Error('Invalid generated path');await unlink(target).catch(e=>{if(e.code!=='ENOENT')throw e;});}
 await writeFile(manifest,JSON.stringify(generated));
-console.log(`Built GitHub Pages preview: ${generated.length} pages, encrypted member bundles, base ${base||'/'}.`);
+console.log(`Built GitHub Pages preview: ${generated.filter(file=>file.endsWith('.html')).length} HTML pages, ${recordMedia.length} protected attachments, base ${base||'/'}.`);

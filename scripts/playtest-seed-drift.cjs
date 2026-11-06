@@ -15,8 +15,14 @@ let browser;
  assert.equal(await page.locator('.seed-corrupted img[src*="/assets/effects/"]').count(),2);
  assert.equal(await page.locator('.seed-drift-link').getAttribute('href'),new URL(at('/guide/access/')).pathname);
  await page.locator('.seed-drift-link').click();await page.getByRole('heading',{name:'ページが見つかりません。'}).waitFor();
+ await page.getByRole('navigation',{name:'メインナビゲーション'}).getByRole('link',{name:'入居者一覧',exact:true}).waitFor();
  await page.goBack();await page.locator('body.seed-drift-active').waitFor();
- for(const route of ['/news/','/floor-map/','/workshop/','/membership/','/facilities/cafe/','/visit/']){await page.goto(at(route));await page.locator('.seed-fragment a').waitFor();assert.equal(await page.locator('.seed-fragment a').count(),1,route);}
+ assert.equal(await page.locator('.seed-drift-link').innerText(),'アクセス');
+ await page.goto(at('/news/'));const red=page.getByRole('link',{name:/第5次居住実証 参加者募集について/});await red.waitFor();
+ assert.equal(await red.locator('.news-title').evaluate(node=>getComputedStyle(node).color),'rgb(155, 32, 40)');
+ const response=await Promise.all([page.waitForNavigation(),red.click()]);assert.equal(response[0].status(),404);
+ await page.getByRole('heading',{name:'ページが見つかりません。'}).waitFor();await page.locator('#main-navigation a[href$="/tenants/"]').waitFor();
+ for(const route of ['/floor-map/','/workshop/','/membership/','/facilities/cafe/']){await page.goto(at(route));await page.locator('.seed-fragment a').waitFor();assert.equal(await page.locator('.seed-fragment a').count(),1,route);}
  await page.goto(at('/gallery/0021/'));await page.locator('article.seed-corrupted').waitFor();
  await page.goto(at('/gallery/0022/'));assert.equal(await page.locator('body').getAttribute('data-asunaro-stage'),'root');
  assert.equal((await context.cookies()).some(cookie=>cookie.name===seed.name),false);

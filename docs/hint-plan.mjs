@@ -149,7 +149,7 @@ export const hintPlan = [
         "kind": "member",
         "path": "/members/records/PN-2022-034/",
         "words": [
-          "青井真",
+          "青井真澄",
           "夏帆さんの本",
           "私はそこを見てしまった"
         ],
@@ -1124,7 +1124,7 @@ export const hintPlan = [
         "kind": "private",
         "path": "告発書.pdf",
         "words": [
-          "朝倉 紬",
+          "朝倉 紬乃",
           "20120901P0083"
         ]
       },
@@ -1175,7 +1175,7 @@ export const hintPlan = [
         "kind": "member",
         "path": "/members/records/TR-2026-011/",
         "words": [
-          "榎本航",
+          "榎本航策",
           "EA-2026-009"
         ],
         "role": "asakura"

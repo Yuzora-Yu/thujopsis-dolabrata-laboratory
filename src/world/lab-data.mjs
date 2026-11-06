@@ -1,7 +1,7 @@
 // Fictional historical measurements. Individual worth is not a measurement field.
 export const subjectMeasurements=[
  {id:'P-026',name:'稲葉 澪',date:'2016.10.04',cardHits:2,counts:{deviation:3,emergence:2,precursor:3,early:2,hidden:2,desync:2},note:'案内図の線の間隔を、測定盤でも確かめた。',profile:'/people/inaba-mio/',current:'継続観察／B-04',source:'OPS-2026-084',protected:true},
- {id:'P-031',name:'青井 真',date:'2022.08.19',cardHits:3,counts:{deviation:4,emergence:2,precursor:2,early:1,hidden:1,desync:2},note:'画面の前に、工具の修理へ戻る予定を記入。',profile:'/people/aoi-makoto/',current:'条件調整／B-06',source:'OPS-2026-084',protected:true},
+ {id:'P-031',name:'青井 真澄',date:'2022.08.19',cardHits:3,counts:{deviation:4,emergence:2,precursor:2,early:1,hidden:1,desync:2},note:'画面の前に、工具の修理へ戻る予定を記入。',profile:'/people/aoi-makoto/',current:'条件調整／B-06',source:'OPS-2026-084',protected:true},
  {id:'P-032',name:'安積 透',date:'2022.08.19',cardHits:4,counts:{deviation:2,emergence:1,precursor:1,early:0,hidden:0,desync:2},note:'妹へ持っていくスタンドの形を、呼称欄の余白に描いた。',profile:'/people/azumi-toru/',current:'現所在の資料未受領',source:'GR-2022-009'},
  {id:'P-033',name:'吉野 夏帆',date:'2022.08.19',cardHits:4,counts:{deviation:1,emergence:2,precursor:2,early:1,hidden:1,desync:3},note:'終わったら本を返すので、名前の札を残してほしいと申出。',profile:'/people/yoshino-kaho/',current:'記録終了／2022.09.11',source:'EV-2022-091'},
  {id:'P-034',name:'瀬尾 灯',date:'2022.08.19',cardHits:1,counts:{deviation:3,emergence:2,precursor:2,early:2,hidden:2,desync:2},note:'表示を見ながら、母が読むなら文字を大きくしたいと記入。',profile:'/people/seo-akari/',current:'測定継続／B-07',source:'OPS-2026-084',protected:true},

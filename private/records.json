@@ -20,7 +20,7 @@
     },
     {
       "id": "P-031",
-      "name": "青井 真",
+      "name": "青井 真澄",
       "last_measurement": "2026-10-26",
       "location": "B1-B06",
       "source": "PN-2022-034 / OPS-2026-084"
@@ -28,7 +28,7 @@
   ],
   "health_record": {
     "id": "HC-2021-031",
-    "subject": "榊原恒一",
+    "subject": "榊原惟臣",
     "findings": [
       "交付時の本人意思確認欄が空欄",
       "本人向け管理表と交付原本の不一致",
@@ -47,7 +47,7 @@
     "support_request": "SA-2023-012",
     "public_status": "2023-06-15 業務終了",
     "original_status": "2023-06-14 施設内で死亡。外部診療照会は未承認。",
-    "recipient": "倉橋真紀への退出支援申出は未送信"
+    "recipient": "倉橋真紀乃への退出支援申出は未送信"
   },
   "founding_origin": "OR-2006-004 / 瀬尾文乃の生活と用具の聞き取り、FUM-2010-002の本人意見を踏まえた設立条件",
   "family_inquiry": {

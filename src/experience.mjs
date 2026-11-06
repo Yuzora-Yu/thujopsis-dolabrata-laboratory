@@ -1,3 +1,4 @@
+import {programPath} from './program.mjs';
 import {gallery,tenants,news,documents} from './content.mjs';
 import {editorialPages} from './world/editorial.mjs';
 import {archiveItems,archiveNotes} from './world/archive-data.mjs';
@@ -14,7 +15,7 @@ export const growthStages=[
  {name:'HEARTWOOD',label:'木の芯'},
 ];
 const roleLevels={minamo:2,ordis:3,ashita:4,institution:5,asakura:6};
-const mainPages=['/','/about/','/facilities/','/facilities/coworking/','/facilities/meeting/','/facilities/office/','/facilities/cafe/','/facilities/presentation/','/facilities/hall/','/workshop/','/gallery/','/floor-map/','/membership/','/price/','/visit/','/news/','/privacy/','/search/','/404/',...Object.keys(editorialPages),'/tenants/','/people/asakura-tsumugi/','/people/inaba-mio/'];
+const mainPages=['/','/about/',programPath,'/facilities/','/facilities/coworking/','/facilities/meeting/','/facilities/office/','/facilities/cafe/','/facilities/presentation/','/facilities/hall/','/workshop/','/gallery/','/floor-map/','/membership/','/price/','/visit/','/news/','/privacy/','/search/','/404/',...Object.keys(editorialPages),'/tenants/','/people/asakura-tsumugi/','/people/inaba-mio/'];
 const memberPages=['/members/login/','/members/','/members/reservations/','/members/records/','/members/activity/','/members/messages/','/members/projects/','/members/organization/','/members/contact/','/members/contact/received/','/members/inquiry/','/members/personal/'];
 const entries=[
  ...mainPages.map(path=>({kind:'main',path,level:0})),

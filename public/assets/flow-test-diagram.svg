@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 420" role="img" aria-labelledby="title description">
+ <title id="title">流路確認の試験配管</title>
+ <desc id="description">試験槽の水をポンプで送り、枝Aと枝Bに分けて同じ槽に戻す。図では枝Aの弁を閉じ、枝Bを通る水だけを観察している。</desc>
+ <defs>
+  <marker id="arrow" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0l8 4-8 4z" fill="#a63d43"/></marker>
+ </defs>
+ <rect width="840" height="420" fill="#f6f7f2"/>
+ <g font-family="Meiryo, sans-serif" fill="#273631">
+  <text x="38" y="38" font-size="22" font-weight="bold">流路確認の試験配管</text>
+  <text x="800" y="37" font-size="13" text-anchor="end">2013.08　循環設備の共同試作</text>
+  <path d="M38 53H802" stroke="#aebbb0"/>
+  <text x="63" y="179" font-size="17">試験槽</text>
+  <text x="229" y="367" font-size="16">ポンプ</text>
+  <text x="433" y="132" font-size="17">枝 A　閉</text>
+  <text x="433" y="232" font-size="17">枝 B　開</text>
+  <text x="147" y="104" font-size="15">戻り口</text>
+  <text x="480" y="322" font-size="15">着色水の流れ</text>
+  <text x="38" y="393" font-size="14">枝 A を止めた状態で、枝 B から試験槽への戻りを確認。</text>
+ </g>
+ <g fill="none" stroke="#3b5148" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M67 190V287H179V190"/>
+  <path d="M123 287V329H228M276 329H340V151H451M489 151H675V89H123V207M340 253H451M489 253H675V151"/>
+  <circle cx="252" cy="329" r="23" fill="#f6f7f2"/>
+  <path d="m242 318 22 11-22 11z" fill="#3b5148"/>
+  <path d="m451 139 19 12-19 12zm38 0-19 12 19 12z" fill="#c1c8bd"/>
+  <path d="m451 241 19 12-19 12zm38 0-19 12 19 12z" fill="#f6f7f2"/>
+ </g>
+ <path d="M70 224H176V284H70Z" fill="#aa4047" opacity=".22"/>
+ <g fill="none" stroke="#a63d43" stroke-width="3" marker-end="url(#arrow)">
+  <path d="M156 329H207"/><path d="M340 302V267"/><path d="M361 253H430"/><path d="M510 253H578"/><path d="M675 225V175"/><path d="M586 89H516"/><path d="M123 139V190"/><path d="M421 316H467"/>
+ </g>
+ <path d="M38 372H802" stroke="#c2cac1"/>
+</svg>

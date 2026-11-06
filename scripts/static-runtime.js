@@ -176,7 +176,22 @@ document.addEventListener('click',async event=>{
  const url=new URL(anchor.href,location.href),path=url.pathname.slice(base.length);if(!path.startsWith('/members/download/'))return;
  event.preventDefault();const account=await currentBundle();state=stored(storageKey,state);if(!account||state.ending==='end2'&&account.account.role==='asakura')return;
  const file=account.downloads[path.split('/').filter(Boolean).at(-1)];if(!file||path.endsWith('hozen.zip')&&!state.contact)return;
- const href=URL.createObjectURL(new Blob([bytes(file.data)],{type:file.type})),download=document.createElement('a');download.href=href;download.download=file.name;download.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
+ const message=anchor.closest('.record-media')?.querySelector('[data-record-media-message]');
+ if(anchor.getAttribute('aria-busy')==='true')return;
+ anchor.setAttribute('aria-busy','true');
+ if(message)message.textContent='資料を取得しています。';
+ try{
+  let data;
+  if(file.path){
+   const response=await fetch(file.path);if(!response.ok)throw new Error('Attachment unavailable');const packed=await response.json();
+   const key=await crypto.subtle.importKey('raw',bytes(file.key),{name:'AES-GCM'},false,['decrypt']);
+   data=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(packed.iv)},key,bytes(packed.data));
+   if(stored(authKey)?.id!==account.account.id||stored(storageKey,state).ending==='end2'&&account.account.role==='asakura')throw new Error('Access changed');
+  }else data=bytes(file.data);
+  const href=URL.createObjectURL(new Blob([data],{type:file.type})),download=document.createElement('a');download.href=href;download.download=file.name;download.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
+  if(message)message.textContent='';
+ }catch{if(message)message.textContent='資料を取得できませんでした。ページを開き直してご確認ください。';}
+ finally{anchor.removeAttribute('aria-busy');}
 });
 window.addEventListener('storage',event=>{if(event.key===storageKey){state=stored(storageKey,state);if(!document.querySelector('[data-lab-root]')&&document.querySelector('[data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({trial:trialView(state.consoleTrial),ending:state.ending}));}});
 window.addEventListener('pageshow',event=>{if(event.persisted&&!rendering&&site)void boot();});

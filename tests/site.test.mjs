@@ -63,7 +63,7 @@ test('submission to facility office identifies the informant',async()=>{
  const c=client();const {zip}=await evidence(c);const r=await c.upload('/members/contact/',{subject:'資料の確認',message:'添付資料をご確認ください。'},'資料.zip',zip);assert.equal(r.status,303);assert.equal((await c.get('/people/asakura-tsumugi/')).response.status,404);assert.match((await c.get('/members/messages/')).text,/個人登録は終了/);
 });
 test('name search, personal account and independent submission reveal and stop succession',async()=>{
- const c=client();const {caseId}=await evidence(c);assert.match((await c.get('/search/?q='+encodeURIComponent('朝倉 紬'))).text,/asakura-tsumugi/);assert.match((await c.get('/people/asakura-tsumugi/')).text,/1993年6月18日/);
+ const c=client();const {caseId}=await evidence(c);assert.match((await c.get('/search/?q='+encodeURIComponent('朝倉 紬乃'))).text,/asakura-tsumugi/);assert.match((await c.get('/people/asakura-tsumugi/')).text,/1993年6月18日/);
  await c.login('20120901P0083','19930618');assert.match((await c.get('/members/personal/')).text,/原型継承試験/);assert.match((await c.get('/members/records/AS-2024-002/')).text,/病気の時の言葉/);
  const doc=(await c.get('/members/records/EA-2026-009/')).text;assert.match(doc,/東都研究監査室/);assert.match(doc,/4319/);
  const r=await c.binary('/members/download/complete.zip');const zip=Buffer.from(await r.arrayBuffer());assert.ok(zip.includes(Buffer.from('継承計画.json')));assert.equal((await submitAgency('audit',caseId,zip)).status,303);assert.match((await c.get('/news/closure/')).text,/外部への資料移管/);
@@ -79,7 +79,7 @@ test('publication numbers form tight sequences independent of account registrati
 });
 
 test('public search tolerates spacing and width, and member links open a separate tab',async()=>{
- const c=client();for(const q of ['朝倉紬','朝倉 紬','朝倉　紬','朝 倉  紬'])assert.match((await c.get('/search/?q='+encodeURIComponent(q))).text,/href="\/people\/asakura-tsumugi\//,q);
+ const c=client();for(const q of ['朝倉紬乃','朝倉 紬乃','朝倉　紬乃','朝 倉  紬'])assert.match((await c.get('/search/?q='+encodeURIComponent(q))).text,/href="\/people\/asakura-tsumugi\//,q);
  assert.match((await c.get('/search/?q='+encodeURIComponent('３Ｄプリンター'))).text,/工房のご案内/);
  assert.match((await c.get('/membership/')).text,/href="\/members\/" target="_blank" rel="noopener"/);
  assert.doesNotMatch((await c.get('/')).text,/↗/);
@@ -139,4 +139,15 @@ test('receipt URLs cannot claim an ending for the wrong recipient or undo protec
  await c.upload('/members/contact/',{subject:'原本再提出',message:'重複した資料です。'},'原本.zip',zip);
  assert.equal(app.cases.get(caseId).ending,'end3');assert.equal((await c.get('/people/asakura-tsumugi/')).response.status,200);
  assert.match((await c.get('/members/activity/')).text,/本件の確認は終了しております/);
+});
+
+
+test('printed editions and archival copies follow the underlying record permissions',async()=>{
+ const c=client(),pdf='/members/download/records/YH-2018-041.pdf',annex='/members/download/records/YH-2018-041-A.pdf',scan='/members/download/records/RG-2007-011-scan.jpg';
+ assert.equal((await c.binary(pdf)).status,303);
+ await c.login('201204010017','20080519');const aggregate=await c.binary(pdf);assert.equal(aggregate.status,200);assert.equal(aggregate.headers.get('content-type'),'application/pdf');assert.equal(Buffer.from(await aggregate.arrayBuffer()).subarray(0,5).toString(),'%PDF-');
+ assert.equal((await c.binary(annex)).status,404);assert.equal((await c.binary(scan)).status,404);
+ await c.login('201804010046','20151112');assert.equal((await c.binary(annex)).status,200);
+ await c.login('201204010000','20100615');const copy=await c.binary(scan);assert.equal(copy.status,200);assert.equal(copy.headers.get('content-type'),'image/jpeg');assert.equal(Buffer.from(await copy.arrayBuffer()).readUInt16BE(0),0xffd8);
+ assert.equal((await c.binary('/assets/record-media/YH-2018-041-A.pdf')).status,404);
 });

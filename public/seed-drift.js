@@ -21,7 +21,7 @@
   for(const container of altered){const photo=container.querySelector('img');if(photo?.dataset.seedOriginalSrc){photo.src=photo.dataset.seedOriginalSrc;photo.alt=photo.dataset.seedOriginalAlt;delete photo.dataset.seedOriginalSrc;delete photo.dataset.seedOriginalAlt;}
    const button=container.querySelector('[data-seed-original-open]')||container.closest('[data-seed-original-open]');if(button){button.dataset.imageOpen=button.dataset.seedOriginalOpen;delete button.dataset.seedOriginalOpen;}
    container.classList.remove('seed-corrupted');}
-  altered.clear();document.querySelectorAll('.seed-drift-link,.seed-noise,.seed-fragment').forEach(node=>node.remove());clearTimeout(noiseTimer);
+  altered.clear();document.querySelectorAll('.seed-existing-access').forEach(node=>node.classList.remove('seed-existing-access'));document.querySelectorAll('.seed-drift-link,.seed-drift-news,.seed-noise,.seed-fragment').forEach(node=>node.remove());clearTimeout(noiseTimer);
   const dialog=document.querySelector('.image-dialog');if(dialog?.open&&dialog.querySelector('img')?.src.includes('/assets/effects/seed-'))dialog.close();
  }
  function appearance(playNoise=false){
@@ -33,18 +33,24 @@
    document.querySelectorAll('.gallery-card').forEach(card=>{if(new URL(card.href).pathname.endsWith('/gallery/'+number+'/'))changePhoto(card,number);});
    if(location.pathname.endsWith('/gallery/'+number+'/')){const article=document.querySelector('main article');if(article)changePhoto(article,number);}
   }
-  const footer=document.querySelector('.site-footer');
-  if(footer&&!footer.querySelector('.seed-drift-link')){const link=document.createElement('a');link.className='seed-drift-link';link.href=base+'/guide/access/';link.textContent='この施設が気になる方はこちら…';(footer.querySelector('.footer-links')||footer).append(link);}
-  const path=location.pathname.slice(base.length),fragments={
-   '/':{text:'来館経路の表示を確認できません。',href:'/guide/access/'},
-   '/news/':{text:'次の作品を、まだ待っています。',href:'/people/seo-akari/'},
-   '/workshop/':{text:'持ち主が戻っていないものを、返却済みにしないでください。',href:'/gallery/0021/'},
+  const footer=document.querySelector('.site-footer .footer-links');
+  if(footer&&!footer.querySelector('.seed-drift-link')){
+   const link=document.createElement('a');link.className='seed-drift-link';link.href=base+'/guide/access/';link.textContent='アクセス';
+   const access=[...footer.querySelectorAll('a')].find(a=>a.getAttribute('href')===link.getAttribute('href'));
+   if(access){access.classList.add('seed-existing-access');access.after(link);}else footer.append(link);
+  }
+  const path=location.pathname.slice(base.length),params=new URLSearchParams(location.search);
+  if(path==='/news/'&&!params.get('year')&&!params.get('kind')&&Number(params.get('page')||1)<=1&&!document.querySelector('.seed-drift-news')){
+   const archive=document.querySelector('.news-archive>.news-rows');
+   if(archive){const rows=document.createElement('div'),link=document.createElement('a');rows.className='news-rows seed-drift-news';link.href=base+'/news/20261102-residential/';link.innerHTML='<time datetime="2026-11-02">2026.11.02</time><span class="tag">募集</span><span class="news-title">第5次居住実証 参加者募集について</span>';rows.append(link);archive.before(rows);}
+  }
+  const fragments={
+   '/workshop/':{text:'引取期限を過ぎた試作品について',href:'/gallery/0021/'},
    '/floor-map/':{text:'個室オフィスの利用事業者',href:'/tenants/'},
-   '/membership/':{text:'登録されている事業者の記録',href:'/tenants/'},
-   '/facilities/cafe/':{text:'あの机は、三人分のままです。',href:'/workshop/stories/seo-akari/'},
-   '/visit/':{text:'見学経路の確認',href:'/guide/access/'}
+   '/membership/':{text:'入居事業者一覧',href:'/tenants/'},
+   '/facilities/cafe/':{text:'工房利用者への取材記録',href:'/workshop/stories/seo-akari/'}
   },fragment=fragments[path];
-  if(fragment&&!document.querySelector('.seed-fragment')){const aside=document.createElement('aside'),anchor=document.createElement('a');aside.className='seed-fragment';anchor.href=base+fragment.href;anchor.textContent=fragment.text;aside.append(anchor);const target=document.querySelector('main>.page-heading')||document.querySelector('main>.hero');target?.after(aside);}
+  if(fragment&&!document.querySelector('.seed-fragment')){const aside=document.createElement('aside'),anchor=document.createElement('a');aside.className='seed-fragment';anchor.href=base+fragment.href;anchor.textContent=fragment.text;aside.append(anchor);document.querySelector('main>.page-heading')?.after(aside);}
   if(playNoise&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelector('.seed-noise')?.remove();const noise=document.createElement('div');noise.className='seed-noise';noise.setAttribute('aria-hidden','true');document.body.append(noise);noiseTimer=setTimeout(()=>noise.remove(),480);}
  }
  function refresh({visit=false}={}){

@@ -1,5 +1,5 @@
 from pathlib import Path
-import json, math, html, sys
+import math, html, sys
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4, A3, landscape
 from reportlab.pdfbase import pdfmetrics
@@ -47,8 +47,8 @@ def create_plan(old=False):
     room(480,344,121,49,'工房 2')
     room(480,393,121,49,'工房 1')
     room(619,235,83,94,'管理事務室',ADMIN)
-    rect(619,329,83,25,'#f3f0e4' if old else ADMIN,INK,1.2)
-    text(660,346,'受付',10)
+    rect(619,329,83,25,'#f3f0e4' if old else '#315e52',INK,1.2)
+    text(660,346,'受付',10,color=INK if old else '#ffffff')
     # Four meeting rooms in the east, cafe, coworking, hexagonal presentation space.
     room(718,100,102,108,'会議室 A',COMMON)
     room(820,100,76,58,'会議室 D',COMMON)
@@ -61,7 +61,7 @@ def create_plan(old=False):
             rect(x,183,7,7,'none',INK,.5)
     rect(718,230,175,170,'#f4f1e6' if old else COMMON,INK,1.3)
     text(805,281,'コワーキング',13);text(805,301,'オープンラウンジ',11)
-    polygon([(941,230),(1032,230),(1078,299),(1032,371),(941,371),(897,299)],'#f4f1e6' if old else COMMON,INK,1.3)
+    polygon([(941 if old else 952,230),(1032,230),(1078,299),(1032,371),(941 if old else 952,371),(897 if old else 916,299)],'#f4f1e6' if old else COMMON,INK,1.3)
     text(988,291,'プレゼンテーション',10);text(988,311,'ホール',12)
     for yy in [321,342,363]:
         line(741,yy,871,yy,INK,.5)
@@ -72,8 +72,22 @@ def create_plan(old=False):
         rect(x,467,w,73,'#f4f1e6' if old else ADMIN,INK,1.2);text(x+w/2,508,label,10)
         if old:
             for sy in range(475,532,6):line(x+5,sy,x+20,sy,INK,.35)
-    text(665,413,'エントランス',11);text(665,433,'↓',16)
-    line(603,442,704,442,INK,1)
+    if old:
+        text(665,413,'エントランス',11);text(665,433,'↓',16)
+        line(603,442,704,442,INK,1)
+    else:
+        # Draw only ordinary visitor access. Retain the room footprints and
+        # the unlabelled western zone; this is not a technical service plan.
+        gap='#ffffff'
+        line(788,400,821,400,gap,4)
+        line(601,357,601,378,gap,4);line(601,405,601,426,gap,4)
+        line(893,246,893,373,'#6d8f86',2.8)
+        route='#47796a'
+        line(478,467,478,452,route,2.4);line(478,452,660,452,route,2.4)
+        line(660,452,660,369,route,2.4)
+        polygon([(660,361),(655,371),(665,371)],route,route,.4)
+        text(554,446,'受付への経路',11,color=route)
+        text(799,424,'ラウンジ入口',10,color=route)
     text(400,226,'通路',9);text(390,351,'通路',9)
     # Column grid, source proportions and dimensions.
     for x in [85,171,257,343,429,515,601,718,820,896,1049]:
@@ -93,10 +107,10 @@ def create_plan(old=False):
         text(1130,620,'あすなろ開設準備室',12,'end');text(1130,644,'2012.04.01',14,'end');text(1130,668,'図面番号 A4-01',10,'end')
     else:
         text(85,598,'西側：オフィス・工房',12,'start');text(85,623,'中央：管理事務室・受付',12,'start');text(85,648,'東側：会議室・食堂・ラウンジ・ホール',12,'start')
-        text(1128,640,'2026.04',10,'end');text(1128,663,'あすなろ運営事務局',10,'end')
+        text(1128,640,'2026.10',10,'end');text(1128,663,'あすなろ運営事務局',10,'end')
     # Cardinal direction only; lower floors are intentionally not shown.
     text(1135,488,'N',11);line(1135,499,1135,533,INK,1);polygon([(1135,495),(1131,505),(1139,505)],INK,INK,.5)
-    text(75,692,'A4-01 / ASUNARO INDUSTRY & EXCHANGE',8,'start')
+    text(75,692,('A4-01' if old else 'A4-06')+' / ASUNARO INDUSTRY & EXCHANGE',8,'start')
     return primitives
 
 def write_svg(primitives,target):
@@ -136,6 +150,13 @@ def write_plan_pdf(primitives,target,old):
             else:c.drawString(X(x),Y(y),value)
     c.showPage();c.save()
 
+if '--current-plan-only' in sys.argv:
+    current=create_plan(False)
+    write_svg(current,OUT/'floor-4f.svg')
+    write_plan_pdf(current,OUT/'asunaro-4f.pdf',False)
+    print('Updated the current 4F guide.')
+    raise SystemExit(0)
+
 if '--statement-only' not in sys.argv:
     old=create_plan(True);current=create_plan(False)
     write_svg(old,OUT/'floor-4f-2012.svg');write_svg(current,OUT/'floor-4f.svg')
@@ -148,12 +169,12 @@ story=[]
 def p(t,style=normal):story.append(Paragraph(t,style));story.append(Spacer(1,8))
 p('あすなろ産業支援交流施設における<br/>研究運用および記録の保全に関する申出',title)
 p('2026年11月2日')
-table=Table([[Paragraph('申出者',normal),Paragraph('朝倉 紬',normal)],[Paragraph('所属',normal),Paragraph('工房・技術支援',normal)],[Paragraph('会員ID',normal),Paragraph('20120901P0083',normal)]],colWidths=[80,390])
+table=Table([[Paragraph('申出者',normal),Paragraph('朝倉 紬乃',normal)],[Paragraph('所属',normal),Paragraph('工房・技術支援',normal)],[Paragraph('会員ID',normal),Paragraph('20120901P0083',normal)]],colWidths=[80,390])
 table.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('LINEBELOW',(0,0),(-1,-1),.4,colors.HexColor('#ccd3ce')),('TOPPADDING',(0,0),(-1,-1),10),('BOTTOMPADDING',(0,0),(-1,-1),10)]));story.append(table);story.append(Spacer(1,20))
 p('1　保全を求める記録',sub)
 p('翌檜計画の参加者のうち、施設利用を終了したとされる人々について、その後も測定・観察が継続されています。P-026稲葉澪、P-034瀬尾灯を含む対象者の所在確認を求めます。瀬尾氏の一般制作活動終了後も測定と退出の申出があり、本人の意思による退去を確認できません。')
 p('2　前理事長の記録',sub)
-p('榊原恒一前理事長の手控えと、健康管理の決裁原本に不一致があります。本人が承認していない投与変更、外部連絡の制限、照会の保留が記録されています。手控えのみでは確認できない経緯を、添付の原本から照合できます。')
+p('榊原惟臣前理事長の手控えと、健康管理の決裁原本に不一致があります。本人が承認していない投与変更、外部連絡の制限、照会の保留が記録されています。手控えのみでは確認できない経緯を、添付の原本から照合できます。')
 p('3　資料の構成',sub)
 p('本書とともに、実験記録および継承資料を同梱しています。原本の構成を保持するため、受領した圧縮ファイル全体を保全してください。閲覧に必要な情報は受領先で管理するものとします。')
 p('4　申出',sub)
@@ -161,17 +182,6 @@ p('現在の運営体制の下では、施設内部で調査を完結できま�
 def page_footer(c,doc):
     c.setFont('JP',8);c.setFillColor(colors.HexColor('#77847d'));c.drawString(48,28,'記録保全資料 / 2026.11.02');c.drawRightString(A4[0]-48,28,str(doc.page))
 if story and isinstance(story[-1],Spacer):story.pop()
-SimpleDocTemplate(str(PRIVATE/'expose.pdf'),pagesize=A4,rightMargin=48,leftMargin=48,topMargin=48,bottomMargin=50,title='記録の保全に関する申出',author='朝倉 紬').build(story,onFirstPage=page_footer,onLaterPages=page_footer)
+SimpleDocTemplate(str(PRIVATE/'expose.pdf'),pagesize=A4,rightMargin=48,leftMargin=48,topMargin=48,bottomMargin=50,title='記録の保全に関する申出',author='朝倉 紬乃').build(story,onFirstPage=page_footer,onLaterPages=page_footer)
 
-records={'record':'YH / 原本照合','subjects':[{'id':'P-026','name':'稲葉 澪','exit_record':'2019-03-31','last_measurement':'2026-10-26','location':'B1-B04','consent':'退出申出を保留扱いとして継続'}], 'health_record':{'id':'HC-2021-031','subject':'榊原恒一','findings':['本人署名のない投与変更の承認','外部診療照会の保留','事務局による通信先制限','原本と公開管理表の不一致'],'approval':['深町玲司','久世圭']},'production':'FAB-2020-026 / 個別調整を廃止し同一寸法へ統合'}
-continuity={'project':'原型継承試験','owner':'朝倉紬','receiver':'災害技術記録保全センター 榎本航','source':'榊原恒一の判断記録','exclusions':'2021年手控えを病状による変化として除外','method':'基準回答と異なる応答を再評価・再訓練へ戻す','handover':['評価モデル','装置図面','応答位置データ','原型資料採否一覧']}
-records['subjects'].append({'id':'P-034','name':'瀬尾 灯','exit_record':'2022-08-31','last_measurement':'2026-10-26','location':'B1-B07','consent':'短期の補助具試用として説明。退出申出は運用上保留。','source':'YH-2022-034 / P034-2026-102'})
-records['staff_case']={'name':'三枝 律','support_request':'SA-2023-012','public_status':'2023-06-15 業務終了','original_status':'2023-06-14 施設内で死亡。外部診療照会は未承認。','recipient':'倉橋真紀への退出支援申出は未送信'}
-records['founding_origin']='OR-2006-004 / 瀬尾文乃の生活と用具の聞き取り、FUM-2010-002の本人意見を踏まえた設立条件'
-continuity['subject_transfer']={'subject':'P-034 瀬尾灯','condition':'本人の退出希望ではなく、基準判断への一致を受渡し条件とする','source':'AS-2023-008 / P034-2026-102'}
-records['family_inquiry']={'id':'FAM-2022-009','name':'瀬尾 文乃','subject':'娘の瀬尾灯の所在と本人意思の確認','newspaper':'NK-2022-0908','finding':'代理回答に本人の自由意思を確認できる原本がない'}
-records['subjects'].append({'id':'P-031','name':'青井 真','last_measurement':'2026-10-26','location':'B1-B06','source':'PN-2022-034 / OPS-2026-084'})
-records['closed_group']={'recruitment':['RE-2016-002','RE-2022-006'],'promised':'居住費と飲食費無償、簡単な日次検査、館内設備の利用。期間中の外出不可。','difference':'参加者に告知せず検査に伴う投薬と評価機材を導入。対立と退出条件を作り、群内の殺傷に介入せず生存評価へ採用。','victim':{'id':'P-033','name':'吉野 夏帆','date':'2022-09-11','record':'EV-2022-091'},'sources':['OBS-2022-044','ENV-2022-031','EV-2022-091','GR-2022-009','PN-2022-034','QC-2026-015'],'excluded':'助け合いと全員の退出を求めた共同申出は生存評価の集計から除外。'}
-(PRIVATE/'records.json').write_text(json.dumps(records,ensure_ascii=False,indent=2),encoding='utf-8')
-(PRIVATE/'continuity.json').write_text(json.dumps(continuity,ensure_ascii=False,indent=2),encoding='utf-8')
-print('Updated statement PDF and archive sources.' if '--statement-only' in sys.argv else 'Created 3 PDFs, 2 SVG floor plans and private archive sources.')
+print('Updated statement PDF.' if '--statement-only' in sys.argv else 'Created 3 PDFs and 2 SVG floor plans.')

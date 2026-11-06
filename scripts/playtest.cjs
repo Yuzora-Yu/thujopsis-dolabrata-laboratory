@@ -33,7 +33,7 @@ async function newsInterface(p){
  await p.locator('[name=year]').selectOption('2025');await p.locator('[name=kind]').selectOption('活動報告');await p.locator('.news-filters button').click();await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();
  const rows=await p.locator('.news-rows>a:visible').evaluateAll(nodes=>nodes.map(n=>[n.dataset.newsYear,n.dataset.newsKind]));assert.ok(rows.length>0);assert.ok(rows.every(([year,kind])=>year==='2025'&&kind==='活動報告'));
  await p.locator('[name=kind]').selectOption('工房');await p.locator('.news-filters button').click();await p.getByText('該当するお知らせはありません。',{exact:true}).waitFor();
- await p.goto(main('/news/?page=3'));await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();assert.ok(await p.locator('.news-rows a[href$="/news/20120401/"]:visible').count());
+ await p.goto(main('/news/'));await p.locator('.news-pagination a').last().click();await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();assert.ok(await p.locator('.news-rows a[href$="/news/20120401/"]:visible').count());
  for(const word of ['居住環境実証','生活環境継続試験','RE-2022-006']){await p.goto(main('/search/?q='+encodeURIComponent(word)));assert.equal(await p.locator('a[href$="/news/20160520/"],a[href$="/news/20220715/"]').count(),0);}
 }
 
@@ -54,7 +54,7 @@ async function newsInterface(p){
  await p.goto(main('/gallery/0021/'));await p.getByRole('link',{name:'瀬尾灯さんに聞く、道具づくりの話',exact:true}).click();assert.match(await body(p),/来月/);await p.getByRole('link',{name:'瀬尾灯さんの制作記録',exact:true}).click();let makerLoanId;assert.match(await body(p),/一般制作活動/);
  await p.goto(main('/gallery/0005/'));assert.match(await body(p),/入居者紹介/);
  await p.goto(main('/search/?q='+encodeURIComponent('入居者紹介')));await p.locator('.search-results a[href$="/tenants/"]').waitFor();
- await p.goto(main('/visit/'));await p.getByRole('link',{name:'アクセス',exact:true}).click();await p.getByRole('heading',{name:'ページが見つかりません。'}).waitFor();
+ await p.goto(main('/visit/'));await p.locator('#main').getByRole('link',{name:'アクセス',exact:true}).click();await p.getByRole('heading',{name:'ページが見つかりません。'}).waitFor();
  const footer=await p.locator('.footer-links a').allTextContents();assert.ok(footer.indexOf('入居者紹介')<footer.indexOf('制作物ギャラリー'));
  await p.getByRole('link',{name:'入居者紹介',exact:true}).click();
  const visible=await p.locator('.tenant-id').allTextContents();const numbers=visible.map(t=>Number(t.match(/\d+/)[0]));const missing=Array.from({length:Math.max(...numbers)},(_,i)=>i+1).filter(n=>!numbers.includes(n));assert.equal(missing[0],3);

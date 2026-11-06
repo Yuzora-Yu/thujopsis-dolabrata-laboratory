@@ -1,3 +1,4 @@
+import {mayReadRecordMedia,recordMediaPrefix} from './src/record-media.mjs';
 import http from 'node:http';
 import {readFile,stat} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
@@ -132,6 +133,14 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     if(account.role==='asakura'&&caseState.ending==='end2')return send(res,403,memberLayout('登録終了','<h1>この登録は終了しました。</h1><p>運営事務局にお問い合わせください。</p>',ctx));
     if(account.role==='asakura'&&pathname==='/members/personal/')caseState.truth=true;
     if(pathname.startsWith('/members/download/')){
+     if(pathname.startsWith(recordMediaPrefix)){
+      const file=mayReadRecordMedia(pathname.slice(recordMediaPrefix.length),account.role);
+      if(!file)return send(res,404,memberLayout('資料が見つかりません','<h1>該当する資料はありません。</h1>',ctx));
+      const relative='record-media/'+file.filename;
+      const data=privateFileLoader?await privateFileLoader(relative):await readFile(path.join(root,'private',relative));
+      res.setHeader('Content-Disposition',`attachment; filename="${file.filename}"`);
+      return send(res,200,data,file.type);
+     }
      if(pathname==='/members/download/hozen.zip'&&account.role==='institution'&&caseState.contact){archive??=archiveFactory?archiveFactory(false):makeArchive(new URL('./src/archive.mjs',import.meta.url));const data=await archive;caseState.downloaded=true;persist();res.setHeader('Content-Disposition',"attachment; filename*=UTF-8''"+encodeURIComponent('保全資料_20261102.zip'));return send(res,200,data,'application/zip');}
      if(account.role==='asakura'){
       if(pathname==='/members/download/complete.zip'){complete??=archiveFactory?archiveFactory(true):makeArchive(new URL('./src/archive.mjs',import.meta.url),{complete:true});res.setHeader('Content-Disposition',"attachment; filename*=UTF-8''"+encodeURIComponent('原本および移送関係資料.zip'));return send(res,200,await complete,'application/zip');}

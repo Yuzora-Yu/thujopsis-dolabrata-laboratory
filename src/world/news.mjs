@@ -24,7 +24,7 @@ export function expandNews(existing){
   n.important=['20211103','20120401','20220218'].includes(n.id);
   n.available=!!newsIsAvailable(n);
   n.listed=!!newsIsListed(n);
-  if(n.id==='20211103')n.body='当機構前理事長・榊原恒一が、療養中のところ、2021年11月3日に病気のため逝去いたしました。享年70。生前賜りましたご厚情に深く感謝申し上げます。ご遺族のご意向により、葬儀は近親者のみで執り行われます。設立時からの理念を引き継ぎ、産業と地域の未来に貢献してまいります。';
+  if(n.id==='20211103')n.body='当機構前理事長・榊原惟臣が、療養中のところ、2021年11月3日に病気のため逝去いたしました。享年70。生前賜りましたご厚情に深く感謝申し上げます。ご遺族のご意向により、葬儀は近親者のみで執り行われます。設立時からの理念を引き継ぎ、産業と地域の未来に貢献してまいります。';
   if(n.id==='20220708'){n.body+=' 製作者の瀬尾灯さんに、ご家族のために始めた道具づくりと、次の試作について伺いました。';n.link='/workshop/stories/seo-akari/';n.linkText='瀬尾灯さんの制作の話';}
   if(n.id==='20170714')n.archiveLink='/collections/';
   if(n.id==='20120401')n.links=[{path:'/about/identity/',text:'施設名に込めた願い'},{path:'/about/emblem/',text:'ロゴに込めた想い'}];
