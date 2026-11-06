@@ -106,7 +106,9 @@
 
 根拠と、その時点で読めるページ：
 
-- /members/records/PN-2022-034/ — CANOPY · 192 / 263／閲覧者 institution。確認する記載：青井真澄、夏帆さんの本、私はそこを見てしまった。
+- /workshop/stories/seo-akari/ — SEED · 022 / 263。確認する記載：夏帆さん、春の製本相談の記録。
+- /people/yoshino-kaho/ — SEED · 021 / 263。確認する記載：青い布表紙の地図帳、赤鉛筆、青井さんの押さえ板。
+- /members/records/PN-2022-034/ — CANOPY · 192 / 263／閲覧者 institution。確認する記載：青井真澄、夏帆さんの本、青い布表紙の地図帳（別包み）、預かり票の返却欄は空欄、私はそこを見てしまった。
 - /members/records/QC-2026-015/ — HEARTWOOD · 193 / 263／閲覧者 asakura。確認する記載：共同申出、EA-2026-009。
 
 段階別ヒント案：

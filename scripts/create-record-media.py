@@ -39,6 +39,7 @@ STYLES = {
     "memo": ("Mincho", "#484337", "#f3f0e7", "手控え", "memo"),
     "letter": ("Mincho", "#483c30", "#f0ece2", "回答書控え", "formal"),
     "ledger": ("Office", "#414c4e", "#eaeeee", "管理簿複写", "form"),
+    "workshop-receipt": ("Office", "#574937", "#f1ebe2", "工房受付／預かり控え", "form"),
     "maintenance": ("Gothic", "#3f5861", "#e8eff0", "施設保守・作業完了", "strip"),
     "operations": ("Gothic", "#1f4a44", "#e3ece7", "区画運用報告", "strip"),
 }
@@ -75,7 +76,7 @@ def render(record, style_key, target):
     font, accent_hex, pale_hex, register, frame = STYLES[style_key]
     accent, pale = colors.HexColor(accent_hex), colors.HexColor(pale_hex)
     dark = colors.HexColor("#232824")
-    compact = style_key == "individual" or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
+    compact = style_key in {"individual", "workshop-receipt"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
     issue_date = datetime.strptime(record.get("updated", record["date"]), "%Y年%m月%d日").strftime("%Y%m%d")
     title = ParagraphStyle("title", fontName=font, fontSize=21, leading=29, wordWrap="CJK", textColor=dark, spaceAfter=15)
     base = ParagraphStyle("body", fontName=font, fontSize=10.1 if compact else 10.6, leading=16.1 if compact else 17.6, wordWrap="CJK", textColor=dark, spaceAfter=6 if compact else 9)

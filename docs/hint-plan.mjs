@@ -146,11 +146,23 @@ export const hintPlan = [
     ],
     "evidence": [
       {
+        "kind": "main",
+        "path": "/workshop/stories/seo-akari/",
+        "words": ["夏帆さん", "春の製本相談の記録"]
+      },
+      {
+        "kind": "main",
+        "path": "/people/yoshino-kaho/",
+        "words": ["青い布表紙の地図帳", "赤鉛筆", "青井さんの押さえ板"]
+      },
+      {
         "kind": "member",
         "path": "/members/records/PN-2022-034/",
         "words": [
           "青井真澄",
           "夏帆さんの本",
+          "青い布表紙の地図帳（別包み）",
+          "預かり票の返却欄は空欄",
           "私はそこを見てしまった"
         ],
         "role": "institution"

@@ -621,5 +621,17 @@
     "year": 2026,
     "mode": "built-in imagegen",
     "references": []
+  },
+  {
+    "key": "p-yoshino-atlas",
+    "path": "docs/source-images/p-yoshino-atlas.png",
+    "asset": "public/assets/media/p-yoshino-atlas.webp",
+    "prompt": "Use case: photorealistic-natural. Create a single 3:2 landscape photo for an April 2022 activity report on a fictional Japanese public makerspace website. An unremarkable inherited household road atlas on a clean, pale birch workbench at a book-repair consultation. It is a small single closed hardback, about 16 × 22 cm, with an ordinary muted slate-blue cloth cover, some subtle rubbing and fraying on the lower front corner, spine on the left. A narrow undecorated off-white paper slip protrudes a centimeter from the right fore edge, marking a page. Beside it sits one simple rectangular pale plywood book-press board, flat with softly sanded straight edges, sized just larger than the book. Show believable cloth texture, page block, real contact shadows, slight uneven wear. Everything sits with weight on the workbench. View at a slightly oblique downward angle from seated height, left-to-right daylight mixed with ordinary overhead light, naturally flat color, enough uncluttered space around the book. Authentic quiet staff documentation, normal phone camera of around 2021–2022, neutral white balance and modest sharpening, no conspicuous filters or bokeh. No people, hands, branding, inscriptions, legible text, overlaid labels, tools beyond the board, or dramatic effects. The workbench should softly fill the background; no visual clutter. Photograph a physically plausible object.",
+    "review": "地図帳の布と擦れ、紙片、合板の積層と接地を確認。2022年の工房取材用。",
+    "year": 2022,
+    "publicationWidth": 1280,
+    "jpegQuality": 85,
+    "mode": "built-in imagegen",
+    "references": []
   }
 ]

@@ -8,7 +8,7 @@ const editions=[
  ['MX-2019-410','ledger',true],['PUB-2023-014','maintenance'],
  ['OR-2006-004','memo',true],['RG-2007-011','letter',true],['HC-2021-031-R','ledger',true],
  ['ENV-2022-031','transfer'],['AP-2022-028','evaluation'],['OPS-2026-084','operations'],
- ['AS-2023-008','memo'],
+ ['AS-2023-008','memo'],['PN-2022-034','workshop-receipt',true],
 ];
 export const recordMedia=editions.flatMap(([id,style,scan])=>[
  {id,style,filename:id+'.pdf',type:'application/pdf',label:'配布資料（PDF）'},
