@@ -120,7 +120,7 @@ async function followPublicLinks(browser){
   ['/about/identity/','#main'],
   ['/facilities/','#main-navigation'],
   ['/facilities/coworking/','#main'],
-  ['/floor-map/','#main'],
+  ['/floor-map/#floor-coworking','#main'],
   ['/workshop/','#main-navigation'],
   ['/gallery/','#main'],
   ['/gallery/0021/','#main'],
@@ -133,8 +133,8 @@ async function followPublicLinks(browser){
   for(const [index,[path,section]] of steps.entries()){
    if(index===0)await page.goto(at(path));
    else{
-    const href=new URL(at(path)).pathname;
-    await page.locator(section).locator('a[href="'+href+'"]').click();
+    const {pathname,hash}=new URL(at(path));
+    await page.locator(section).locator('a[href="'+pathname+hash+'"]').click();
     await page.waitForURL(at(path));
    }
    const count=index+1;
