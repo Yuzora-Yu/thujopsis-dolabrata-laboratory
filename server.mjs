@@ -13,7 +13,7 @@ import {renderLegacy,legacyLogin,legacyLayout} from './src/legacy.mjs';
 import {archiveTicket} from './src/world/archive-data.mjs';
 import {classifyEvidence,nextEnding} from './src/evidence.mjs';
 import {normalizeDocumentId} from './src/search.mjs';
-import {reservationSpaces} from './src/world/editorial.mjs';
+import {isValidReservation} from './public/assets/reservation-policy.js';
 import {readFileSync} from 'node:fs';
 import {writeFile,rename,mkdir} from 'node:fs/promises';
 
@@ -115,8 +115,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     }
     if(pathname==='/members/reservations/'){
      if(['end1','end3'].includes(caseState.ending))return send(res,409,renderMember(pathname,ctx));
-     const date=String(fields.date||''),time=String(fields.time||'');
-     if(!reservationSpaces.some(([id])=>id===fields.space)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||date<'2026-11-02'||!/^\d{2}:\d{2}$/.test(time)||time<'09:00'||time>'20:00'||!String(fields.purpose||'').trim())return send(res,400,renderMember(pathname,{...ctx,error:'施設・利用日時・利用内容をご確認ください。'}));
+     if(!isValidReservation(fields))return send(res,400,renderMember(pathname,{...ctx,reservationDraft:fields,error:'施設・利用日時・利用内容をご確認ください。'}));
      return redirect(res,'/members/reservations/?received=1');
     }
     if(pathname==='/members/contact/'){

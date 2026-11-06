@@ -2,7 +2,7 @@ import {mediaForRecord,recordMediaPrefix} from './record-media.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
 import {projects} from './world/projects.mjs';
 import {labThanks,labAssessment} from './lab.mjs';
-import {reservationSpaces} from './world/editorial.mjs';
+import {firstReservationDate,reservationSpaces,reservationHours,reservationHoursHint} from '../public/assets/reservation-policy.js';
 import {normalizeDocumentId,documentLookupMessages} from './search.mjs';
 import {documents,facility,accounts} from './content.mjs';
 import {esc,brand,arrow} from './render.mjs';
@@ -116,8 +116,23 @@ function renderMemberPage(path,ctx){
   return memberLayout('記録についての照会',`<h1>記録についての照会</h1>${ctx.error?`<p class="form-error">${esc(ctx.error)}</p>`:''}<form class="form-stack" method="post">${fieldToken(csrf)}<label for="record">文書ID</label><input id="record" name="record" value="${esc(d?.id||'')}" required><label for="request">照会内容</label><select id="request" name="request"><option>原本確認</option><option>記載内容の確認</option><option>添付資料の確認</option></select><label for="note">備考</label><textarea id="note" name="note" maxlength="3000"></textarea><button class="button dark" type="submit">照会を送信 <span>→</span></button></form>`,{...ctx,active:'records'});
  }
  if(path==='/members/reservations/'){
- if(['end1','end3'].includes(caseState.ending))return memberLayout('利用申請・予約','<h1>利用申請・予約</h1><div class="notice"><h2>受付を休止しております。</h2><p>施設の一般利用休止に伴い、新規の利用申請を停止しております。</p></div>',{...ctx,active:'reservations'});
- return memberLayout('利用申請・予約',`<h1>利用申請・予約</h1>${query.get('received')?'<div class="form-success">利用申請を受け付けました。内容を確認のうえ、施設からの連絡にて回答いたします。</div>':''}${ctx.error?`<p class="form-error" role="alert">${esc(ctx.error)}</p>`:''}<form class="form-stack" method="post">${fieldToken(csrf)}<label for="space">施設</label><select id="space" name="space">${reservationSpaces.map(([id,name])=>`<option value="${id}"${query.get('space')===id?' selected':''}>${name}</option>`).join('')}</select><label for="date">利用日</label><input id="date" name="date" type="date" min="2026-11-02" required><label for="time">開始時刻</label><input id="time" name="time" type="time" min="09:00" max="20:00" required><label for="purpose">利用内容</label><textarea id="purpose" name="purpose" maxlength="2000" required></textarea><button class="button dark">申請する <span>→</span></button></form>`,{...ctx,active:'reservations'});
+  if(['end1','end3'].includes(caseState.ending))return memberLayout('利用申請・予約','<h1>利用申請・予約</h1><div class="notice"><h2>受付を休止しております。</h2><p>施設の一般利用休止に伴い、新規の利用申請を停止しております。</p></div>',{...ctx,active:'reservations'});
+  const draft = ctx.reservationDraft || {};
+  const requested = draft.space || query.get('space');
+  const space = reservationSpaces.some(([id])=>id===requested) ? requested : reservationSpaces[0][0];
+  const {start,lastStart} = reservationHours(space);
+  const options = reservationSpaces.map(([id,name])=>`<option value="${id}"${space===id?' selected':''}>${name}</option>`).join('');
+  return memberLayout('利用申請・予約',`<h1>利用申請・予約</h1>${query.get('received')?'<div class="form-success">利用申請を受け付けました。内容を確認のうえ、施設からの連絡にて回答いたします。</div>':''}
+   <form class="form-stack" method="post" data-reservation-form>
+    ${fieldToken(csrf)}
+    <p class="form-error" role="alert" data-reservation-error${ctx.error?'':' hidden'}>${esc(ctx.error||'')}</p>
+    <label for="space">施設</label><select id="space" name="space">${options}</select>
+    <label for="date">利用日</label><input id="date" name="date" type="date" min="${firstReservationDate}" value="${esc(draft.date)}" required>
+    <label for="time">開始時刻</label><input id="time" name="time" type="time" min="${start}" max="${lastStart}" value="${esc(draft.time)}" aria-describedby="reservation-hours" required>
+    <p class="member-note" id="reservation-hours" data-reservation-hours aria-live="polite">${reservationHoursHint(space)}</p>
+    <label for="purpose">利用内容</label><textarea id="purpose" name="purpose" maxlength="2000" required>${esc(draft.purpose)}</textarea>
+    <button class="button dark">申請する <span>→</span></button>
+   </form>`,{...ctx,active:'reservations'});
  }
  if(path==='/members/contact/')return memberLayout('運営事務局へのお問い合わせ',`<h1>運営事務局へのお問い合わせ</h1><p>施設利用や運営に関するご連絡を承ります。必要に応じて資料を添付してください。</p>${ctx.error?`<p class="form-error">${esc(ctx.error)}</p>`:''}<form class="form-stack" method="post" enctype="multipart/form-data">${fieldToken(csrf)}<label for="subject">件名</label><input id="subject" name="subject" maxlength="150" required><label for="message">内容</label><textarea id="message" name="message" maxlength="5000" required></textarea><label for="attachment">添付資料</label><input id="attachment" name="attachment" type="file" accept=".zip,.pdf"><button class="button dark">送信する <span>→</span></button></form>`,{...ctx,active:'contact'});
  if(path==='/members/contact/received/')return memberLayout('受付完了',`<h1>お問い合わせを受け付けました。</h1><p>担当部署にて確認いたします。</p><div class="member-meta">受付番号：AD-2026-1102</div><p><a class="text-link" href="/members/messages/">施設からの連絡 </a></p><p><a class="text-link" href="/">施設サイトへ </a></p>`,{...ctx,active:'contact'});

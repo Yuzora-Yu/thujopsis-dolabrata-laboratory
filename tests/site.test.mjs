@@ -73,8 +73,32 @@ test('name search, personal account and independent submission reveal and stop s
 });
 test('state changes require CSRF verification',async()=>{const r=await fetch(base+'/members/login/',{method:'POST',body:new URLSearchParams({id:'201204010017',password:'20080519'})});assert.equal(r.status,403);});
 
+test('reservation requests respect the selected facility’s start time and keep the draft on error',async()=>{
+ const c=client();
+ assert.equal((await c.login('201204010017','20080519')).status,303);
+ const route='/members/reservations/';
+ const form=(await c.get(route+'?space=workshop')).text;
+ assert.match(form,/<option value="workshop" selected>工房/);
+ assert.match(form,/<input id="time"[^>]+max="16:00"[^>]+aria-describedby="reservation-hours"/);
+ assert.match(form,/工房受付は17:00までです。/);
+ const draft={space:'workshop',date:'2026-11-07',time:'16:00',purpose:'試作の相談'};
+ const accepted=await c.post(route,draft);
+ assert.equal(accepted.status,303);
+ assert.equal(accepted.headers.get('location'),route+'?received=1');
+ const late=await c.post(route,{...draft,time:'16:01'});
+ assert.equal(late.status,400);
+ const error=await late.text();
+ assert.match(error,/<option value="workshop" selected>工房/);
+ assert.match(error,/<input id="time"[^>]+value="16:01"/);
+ assert.match(error,/>試作の相談<\/textarea>/);
+ assert.equal((await c.post(route,{...draft,space:'meeting-a',time:'20:00'})).status,303);
+ for(const change of [{space:'unlisted'}, {date:'2026-11-01'}, {date:'2026-11-31'}, {time:'12:65'}]){
+  assert.equal((await c.post(route,{...draft,...change})).status,400);
+ }
+});
+
 test('publication numbers form tight sequences independent of account registration',()=>{
- assert.deepEqual(gallery.map(g=>Number(g.id)),Array.from({length:32},(_,i)=>i+1));
+ assert.deepEqual(gallery.map(g=>Number(g.id)),Array.from({length:34},(_,i)=>i+1));
  assert.deepEqual(tenants.map(t=>Number(t.page)),Array.from({length:18},(_,i)=>i+1));
  assert.equal(tenants.find(t=>t.page==='0003').id,'0017');
  assert.equal(new Set(gallery.map(g=>g.image)).size,gallery.length);

@@ -582,5 +582,37 @@
     "year": 2026,
     "mode": "built-in imagegen",
     "references": []
+  },
+  {
+    "key": "f-hall-exhibition",
+    "path": "docs/source-images/f-hall-exhibition.png",
+    "asset": "public/assets/media/f-hall-exhibition.webp",
+    "prompt": "Photoreal 2026 archival Japanese public facility photograph of the original 3F large multipurpose hall temporarily rearranged for the one-day Moon habitation and fabrication showcase on 24 October. Preserve actual reference hall architecture: tall room, warm wood lower walls, burgundy curtains and stage at far end, windows along left, authentic civic hall scale. Chairs removed for this event. Several evenly spaced low display islands, soft dark blue backdrop and a modest three-module silver habitat scale model in a low transparent case, sheets of fabrication examples on other small counters. Wide clear center and side aisles. No readable lettering, no people in room, photos, or reflections. Well composed substantial event venue, photographic rather than concept art. Horizontal 3:2.",
+    "review": "3階ホール特別展示。既存写真の舞台・窓・壁を揃え、客席に代えて通路と展示台を配置。",
+    "year": 2026,
+    "mode": "built-in imagegen",
+    "references": [
+      "b2469c7:public/assets/media/f-hall.webp"
+    ]
+  },
+  {
+    "key": "g-metal-lattice",
+    "path": "docs/source-images/g-metal-lattice.png",
+    "asset": "public/assets/media/g-metal-lattice.webp",
+    "prompt": "One original photoreal industrial design tabletop record of a palm-sized sectioned 17-4 PH stainless steel lightweight structure sample made on a metal material-extrusion printer then debound and sintered. The left half is a thick curved shell of matte bead-blasted dark silver, the right side deliberately open to show eight to twelve visible repeat cells of a smooth physically continuous gyroid lattice. Sintered metal softly reflective, fine credible surface texture, no polished chrome, no extra hardware. Self-supporting sample with a flat base, staged next to a simple matching solid section on a dark desaturated studio worktop. Beautiful directional light shows the pattern and supports. Horizontal 3:2. No people, hands, words, watermark, neon, glowing, floating parts, lattice breaking into detached specks.",
+    "review": "外殻と開いた格子の連続、試験片が台に接する位置、金属の仕上がりを確認。",
+    "year": 2026,
+    "mode": "built-in imagegen",
+    "references": []
+  },
+  {
+    "key": "g-flexure-panel",
+    "path": "docs/source-images/g-flexure-panel.png",
+    "asset": "public/assets/media/g-flexure-panel.webp",
+    "prompt": "Original physically credible photoreal tabletop photograph of a sophisticated laser-cut plywood flexure-panel prototype at a Japanese workshop, designed as a flat-pack small curved light shade sample. One single 3mm natural birch plywood sheet with parallel alternating narrow kerf slits through the middle that allow the sheet to curve into one smooth broad arc. All narrow wooden bridges remain joined to the intact strip of wood at either side. Mount the two straight ends into a simple slotted rectangular plywood foot, self-supporting on a slate gray tabletop. A second flat smaller kerf-cut material swatch lies flat beside it. Warm side light makes the slits cast a striking repeat pattern across the table, showing the reason for the precision work. No lightbulb or wires, no metal screws, no people, no hands, no writing. Horizontal 3:2, crisp contemporary documentation photo.",
+    "review": "切り込みの外に連続する薄板、両端の支持と光の方向を確認。",
+    "year": 2026,
+    "mode": "built-in imagegen",
+    "references": []
   }
 ]

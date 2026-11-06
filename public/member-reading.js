@@ -1,8 +1,11 @@
 import {normalizeLedger,recordReading,ledgerRows} from './reading-state.js';
+import {updateReservationHours} from './assets/reservation-policy.js';
 const base=document.querySelector('meta[name="asunaro-base"]')?.content||'';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let currentPage='';
 function refresh(){
+ const reservationForm=document.querySelector('[data-reservation-form]');
+ if(reservationForm)updateReservationHours(reservationForm);
  const body=document.body,role=body.dataset.memberRole,caseId=body.dataset.memberCase;
  if(!role||!caseId||caseId.startsWith('@@'))return;
  const key='asunaro-reading-v1:'+base+':'+caseId;
@@ -27,6 +30,12 @@ function refresh(){
  for(const element of document.querySelectorAll('[data-reading-reference]'))element.textContent='照会端末 '+caseId.slice(0,8).toUpperCase();
 }
 window.asunaroReading={refresh};
+document.addEventListener('change',event=>{
+ const input=event.target;
+ if(input instanceof HTMLSelectElement && input.name==='space' && input.form?.matches('[data-reservation-form]')){
+  updateReservationHours(input.form);
+ }
+});
 refresh();
 window.addEventListener('pageshow',()=>refresh());
 window.addEventListener('storage',()=>refresh());

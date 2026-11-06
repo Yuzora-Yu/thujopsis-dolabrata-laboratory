@@ -9,7 +9,7 @@ export function programBanner(){
 }
 
 export function programExhibit(){
- const workKeys = ['latch','layered-map','hinge'];
+ const workKeys = ['metal-lattice','latch','layered-map'];
  const works = workKeys.map(key => galleryRecords.find(work => work.key === key));
  return `<section class="hero lunar-hero" aria-labelledby="lunar-title">
  <img class="hero-image" src="/assets/media/lunar-habitat-concept.webp" alt="月面の平原に三つの建物をつないだ構想図。窓に暖色の灯りがともっている。" width="1817" height="866" fetchpriority="high" decoding="async">
@@ -19,7 +19,7 @@ export function programExhibit(){
    <div class="lunar-intro"><p class="eyebrow">EXHIBITION / 4F</p><h2 id="exhibit-intro">月へ持っていくもの。</h2>
     <p>道具の蓋が閉まらなくなったら。昨日と違う順序で設備を使うことになったら。月での暮らしを想像すると、ふだん何気なく使っている道具にも、違う工夫が見えてきます。</p>
     <p>4階の交流スペースでは、居住区の模型と工房の試作品を並べて展示しております。ご見学の際は中央受付へお越しください。</p>
-    <div class="button-row"><a class="button dark" href="/news/20261020/">展示のご案内</a></div>
+    <div class="button-row"><a class="button dark" href="/news/20261020/">展示のご案内</a><a class="text-link" href="/facilities/hall/#exhibition">3階ホールでの特別展示</a></div>
    </div>
    <figure class="lunar-exhibit-view"><img src="/assets/media/lunar-exhibit.webp" alt="4階の交流スペースに設けた展示。ガラスケースの中に小さな月面居住区の模型がある。" width="1536" height="1024" loading="lazy" decoding="async"><figcaption>4階 交流スペース ／ 展示の様子</figcaption></figure>
   </section>
@@ -29,6 +29,7 @@ export function programExhibit(){
      <img src="/assets/${work.image}" alt="" width="1536" height="1024" loading="lazy" decoding="async">
      <div><small>${work.tag}</small><h3>${work.title}</h3></div>
     </a>`).join('')}</div>
+    <p class="lunar-older-work">展示のきっかけになった、<a class="text-link" href="/gallery/0026/">一度に造形する小物ケース</a>もご覧いただけます。</p>
    </div>
   </section>
  </article>`;

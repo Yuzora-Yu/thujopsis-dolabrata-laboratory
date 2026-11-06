@@ -1,0 +1,47 @@
+// Equipment currently listed by the fictional facility. The manufacturer links
+// document the machines, while the room and access information belongs to Asunaro.
+export const workshopEquipment = [
+ {
+  id:'resin',
+  name:'UltiMaker S7',
+  manufacturer:'UltiMaker',
+  type:'樹脂3Dプリンター（熱溶解積層方式）',
+  room:'4階 工房2',
+  dimensionsLabel:'造形範囲',
+  dimensions:'330 × 240 × 300 mm',
+  materials:['PLA','PETG','TPU'],
+  description:'硬い部品としなる部品の試作や、組み立て前の寸法確認に使います。二つのノズルで、造形する樹脂と支えに使う材料を分けられます。',
+  access:'初回は職員と一緒に造形データを確認いたします。その後は予約のうえ、ご利用いただけます。',
+  source:'https://ultimaker.com/ja/3d-printers/s-series/ultimaker-s7/',
+ },
+ {
+  id:'laser',
+  name:'Speedy 300 CO₂',
+  manufacturer:'Trotec Laser',
+  type:'CO₂レーザー加工機',
+  room:'4階 工房1',
+  dimensionsLabel:'加工範囲',
+  dimensions:'726 × 432 mm',
+  materials:['木材','アクリル','紙'],
+  description:'木材やアクリル板から部材を切り出し、表面に文字や目盛りを彫刻できます。層ごとに異なる形を切り出す展示模型や、差し込んで組み立てる部材の試作に使います。',
+  access:'ご予約の際に材料をご申告ください。加工前に、職員が材料と設定を確認いたします。',
+  source:'https://www.troteclaser.com/ja/laser-machines/laser-engraver/%E3%82%B9%E3%83%94%E3%83%BC%E3%83%87%E3%82%A3300',
+ },
+ {
+  id:'metal',
+  name:'Metal X',
+  manufacturer:'Markforged',
+  type:'金属3Dプリンター（フィラメント方式）',
+  room:'専用加工室（職員管理）',
+  dimensionsLabel:'造形機本体の公称造形範囲',
+  dimensions:'300 × 220 × 180 mm',
+  materials:['17-4PHステンレス鋼'],
+  description:'金属粉を樹脂で固めたフィラメントで形をつくります。脱脂と焼結を経て、金属の治具や交換部品の試作に使えます。焼結で収縮するため、完成寸法は図面ごとに確認いたします。',
+  access:'4階中央受付で試作のご相談を承ります。造形から脱脂、焼結まで職員が担当し、加工後に受付でお渡しいたします。',
+  source:'https://www-objects.markforged.com/craft/3d_printers_detail/metal-x/Metal_System_Datasheets.pdf',
+  supporting:[
+   {name:'Wash-1', type:'脱脂装置', description:'造形後の部品を洗浄し、結合材の一部を取り除きます。'},
+   {name:'Sinter-1', type:'焼結炉', description:'脱脂後の部品を炉に入れ、金属粒子を結合させます。'},
+  ],
+ },
+];

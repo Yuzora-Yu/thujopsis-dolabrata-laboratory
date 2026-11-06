@@ -27,6 +27,10 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await p.locator('.program-promo a').click();
   await p.getByRole('heading',{level:1,name:/月に、暮らしを/}).waitFor();
   assert.equal(await p.locator('[data-habitat-demo],a[href*="/field-notes/"]').count(),0);
+  await p.getByRole('link',{name:'3階ホールでの特別展示',exact:true}).click();
+  await p.locator('#exhibition img').evaluate(image=>image.decode());
+  assert.match(await p.locator('#exhibition figcaption').innerText(),/2026年10月31日/);
+  await p.locator('#exhibition').getByRole('link',{name:'月の企画展示を見る',exact:true}).click();
   await p.locator('.lunar-exhibit-view img').evaluate(image=>image.decode());
   const exhibits=p.locator('.lunar-work-grid .lunar-work');
   assert.equal(await exhibits.count(),3);
@@ -36,6 +40,16 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await p.getByRole('heading',{level:1,name:'工具を使わず交換できる留め具'}).waitFor();
   await p.getByRole('link',{name:'月の企画展示を見る',exact:true}).click();
   await p.getByRole('heading',{level:1,name:/月に、暮らしを/}).waitFor();
+  await p.goto(base+'/workshop/');
+  for(const name of ['UltiMaker S7','Speedy 300 CO₂','Metal X']){
+   await p.getByRole('heading',{name,exact:true}).waitFor();
+  }
+  assert.match(await p.locator('.workshop-access').innerText(),/無料.*ご利用/);
+  await p.getByRole('link',{name:'制作物ギャラリーを見る',exact:true}).click();
+  await p.getByLabel('制作方法').selectOption('金属3Dプリンター');
+  await p.getByRole('button',{name:'表示する',exact:true}).click();
+  await p.waitForFunction(()=>document.querySelector('select[name=method]').value==='金属3Dプリンター');
+  assert.deepEqual(await p.locator('.gallery-card:visible').evaluateAll(cards=>cards.map(card=>card.dataset.galleryMethod)),['金属3Dプリンター']);
   await p.goto(base+'/research/lunar-habitat/field-notes/');
   assert.equal(await p.locator('body').getAttribute('data-asunaro-stage'),'root');
   assert.equal(await p.locator('.seed-note').count(),0);
@@ -72,22 +86,29 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   assert.ok(!logoSources.some(src=>src.endsWith('/0003.svg')));
   await p.screenshot({path:'.work/qa/tenant-cards-desktop.png',fullPage:true});
   await cards.filter({hasText:'モクノワデザイン'}).click();
-  await p.getByRole('link',{name:'資料の閲覧履歴',exact:true}).click();
-  const history = p.locator('#reading-history');
-  await history.getByRole('link',{name:/開設記念の模型を展示いたしました/}).click();
+  await p.getByRole('link',{name:'活動に関する資料',exact:true}).click();
+  const materials = p.locator('#reading-history');
+  const openingNotice = materials.getByRole('link',{name:/開設記念の模型を展示いたしました/});
+  assert.equal(await openingNotice.locator('time').getAttribute('datetime'),'2012-09-03');
+  await openingNotice.click();
   await p.getByRole('heading',{name:'開設記念の模型を展示いたしました',exact:true}).waitFor();
-  assert.match(await p.locator('.tenant-material-source').innerText(),/お知らせの控え.*2012\.09\.03/);
-  await p.getByRole('link',{name:'モクノワデザインの閲覧履歴へ',exact:true}).click();
+  const noticeSource=p.locator('.tenant-material-source');
+  assert.match(await noticeSource.innerText(),/お知らせの控え/);
+  assert.equal(await noticeSource.locator('time').getAttribute('datetime'),'2012-09-03');
+  await p.getByRole('link',{name:'モクノワデザインの活動資料へ戻る',exact:true}).click();
   assert.equal(new URL(p.url()).hash,'#reading-history');
-  await p.locator('.tenant-reading').screenshot({path:'.work/qa/tenant-reading-desktop.png'});
+  await materials.screenshot({path:'.work/qa/tenant-materials-desktop.png'});
   await p.goto(base+'/tenants/0008/');
-  await history.getByRole('link',{name:/工房ギャラリー掲載のお知らせ/}).click();
+  await materials.getByRole('link',{name:/工房ギャラリー掲載のお知らせ/}).click();
   await p.getByRole('link',{name:'つまみを回しやすくするカバー',exact:true}).click();
   await p.getByRole('heading',{name:'つまみを回しやすくするカバー',exact:true}).waitFor();
   await p.goto(base+'/floor-map/');await p.locator('img[src$="/floor-4f.svg"]').waitFor();
   await p.locator('.floor-arrival img').evaluate(image=>image.decode());
   await p.screenshot({path:'.work/qa/nov06-floor.png',fullPage:true});
-  await p.goto(base+'/tenants/0003/');await p.locator('.tenant-exhibit').waitFor();await p.locator('img.tenant-logo').evaluate(image=>image.decode());await p.screenshot({path:'.work/qa/nov06-tenant.png',fullPage:true});
+  await p.goto(base+'/tenants/0003/');
+  await p.locator('.tenant-identity img.tenant-logo').evaluate(image=>image.decode());
+  await p.locator('#profile img[src$="flow-test-diagram.svg"]').evaluate(image=>image.decode());
+  await p.screenshot({path:'.work/qa/nov06-tenant.png',fullPage:true});
   const publicUrl = p.url();
   const [member] = await Promise.all([p.waitForEvent('popup'),p.locator('.member-link').click()]);
   assert.equal(p.url(),publicUrl);
@@ -151,6 +172,10 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await memberNav.getByRole('link',{name:'研究資料照会',exact:true}).click();
   await mobile.getByRole('heading',{name:'研究資料照会',exact:true}).waitFor();
   await mobile.screenshot({path:'.work/qa/member-palette-mobile.png'});
-  assert.deepEqual(errors,[]);console.log('Public program passed: sticky menu, staff page, exhibit and gallery, member story, linked notice, authorized PDF, and 390px layout.');
+  await mobile.goto(base+'/members/reservations/?space=workshop');
+  await mobile.waitForFunction(()=>document.querySelector('#time')?.max==='16:00');
+  await mobile.locator('#space').selectOption('meeting-a');
+  await mobile.waitForFunction(()=>document.querySelector('#time')?.max==='20:00');
+  assert.deepEqual(errors,[]);console.log('Public program passed: sticky menu, staff, hall exhibit, real equipment, metal gallery filter, tenant materials, linked member records, and workshop hours.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -1,4 +1,5 @@
 import {matchesSearch,normalizeDocumentId,documentLookupMessages} from './search-engine.js';
+import {isValidReservation,updateReservationHours} from './assets/reservation-policy.js';
 import {classifyEvidence,nextEnding} from './evidence.js';
 import {advanceTrial,trialView} from './lab-core.js';
 
@@ -111,8 +112,13 @@ async function boot(){
    if(current.path==='/members/records/')await documentResults(account,normalizeDocumentId(params.get('document_id')||''));
    if(current.path==='/members/inquiry/'){const id=normalizeDocumentId(params.get('record')||'');document.querySelector('#record').value=account.docs.some(d=>d.id===id&&d.inquiry)?id:'';}
    if(current.path==='/members/reservations/'){
-    const select=document.querySelector('#space');if(select&&params.get('space'))select.value=params.get('space');
-    if(params.get('received'))document.querySelector('h1').insertAdjacentHTML('afterend','<div class="form-success">利用申請を受け付けました。内容を確認のうえ、施設からの連絡にて回答いたします。</div>');
+    const form=document.querySelector('[data-reservation-form]');
+    if(form){
+     const select=form.elements.space,requested=params.get('space');
+     if([...select.options].some(option=>option.value===requested))select.value=requested;
+     updateReservationHours(form);
+     if(params.get('received'))document.querySelector('h1').insertAdjacentHTML('afterend','<div class="form-success">利用申請を受け付けました。内容を確認のうえ、施設からの連絡にて回答いたします。</div>');
+    }
    }
    return;
   }
@@ -136,8 +142,14 @@ async function boot(){
    const summary=document.querySelector('.search-results');if(summary){summary.innerHTML=keyword?results.map(x=>`<a href="${urlFor(x.url)}"><h2>${esc(x.title)}</h2><p>${esc(x.text.slice(0,100))}…</p></a>`).join('')||'<p>該当するページはありません。</p>':'';summary.previousElementSibling.textContent=keyword?'「'+keyword+'」の検索結果　'+results.length+'件':'';}
   }
   if(current.kind==='main'&&current.path==='/gallery/'&&params.get('method')){
-   const method=params.get('method');document.querySelector('select[name=method]').value=method;
-   document.querySelectorAll('.gallery-card').forEach(card=>{card.hidden=card.querySelector('.card-meta>span')?.textContent!==method;});
+   const select = document.querySelector('select[name=method]');
+   const method = params.get('method');
+   if (select && [...select.options].some(option=>option.value===method)) {
+    select.value = method;
+    document.querySelectorAll('[data-gallery-method]').forEach(card => {
+     card.hidden = card.dataset.galleryMethod !== method;
+    });
+   }
   }
   if(current.kind==='archive'&&current.path==='/collections/'&&params.get('q')){
    const keyword=params.get('q');document.querySelector('#collection-query').value=keyword;
@@ -148,7 +160,7 @@ async function boot(){
 }
 
 document.addEventListener('submit',async event=>{
- const form=event.target;if(!(form instanceof HTMLFormElement)||form.method.toLowerCase()!=='post')return;
+ const form=event.target;if(!(form instanceof HTMLFormElement)||(form.getAttribute('method')||'get').toLowerCase()!=='post')return;
  event.preventDefault();if(!form.reportValidity())return;
  const current=route(),values=new FormData(form),submit=form.querySelector('button[type=submit],button:not([type])');if(submit)submit.disabled=true;
  try{
@@ -186,7 +198,14 @@ document.addEventListener('submit',async event=>{
   }
   if(current.path==='/members/reservations/'){
    if(['end1','end3'].includes(state.ending)){await boot();return;}
-   const date=String(values.get('date')||''),time=String(values.get('time')||'');if(date<'2026-11-02'||time<'09:00'||time>'20:00'){showError('施設・利用日時・利用内容をご確認ください。');return;}
+   if(!isValidReservation(Object.fromEntries(values))){
+    const error=form.querySelector('[data-reservation-error]');
+    if(error){
+     error.hidden=false;
+     error.textContent='施設・利用日時・利用内容をご確認ください。';
+    }else showError('施設・利用日時・利用内容をご確認ください。');
+    return;
+   }
    go('/members/reservations/?received=1');return;
   }
   if(current.path==='/members/contact/'){
