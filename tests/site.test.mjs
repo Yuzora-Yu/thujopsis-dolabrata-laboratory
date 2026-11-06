@@ -315,6 +315,8 @@ test('printed editions and archival copies follow the underlying record permissi
  const loanCopy='/members/download/records/FAB-2022-071.pdf';
  const dailyCopies=['CONS-2016-005.pdf','OBS-2022-044.pdf','OBS-2022-044-scan.jpg'].map(file=>'/members/download/records/'+file);
  const closedGroupCopies=['EV-2022-091.pdf','GR-2022-009.pdf'];
+ const fabrication='/members/download/records/FAB-2020-026.pdf';
+ const handover='/members/download/records/AH-2017-009.pdf';
  assert.equal((await c.binary(pdf)).status,303);
  assert.equal((await c.binary(loanCopy)).status,303);
  await c.login('201204010017','20080519');const aggregate=await c.binary(pdf);assert.equal(aggregate.status,200);assert.equal(aggregate.headers.get('content-type'),'application/pdf');assert.equal(Buffer.from(await aggregate.arrayBuffer()).subarray(0,5).toString(),'%PDF-');
@@ -325,6 +327,8 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary(individualCopy)).status,404);
  assert.equal((await c.binary(westCopy)).status,404);
  for(const file of dailyCopies)assert.equal((await c.binary(file)).status,404,file);
+ assert.equal((await c.binary(fabrication)).status,404);
+ assert.equal((await c.binary(handover)).status,404);
  await c.login('201804010046','20151112');assert.equal((await c.binary(annex)).status,200);
  const individual=await c.binary(individualCopy);
  assert.equal(individual.status,200);assert.equal(individual.headers.get('content-type'),'image/jpeg');
@@ -334,6 +338,8 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary(reorganization)).status,404);
  assert.equal((await c.binary(intakeCopy)).status,404);
  for(const file of dailyCopies)assert.equal((await c.binary(file)).status,200,file);
+ assert.equal((await c.binary(fabrication)).status,200);
+ assert.equal((await c.binary(handover)).status,404);
  for(const file of closedGroupCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,404,file);
  await c.login('201204010000','20100615');const copy=await c.binary(scan);assert.equal(copy.status,200);assert.equal(copy.headers.get('content-type'),'image/jpeg');assert.equal(Buffer.from(await copy.arrayBuffer()).readUInt16BE(0),0xffd8);
  const east=await c.binary(eastWork);assert.equal(east.status,200);assert.equal(east.headers.get('content-type'),'application/pdf');
@@ -354,5 +360,7 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary('/assets/record-media/OBS-2022-044-scan.jpg')).status,404);
  await c.login('201704010038','20161204');
  assert.equal((await c.binary(loanCopy)).status,404);
+ assert.equal((await c.binary(fabrication)).status,404);
+ assert.equal((await c.binary(handover)).status,200);
  for(const file of dailyCopies)assert.equal((await c.binary(file)).status,404,file);
 });

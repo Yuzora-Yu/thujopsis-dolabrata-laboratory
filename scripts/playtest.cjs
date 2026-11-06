@@ -347,9 +347,19 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  await p.locator('.search-results').getByRole('link',{name:/トリム部品設計/}).click();
  assert.match(await p.locator('#activities').innerText(),/2019\.09\.20[\s\S]*名札を受付へ返しました/);
  await p.goto(main('/news/'));assert.equal(await p.locator('.news-rows a[href*="20120416"]').count(),0);assert.equal(await p.locator('.news-rows a[href*="20120903"]').count(),0);
- const fabrication=await document(p,observation.match(/FAB-2020-\d{3}/)[0]);
+ const fabricationId=observation.match(/FAB-2020-\d{3}/)[0];
+ await p.goto(main('/gallery/0019/'));
+ assert.equal(await p.locator('.article-meta time').innerText(),'掲載 2021.03.12');
+ assert.match(await body(p),/2020年の製作時/);
+ await p.getByRole('img',{name:/円弧状の長穴.*丸穴/}).evaluate(image=>image.decode());
+ const fabrication=await document(p,fabricationId);
  assert.match(fabrication,/7月10日の指示[\s\S]*7月13日|7月13日[\s\S]*7月10日の指示/);
  assert.match(fabrication,/外すときは係員を呼ぶ/);
+ assert.match(fabrication,/丸穴と円弧状の長穴[\s\S]*丸穴二か所/);
+ assert.match(fabrication,/旧型図1枚と取付票の控え1枚/);
+ const envelope=fabrication.match(/F\d{2}-\d{4}-\d{2}/)[0];
+ const fabricationPdf=await download(p,'a[href$="'+fabricationId+'.pdf"]','fabrication-change.pdf');
+ assert.deepEqual(fabricationPdf.data,await fs.readFile('private/record-media/'+fabricationId+'.pdf'));
  const handoverId=fabrication.match(/AH-2017-\d{3}/)[0];
  const ashitaRegistration=fabrication.match(/登録(\d{4})/)[1];
  const ashita=unlistedTenants.find(tenant=>tenant['登録番号']===ashitaRegistration);
@@ -359,6 +369,19 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  await login(p,ymd(ashita['入居日'])+ashitaRegistration,ymd(ashita['設立日']));
  const handover=await document(p,handoverId);
  assert.match(handover,/2020年7月15日[\s\S]*取付先欄は空欄/);
+ assert.ok(handover.includes(envelope)&&handover.includes(fabricationId));
+ assert.match(handover,/旧型図1枚と取付票の控え1枚/);
+ assert.match(handover,/受領簿 No\.0006。照合票 AH-2021-006/);
+ await p.setViewportSize({width:390,height:844});
+ try{
+  const rows=p.getByRole('region',{name:'移管作業用の閲覧票'}).locator('tbody td:first-child');
+  const lines=await rows.evaluateAll(cells=>cells.map(cell=>{
+   const text=document.createRange();text.selectNodeContents(cell);
+   return text.getClientRects().length;
+  }));
+  assert.deepEqual(lines,[1,1,1,1]);
+  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+ }finally{await p.setViewportSize({width:1440,height:1000});}
  const handoverPdf=await download(p,'a[href$="'+handoverId+'.pdf"]','handover.pdf');
  assert.deepEqual(handoverPdf.data,await fs.readFile('private/record-media/'+handoverId+'.pdf'));
  const ticket=handover.match(/閲覧票番号\s+(\S+)/)[1],code=handover.match(/照会符号\s+(\S+)/)[1];

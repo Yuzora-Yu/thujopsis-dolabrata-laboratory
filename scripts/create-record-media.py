@@ -44,6 +44,7 @@ STYLES = {
     "ledger": ("Office", "#414c4e", "#eaeeee", "管理簿複写", "form"),
     "watch-log": ("Office", "#393c3b", "#eeeeeb", "居住実証運用室／当直連絡", "form"),
     "workshop-receipt": ("Office", "#574937", "#f1ebe2", "工房受付／預かり控え", "form"),
+    "shop-change": ("Office", "#554a37", "#f1ece3", "工房／製作変更控え", "form"),
     "maintenance": ("Gothic", "#3f5861", "#e8eff0", "施設保守・作業完了", "strip"),
     "operations": ("Gothic", "#1f4a44", "#e3ece7", "区画運用報告", "strip"),
     "decision": ("Gothic", "#313c52", "#eceef2", "事業再編／決裁原議", "strip"),
@@ -81,7 +82,7 @@ def render(record, style_key, target):
     font, accent_hex, pale_hex, register, frame = STYLES[style_key]
     accent, pale = colors.HexColor(accent_hex), colors.HexColor(pale_hex)
     dark = colors.HexColor("#232824")
-    compact = style_key in {"individual", "workshop-receipt", "daily-check", "decision", "watch-log"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
+    compact = style_key in {"individual", "workshop-receipt", "daily-check", "decision", "watch-log", "shop-change"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
     tables = record.get("tables", [])
     participant_sheet = next((item for item in tables if item.get("participantCopy")), None)
     issue_date = datetime.strptime(record.get("updated", record["date"]), "%Y年%m月%d日").strftime("%Y%m%d")
@@ -143,7 +144,7 @@ def render(record, style_key, target):
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):
         flow.append(p(record["signoff"], meta))
-    addendum_title = {"decision": "決裁後の追記", "watch-log": "保存時の照合注記"}.get(style_key)
+    addendum_title = {"decision": "決裁後の追記", "watch-log": "保存時の照合注記", "shop-change": "納入後の訂正・保全"}.get(style_key)
     if addendum_title and record.get("addenda"):
         flow.extend([PageBreak(), p(addendum_title, title)])
     for note in record.get("addenda", []):
