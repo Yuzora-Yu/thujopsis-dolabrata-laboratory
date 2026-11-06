@@ -1,4 +1,4 @@
-import {matchesSearch,normalizeDocumentId,documentLookupMessages} from './search-engine.js';
+import {matchesSearch,searchExcerpt,normalizeDocumentId,documentLookupMessages} from './search-engine.js';
 import {isValidReservation,updateReservationHours} from './assets/reservation-policy.js';
 import {agencyReceipt,classifyEvidence,generalUsePaused,hasOfficeReceipt,inquiryClosed,nextEnding,publicOperationLabel} from './evidence.js';
 import {advanceTrial,trialView} from './lab-core.js';
@@ -147,6 +147,12 @@ async function boot({restoreFragment=false}={}){
  if(rendering)return;rendering=true;
  try{
   const current=route(),params=new URLSearchParams(location.search);
+  const publicSearch=current.kind==='main'&&current.path==='/search/';
+  const keyword=publicSearch?(params.get('q')||'').trim():'';
+  if(publicSearch){
+   const field=document.querySelector('main input[name=q]');
+   if(field&&field.value===field.defaultValue)field.value=keyword;
+  }
   if(current.kind==='archive'&&current.path==='/collections/')filterArchiveCatalogue(params);
   reflectPublicOperation();
   await sitePromise;state=stored(storageKey,state);
@@ -218,10 +224,13 @@ async function boot({restoreFragment=false}={}){
     }
    }
   }
-  if(current.kind==='main'&&current.path==='/search/'){
-   const keyword=params.get('q')||'';const input=document.querySelector('main input[name=q]');if(input)input.value=keyword;
+  if(publicSearch){
    const results=site.entries.filter(x=>matchesSearch(x,keyword)&&(state.ending!=='end2'||x.url!=='/people/asakura-tsumugi/'));
-   const summary=document.querySelector('.search-results');if(summary){summary.innerHTML=keyword?results.map(x=>`<a href="${urlFor(x.url)}"><h2>${esc(x.title)}</h2><p>${esc(x.text.slice(0,100))}…</p></a>`).join('')||'<p>該当するページはありません。</p>':'';summary.previousElementSibling.textContent=keyword?'「'+keyword+'」の検索結果　'+results.length+'件':'';}
+   const summary=document.querySelector('.search-results');
+   if(summary){
+    summary.innerHTML=keyword?results.map(x=>`<a href="${urlFor(x.url)}">${x.published?`<time class="search-result-date" datetime="${esc(x.published)}">${esc(x.published.replaceAll('-','.'))}</time>`:''}<h2>${esc(x.title)}</h2><p>${esc(searchExcerpt(x))}</p></a>`).join('')||'<p>該当するページはありません。</p>':'';
+    summary.previousElementSibling.textContent=keyword?'「'+keyword+'」の検索結果　'+results.length+'件':'';
+   }
   }
  }catch{showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');}
  finally{

@@ -203,11 +203,24 @@ test('publication numbers form tight sequences independent of account registrati
  assert.equal(new Set(news.map(n=>n.id)).size,news.length);
 });
 
-test('public search tolerates spacing and width, and member links open a separate tab',async()=>{
+test('public search tolerates spacing, width and full publication dates; member links open a separate tab',async()=>{
  const c=client();for(const q of ['朝倉紬乃','朝倉 紬乃','朝倉　紬乃','朝 倉  紬'])assert.match((await c.get('/search/?q='+encodeURIComponent(q))).text,/href="\/people\/asakura-tsumugi\//,q);
  assert.match((await c.get('/search/?q='+encodeURIComponent('３Ｄプリンター'))).text,/工房のご案内/);
  assert.match((await c.get('/search/?q='+encodeURIComponent('４１１ 号室'))).text,/href="\/tenants\/0008\//);
  assert.doesNotMatch((await c.get('/search/?q='+encodeURIComponent('４１２号室'))).text,/href="\/tenants\/0013\//);
+ for(const q of ['2012年4月16日掲載','２０１２ 年 ４ 月 １６ 日','2012/4/16','2012.04.16','2012-04-16','20120416']){
+  const result=(await c.get('/search/?q='+encodeURIComponent(q))).text;
+  assert.match(result,/href="\/news\/20120416\/"[\s\S]*?<time[^>]*datetime="2012-04-16"[\s\S]*?開設準備の際に作成した4階配置図/,q);
+ }
+ const east=(await c.get('/search/?q='+encodeURIComponent('2023/6/16 会議室'))).text;
+ assert.match(east,/href="\/news\/20230616\/"[\s\S]*?<time[^>]*datetime="2023-06-16"/);
+ for(const q of ['2012年','2012/4','2012年4月1日','2012-04-31','4月16日']){
+  assert.doesNotMatch((await c.get('/search/?q='+encodeURIComponent(q))).text,/href="\/news\/20120416\//,q);
+ }
+ for(const day of ['2016-05-20','2022-07-15','2026-10-27']){
+  const result=(await c.get('/search/?q='+day)).text;
+  assert.ok(!result.includes(`/news/${day.replaceAll('-','')}/`),day);
+ }
  assert.match((await c.get('/membership/')).text,/href="\/members\/" target="_blank" rel="noopener"/);
  assert.doesNotMatch((await c.get('/')).text,/↗/);
 });

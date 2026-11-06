@@ -108,6 +108,13 @@ function installSeedNotes(){
  document.body.append(dialog);
 }
 
+function referringListing(link){
+ if(!link||!document.referrer)return null;
+ const previous=new URL(document.referrer),destination=new URL(link.href);
+ if(previous.origin!==destination.origin||previous.pathname.replace(/\/index\.html$/,'/')!==destination.pathname)return null;
+ return {previous,destination};
+}
+
 function prepareGallery(){
  const form=document.querySelector('[data-gallery-filter]');
  if(form){
@@ -126,9 +133,9 @@ function prepareGallery(){
   if(target?.matches('.gallery-card:not([hidden])'))requestAnimationFrame(()=>target.scrollIntoView({block:'start'}));
  }
  const returnLink=document.querySelector('[data-gallery-return]');
- if(!returnLink||!document.referrer)return;
- const previous=new URL(document.referrer),destination=new URL(returnLink.href);
- if(previous.origin!==destination.origin||previous.pathname.replace(/\/index\.html$/,'/')!==destination.pathname)return;
+ const listing=referringListing(returnLink);
+ if(!listing)return;
+ const {previous,destination}=listing;
  const previousMethod=previous.searchParams.get('method');
  if(previousMethod===returnLink.dataset.galleryReturn){
   destination.searchParams.set('method',previousMethod);
@@ -136,9 +143,22 @@ function prepareGallery(){
  }
 }
 
+function prepareNewsReturn(){
+ const returnLink=document.querySelector('.article-return a[href$="/news/"]');
+ const listing=referringListing(returnLink);
+ if(!listing)return;
+ const {previous,destination}=listing;
+ for(const parameter of ['year','kind','page']){
+  const value=previous.searchParams.get(parameter);
+  if(value)destination.searchParams.set(parameter,value);
+ }
+ returnLink.href=destination.href;
+}
+
 window.asunaroInit=function(){
 installSeedNotes();
 prepareGallery();
+prepareNewsReturn();
 refreshSeedCollection();
 const searchDialog=document.querySelector('.search-dialog');
 document.querySelector('[data-search-open]')?.addEventListener('click',()=>{searchDialog.showModal();searchDialog.querySelector('input').focus();});

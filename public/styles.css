@@ -425,6 +425,8 @@ dialog{border:0;color:var(--ink)}dialog::backdrop{background:#1024289e;backdrop-
 }
 @media(max-width:520px){.member-sidebar nav{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
+.search-result-date{display:block;color:var(--muted);font-size:.75rem;font-variant-numeric:tabular-nums;margin-bottom:.35rem}
+
 .tenant-profile-tabs{gap:clamp(12px,6vw,70px);margin-bottom:1.65rem}
 .tenant-related-materials{margin-block:3.5rem 2.5rem}
 .tenant-material-list{margin:1.2rem 0 0;padding:0;list-style:none;border-top:1px solid var(--line)}

@@ -3,7 +3,7 @@ import {tenantExhibits} from './world/tenant-exhibits.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
 import {editorialPages,facilityInfo} from './world/editorial.mjs';
 import {facility, gallery, tenants, news, searchEntries, tenantMaterialEntries} from './content.mjs';
-import {matchesSearch} from './search.mjs';
+import {matchesSearch,searchExcerpt} from './search.mjs';
 import {seedNotes,seedNoteTotal,seedCollectionPath} from './seed-notes.mjs';
 import {workshopEquipment} from './world/workshop-equipment.mjs';
 import {workshopHours} from '../public/assets/reservation-policy.js';
@@ -404,7 +404,7 @@ function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCH
  if(t)return tenantProfile(t);
  if(path==='/people/asakura-tsumugi/')return layout('朝倉 紬乃｜制作と活動の記録',heading('PEOPLE','朝倉 紬乃')+`<article class="wrap article narrow prose"><p class="profile-kicker">TSUMUGINO ASAKURA / FABRICATION</p><p>1993年6月18日生まれ。2012年からあすなろの個人会員として制作を始め、2015年より工房の技術支援に従事。生活道具の製作と、過去の制作記録の保全に取り組んでいます。</p>${img('media/p-asakura.webp','2017年、工房の取材時に撮影した朝倉紬乃')}<h2>制作について</h2><p>最初の頃、治具を割ってしまって、もう来ない方がいいのかと聞いたことがあります。榊原先生は、工房の費用で交換できると説明してから、「失敗した人を追い出したら、誰も試せないでしょう」と笑いました。私も同じ説明をできる側になりたいと思いました。</p><p>使った人がいなくなった道具にも、直した跡が残っています。捨てる前に、誰がどこを変えたのか調べるのが好きです。先生の言葉を記録する仕事も、そこから続いています。</p><h2>工房で教わったこと</h2><p>2021年、初めて工房に来た瀬尾灯さんに、機械と材料の扱いをご案内しました。私と一つ違いの年齢で、設計の仕事を経て作業療法士になったと伺いました。困りごとを聞くとすぐ図面を描き始めるので、三枝律と一緒に、今日はどこまで作るかと相談したものです。</p></article>`);
  if(path==='/people/inaba-mio/')return inabaInterview();
- if(path==='/search/'){const keyword=q.trim();const hits=keyword?searchEntries.filter(x=>matchesSearch(x,keyword)&&(ending!=='end2'||x.url!=='/people/asakura-tsumugi/')):[];return layout('サイト内検索',heading('SITE SEARCH','サイト内検索')+`<section class="wrap article narrow"><p class="search-scope">施設HPの公開ページを検索できます。</p><form method="get" class="search-box"><input type="search" name="q" value="${esc(keyword)}" aria-label="キーワード" placeholder="キーワード" required><button type="submit">検索</button></form><p class="small muted">${keyword?`「${esc(keyword)}」の検索結果　${hits.length}件`:''}</p><div class="search-results">${hits.map(h=>`<a href="${h.url}"><h2>${esc(h.title)} ${arrow}</h2><p>${esc(h.text.slice(0,100))}…</p></a>`).join('')}${keyword&&!hits.length?'<p>該当するページはありません。</p>':''}</div></section>`);}
+ if(path==='/search/'){const keyword=q.trim();const hits=keyword?searchEntries.filter(x=>matchesSearch(x,keyword)&&(ending!=='end2'||x.url!=='/people/asakura-tsumugi/')):[];return layout('サイト内検索',heading('SITE SEARCH','サイト内検索')+`<section class="wrap article narrow"><p class="search-scope">施設サイトの公開ページを検索できます。</p><form method="get" class="search-box"><input type="search" name="q" value="${esc(keyword)}" aria-label="キーワード" placeholder="キーワード" required><button type="submit">検索</button></form><p class="small muted" role="status" aria-live="polite">${keyword?`「${esc(keyword)}」の検索結果　${hits.length}件`:''}</p><div class="search-results">${hits.map(h=>`<a href="${h.url}">${h.published?`<time class="search-result-date" datetime="${esc(h.published)}">${esc(h.published.replaceAll('-','.'))}</time>`:''}<h2>${esc(h.title)}</h2><p>${esc(searchExcerpt(h))}</p></a>`).join('')}${keyword&&!hits.length?'<p>該当するページはありません。</p>':''}</div></section>`);}
  return null;
 }
 

@@ -148,8 +148,19 @@ async function newsInterface(p){
  await p.goto(main('/news/'));await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();assert.equal(await p.locator('.news-rows>a:visible').count(),12);
  await p.locator('[name=year]').selectOption('2025');await p.locator('[name=kind]').selectOption('活動報告');await p.locator('.news-filters button').click();await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();
  const rows=await p.locator('.news-rows>a:visible').evaluateAll(nodes=>nodes.map(n=>[n.dataset.newsYear,n.dataset.newsKind]));assert.ok(rows.length>0);assert.ok(rows.every(([year,kind])=>year==='2025'&&kind==='活動報告'));
+ const filtered=p.url();
+ await p.locator('.news-rows>a:visible').first().click();
+ await p.getByRole('link',{name:'お知らせ一覧へ',exact:true}).click();
+ await p.waitForURL(filtered);
+ assert.equal(await p.locator('[name=year]').inputValue(),'2025');
+ assert.equal(await p.locator('[name=kind]').inputValue(),'活動報告');
  await p.locator('[name=kind]').selectOption('工房');await p.locator('.news-filters button').click();await p.getByText('該当するお知らせはありません。',{exact:true}).waitFor();
- await p.goto(main('/news/'));await p.locator('.news-pagination a').last().click();await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();assert.ok(await p.locator('.news-rows a[href$="/news/20120401/"]:visible').count());
+ await p.goto(main('/news/'));await p.locator('.news-pagination a').last().click();await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();
+ const lastPage=p.url();
+ await p.locator('.news-rows a[href$="/news/20120401/"]:visible').click();
+ await p.getByRole('link',{name:'お知らせ一覧へ',exact:true}).click();
+ await p.waitForURL(lastPage);
+ assert.ok(await p.locator('.news-rows a[href$="/news/20120401/"]:visible').count());
  for(const word of ['居住環境実証','生活環境継続試験','RE-2022-006']){await p.goto(main('/search/?q='+encodeURIComponent(word)));assert.equal(await p.locator('a[href$="/news/20160520/"],a[href$="/news/20220715/"]').count(),0);}
 }
 
@@ -270,13 +281,20 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const oldRoom=await p.locator('table tr').filter({hasText:'通路側の扉'}).locator('td').first().innerText();
  const westScan=await download(p,'a[href$="'+westId+'-scan.jpg"]','west-ledger.jpg');
  assert.deepEqual(westScan.data,await fs.readFile('private/record-media/'+westId+'-scan.jpg'));
- const originalPlan=westLedger.match(/図面(A4-\d{2})/)[1];
+ const publishedNotice=westLedger.match(/\d{4}年\d{1,2}月\d{1,2}日掲載/)[0];
  const districtDecisionId=westLedger.match(/決裁通知を受領（参照議事録 (RM-\d{4}-\d{3})/)[1];
  await p.locator('#next-document-id').fill(districtDecisionId);
  await p.locator('.record-lookup button').click();
  await p.getByText('該当する資料は閲覧できません。',{exact:true}).waitFor();
- await p.goto(main('/search/?q='+encodeURIComponent(originalPlan)));
- await p.getByRole('link',{name:/開設時の区画配置について/}).click();
+ await p.goto(main('/'));
+ await p.getByRole('button',{name:'サイト内検索を開く'}).click();
+ const publicSearch=p.locator('.search-dialog');
+ await publicSearch.getByRole('searchbox').fill(publishedNotice);
+ await publicSearch.getByRole('button',{name:'検索',exact:true}).click();
+ const datedNotice=p.locator('.search-results').getByRole('link',{name:/開設時の区画配置について/});
+ assert.equal(await datedNotice.locator('time').getAttribute('datetime'),'2012-04-16');
+ assert.match(await datedNotice.innerText(),/開設準備の際に作成した4階配置図/);
+ await datedNotice.click();
  await p.locator('img[src*="floor-4f-2012.svg"]').waitFor();
  await p.screenshot({path:'.work/qa/'+mode+'-old-map.png',fullPage:true});
  await p.getByRole('button',{name:'サイト内検索を開く'}).click();
