@@ -54,6 +54,8 @@ async function verifyStaticNotice(p,noticePath,{label,heading='',failure=''}={})
  const notice=await p.context().newPage();
  notice.on('pageerror',error=>errors.push(error.message));
  const indexPattern='**/assets/site-index.json',portalPattern='**/assets/portal/*.json';
+ const staleLoader=url=>url.pathname.endsWith('/static-runtime.js')&&!url.search;
+ const staleLoaderHandler=route=>route.fulfill({status:200,contentType:'application/javascript',body:'/* Cached predecessor without notice support. */ export {};'});
  let releaseIndex,releasePortal,portalRequests=0;
  const indexHold=new Promise(resolve=>{releaseIndex=resolve;}),portalHold=new Promise(resolve=>{releasePortal=resolve;});
  const pendingRoutes=[];
@@ -87,6 +89,8 @@ async function verifyStaticNotice(p,noticePath,{label,heading='',failure=''}={})
   assert.equal(await notice.locator('.footer-links').getByRole('link',{name:'入居者紹介',exact:true}).count(),0);
  };
  await notice.route(indexPattern,indexHandler);
+ // A cached predecessor at the old URL must not be used by a new notice shell.
+ await notice.route(staleLoader,staleLoaderHandler);
  if(delayPortal||failure==='portal')await notice.route(portalPattern,portalHandler);
  try{
   await Promise.all([
@@ -120,6 +124,7 @@ async function verifyStaticNotice(p,noticePath,{label,heading='',failure=''}={})
   releaseIndex();releasePortal();
   await Promise.allSettled(pendingRoutes);
   await notice.unroute(indexPattern,indexHandler);
+  await notice.unroute(staleLoader,staleLoaderHandler);
   if(delayPortal||failure==='portal')await notice.unroute(portalPattern,portalHandler);
   await notice.close();
  }
