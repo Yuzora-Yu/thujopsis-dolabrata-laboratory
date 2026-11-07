@@ -96,15 +96,9 @@ def historical_registers():
     c.save()
 
 
-if '--registers-only' in sys.argv:
-    historical_registers()
-    print('Created two historical registers.')
-    raise SystemExit(0)
-
-
-if not {'--missing-only', '--corrections-only', '--akari-only'}.intersection(sys.argv):
-    historical_registers()
+def historical_outline():
     c=paper('ks-1943-06.pdf','第二種国土継続研究 実施概要','収蔵番号 KS-1943-06')
+    c.setDateFormatter(lambda *_: 'D:20170714000000')
     c.setLineWidth(.7);c.rect(40,55,W-80,H-110)
     c.setFont('Mincho',14);c.drawCentredString(W/2,H-105,'第二種國土繼續研究')
     c.setFont('Mincho',21);c.drawCentredString(W/2,H-145,'實　施　概　要')
@@ -118,8 +112,25 @@ if not {'--missing-only', '--corrections-only', '--akari-only'}.intersection(sys
     ]
     for title,text in sections:
      c.setFont('Mincho',12);c.drawString(68,y,title);y-=25;y=para(c,text,80,y,W-158,11,21)-30
-    c.setFont('JP',8);c.drawString(66,88,'保存注記：1945年に研究凍結。処理簿 KS-1945-02 を参照。')
+    c.setFont('JP',8)
+    c.drawString(40,36,'保存室注記　2017年7月14日　紙資料から複写収録')
+    c.drawString(40,23,'1945年に研究凍結。処理簿 KS-1945-02 を参照。')
     c.save()
+
+
+if '--registers-only' in sys.argv:
+    historical_registers()
+    print('Created two historical registers.')
+    raise SystemExit(0)
+
+if '--outline-only' in sys.argv:
+    historical_outline()
+    print('Created the historical outline.')
+    raise SystemExit(0)
+
+if not {'--missing-only', '--corrections-only', '--akari-only'}.intersection(sys.argv):
+    historical_registers()
+    historical_outline()
 
 def newspaper(name,issue,headline,subhead,paragraphs,code):
  c=paper(name,'夕凪日報 '+issue,code)

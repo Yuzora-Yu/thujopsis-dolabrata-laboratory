@@ -37,6 +37,16 @@ test('retired recruitment articles are discoverable through records, not public 
  assert.match(renderMember('/members/records/PN-2022-034/',context('asakura')),/夏帆さんの本/);
 });
 
+test('identity notices stay in the inbox and do not reach unrelated or closed accounts',()=>{
+ const notice=renderMember('/members/messages/',context('institution'));
+ assert.match(notice,/<h2>照会名義の確認<\/h2>/);
+ assert.doesNotMatch(renderMember('/members/activity/',context('institution')),/照会名義の確認/);
+ assert.match(renderMember('/members/records/CH-2021-003/',context('institution')),/href="\/members\/messages\/#reading-notification"/);
+ assert.doesNotMatch(renderMember('/members/messages/',context('minamo')),/reading-notification/);
+ const closed=context('institution');closed.caseState.ending='end3';
+ assert.doesNotMatch(renderMember('/members/messages/',closed),/reading-notification/);
+});
+
 test('current news has operational detail and later references do not appear in old recruitment copies',()=>{
  assert.ok(news.filter(n=>n.listed).length>=30);
  for(const n of news.filter(n=>n.listed)){assert.ok(n.sections?.length>=2,n.id);assert.ok(n.body.length+n.sections.flat().join('').length>180,n.id);}

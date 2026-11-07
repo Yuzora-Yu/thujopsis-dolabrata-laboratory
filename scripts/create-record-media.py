@@ -88,6 +88,8 @@ def render(record, style_key, target):
     dark = colors.HexColor("#232824")
     compact = style_key in {"individual", "workshop-receipt", "trial-intake", "daily-check", "decision", "watch-log", "shop-change"} or record["id"] in {"YH-2013-014", "ENV-2022-031", "HC-2021-031-R"}
     tables = record.get("tables", [])
+    addendum_title = record.get("printAddendumTitle") or {"decision": "決裁後の追記", "watch-log": "保存時の照合注記", "shop-change": "納入後の訂正・保全", "implementation-plan": "実施計画に添えた追記"}.get(style_key)
+    separate_addenda = bool(addendum_title and record.get("addenda"))
     participant_sheet = next((item for item in tables if item.get("participantCopy")), None)
     participant_form = {
         "heading": "日次確認票",
@@ -136,7 +138,7 @@ def render(record, style_key, target):
         flow.append(PageBreak())
     flow.extend([p(record.get("kindLabel", register), meta), p(record["title"], title)])
     info = [["作成", record["date"]], ["管理・作成者", record["owner"]]]
-    if record.get("updated") and style_key != "implementation-plan":
+    if record.get("updated") and not separate_addenda:
         info.append(["最終更新", record["updated"]])
     if frame == "form":
         table(["管理欄", "記載"], info)
@@ -161,8 +163,7 @@ def render(record, style_key, target):
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):
         flow.append(p(record["signoff"], meta))
-    addendum_title = record.get("printAddendumTitle") or {"decision": "決裁後の追記", "watch-log": "保存時の照合注記", "shop-change": "納入後の訂正・保全", "implementation-plan": "実施計画に添えた追記"}.get(style_key)
-    if addendum_title and record.get("addenda"):
+    if separate_addenda:
         flow.extend([PageBreak(), p(addendum_title, title)])
     for note in record.get("addenda", []):
         flow.append(p("追記　" + note["date"] + "　" + note["by"], sub))
