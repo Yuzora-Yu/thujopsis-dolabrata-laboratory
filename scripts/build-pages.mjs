@@ -13,34 +13,28 @@ import {subjectViews} from '../src/world/lab-data.mjs';
 import {labConsoleAsset} from '../src/lab.mjs';
 import {makeArchive} from '../src/archive.mjs';
 import {hostingOrigins,rewriteHostedHtml} from '../src/hosting.mjs';
+import {prepareBrowserAssets,versionHtmlAssets} from './browser-assets.mjs';
 
 const base=(process.env.PAGES_BASE_PATH||'/thujopsis-dolabrata-laboratory').replace(/\/$/,'');
 if(base&&!/^\/[a-zA-Z0-9_-]+$/.test(base))throw new Error('Invalid Pages base path');
 const out=path.resolve('dist/pages'),origins=hostingOrigins(base||''),stageValues={initial:{contact:false,ending:''},contact:{contact:true,ending:''},end1:{contact:true,ending:'end1'},end2:{contact:true,ending:'end2'},end3:{contact:true,ending:'end3'}};
 await mkdir(path.join(out,'assets/portal'),{recursive:true});
 await cp('public/assets',path.join(out,'assets'),{recursive:true});
-for(const name of ['styles.css','app.js','photo-pan.js','seed-drift.js','member-reading.js','reading-state.js','lab-core.js','lab-console.js'])await cp('public/'+name,path.join(out,name));
-await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));
-await cp('src/player-state.mjs',path.join(out,'assets/player-state.js'));
+const rootAssets=['styles.css','app.js','photo-pan.js','seed-drift.js','member-reading.js','reading-state.js','lab-core.js','lab-console.js'];
+for(const name of rootAssets)await cp('public/'+name,path.join(out,name));
+const sourceAssets={'search-engine.js':'src/search.mjs','evidence.js':'src/evidence.mjs','assets/player-state.js':'src/player-state.mjs','static-runtime.js':'scripts/static-runtime.js'};
+for(const [name,source]of Object.entries(sourceAssets))await cp(source,path.join(out,name));
 const labVersion=createHash('sha256').update((await readFile('public/lab-console.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 if(labConsoleAsset!==`/lab-console.js?v=${labVersion}`)throw new Error('Update labConsoleAsset to match public/lab-console.js');
-const playerStateVersion=createHash('sha256').update((await readFile('src/player-state.mjs','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
-const runtimeSource=(await readFile('scripts/static-runtime.js','utf8'))
- .replaceAll("import('./lab-console.js')",`import('.${labConsoleAsset}')`)
- .replaceAll("from './assets/player-state.js'",`from './assets/player-state.js?v=${playerStateVersion}'`);
-await writeFile(path.join(out,'static-runtime.js'),runtimeSource);
-const runtimeVersion=createHash('sha256').update(runtimeSource.replaceAll('\r\n','\n')).digest('hex').slice(0,16);
-const photoPanVersion=createHash('sha256').update((await readFile('public/photo-pan.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
-const seedDriftVersion=createHash('sha256').update((await readFile('public/seed-drift.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
-const styleVersion=createHash('sha256').update((await readFile('public/styles.css','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
-const playerScriptVersion=createHash('sha256').update((await readFile('public/assets/player-record.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
-const playerStyleVersion=createHash('sha256').update((await readFile('public/assets/player-record.css','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
+const assetPaths=[...rootAssets,...Object.keys(sourceAssets),'assets/player-record.js','assets/player-record.css','assets/reservation-policy.js'];
+const browserAssets=prepareBrowserAssets(Object.fromEntries(await Promise.all(assetPaths.map(async name=>[name,await readFile(path.join(out,name),'utf8')]))));
+for(const [name,asset]of browserAssets)await writeFile(path.join(out,name),asset.content);
 function hosted(html,kind='main'){
  // Portal and private-room loading shells intentionally carry no story marker,
  // but their head must load the player module before decrypted body views arrive.
  html=withPlayerAssets(html);
- const result=rewriteHostedHtml(html,{kind,origins,basePath:base}).replaceAll(`src="${base}/seed-drift.js"`,`src="${base}/seed-drift.js?v=${seedDriftVersion}"`).replaceAll(`href="${base}/styles.css"`,`href="${base}/styles.css?v=${styleVersion}"`).replaceAll(`src="${base}/photo-pan.js"`,`src="${base}/photo-pan.js?v=${photoPanVersion}"`).replaceAll(`src="${base}/assets/player-record.js"`,`src="${base}/assets/player-record.js?v=${playerScriptVersion}"`).replaceAll(`href="${base}/assets/player-record.css"`,`href="${base}/assets/player-record.css?v=${playerStyleVersion}"`);
- return result.replace('</head>',`<meta name="asunaro-base" content="${base}"><meta name="asunaro-static" content="true"><script type="module" src="${base}/static-runtime.js?v=${runtimeVersion}"></script></head>`);
+ const result=rewriteHostedHtml(html,{kind,origins,basePath:base}).replace('</head>',`<meta name="asunaro-base" content="${base}"><meta name="asunaro-static" content="true"><script type="module" src="${base}/static-runtime.js"></script></head>`);
+ return versionHtmlAssets(result,{assets:browserAssets,basePath:base});
 }
 function initialShell(html){
  // The static login shell is replaced after its data has loaded. Keep it inert

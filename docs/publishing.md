@@ -47,6 +47,16 @@ Durable Objectsは一人の進行単位ごとに分け、SQLiteへ状態を保�
 
 private/runtime-state.json、.work、.wrangler、.dev.varsはGitの対象外。会員資料と実ZIPはWorkerのコードへ含め、ASSETSからは配信しない。公開アセットのルートはpublic/assetsに限定する。
 
+## 静的版のブラウザー資材
+
+Pagesの2つのビルドでは、scripts/browser-assets.mjsで管理対象のJS・CSSを処理する。相対importの依存先から先に実配信の内容を確定し、その内容のSHA-256先頭16桁をvへ付ける。子の更新は親のURLにも伝わる。HTML本体、会員・旧資料室・結果画面の埋込HTML、動的importが同じ配信版を参照する。物語のURL、会員ID、ケース、ブラウザー保存のキーは変更しない。
+
+現在の15資材は循環のない依存関係である。管理されていないローカルimportや循環を追加した場合は、無版のまま配らずビルドを止める。外部URLはこの処理で書き換えない。Node・Worker用の原稿ファイルは加工せず、静的配布先へ正規化した内容を書き出す。
+
+labConsoleAssetはNode・Workerの原稿版を指す検査値として維持する。Pagesではlab-consoleの内部importを加工するため、HTMLと動的importの両方に、加工後の配信内容から計算した値を使う。原稿値とPagesの配信値を同じものと見なさない。
+
+scripts/playtest-pages-cached-modules.cjsは、実際の旧モジュールを通常のHTTPキャッシュに保存してから現行HTMLへ移る、ローカルの作者用確認。旧GitオブジェクトとEdgeがある環境で実行する。ゲームの保存データへ直接値を書き込む試験ではない。独自ドメイン直下の確認時は先にbuild:cloudflare-pagesを実行し、PAGES_BASE_PATH=/として同じ確認を行う。接続やデプロイはしない。
+
 ## ページ番号と成長段階
 
 src/experience.mjsのexperienceSettingsでshowPageIndex、showGrowthStageを切り替える。ページ・文書・企業・制作物の登録から番号と合計を算出するため、合計の手入力は不要。新しい種類のページを作った際だけ、同ファイルの登録元へ追加する。growthStagesでSEED、ROOT、SPROUT、SAPLING、BRANCH、CANOPY、HEARTWOODの表示名を一括編集できる。番号と段階は最下部のⓒYU-ZORAの右横に配置する。
