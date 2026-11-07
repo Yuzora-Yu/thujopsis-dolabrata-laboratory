@@ -11,6 +11,7 @@ export function renderPlayerRecord() {
   <div class="pr-loading"><p class="pr-status" data-player-status role="status" aria-live="polite">記録を読み込んでいます。</p><button class="pr-button pr-button-quiet" type="button" data-player-reload hidden>もう一度読み込む</button></div>
   <div data-player-record-content hidden>
    <section class="pr-section pr-endings-section" aria-labelledby="pr-endings-title"><div class="pr-section-heading"><h2 id="pr-endings-title">見届けた結末</h2><p>共有する記録を選べます。</p></div><div data-player-endings></div></section>
+   <details class="pr-section pr-restart-section" data-player-restart-section hidden><summary>現在の結末から、探索を続け直す</summary><div class="pr-restart-body"><p>現在の結末と提出状況を戻し、訪れたページから探索を続けられるようにします。</p><p>探索や到達済みENDの記録は残ります。</p><button class="pr-button pr-button-quiet" type="button" data-player-restart-open>戻す内容を確認</button></div></details>
    <section class="pr-section pr-share-section" aria-labelledby="pr-share-title"><h2 id="pr-share-title">探索の記録を共有</h2><p class="pr-muted">共有するのは閲覧件数と選んだEND番号、施設トップのURLだけです。</p>
     <label class="pr-field-label" for="pr-share-text">共有する本文</label><textarea id="pr-share-text" class="pr-share-text" data-player-share-text rows="4" readonly></textarea>
     <div class="pr-actions"><a class="pr-button" data-player-x target="_blank" rel="noopener noreferrer" aria-label="Xで共有（別タブで開きます）">Xで共有</a><button class="pr-button" type="button" data-player-native-share hidden>端末で共有</button><button class="pr-button pr-button-quiet" type="button" data-player-copy>本文をコピー</button></div>
@@ -18,7 +19,6 @@ export function renderPlayerRecord() {
     <p class="pr-action-status" data-player-share-status role="status" aria-live="polite"></p>
    </section>
    <section class="pr-section pr-visits-section" aria-labelledby="pr-visits-title"><div class="pr-section-heading"><h2 id="pr-visits-title">訪れたページ</h2><p class="pr-visit-count" data-player-visit-count></p></div><div class="pr-filters"><div><label class="pr-field-label" for="pr-visit-search">タイトルから探す</label><input id="pr-visit-search" type="search" data-player-visit-search autocomplete="off" placeholder="ページのタイトル"></div><div><label class="pr-field-label" for="pr-visit-group">表示する範囲</label><select id="pr-visit-group" data-player-visit-group><option value="all">すべて</option></select></div></div><p class="pr-small pr-muted" data-player-filter-status role="status" aria-live="polite"></p><p class="pr-small pr-muted">リンク先は現在の探索状況で開きます。会員ページは、現在のログイン名義で表示されます。</p><div data-player-visits></div></section>
-   <details class="pr-section pr-restart-section" data-player-restart-section hidden><summary>現在の結末から、探索を続け直す</summary><div class="pr-restart-body"><p>現在の結末と提出状況を戻し、訪れたページから探索を続けられるようにします。</p><p>探索や到達済みENDの記録は残ります。</p><button class="pr-button pr-button-quiet" type="button" data-player-restart-open>戻す内容を確認</button></div></details>
   </div>
  </main>
  <footer class="pr-footer"><p>このWebサイトの内容は考察コンテンツのために作られたフィクションであり、実在の人物・団体とは一切関係がありません。</p><small>ⓒYU-ZORA</small></footer>

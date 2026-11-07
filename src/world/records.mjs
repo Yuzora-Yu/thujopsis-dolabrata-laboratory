@@ -2724,6 +2724,10 @@ export const researchRecords = [
   {
     "id": "QC-2026-015",
     "title": "説明原稿・検査・生存評価の照合表",
+    "printMetadata": {
+      "creator": "東都研究監査室／文書管理",
+      "producer": "東都研究監査室"
+    },
     "date": "2026年10月29日",
     "owner": "東都研究監査室 倉橋真紀乃／照会添付・個人受領控え",
     "roles": [

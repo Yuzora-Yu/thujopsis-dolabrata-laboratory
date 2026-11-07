@@ -51,15 +51,24 @@ async function changeState(update){
      mirrors.push(mirrorFingerprint(mirror),mirrorFingerprint(serialized));knownMirrors=[...new Set(mirrors)].slice(-1000);
      store.put({...existing,mirrors:knownMirrors},storageKey);recoveryError=legacyConflict(true);return;
     }
-    if(existing){current=existing.state;commit=existing.commit;}
+    if(existing){
+     current=existing.state;commit=existing.commit;
+     // Repair a database imported by the earlier runtime without rolling its
+     // canonical story state back to the older, already-known mirror.
+     const restored=mirror?JSON.parse(mirror):null;
+     if(restored?.id===current.id&&restored.playerStoreVersion===1&&Number.isSafeInteger(restored.playerStoreCommit)&&restored.playerStoreCommit>commit)commit=restored.playerStoreCommit;
+    }
     else{
      if(mirror){try{current=JSON.parse(mirror);}catch{throw storageFailure();}if(!current?.id)throw storageFailure();mirrors.push(mirrorFingerprint(mirror));}
      else current={id:playerToken(),contact:false,downloaded:false,ending:'',truth:false};
+     // A restored mirror may already have a committed generation, even when
+     // this browser has no database yet. Continue it before publishing back.
+     if(current.playerStoreVersion===1&&Number.isSafeInteger(current.playerStoreCommit)&&current.playerStoreCommit>=0)commit=current.playerStoreCommit;
     }
     const before=JSON.stringify(current);
     normalizePlayerState(current);current.playerCsrf ||= playerToken();
     result=update?.(current);
-    if(!existing||JSON.stringify(current)!==before)commit++;
+    if(!existing||commit!==existing.commit||JSON.stringify(current)!==before){if(!Number.isSafeInteger(commit+1))throw storageFailure();commit++;}
     current.playerStoreVersion=1;current.playerStoreCommit=commit;
     serialized=JSON.stringify(current);const fingerprint=mirrorFingerprint(serialized);
     if(!mirrors.includes(fingerprint))mirrors.push(fingerprint);
@@ -71,7 +80,7 @@ async function changeState(update){
    state=current;
    try{
     const mirrorText=localStorage.getItem(storageKey),mirror=stored(storageKey);
-    const newerMirror=mirror?.id===current.id&&mirror.playerStoreVersion===1&&mirror.playerStoreCommit>commit;
+    const newerMirror=mirror?.id===current.id&&mirror.playerStoreVersion===1&&Number.isSafeInteger(mirror.playerStoreCommit)&&mirror.playerStoreCommit>commit;
     if(mirrorText&&!knownMirrors.includes(mirrorFingerprint(mirrorText))&&!newerMirror)throw legacyConflict();
     // A later committed tab may already have sent its mirror notification.
     if(!newerMirror)localStorage.setItem(storageKey,serialized);
