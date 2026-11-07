@@ -1,6 +1,10 @@
 import {venueOpeningHours} from '../../public/assets/reservation-policy.js';
 
 export const storyToday='2026-11-02';
+export const visitorGuide={
+ floor:4, desk:'中央受付', weekdayStart:9, weekdayEnd:17,
+ edition:'見学案内 第4版', revision:'2026年10月改訂',
+};
 export function newsIsAvailable(n){const [year,...rest]=storyToday.split('-');const cutoff=[String(Number(year)-5),...rest].join('-');return n.important||n.restored||n.date.replaceAll('.','-')>=cutoff;}
 export function newsIsListed(n){return newsIsAvailable(n)&&!n.restored&&n.listed!==false;}
 

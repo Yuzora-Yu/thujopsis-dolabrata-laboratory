@@ -5,6 +5,7 @@ const root=path.resolve(__dirname,'..'),out=path.join(root,'.work','qa','pv');
 const source={
  east:'media/f-home-east.webp',
  exterior:'exterior.webp',
+ lounge:'lounge.webp',
  shop:'workshop.webp',
  atlas:'media/p-yoshino-atlas.webp',
  metal:'media/g-metal-lattice.webp',
@@ -16,6 +17,10 @@ const source={
 
 (async()=>{
  await fs.mkdir(out,{recursive:true});
+ const [{facility},{visitorGuide},{seedNotes}]=await Promise.all([
+  import('../src/content.mjs'),import('../src/world/editorial.mjs'),import('../src/seed-notes.mjs'),
+ ]);
+ const guide={...visitorGuide,name:facility.name,stamp:seedNotes['/visit/'].stamp};
  const data=Object.fromEntries(await Promise.all(Object.entries(source).map(async([key,file])=>{
   const format=path.extname(file).slice(1);
   return [key,'data:image/'+format+';base64,'+(await fs.readFile(path.join(root,'public','assets',file))).toString('base64')];
@@ -24,10 +29,10 @@ const source={
  try{
   const page=await browser.newPage({viewport:{width:1280,height:720}});
   await page.setContent('<body style="margin:0;background:#101616"><canvas width="1280" height="720"></canvas></body>');
-  const result=await page.evaluate(async data=>{
+  const result=await page.evaluate(async ({data,guide})=>{
    const W=1280,H=720,canvas=document.querySelector('canvas'),g=canvas.getContext('2d',{alpha:false});
    const duration=30,cueStart=24.55,cueEnd=25.32;
-   const cuts={exterior:4.1,shop:7,atlas:10.15,metal:13.15,exhibit:15.45,moon:17.9,reception:20.1,board:23,end:27};
+   const cuts={exterior:3.65,lounge:5.95,shop:8.65,atlas:11.35,metal:13.95,exhibit:16.2,moon:18.55,reception:20.7,board:23.15,end:27};
    const images=Object.fromEntries(await Promise.all(Object.entries(data).map(async([key,url])=>{const img=new Image();img.src=url;await img.decode();return [key,img];})));
    const type=['video/mp4;codecs=avc1.42001f,mp4a.40.2','video/webm;codecs=vp9,opus'].find(x=>MediaRecorder.isTypeSupported(x));
    if(!type)throw new Error('No local video encoder available');
@@ -50,7 +55,7 @@ const source={
      const air=fastAir-slowAir;
      const vent=.041*Math.sin(tau*118*time+.05*Math.sin(tau*.17*time))
        +.023*Math.sin(tau*237*time)+.011*Math.sin(tau*359*time);
-     const outside=windowGain(time,cuts.exterior,cuts.shop,.36);
+     const outside=windowGain(time,cuts.exterior,cuts.lounge,.36);
      const atmosphere=(1-outside)*(.09*air+vent)+outside*.17*air;
      const tone=(windowGain(time,.4,cuts.exterior,1.15)+windowGain(time,cuts.metal,cuts.reception-.4,.7)+windowGain(time,cuts.end+.1,29.85,.85))
        *(.018*Math.sin(tau*261.63*time)+.011*Math.sin(tau*392*time));
@@ -77,43 +82,46 @@ const source={
     cover('east',t,.55,.52);
     const grad=g.createLinearGradient(0,0,W*.72,0);
     grad.addColorStop(0,'#1b140fe8');grad.addColorStop(1,'#1b140f00');g.fillStyle=grad;g.fillRect(0,0,W,H);
-    text('あすなろ産業支援交流施設',72,227,29,{color:'#f0e9d6'});
+    text(guide.name,72,227,32,{color:'#f0e9d6'});
     text('ともに、',72,325,56);
     text('明日をつくる。',72,402,56);
-    text('ものづくりと交流の拠点、あすなろ。',72,493,29,{color:'#f0e9d6'});
-    g.fillStyle='#211711c9';g.fillRect(1004,619,222,47);
-    text('4階 食堂・カフェ',1018,652,26,{color:'#f0e9d6'});
+    text('仕事とものづくりの拠点',72,493,35,{color:'#f0e9d6'});
+    g.fillStyle='#211711c9';g.fillRect(958,619,268,47);
+    text('4階 食堂・カフェ',974,652,30,{color:'#f0e9d6'});
    }
    function visitorBoard(t){
     const ink='#263c34',muted='#4c6658';
     g.fillStyle='#f3f3ea';g.fillRect(0,0,W,H);
     g.fillStyle='#dce4d0';g.fillRect(846,76,340,458);
     g.drawImage(images.logo,92,83,48,48);
-    text('あすなろ産業支援交流施設',158,116,25,{color:ink});
+    text(guide.name,158,116,25,{color:ink});
     text('見学のご案内',92,252,62,{color:ink});
     g.strokeStyle='#98aa98';g.lineWidth=1;
     g.beginPath();g.moveTo(92,286);g.lineTo(790,286);g.stroke();
     text('受付場所',94,374,26,{color:muted});
-    text('4階 中央受付',284,374,36,{color:ink});
+    text(guide.floor+'階 '+guide.desk,284,374,36,{color:ink});
     text('受付時間',94,447,26,{color:muted});
-    text('平日 9:00–17:00',284,447,36,{color:ink});
-    text('ラウンジと共用エリアをご案内します。',94,531,25,{color:ink});
-    text('4F',914,331,125,{color:'#3a5949'});
-    text('中央受付',925,403,31,{color:ink});
+    text('平日 '+guide.weekdayStart+':00–'+guide.weekdayEnd+':00',284,447,36,{color:ink});
+    text('ラウンジと共用エリアをご案内いたします。',94,531,25,{color:ink});
+    text(guide.floor+'F',914,331,125,{color:'#3a5949'});
+    text(guide.desk,925,403,31,{color:ink});
     g.beginPath();g.moveTo(92,585);g.lineTo(1186,585);g.stroke();
-    text('見学案内 第4版',94,630,29,{color:muted});
-    text('2026年10月改訂',737,630,29,{color:muted});
-    text(t>=cueStart&&t<cueEnd?'17:14 呼出継続':'17:06 差替',1186,630,29,{color:muted,align:'right'});
+    text(guide.edition,94,630,29,{color:muted});
+    text(guide.revision,737,630,29,{color:muted});
+    text(t>=cueStart&&t<cueEnd?'17:14 呼出':guide.stamp,1186,630,29,{color:muted,align:'right'});
    }
    function frame(t){
     if(t<cuts.exterior){
      opening(t);
-    }else if(t<cuts.shop){
+    }else if(t<cuts.lounge){
      cover('exterior',t-cuts.exterior,.5,.6);
-     lower('あすなろ産業支援交流施設','企業とつくり手が集う場所。');
+     lower(guide.name,'企業とつくり手が集う場所。');
+    }else if(t<cuts.shop){
+     cover('lounge',t-cuts.lounge,.5,.54);
+     lower('4階 コワーキング・ラウンジ','集中する席も、話せる席も。');
     }else if(t<cuts.atlas){
      cover('shop',t-cuts.shop,.64,.64);
-     lower('4F / 工房2','道具を、つくってみる。');
+     lower('4階 工房2','道具を、つくってみる。');
     }else if(t<cuts.metal){
      cover('atlas',t-cuts.atlas,.5,.53);
      lower('工房の製本相談 ／ 2022年4月','使い続けるために、直す。');
@@ -122,25 +130,25 @@ const source={
      lower('工房でつくった展示品','金属3Dプリンターの試験片');
     }else if(t<cuts.moon){
      cover('exhibit',t-cuts.exhibit,.5,.71);
-     lower('4階 ラウンジ前','月へ持っていくもの。');
+     lower('4階 ラウンジ前','月の企画展示');
     }else if(t<cuts.reception){
      cover('moon',t-cuts.moon,.68,.5);
-     lower('企画展示 ／ 月面居住区の構想図','月に、暮らしを持っていく。');
+     lower('月に、暮らしを持っていく。','月面居住区の構想図');
     }else if(t<cuts.board){
      cover('reception',t-cuts.reception,.5,.64);
-     lower('4F / 中央受付','見学は、中央受付へ。');
+     lower(guide.floor+'階 '+guide.desk,'見学は、'+guide.desk+'へ。');
     }else if(t<cuts.end){
      visitorBoard(t);
     }else{
      g.fillStyle='#edf1e4';g.fillRect(0,0,W,H);
      g.drawImage(images.logo,100,227,104,104);
-     text('あすなろ産業支援交流施設',228,296,49,{color:'#21382f'});
+     text(guide.name,228,296,49,{color:'#21382f'});
      text('ともに、明日をつくる。',229,362,29,{color:'#4f6858'});
      text('この映像は、架空の施設を紹介する作品です。',100,650,29,{color:'#354e40'});
      text('© YU-ZORA',1015,650,22,{color:'#4f6858'});
     }
    }
-   const samples=[2.4,5.7,8.5,11.7,14.3,16.7,19,21.6,24.3,24.95,25.7,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
+   const samples=[2.4,4.8,7.3,10,12.6,15.1,17.4,19.65,21.9,24.3,24.95,25.7,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
    frame(0);
    const audio=new AudioContext({sampleRate:48000});
    const audioCapture=audio.createMediaStreamDestination();
@@ -174,7 +182,7 @@ const source={
     reader.readAsDataURL(blob);
    });
    return {container,encoded,samples};
-  },data);
+  },{data,guide});
   const ext=result.container==='video/mp4'?'mp4':'webm';
   const target=path.join(out,'asunaro-facility-pv.'+ext);
   const movie=Buffer.from(result.encoded,'base64');
