@@ -11,6 +11,7 @@
     "build:worker": "node scripts/build-worker.mjs",
     "build:pages": "node scripts/build-pages.mjs",
     "preview:pages": "node scripts/serve-pages.mjs",
+    "preview:cloudflare-pages": "node scripts/serve-cloudflare-pages.mjs",
     "dev:cloudflare": "wrangler dev",
     "typecheck": "tsc --noEmit",
     "build:hints": "node scripts/build-hint-plan.mjs",

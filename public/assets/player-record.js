@@ -42,7 +42,12 @@ function originBase(value) {
 function routeUrl(kind, path) {
  const base = originBase(current?.origins?.[kind]);
  const pathname = safePath(path);
- return base && pathname ? base + pathname : null;
+ if (!base || !pathname) return null;
+ const url = new URL(base + pathname);
+ if (['hozen','audit'].includes(kind) && ['/receive/','/received/'].includes(pathname) && /^[a-f0-9]{48}$/.test(current?.caseId || '')) {
+  url.searchParams.set('case', current.caseId);
+ }
+ return url.href;
 }
 function mainUrl() { return routeUrl('main', '/'); }
 function recordUrl() { return routeUrl('main', '/player-record/'); }
@@ -197,9 +202,11 @@ function marker() {
 }
 function pageTitle(page) {
  if (page.path.endsWith('/search/')) return 'サイト内検索';
+ if (page.path.endsWith('/console/subjects/')) return '被験者の測定原票';
  if (page.path.includes('/console/')) return '研究コンソール';
  const title = document.title.replace(/\s*[|｜]\s*(?:あすなろ産業支援交流施設|あすなろ会員サイト|産業継続研究資料 保存室|記録保全受付)\s*$/u, '').trim();
- return (title || 'ページ').replace(/\s+/gu, ' ').slice(0, 180);
+ const label = ['hozen','audit'].includes(page.kind) ? page.path === '/received/' ? '：受付控え' : page.path === '/receive/' ? '：資料の提出' : '' : '';
+ return ((title || 'ページ') + label).replace(/\s+/gu, ' ').slice(0, 180);
 }
 async function recordVisiblePage() {
  const page = marker();

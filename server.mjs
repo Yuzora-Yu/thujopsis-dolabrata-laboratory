@@ -62,7 +62,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     const session=sessionFor(req,res),state=cases.get(session.caseId);
     const json=(status,value)=>send(res,status,JSON.stringify(value),'application/json; charset=utf-8');
     normalizePlayerState(state);
-    if(req.method==='GET'){persist();return json(200,playerSnapshot(state,{csrf:session.csrf,origins}));}
+    if(req.method==='GET'){persist();return json(200,playerSnapshot(state,{csrf:session.csrf,caseId:session.caseId,origins}));}
     if(req.method!=='POST')return json(405,{error:'受付方法をご確認ください。'});
     const {fields}=await readBody(req);
     if(!safeEqual(fields.csrf,session.csrf))return json(403,{error:'閲覧情報を更新して再度お試しください。'});
@@ -72,7 +72,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
       restartPlayerState(state,fields.revision);
       for(const item of sessions.values())if(item.caseId===session.caseId)item.csrf=token();
      }else throw new PlayerStateError('記録の操作を確認できませんでした。');
-     persist();return json(200,playerSnapshot(state,{csrf:session.csrf,origins}));
+     persist();return json(200,playerSnapshot(state,{csrf:session.csrf,caseId:session.caseId,origins}));
     }catch(error){if(error instanceof PlayerStateError)return json(error.status,{error:error.message});throw error;}
    }
    // Only this directory is a static root. Server sources and protected records are never served.

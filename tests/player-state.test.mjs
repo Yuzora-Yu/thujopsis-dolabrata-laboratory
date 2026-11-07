@@ -41,6 +41,9 @@ test('visits strip query data, merge by provider/path, retain first time, and va
  for(const invalid of [{path:'https://other.invalid/'},{path:'//other.invalid/'},{path:'/%5cother/'},{kind:'other'},{title:'<script>'},{stage:'unknown'}])
   assert.throws(()=>addPlayerVisit(state,{...visit,...invalid}));
  const snapshot=playerSnapshot(state);snapshot.visits[0].title='changed';assert.notEqual(state.visits[0].title,'changed');
+ assert.equal(snapshot.caseId,'','a legacy fixture without an ID remains supported');
+ state.id='static-case';assert.equal(playerSnapshot(state).caseId,'static-case');
+ assert.equal(playerSnapshot(state,{caseId:'session-case'}).caseId,'session-case','an explicit server session ID wins over any stored ID');
  state.visits=Array.from({length:maxPlayerVisits},(_,i)=>({kind:'main',path:'/item/'+i+'/',title:'記事',stage:'seed',firstVisitedAt:at,lastVisitedAt:at}));
  assert.throws(()=>addPlayerVisit(state,{...visit,path:'/one-more/'}),/上限/);
  addPlayerVisit(state,{...visit,path:'/item/0/'});assert.equal(state.visits.length,maxPlayerVisits);
@@ -83,18 +86,22 @@ async function formFor(c,kind,caseId,zip){
  return form;
 }
 
-test('player API is available on every surface, rejects malformed writes, and never switches cases by query',async()=>{
+test('player API is available on every surface, exposes only its own case, and never switches cases by query or body',async()=>{
  const app=createApplication(),c=client(app),initial=await c.context();
  assert.equal(initial.revision,0);assert.equal(initial.ending,'');assert.deepEqual(initial.endings,[]);assert.deepEqual(initial.origins,app.origins);
- for(const kind of ['archive','hozen','audit'])assert.equal((await c.context(kind)).csrf,initial.csrf);
+ assert.equal(initial.caseId,c.session.caseId);
+ for(const kind of ['archive','hozen','audit']){const context=await c.context(kind);assert.equal(context.csrf,initial.csrf);assert.equal(context.caseId,initial.caseId);}
  const request=fields=>c.request('/player-record/api/',{method:'POST',fields});
  assert.equal((await request({...visit,csrf:'wrong',action:'visit'})).status,403);
  assert.equal((await request({...visit,csrf:initial.csrf,action:'visit'})).status,200);
  assert.equal((await request({...visit,path:'//bad.invalid/',csrf:initial.csrf,action:'visit'})).status,400);
  assert.equal((await request({csrf:initial.csrf,action:'restart',revision:0})).status,409);
- const other=client(app);await other.context();assert.notEqual(c.session.caseId,other.session.caseId);
+ const other=client(app),otherContext=await other.context();assert.notEqual(c.session.caseId,other.session.caseId);assert.equal(otherContext.caseId,other.session.caseId);
  const response=await c.request('/player-record/api/?case='+other.session.caseId);
- assert.equal(response.json().visits.length,1);assert.equal(app.cases.get(other.session.caseId).visits.length,0);
+ assert.equal(response.json().caseId,initial.caseId);assert.equal(response.json().visits.length,1);assert.equal(app.cases.get(other.session.caseId).visits.length,0);
+ const bodyTarget=await request({...visit,case:other.session.caseId,caseId:other.session.caseId,csrf:initial.csrf,action:'visit'});
+ assert.equal(bodyTarget.status,200);assert.equal(bodyTarget.json().caseId,initial.caseId);assert.equal(c.session.caseId,initial.caseId);
+ assert.equal(app.cases.get(other.session.caseId).visits.length,0);assert.equal(JSON.stringify(bodyTarget.json()).includes(other.session.caseId),false);
  await Promise.all(Array.from({length:20},(_,i)=>request({...visit,path:'/parallel/'+i+'/',csrf:initial.csrf,action:'visit'})));
  assert.equal((await c.context()).visits.length,21);
 });
@@ -108,8 +115,8 @@ test('restart rotates only this case sessions, keeps authentication, and rejects
  assert.equal(peer.session.caseId,c.session.caseId,'a case-linked form in a fresh browser binds the same case');
  const peerCsrf=peer.session.csrf,account=c.session.accountId;
  const other=client(app);await other.context();const untouched=structuredClone(app.cases.get(other.session.caseId)),otherCsrf=other.session.csrf;
- const restart=await c.request('/player-record/api/',{method:'POST',fields:{action:'restart',csrf:snapshot.csrf,revision:snapshot.revision}});
- assert.equal(restart.status,200);assert.equal(restart.json().revision,1);assert.notEqual(restart.json().csrf,snapshot.csrf);
+ const restart=await c.request('/player-record/api/?case='+other.session.caseId,{method:'POST',fields:{action:'restart',case:other.session.caseId,caseId:other.session.caseId,csrf:snapshot.csrf,revision:snapshot.revision}});
+ assert.equal(restart.status,200);assert.equal(restart.json().caseId,c.session.caseId);assert.equal(restart.json().revision,1);assert.notEqual(restart.json().csrf,snapshot.csrf);
  assert.equal((await c.request('/player-record/api/',{method:'POST',fields:{action:'restart',csrf:restart.json().csrf,revision:0}})).status,409);
  assert.notEqual(peer.session.csrf,peerCsrf);assert.equal(c.session.accountId,account);assert.equal(other.session.csrf,otherCsrf);
  assert.deepEqual(app.cases.get(other.session.caseId),untouched);

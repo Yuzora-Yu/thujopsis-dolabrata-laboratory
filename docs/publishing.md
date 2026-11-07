@@ -25,6 +25,8 @@ mainへのPushで.github/workflows/pages.ymlが動く。テスト、公開HTML�
 
 最低限の公開にはCloudflare Pages Freeへ静的版を置く。`npm run build:cloudflare-pages`で、ドメイン直下用のdist/pagesをローカル生成する。作成処理はCloudflareへ接続せず、DNSや契約を変更しない。Cloudflare側のGit連携を使う場合も、出力ディレクトリはdist/pages、ビルドコマンドは同じものを指定できる。
 
+そのまま手元で確認する場合は`npm run preview:cloudflare-pages`を実行し、http://127.0.0.1:4817/を開く。`preview:pages`はGitHub用のサブディレクトリ配置に対応する別のコマンドであり、直下用ビルドの確認には使わない。どちらも同じローカル配信処理を使い、ネットワーク上の公開先へ接続しない。
+
 候補はasunaro.yu-zora.com。既存ドメインのサブドメインを使い、別のドメインを購入しない。最小構成では資料室、保全窓口、監査室を/historical-records/、/records-center/、/independent-review/へ配置する。別オリジンではIndexedDB・localStorageの保存領域が共有されないため、静的版を単純に複数のサブドメインへ分ける設定にはしない。
 
 後日用途を分ける場合の候補はasunaro-archive.yu-zora.com、hozen.yu-zora.com、asunaro-guide.yu-zora.com。いずれも未設定。複数サイト間で進行を連携する方式は、公開構成を決めてから選ぶ。

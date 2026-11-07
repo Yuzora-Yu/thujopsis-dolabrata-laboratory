@@ -2,7 +2,7 @@ import {DurableObject} from 'cloudflare:workers';
 import {Buffer} from 'node:buffer';
 import {createApplication} from '../server.mjs';
 import {buildEvidenceArchive,healthComparisonFile} from '../src/archive.mjs';
-import {hostingOrigins,providerRoute,rewriteHostedHtml} from '../src/hosting.mjs';
+import {hostingOrigins,providerRoute,rewriteHostedHtml,acceptsCaseLink} from '../src/hosting.mjs';
 import evidence from './evidence.generated.mjs';
 
 const MAX_BODY=25*1024*1024;
@@ -74,10 +74,11 @@ export default {
    const fromCookie=request.headers.get('cookie')?.match(/(?:^|;\s*)asunaro_session=[a-f0-9]+\.([a-f0-9]{48})/)?.[1];
    const body=request.method==='POST'?await limitedBody(request):new ArrayBuffer(0);
    let fromForm='';
-   if(route.kind==='audit'||route.kind==='hozen'){
+   const caseLink=acceptsCaseLink(route);
+   if(caseLink){
     if(request.method==='POST'){const copy=new Request(request.url,{method:'POST',headers:request.headers,body});fromForm=String((await copy.formData()).get('case')||'');}
    }
-   const linkedCase=fromForm||url.searchParams.get('case')||'';
+   const linkedCase=caseLink?(fromForm||url.searchParams.get('case')||''):'';
    const caseId=/^[a-f0-9]{48}$/.test(linkedCase)?linkedCase:fromCookie||Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,'0')).join('');
    return await env.CASE_STATE.getByName(caseId).dispatch(request.url,request.method,Object.fromEntries(request.headers),body,caseId);
   }catch(error){

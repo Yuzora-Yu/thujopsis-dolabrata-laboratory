@@ -10,6 +10,9 @@ export function providerRoute(url,origins){
  }
  return {kind:'main',path:url.pathname};
 }
+export function acceptsCaseLink({kind,path}){
+ return (kind==='hozen'||kind==='audit')&&['/','/receive/','/received/'].includes(path);
+}
 export function rewriteHostedHtml(html,{kind='main',origins,basePath=''}){
  return html.replace(/\b(href|src|poster|action|data-image-open)="([^"\n]*)"/g,(all,key,value)=>{
   if(!value.startsWith('/')||value.startsWith('//'))return all;

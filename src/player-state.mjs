@@ -95,9 +95,9 @@ export function restartPlayerState(state, revision, now = Date.now()) {
  return state;
 }
 
-export function playerSnapshot(state, {csrf = '', origins = {}, now = Date.now()} = {}) {
+export function playerSnapshot(state, {csrf = '', caseId = state.id || '', origins = {}, now = Date.now()} = {}) {
  normalizePlayerState(state, now);
- return {csrf, ending: endingIds.has(state.ending) ? state.ending : '',
+ return {csrf, caseId: typeof caseId === 'string' ? caseId : '', ending: endingIds.has(state.ending) ? state.ending : '',
   endings: state.endings.map(entry => ({...entry})), visits: state.visits.map(entry => ({...entry})),
   revision: state.revision, origins: {...origins}};
 }

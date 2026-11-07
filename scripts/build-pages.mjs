@@ -24,7 +24,10 @@ await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evide
 await cp('src/player-state.mjs',path.join(out,'assets/player-state.js'));
 const labVersion=createHash('sha256').update((await readFile('public/lab-console.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 if(labConsoleAsset!==`/lab-console.js?v=${labVersion}`)throw new Error('Update labConsoleAsset to match public/lab-console.js');
-const runtimeSource=(await readFile('scripts/static-runtime.js','utf8')).replaceAll("import('./lab-console.js')",`import('.${labConsoleAsset}')`);
+const playerStateVersion=createHash('sha256').update((await readFile('src/player-state.mjs','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
+const runtimeSource=(await readFile('scripts/static-runtime.js','utf8'))
+ .replaceAll("import('./lab-console.js')",`import('.${labConsoleAsset}')`)
+ .replaceAll("from './assets/player-state.js'",`from './assets/player-state.js?v=${playerStateVersion}'`);
 await writeFile(path.join(out,'static-runtime.js'),runtimeSource);
 const runtimeVersion=createHash('sha256').update(runtimeSource.replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const photoPanVersion=createHash('sha256').update((await readFile('public/photo-pan.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
