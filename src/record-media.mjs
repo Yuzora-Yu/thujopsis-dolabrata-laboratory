@@ -9,7 +9,8 @@ const editions=[
  ['OR-2006-004','memo',true],['RG-2007-011','letter',true],['AH-2021-006','ledger'],['HC-2021-031-R','ledger',true],
  ['CONS-2016-005','consent'],['YH-2022-034','trial-intake',true],['OBS-2022-044','daily-check',true],
  ['ENV-2022-031','transfer'],['EV-2022-091','watch-log'],['GR-2022-009','group-review'],['YH-2022-017','decision'],['AP-2022-028','evaluation'],['OPS-2026-084','operations'],
- ['AS-2023-008','memo'],['FAB-2022-071','workshop-receipt'],['PN-2022-034','workshop-receipt',true],
+ ['AS-2023-008','memo'],['FAB-2022-071','workshop-receipt'],
+ ['PN-2022-034','workshop-receipt',true,{pdf:'受領票と後日の書面（PDF）',image:'9月2日の預かり控え（画像）'}],
 ];
 const printLabels={
  ledger:'保存複写（PDF）',
@@ -22,9 +23,9 @@ const printLabels={
  'shop-change':'工房の製作票と追記（PDF）',
  'group-review':'評価総括の提出控え（PDF）',
 };
-export const recordMedia=editions.flatMap(([id,style,scan])=>[
- {id,style,filename:id+'.pdf',type:'application/pdf',label:printLabels[style]||'配布資料（PDF）'},
- ...(scan?[{id,style,filename:id+'-scan.jpg',type:'image/jpeg',label:style==='daily-check'||style==='trial-intake'?'本人控えの複写（画像）':'保存複写（画像）'}]:[]),
+export const recordMedia=editions.flatMap(([id,style,scan,labels={}])=>[
+ {id,style,filename:id+'.pdf',type:'application/pdf',label:labels.pdf??printLabels[style]??'配布資料（PDF）'},
+ ...(scan?[{id,style,filename:id+'-scan.jpg',type:'image/jpeg',label:labels.image??(style==='daily-check'||style==='trial-intake'?'本人控えの複写（画像）':'保存複写（画像）')}]:[]),
 ]);
 const byFilename=new Map(recordMedia.map(item=>[item.filename,item]));
 export const recordMediaPrefix='/members/download/records/';

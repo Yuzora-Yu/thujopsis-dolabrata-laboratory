@@ -97,6 +97,27 @@ test('cohort records distinguish the participant copy, dispatch and night duty',
  assert.equal(incident.tables[0].rows.at(-1)[1],'P-033の死亡を確認');
 });
 
+test('the evaluation summary can be traced to the joint request and the duty log',()=>{
+ const byId=id=>documents.find(document=>document.id===id);
+ const summary=byId('GR-2022-009').tables[0].rows;
+ const cooperation=summary.find(([label])=>label.startsWith('食事を取り分け'));
+ assert.match(cooperation[1],/PN-2022-034\n9月2日・9日/);
+ const request=summary.find(([label])=>label==='全員の退出を求める');
+ assert.deepEqual(request.slice(1),['PN-2022-034\n9月10日の控え','除外。条件変更の要求']);
+ const receipt=byId('PN-2022-034');
+ const joint=receipt.entries.find(entry=>entry.by.includes('共同申出の控え'));
+ assert.equal(joint.at,'2022年9月10日');
+ assert.match(joint.by,/瀬尾灯・青井真澄/);
+ assert.match(joint.text,/一人ずつ聞いてください.*希望どおりに外へ/);
+ assert.match(recordText(receipt),/夏帆さんが一人ずつ包んでいました/);
+ assert.match(recordText(receipt),/申出の原本は受付の担当に渡しました/);
+ const aid=summary.find(([label])=>label==='救護を要請');
+ assert.deepEqual(aid.slice(1),['EV-2022-091\n21:12、21:14','除外。群外の資源要求']);
+ const calls=byId('EV-2022-091').tables[0].rows;
+ assert.match(calls.find(([time])=>time==='21:12')[1],/外の救急/);
+ assert.match(calls.find(([time])=>time==='21:14')[1],/人を呼んで/);
+});
+
 test('public facility routes do not announce the old archive and the first clipping is a direct PDF',()=>{
  for(const route of publicPaths){const html=renderPublic(route)||'';assert.doesNotMatch(html,/href="[^"]*(?:historical-records|127\.0\.0\.1:4176|\/snapshots\/)/,route);}
  assert.doesNotMatch(renderPublic('/about/history/'),/準備期の公開記録/);

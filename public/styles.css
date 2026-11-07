@@ -69,7 +69,8 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .snapshot-notice figure{margin:1.4rem 0 0;max-width:32rem}
 .snapshot-notice figcaption{margin-top:.4rem;color:#58675f;font-size:.75rem}
 [data-member-record="AH-2017-009"] .record-table tbody td:first-child,
-[data-member-record="ENV-2022-031"] #record-table-2 tbody td:first-child{white-space:nowrap}
+[data-member-record="ENV-2022-031"] #record-table-2 tbody td:first-child,
+[data-member-record="GR-2022-009"] #record-table-1 tbody td:nth-child(2){white-space:nowrap}
 .record-revision{display:block;font-size:.75rem;color:#6a7670;margin-top:.5rem}.record-table:focus-visible{outline:2px solid #547262;outline-offset:5px}
 .reading-expand{margin:1rem 0}.reading-expand summary{cursor:pointer;color:#315a49;text-decoration:underline;text-underline-offset:.25em;width:fit-content;padding:.45rem 0}.reading-expand[open]+.reading-preview{display:none}.reading-list .reading-omission{padding:.4rem 0 .4rem 3rem;color:#8a958d;border:0}
 .portal-loading{max-width:40rem;margin:5rem auto;padding:2rem;color:#68766e;min-height:35vh}

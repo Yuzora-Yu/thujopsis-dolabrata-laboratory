@@ -595,12 +595,29 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const summaryId=incident.match(/GR-2022-\d{3}/)[0];
  const summary=await document(p,summaryId);
  assert.match(summary,/自発的淘汰/);
- assert.match(summary,/当直連絡21:12、21:14[\s\S]*除外。群外の資源要求/);
+ const rescueRow=p.getByRole('row').filter({hasText:'救護を要請'});
+ assert.match(await rescueRow.innerText(),/EV-2022-091\s+21:12、21:14[\s\S]*除外。群外の資源要求/);
+ const excludedRequest=p.getByRole('row').filter({hasText:'全員の退出を求める'});
+ const excludedText=await excludedRequest.innerText();
+ assert.match(excludedText,/9月10日の控え[\s\S]*除外。条件変更の要求/);
+ await p.setViewportSize({width:320,height:844});
+ try{
+  const sources=p.getByRole('region',{name:'第3居住群／採否'}).locator('tbody td:nth-child(2)');
+  assert.deepEqual(await sources.evaluateAll(cells=>cells.map(cell=>{
+   const range=document.createRange();range.selectNodeContents(cell);
+   return new Set([...range.getClientRects()].map(rect=>rect.top)).size;
+  })),[2,2,2,2,1]);
+  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
+ }finally{await p.setViewportSize({width:1440,height:1000});}
  const summaryFile=summaryId+'.pdf';
  const summaryPrint=await download(p,'a[href$="'+summaryFile+'"]',summaryFile);
  assert.deepEqual(summaryPrint.data,await fs.readFile('private/record-media/'+summaryFile));
- const intakeId=incident.match(/PN-2022-\d{3}/)[0];
+ const intakeId=excludedText.match(/PN-2022-\d{3}/)[0];
  const intake=await document(p,intakeId);
+ const petition=p.locator('.record-entries li').filter({hasText:'共同申出の控え'});
+ assert.match(await petition.innerText(),/2022年9月10日[\s\S]*瀬尾灯・青井真澄[\s\S]*一人ずつ聞いてください[\s\S]*希望どおりに外へ/);
+ await p.getByRole('link',{name:'受領票と後日の書面（PDF）'}).waitFor();
+ await p.getByRole('link',{name:'9月2日の預かり控え（画像）'}).waitFor();
  assert.match(intake,/青い布表紙の地図帳（別包み）/);
  assert.match(intake,/料理帳の複写/);
  assert.match(intake,/夏帆さんの本を返却済みにしないでください/);
@@ -631,6 +648,10 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  const personName=pdfText.match(/申出者\s+([^\n]+)/)[1].trim(),personId=pdfText.match(/会員ID\s+([A-Z0-9]+)/)[1];
  await p.goto(main('/search/?q='+encodeURIComponent(personName.replace(/\s+/g,''))));await p.getByRole('link',{name:/制作と活動の記録/}).click();const personalText=await body(p),birth=ymd(personalText);await login(p,personId,birth);await p.getByRole('link',{name:'個人保存資料',exact:true}).first().click();
  await document(p,'AS-2024-002');await document(p,'AS-2026-014');await document(p,'TR-2026-011');const complete=await download(p,'a[href$="complete.zip"]','complete.zip');const groupRecords=JSON.parse(zipEntry(complete.data,'実験記録.json').toString());const originalDocuments=JSON.parse(zipEntry(complete.data,'文書原本.json').toString()).documents;assert.ok(originalDocuments.some(d=>d.id==='CH-2021-003'&&d.entries.length));assert.ok(originalDocuments.some(d=>d.id==='EV-2022-091'&&d.tables.length));assert.ok(originalDocuments.every(d=>!('roles' in d)&&!('audit' in d)));const measurementSheets=JSON.parse(zipEntry(complete.data,'適性測定原票.json').toString());assert.equal(measurementSheets.sheets.length,5);assert.ok(!JSON.stringify(measurementSheets).includes('星をみる灯'));assert.equal(groupRecords.closed_group.victim.id,'P-033');assert.ok(groupRecords.closed_group.sources.includes('GR-2022-009'));assert.ok(groupRecords.subjects.some(subject=>subject.id==='P-031'));assert.match(await document(p,personalReviewId),/本人の移送承諾なし/);await p.screenshot({path:'.work/qa/'+mode+'-group-crosscheck.png',fullPage:true});await p.setViewportSize({width:390,height:844});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await p.screenshot({path:'.work/qa/'+mode+'-group-mobile.png',fullPage:true});await p.setViewportSize({width:1440,height:1000});const privateRecord=await document(p,'AS-2024-002'),friendPrivateId=privateRecord.match(/AS-2023-\d{3}/)[0];assert.match(await document(p,friendPrivateId),/誰が決めてもいい形/);assert.match(await document(p,'P034-2026-102'),/いま帰りたい/);await document(p,'AS-2026-021');await document(p,'AS-2026-019');if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-assessment]:visible').waitFor();assert.equal(await p.locator('[data-lab-assessment-handle]').innerText(),'星をみる灯');}await p.locator('[data-reading-ledger="combined"] .reading-list li:visible').first().waitFor();const routeNames=await p.locator('[data-reading-ledger="combined"] .reading-source').allTextContents();assert.ok(routeNames.some(x=>x.includes('ミナモ')));assert.ok(routeNames.some(x=>x.includes('オルディス')));await p.screenshot({path:'.work/qa/'+mode+'-reader-path.png',fullPage:true});await document(p,'EA-2026-009');await p.getByRole('link',{name:/東都研究監査室・記録保全受付/}).click();
+ const preservedIntake=originalDocuments.find(record=>record.id===intakeId);
+ const preservedPetition=preservedIntake.entries.find(entry=>entry.by.includes('共同申出の控え'));
+ assert.match(preservedPetition.text,/いまいる人に一人ずつ聞いてください/);
+ assert.match(groupRecords.closed_group.excluded,/全員に退出の意思を確かめる/);
  const healthCopy=await fs.readFile('private/record-media/HC-2021-031-R.pdf');
  assert.deepEqual(zipEntry(complete.data,'HC-2021-031-R.pdf'),healthCopy);
  assert.ok(originalDocuments.some(record=>record.id==='HC-2021-031-R'&&record.signatureClips.length===2));
