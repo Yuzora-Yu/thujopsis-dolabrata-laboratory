@@ -367,10 +367,13 @@ test('production domains and project-path previews preserve cross-site and asset
  const production=hostingOrigins('https://asunaro.yu-zora.com',{archive:'https://archive.asunaro.yu-zora.com'});
  assert.deepEqual(providerRoute(new URL('https://archive.asunaro.yu-zora.com/room/'),production),{kind:'archive',path:'/room/'});
  const preview=hostingOrigins('/thujopsis-dolabrata-laboratory');
- const html=rewriteHostedHtml('<a href="/room/">room</a><img src="/assets/logo.png"><video poster="/assets/media/f-home-east.webp"><source src="/assets/video/asunaro-facility-pv.mp4"></video><form action="/room/login/"></form>',{kind:'archive',origins:preview,basePath:'/thujopsis-dolabrata-laboratory'});
+ const html=rewriteHostedHtml('<a href="/room/">room</a><img src="/assets/logo.png"><script src="/photo-pan.js?v=revision"></script><video poster="/assets/media/f-home-east.webp"><source src="/assets/video/asunaro-facility-pv.mp4"></video><form action="/room/login/"></form>',{kind:'archive',origins:preview,basePath:'/thujopsis-dolabrata-laboratory'});
  assert.match(html,/href="\/thujopsis-dolabrata-laboratory\/historical-records\/room\/"/);assert.match(html,/src="\/thujopsis-dolabrata-laboratory\/assets\/logo.png"/);
  assert.match(html,/poster="\/thujopsis-dolabrata-laboratory\/assets\/media\/f-home-east.webp"/);
  assert.match(html,/src="\/thujopsis-dolabrata-laboratory\/assets\/video\/asunaro-facility-pv.mp4"/);
+ assert.match(html,/src="\/thujopsis-dolabrata-laboratory\/photo-pan\.js\?v=revision"/);
+ const separate=rewriteHostedHtml('<script src="/photo-pan.js"></script>',{kind:'archive',origins:production});
+ assert.equal(separate,'<script src="/photo-pan.js"></script>');
 });
 
 test('authentication expiry does not erase the case or its ending after restart',async()=>{

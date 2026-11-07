@@ -58,7 +58,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
    const url=new URL(req.url,'http://127.0.0.1');let pathname=decodeURIComponent(url.pathname);
    if(pathname.includes('\0')||pathname.includes('\\'))return send(res,400,'Bad request','text/plain; charset=utf-8');
    // Only this directory is a static root. Server sources and protected records are never served.
-   if(['GET','HEAD'].includes(req.method)&&(pathname.startsWith('/assets/')||pathname==='/styles.css'||pathname==='/app.js'||pathname==='/seed-drift.js'||pathname==='/member-reading.js'||pathname==='/reading-state.js'||pathname==='/lab-core.js'||pathname==='/lab-console.js')){
+   if(['GET','HEAD'].includes(req.method)&&(pathname.startsWith('/assets/')||pathname==='/styles.css'||pathname==='/app.js'||pathname==='/photo-pan.js'||pathname==='/seed-drift.js'||pathname==='/member-reading.js'||pathname==='/reading-state.js'||pathname==='/lab-core.js'||pathname==='/lab-console.js')){
     const target=path.resolve(publicRoot,'.'+pathname);if(!target.startsWith(publicRoot+path.sep))return send(res,404,notFound());
     try{const info=await stat(target);if(!info.isFile())throw new Error('not a file');const data=await readFile(target);if(path.extname(target)==='.mp4')return sendVideo(req,res,data,'public, max-age=3600');res.writeHead(200,{'Content-Type':mime[path.extname(target)]||'application/octet-stream','Cache-Control':'public, max-age=3600','X-Content-Type-Options':'nosniff'});return res.end(req.method==='HEAD'?undefined:data);}catch{return send(res,404,notFound());}
    }

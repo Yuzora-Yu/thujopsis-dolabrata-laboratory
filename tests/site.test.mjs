@@ -31,7 +31,12 @@ test('public HTML is rendered without credentials, protected data or hidden link
 });
 
 test('public pages and their referenced local assets exist',async()=>{
- const c=client();for(const p of publicPaths){const {response,text}=await c.get(p);assert.equal(response.status,p==='/404/'?404:200,p);for(const match of text.matchAll(/(?:src|href)="(\/assets\/[^"?#]+)/g)){const r=await fetch(base+match[1]);assert.equal(r.status,200,`${p}: ${match[1]}`);}}
+ const c=client(),checked=new Set();for(const p of publicPaths){const {response,text}=await c.get(p);assert.equal(response.status,p==='/404/'?404:200,p);for(const match of text.matchAll(/(?:src|href)="(\/[^"?#]+)(?:[?#][^"]*)?"/g)){
+  const route=match[1];if((!route.startsWith('/assets/')&&!/\.(css|js)$/.test(route))||checked.has(route))continue;
+  const r=await fetch(base+route);assert.equal(r.status,200,`${p}: ${route}`);
+  if(route.endsWith('.js')){assert.match(r.headers.get('content-type'),/javascript/);assert.equal(await r.text(),await readFile(new URL('../public'+route,import.meta.url),'utf8'),route);}
+  checked.add(route);
+ }}
 });
 
 test('facility film can be played and sought through byte ranges',async()=>{
