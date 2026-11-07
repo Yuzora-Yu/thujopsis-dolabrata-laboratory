@@ -10,6 +10,7 @@ import {archivePublicPaths,renderLegacy,legacyLayout,legacyLogin} from '../src/l
 import {archiveTicket,archiveNotes} from '../src/world/archive-data.mjs';
 import {projects} from '../src/world/projects.mjs';
 import {subjectViews} from '../src/world/lab-data.mjs';
+import {labConsoleAsset} from '../src/lab.mjs';
 import {makeArchive} from '../src/archive.mjs';
 import {hostingOrigins,rewriteHostedHtml} from '../src/hosting.mjs';
 
@@ -19,8 +20,12 @@ const out=path.resolve('dist/pages'),origins=hostingOrigins(base||''),stageValue
 await mkdir(path.join(out,'assets/portal'),{recursive:true});
 await cp('public/assets',path.join(out,'assets'),{recursive:true});
 for(const name of ['styles.css','app.js','photo-pan.js','seed-drift.js','member-reading.js','reading-state.js','lab-core.js','lab-console.js'])await cp('public/'+name,path.join(out,name));
-await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));await cp('scripts/static-runtime.js',path.join(out,'static-runtime.js'));
-const runtimeVersion=createHash('sha256').update((await readFile('scripts/static-runtime.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
+await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));
+const labVersion=createHash('sha256').update((await readFile('public/lab-console.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
+if(labConsoleAsset!==`/lab-console.js?v=${labVersion}`)throw new Error('Update labConsoleAsset to match public/lab-console.js');
+const runtimeSource=(await readFile('scripts/static-runtime.js','utf8')).replaceAll("import('./lab-console.js')",`import('.${labConsoleAsset}')`);
+await writeFile(path.join(out,'static-runtime.js'),runtimeSource);
+const runtimeVersion=createHash('sha256').update(runtimeSource.replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const photoPanVersion=createHash('sha256').update((await readFile('public/photo-pan.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const seedDriftVersion=createHash('sha256').update((await readFile('public/seed-drift.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const styleVersion=createHash('sha256').update((await readFile('public/styles.css','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);

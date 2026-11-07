@@ -1,5 +1,7 @@
 import {trialView,advanceTrial} from '../public/lab-core.js';
 import {subjectViews} from './world/lab-data.mjs';
+// Keep this revision aligned with the module; the Pages build verifies its hash.
+export const labConsoleAsset='/lab-console.js?v=23d6e967ceec1936';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function labContext(caseState={},csrf=''){
  const trial=trialView(caseState.consoleTrial);

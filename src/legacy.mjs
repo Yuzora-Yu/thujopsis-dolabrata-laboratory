@@ -2,7 +2,7 @@ import {fictionFooter,decoratePage} from './experience.mjs';
 import {archiveItems,archiveNotes,noticeCapture,pressClippings} from './world/archive-data.mjs';
 import {esc,renderPressClipping} from './render.mjs';
 import {matchesSearch} from './search.mjs';
-import {consoleContent} from './lab.mjs';
+import {consoleContent,labConsoleAsset} from './lab.mjs';
 
 export const archivePublicPaths=['/','/collections/','/snapshots/','/snapshots/2009/','/snapshots/2011/','/snapshots/2017/',...archiveItems.map(i=>`/collections/items/${i.id}/`),...noticeCapture.pages.map(notice=>notice.path)];
 
@@ -14,7 +14,7 @@ function archivePdf(file,label,clippingKey){
  return `<section class="legacy-clipping" aria-label="${esc(label)}">${link}<details><summary>${esc(label)}の本文を読む</summary>${renderPressClipping(pressClippings[clippingKey],'clipping-'+clippingKey)}</details></section>`;
 }
 export function legacyLayout(title,body,{privateRoom=false,consolePage=false}={}){
- return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}｜産業継続研究資料 保存室</title><link rel="stylesheet" href="/styles.css">${consolePage?'<script type="module" src="/lab-console.js"></script>':''}</head><body class="legacy-body"><a class="skip" href="#legacy-main">本文へ移動</a><header class="legacy-header"><p>INDUSTRIAL CONTINUITY RECORDS</p><a href="/">産業継続研究資料 保存室</a><small>旧産業継続研究準備室・部分保存資料</small></header><nav class="legacy-nav" aria-label="資料保存室"><a href="/collections/">収蔵目録</a><a href="/snapshots/">公開画面の保存</a><a href="/room/">資料照会室</a></nav><main id="legacy-main" class="legacy-main">${privateRoom?'<p class="legacy-classification">資料照会室 ／ 移管・保守</p>':''}<h1>${esc(title)}</h1>${body}</main><footer class="legacy-footer">資料管理：旧基盤保存担当 ／ 公開保存資料と継続照会の更新日は各資料に記載</footer>${fictionFooter()}</body></html>`;
+ return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${esc(title)}｜産業継続研究資料 保存室</title><link rel="stylesheet" href="/styles.css">${consolePage?`<script type="module" src="${labConsoleAsset}"></script>`:''}</head><body class="legacy-body"><a class="skip" href="#legacy-main">本文へ移動</a><header class="legacy-header"><p>INDUSTRIAL CONTINUITY RECORDS</p><a href="/">産業継続研究資料 保存室</a><small>旧産業継続研究準備室・部分保存資料</small></header><nav class="legacy-nav" aria-label="資料保存室"><a href="/collections/">収蔵目録</a><a href="/snapshots/">公開画面の保存</a><a href="/room/">資料照会室</a></nav><main id="legacy-main" class="legacy-main">${privateRoom?'<p class="legacy-classification">資料照会室 ／ 移管・保守</p>':''}<h1>${esc(title)}</h1>${body}</main><footer class="legacy-footer">資料管理：旧基盤保存担当 ／ 公開保存資料と継続照会の更新日は各資料に記載</footer>${fictionFooter()}</body></html>`;
 }
 const noteRow=n=>`<a class="legacy-row" href="/room/records/${n.id}/"><span>No.${n.id}</span><time>${n.date}</time><strong>${esc(n.title)}</strong></a>`;
 export function legacyLogin(csrf,{error=''}={}){

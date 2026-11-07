@@ -63,7 +63,7 @@ export async function initConsole(options={}){
        <p class="lab-note">${esc(person.note)}</p>
        <p><a href="${esc(root.dataset.labMain+person.profile)}" target="_blank" rel="noopener">公開時の活動記録<span class="sr-only">（別タブで開きます）</span></a></p>
        <details class="lab-subject-values"><summary>測定値<span>カード ${person.cardHits} / 5　粒子 ${person.found} / 16</span></summary>${senses(person.senses)}</details>
-       ${person.current?`<dl class="lab-current"><dt>管理照合　${esc(person.currentAsOf)}</dt><dd>${esc(person.current)}</dd><dt>参照原本</dt><dd>${esc(person.source)}</dd></dl>`:''}
+       ${person.current?`<dl class="lab-current"><dt>管理照合　${esc(person.currentAsOf)}</dt><dd>${esc(person.current)}</dd><dt>${esc(person.sourceLabel||'参照原本')}</dt><dd>${esc(person.source)}</dd></dl>`:''}
       </div>
      </details>`).join('')}</div>
     <a class="lab-button" href="${esc(root.dataset.labHome)}">自分の測定記録へ</a>`;

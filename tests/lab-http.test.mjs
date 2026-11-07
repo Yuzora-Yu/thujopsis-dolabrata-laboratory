@@ -24,9 +24,22 @@ test('archive console protects raw subjects and future cards; existing case fiel
  r=await c.act('particle_start');const attempt=r.value.trial.particleAttempt.id;assert.equal((await c.act('particle_finish',{attemptId:attempt,taps:'[]'})).status,400);
  // Only this test case's clock is advanced; no saved user cases are involved.
  c.state.consoleTrial.particleAttempt.startedAt-=31000;r=await c.act('particle_finish',{attemptId:attempt,taps:'[]'});assert.equal(r.status,200);assert.equal(r.value.trial.particle.found,0);assert.equal(r.value.trial.complete,true);assert.equal(r.value.subjects.length,5);
+ const measuredBeforeOutcome=r.value.subjects;
  const endTime=r.value.trial.completedAt;await c.act('particle_start');assert.equal(c.state.consoleTrial.completedAt,endTime);assert.equal(c.state.consoleTrial.particleAttempt,null);
  const untouched=client();await untouched.auth();assert.equal((await untouched.context()).trial,null);assert.equal((await untouched.context()).subjects,null);
- c.state.ending='end3';const receipt=await fetch(`http://127.0.0.1:${port+2}/received/?case=${c.caseId}`).then(r=>r.text());assert.match(receipt,/訂正した灯/);assert.match(receipt,/私も一緒に帰りたい/);assert.doesNotMatch(receipt,/data-lab-thanks hidden/);
+ c.state.ending='end3';
+ const afterOutcome=(await c.context()).subjects;
+ const measurements=people=>people.map(({id,date,cardHits,found,senses})=>({id,date,cardHits,found,senses}));
+ assert.deepEqual(measurements(afterOutcome),measurements(measuredBeforeOutcome));
+ for(const id of ['P-026','P-031','P-034']){
+  const before=measuredBeforeOutcome.find(person=>person.id===id),after=afterOutcome.find(person=>person.id===id);
+  assert.equal(before.sourceLabel,'参照原本');assert.equal(after.sourceLabel,'保護前の所在原本');assert.equal(after.source,'OPS-2026-084');assert.equal(after.current,'本人保護・記録照合中');assert.equal(after.currentAsOf,'2026.11.06');
+ }
+ for(const id of ['P-032','P-033']){
+  const before=measuredBeforeOutcome.find(person=>person.id===id),after=afterOutcome.find(person=>person.id===id);
+  assert.equal(after.current,before.current);assert.equal(after.source,before.source);assert.equal(after.sourceLabel,'参照原本');
+ }
+ const receipt=await fetch(`http://127.0.0.1:${port+2}/received/?case=${c.caseId}`).then(r=>r.text());assert.match(receipt,/訂正した灯/);assert.match(receipt,/私も一緒に帰りたい/);assert.doesNotMatch(receipt,/data-lab-thanks hidden/);
  untouched.state.ending='end3';const ordinary=await fetch(`http://127.0.0.1:${port+2}/received/?case=${untouched.caseId}`).then(r=>r.text());assert.match(ordinary,/data-lab-thanks hidden/);assert.doesNotMatch(ordinary,/訂正した灯/);
 });
 test('completion is independent of score and later case outcomes; names stay text rather than executable markup',()=>{

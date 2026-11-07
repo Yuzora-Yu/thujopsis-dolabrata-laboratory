@@ -12,5 +12,5 @@ export const subjectMeasurements=[
 ];
 export function subjectViews({contact=false,truth=false,ending=''}={}){
  const current=contact||truth||!!ending;
- return subjectMeasurements.map(({counts,slip,protected:protectedPerson,current:status,source,...person})=>({...person,...routingSlips[slip],found:counts.deviation+counts.emergence+counts.precursor+counts.hidden+counts.desync,senses:{awareness:Math.round((counts.deviation+counts.emergence)/7*100),foresight:Math.round(counts.early/4*100),insight:counts.hidden*50,intuition:person.cardHits*20,resonance:Math.round(counts.desync/3*100)},...(current?{current:ending==='end3'&&protectedPerson?'本人保護・記録照合中':status,source,currentAsOf:ending==='end3'?'2026.11.06':'2026.10.26'}:{})}));
+ return subjectMeasurements.map(({counts,slip,protected:protectedPerson,current:status,source,...person})=>({...person,...routingSlips[slip],found:counts.deviation+counts.emergence+counts.precursor+counts.hidden+counts.desync,senses:{awareness:Math.round((counts.deviation+counts.emergence)/7*100),foresight:Math.round(counts.early/4*100),insight:counts.hidden*50,intuition:person.cardHits*20,resonance:Math.round(counts.desync/3*100)},...(current?{current:ending==='end3'&&protectedPerson?'本人保護・記録照合中':status,source,sourceLabel:ending==='end3'&&protectedPerson?'保護前の所在原本':'参照原本',currentAsOf:ending==='end3'?'2026.11.06':'2026.10.26'}:{})}));
 }
