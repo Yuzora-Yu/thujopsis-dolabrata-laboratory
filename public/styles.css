@@ -518,3 +518,11 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 }
 
 .heading-phrase{white-space:nowrap}
+.material-facsimile{margin:2rem 0 2.5rem}
+.material-facsimile-button{display:block;width:100%;padding:0}
+.material-facsimile-button img{display:block;width:100%;height:auto}
+.material-facsimile figcaption{margin:.75rem 0 1rem;font-size:.8rem;color:var(--muted);line-height:1.8}
+.material-pdf-link{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:.35rem 1rem}
+.material-pdf-link>span:not(.sr-only){font-size:.75rem;font-weight:400;color:var(--muted)}
+.image-viewport[data-can-pan="true"]{cursor:grab}
+.image-viewport.is-photo-panning{cursor:grabbing;user-select:none}

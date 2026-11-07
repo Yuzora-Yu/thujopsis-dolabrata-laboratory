@@ -18,13 +18,14 @@ if(base&&!/^\/[a-zA-Z0-9_-]+$/.test(base))throw new Error('Invalid Pages base pa
 const out=path.resolve('dist/pages'),origins=hostingOrigins(base||''),stageValues={initial:{contact:false,ending:''},contact:{contact:true,ending:''},end1:{contact:true,ending:'end1'},end2:{contact:true,ending:'end2'},end3:{contact:true,ending:'end3'}};
 await mkdir(path.join(out,'assets/portal'),{recursive:true});
 await cp('public/assets',path.join(out,'assets'),{recursive:true});
-for(const name of ['styles.css','app.js','seed-drift.js','member-reading.js','reading-state.js','lab-core.js','lab-console.js'])await cp('public/'+name,path.join(out,name));
+for(const name of ['styles.css','app.js','photo-pan.js','seed-drift.js','member-reading.js','reading-state.js','lab-core.js','lab-console.js'])await cp('public/'+name,path.join(out,name));
 await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));await cp('scripts/static-runtime.js',path.join(out,'static-runtime.js'));
 const runtimeVersion=createHash('sha256').update((await readFile('scripts/static-runtime.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
+const photoPanVersion=createHash('sha256').update((await readFile('public/photo-pan.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const seedDriftVersion=createHash('sha256').update((await readFile('public/seed-drift.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const styleVersion=createHash('sha256').update((await readFile('public/styles.css','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 function hosted(html,kind='main'){
- const result=rewriteHostedHtml(html,{kind,origins,basePath:base}).replaceAll(`src="${base}/seed-drift.js"`,`src="${base}/seed-drift.js?v=${seedDriftVersion}"`).replaceAll(`href="${base}/styles.css"`,`href="${base}/styles.css?v=${styleVersion}"`);
+ const result=rewriteHostedHtml(html,{kind,origins,basePath:base}).replaceAll(`src="${base}/seed-drift.js"`,`src="${base}/seed-drift.js?v=${seedDriftVersion}"`).replaceAll(`href="${base}/styles.css"`,`href="${base}/styles.css?v=${styleVersion}"`).replaceAll(`src="${base}/photo-pan.js"`,`src="${base}/photo-pan.js?v=${photoPanVersion}"`);
  return result.replace('</head>',`<meta name="asunaro-base" content="${base}"><script type="module" src="${base}/static-runtime.js?v=${runtimeVersion}"></script></head>`);
 }
 function initialShell(html){

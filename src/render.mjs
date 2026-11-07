@@ -38,7 +38,7 @@ function facilityPhoto(file,description,caption,dimensions){
 export function brand(){return `<a class="brand" href="/" aria-label="あすなろ産業支援交流施設 トップページ">${img('logo.png','', '',true)}<span><b>あすなろ</b><small>産業支援交流施設</small></span></a>`;}
 
 export function layout(title,body,{home=false,legacy=false,kind='',description='人と技術が出会い、次の一歩が生まれる。あすなろ産業支援交流施設の施設・サービス、工房、イベントをご案内いたします。'}={}){
- return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${esc(description)}"><meta name="theme-color" content="#14282c"><title>${esc(title)}${home?'':' | あすなろ産業支援交流施設'}</title><link rel="icon" href="/assets/logo.png"><link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script></head><body class="${home?'home ':''}${kind}"><a class="skip" href="#main">本文へ移動</a>
+ return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="${esc(description)}"><meta name="theme-color" content="#14282c"><title>${esc(title)}${home?'':' | あすなろ産業支援交流施設'}</title><link rel="icon" href="/assets/logo.png"><link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script><script src="/photo-pan.js" defer></script></head><body class="${home?'home ':''}${kind}"><a class="skip" href="#main">本文へ移動</a>
  <header class="site-header"><div class="header-main">${brand()}<div class="header-right"><div class="utility">${siteOperation()}<a href="/price/">料金案内</a><a href="/membership/">会員のご案内</a><button type="button" class="search-toggle" aria-label="サイト内検索を開く" data-search-open><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>${link('/members/','会員サイト','member-link')}</div><button class="menu-toggle" type="button" aria-controls="main-navigation" aria-expanded="false">MENU <span>☰</span></button><nav id="main-navigation" aria-label="メインナビゲーション"><a href="/about/">あすなろについて</a><a href="/facilities/">施設・サービス</a><a href="/workshop/">工房のご案内</a>${kind==='error-page'?'<a href="/tenants/">入居者紹介</a>':''}<a href="/gallery/">制作物ギャラリー</a><a href="/news/">お知らせ</a><a class="mobile-nav-link" href="/price/">料金案内</a><a class="mobile-nav-link" href="/membership/">会員のご案内</a></nav></div></div></header>
  <main id="main">${body}</main>
  <footer class="site-footer"><div class="footer-top">${brand()}<p>人と技術のあいだに、<br>あたらしい可能性を。</p></div><div class="footer-links"><a href="/about/">あすなろについて</a><a href="/facilities/">施設・サービス</a><a href="/floor-map/">フロアマップ</a><a href="/workshop/">工房のご案内</a>${kind==='error-page'?'<a href="/tenants/">入居者紹介</a>':''}<a href="/gallery/">制作物ギャラリー</a><a href="/membership/">会員のご案内</a><a href="/news/">お知らせ</a>${legacy?'<a href="/guide/access/">アクセス</a>':''}</div><div class="footer-bottom"><span>© ASUNARO INDUSTRY & EXCHANGE</span><a href="/privacy/">個人情報の取り扱いについて</a><span class="seed-collection-nav" data-seed-collection-nav="${seedNoteTotal}" data-seed-collection-path="${seedCollectionPath}" hidden></span><a href="#main">PAGE TOP ↑</a></div></footer>
@@ -117,10 +117,16 @@ function tenantRelatedMaterials(tenant){
  </section>`;
 }
 function tenantMaterialPage(material){
- const {tenant, title, desk, paragraphs, kind, galleryId} = material;
+ const {tenant, title, desk, paragraphs, kind, galleryId, facsimile, headingParts} = material;
  const work = galleryId && gallery.find(item => item.id === galleryId && item.listed);
- return layout(title,heading('TENANT MATERIALS',esc(title))+`<article class="wrap article narrow prose tenant-material">
-  <p class="tenant-material-source">${esc(kind)} ／ ${materialDate(material)}<br>${esc(desk)}</p>
+ const revision=facsimile?.revision?`?v=${facsimile.revision}`:'';
+ const paper=facsimile?`<figure class="material-facsimile">
+  <button type="button" class="photo-button material-facsimile-button" data-image-open="/assets/${esc(facsimile.image)}${revision}" aria-label="${esc(title)}の紙面を拡大">${img(facsimile.image+revision,facsimile.alt,'',true,[facsimile.width,facsimile.height])}<span class="tenant-photo-action" aria-hidden="true">紙面を拡大</span></button>
+  <figcaption>${esc(facsimile.caption)}</figcaption>
+  <a class="text-link material-pdf-link" href="/assets/${esc(facsimile.pdf)}${revision}" target="_blank" rel="noopener">紙面をPDFで開く<span>PDF・1ページ</span><span class="sr-only">（別タブで開きます）</span></a>
+ </figure><h2>紙面の本文</h2>`:'';
+ return layout(title,heading('TENANT MATERIALS',esc(title),'','',headingParts)+`<article class="wrap article narrow prose tenant-material">
+  <p class="tenant-material-source">${esc(kind)} ／ ${materialDate(material)}<br>${esc(desk)}</p>${paper?`\n  ${paper}`:''}
   ${paragraphs.map(text => `<p>${esc(text)}</p>`).join('')}${work ? `\n  <p>${link('/gallery/'+work.id+'/',esc(work.title))}</p>` : ''}
   <div class="tenant-material-return">${link('/tenants/'+tenant.page+'/#reading-history',esc(tenant.name)+'の活動資料へ戻る')}</div>
  </article>`);
