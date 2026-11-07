@@ -172,6 +172,7 @@ def render(record, style_key, target):
 
     def stationery(c, doc):
         c.setDateFormatter(lambda *_: "D:" + issue_date)
+        recipient_copy = participant_sheet and doc.page == 1
         c.setFillColor(accent)
         c.setStrokeColor(accent)
         if frame == "strip":
@@ -181,7 +182,6 @@ def render(record, style_key, target):
             c.drawString(X + 13, H - 52, register)
             c.drawRightString(W - X - 13, H - 52, record["id"])
         else:
-            recipient_copy = participant_sheet and doc.page == 1
             c.setFont(font, 9)
             c.drawString(X + 6, H - 45, participant_form["series"] if recipient_copy else register)
             c.drawRightString(W - X - 6, H - 45, participant_form["formCode"] if recipient_copy else record["id"])
@@ -192,7 +192,8 @@ def render(record, style_key, target):
         c.line(X + 6, 45, W - X - 6, 45)
         c.setFillColor(colors.HexColor("#55645d"))
         c.setFont("Gothic", 7.6)
-        c.drawString(X + 6, 31, record["id"] + "　／　あすなろ・作品内資料")
+        footer_code = participant_form["formCode"] if recipient_copy else record["id"]
+        c.drawString(X + 6, 31, footer_code)
         c.drawRightString(W - X - 6, 31, str(doc.page))
 
     doc = SimpleDocTemplate(str(target), pagesize=A4, leftMargin=X, rightMargin=X,
@@ -215,7 +216,9 @@ def scan(pdf, target, seed):
         draw.point((x, y), fill=rng.randrange(4, 24))
     from PIL import ImageChops
     image = ImageChops.subtract(image, texture.filter(ImageFilter.GaussianBlur(.34)))
-    image.save(target, quality=90, optimize=True, dpi=(155, 155))
+    temporary = QA / (target.name + ".tmp")
+    image.save(temporary, format="JPEG", quality=90, optimize=True, dpi=(155, 155))
+    temporary.replace(target)
 
 
 payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8-sig"))

@@ -23,7 +23,7 @@ const editions=[
 const printLabels={
  ledger:'保存複写（PDF）',
  'workshop-receipt':'保存複写（PDF）',
- consent:'参加同意書の交付控え（PDF）',
+ consent:'参加説明の交付控え（PDF）',
  decision:'決裁控え（PDF）',
  'trial-intake':'短期試用票と個票（PDF）',
  'daily-check':'本人控えと別管理欄（PDF）',

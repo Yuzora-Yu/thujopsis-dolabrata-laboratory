@@ -80,6 +80,8 @@ test('Akari’s trial dates and the two sets of workshop property remain distinc
  const receipt=record('PN-2022-034');
  assert.match(recordText(receipt),/以前からの預かり分（FAB-2022-071）/);
  assert.doesNotMatch(receipt.tables[0].rows.flat().join(' '),/型紙|料理帳/);
+ assert.deepEqual(receipt.tables[0].head.slice(-2),['返却日','受取人']);
+ for(const row of receipt.tables[0].rows)assert.deepEqual(row.slice(-2),['','']);
 });
 
 test('cohort records distinguish the participant copy, dispatch and night duty',()=>{
