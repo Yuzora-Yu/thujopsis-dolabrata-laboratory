@@ -9,7 +9,7 @@
 | Cloudflare Pages Free | 追加のホスティング費をかけない公開 | 静的版と同じ認証・ブラウザー内保存。作中の別サイトは同じドメイン内のディレクトリへ配置 |
 | Cloudflare Workers + Durable Objects | サーバー保存を使う公開方式 | サーバー側の認証・閲覧制御と、プレイヤーごとの永続保存 |
 
-文章・画像・資料・ページ番号は共通のソースから生成する。GitHub Pages版は現実の個人情報を取り扱う会員サービスではなく、ARGの確認版。Cloudflare版の会員資料は公開アセットへ書き出さない。
+文章・画像・資料・ページ番号は共通のソースから生成する。GitHub Pages版は現実の個人情報を取り扱う会員サービスではなく、ARGの確認版。Worker版の会員資料は公開アセットへ書き出さない。Cloudflare Pagesの静的版では、GitHub Pages版と同じ暗号化済みの資料を配信する。
 
 ## GitHubへの反映
 
@@ -37,7 +37,7 @@ Cloudflare Pagesの静的ファイルへのリクエストは無料・無制限�
 
 wrangler.jsoncとworker/index.tsを使用する。npm run build、npm run build:workerを実行してから、npm run dev:cloudflareでローカル確認できる。
 
-独自ドメインを設定する際の一例はasunaro.yu-zora.com。公開時にCloudflareのCustom Domainへ接続し、ASUNARO_ORIGINへそのURLを指定する。HOZEN_ORIGIN、AUDIT_ORIGIN、ARCHIVE_ORIGINは任意。空のままなら同じホスト内の別ディレクトリを使い、別サブドメインを指定すれば作中の外部サイトとして分けられる。ドメイン設定はまだ変更していない。
+独自ドメインを設定する際の一例はasunaro.yu-zora.com。公開時にCloudflareのCustom Domainへ接続し、ASUNARO_ORIGINへそのURLを指定する。HOZEN_ORIGIN、AUDIT_ORIGIN、ARCHIVE_ORIGINを空にした場合は、同じホスト内の別ディレクトリを使用する。各URLの変更とルーティングは実装しているが、別サブドメインに分離した公開は未検証であり、特に旧資料室と主サイトの照会ケース・測定結果を引き継ぐ方式は追加の設計・検証が必要。現在は同一ホスト内の構成を使用する。ドメイン設定はまだ変更していない。
 
 Durable Objectsは一人の進行単位ごとに分け、SQLiteへ状態を保存する。同じプレイヤーから複数タブで届く更新は順に処理する。新しいデプロイで進行記録を消去する処理は入れない。認証の有効期間と、物語の進行記録の保存期間は分けて扱う。
 

@@ -6,7 +6,7 @@ import {expandNews} from './world/news.mjs';
 import {extraAccounts} from './world/accounts.mjs';
 import {researchRecords} from './world/records.mjs';
 import {enrichPublicPeople,humanSearchEntries,asakuraProfile,inabaProfile,publicPersonText} from './world/people.mjs';
-import {facilityStaff} from './world/editorial.mjs';
+import {facilityStaff,aboutOverview,editorialPages} from './world/editorial.mjs';
 export const floorGuideCode='A4-09';
 
 export const facility = {
@@ -79,6 +79,9 @@ enrichPublicPeople({gallery,tenants});
 
 export const searchEntries = [
  ...humanSearchEntries,
+ {title:aboutOverview.title,url:'/about/',text:[aboutOverview.lead,aboutOverview.heading.replace(/<[^>]*>/g,' '),...aboutOverview.paragraphs,aboutOverview.quote,aboutOverview.founderTitle,aboutOverview.founder,aboutOverview.historyHeading,...aboutOverview.history.flat()].join(' '),summary:aboutOverview.lead},
+ // Only these current editorial pages are indexed here; discovery-only pages stay separate.
+ ...['/about/history/'].map(url=>{const page=editorialPages[url];return {title:page.title,url,text:page.sections.flat().join(' '),summary:page.sections[0][1]};}),
  {title:programTitle,url:programPath,text:'月面 宇宙 工房 道具 小物入れ 企画展示',summary:'工房で製作した小さな道具と、月で暮らす場所の構想図をご紹介いたします。'},
  {title:'施設・サービス',url:'/facilities/',text:'会議室 オフィス コワーキング 食堂 工房 プレゼンテーションホール フロアマップ',summary:'コワーキング・ラウンジ、会議室、工房など、仕事とものづくりを支える施設をご紹介いたします。'},
  {title:'施設職員紹介',url:'/facilities/staff/',text:['中央受付 工房スタッフ 施設職員 見学 製作相談',...facilityStaff.flatMap(staff=>[staff.title,staff.description,staff.quote,staff.credit||''])].join(' '),summary:'中央受付と工房のご案内、製作相談を担当した職員の言葉を掲載しております。'},

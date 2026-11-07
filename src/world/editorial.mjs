@@ -5,6 +5,26 @@ export const visitorGuide={
  floor:4, desk:'中央受付', weekdayStart:9, weekdayEnd:17,
  edition:'見学案内 第4版', revision:'2026年10月改訂',
 };
+export const aboutOverview={
+ title:'あすなろについて',
+ lead:'人と技術の出会いから、暮らしと産業の明日を支えます。',
+ heading:'異なる歩みが、<br>同じ場所で出会う。',
+ paragraphs:[
+  '企業、研究者、個人のつくり手。あすなろには、さまざまな分野に取り組む方々が集まっています。',
+  '私たちは、交流の場と試作の環境を整え、それぞれの可能性が広がるきっかけをつくってまいります。',
+ ],
+ quote:'異なる木が、それぞれの役割で、同じ舟を支える。',
+ founderTitle:'設立者',
+ founder:'榊原惟臣',
+ historyHeading:'沿革',
+ history:[
+  ['2010年6月','施設開設に向けた準備事業を開始'],
+  ['2012年4月1日','あすなろ産業支援交流施設 開設'],
+  ['2016年','工房と入居企業による共同試作を拡充'],
+  ['2021年','事業運営体制を改編'],
+  ['2026年10月','工房の企画展示「月に、暮らしを持っていく。」を開始'],
+ ],
+};
 export const facilityStaff=[
  {
   area:'4F / RECEPTION',title:'中央受付スタッフ',

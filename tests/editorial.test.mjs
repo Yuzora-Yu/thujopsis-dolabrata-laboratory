@@ -235,6 +235,15 @@ test('opening links to naming and emblem essays while the old plan remains a lat
  assert.match(renderPublic('/gallery/0005/'),/入居者紹介/);assert.ok(searchEntries.some(e=>e.url==='/tenants/'));
 });
 
+test('current overview and history can be found by visible copy without indexing discovery-only pages',()=>{
+ for(const [path,query] of [['/about/','人と技術'],['/about/','沿革'],['/about/','設立者 榊原'],['/about/history/','共同事業'],['/about/history/','2016年 共同事業']]){
+  const entries=searchEntries.filter(entry=>entry.url===path);assert.equal(entries.length,1,path);
+  assert.ok(matchesSearch(entries[0],query),query);assert.match(renderPublic(path),/人と技術|共同事業/);
+ }
+ for(const path of ['/about/identity/','/about/emblem/','/tenants/0003/','/historical-records/snapshots/'])assert.ok(!searchEntries.some(entry=>entry.url===path),path);
+ assert.ok(!searchEntries.some(entry=>entry.url.startsWith('/members/')));
+});
+
 test('published navigation does not directly expose nonlisted gallery objects',()=>{
  const hidden=new Set(gallery.filter(g=>!g.listed).map(g=>g.id));
  for(const p of publicPaths.filter(p=>!/^\/gallery\/\d/.test(p)&&!/^\/tenants\/\d/.test(p))){const html=renderPublic(p)||'';for(const m of html.matchAll(/href="\/gallery\/(\d+)\//g))assert.ok(!hidden.has(m[1]),p+' -> '+m[1]);}
