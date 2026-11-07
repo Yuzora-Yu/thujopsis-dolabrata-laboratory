@@ -27,7 +27,7 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await p.locator('.program-promo a').click();
   await p.getByRole('heading',{level:1,name:/月に、暮らしを/}).waitFor();
   assert.equal(await p.locator('[data-habitat-demo],a[href*="/field-notes/"]').count(),0);
-  await p.getByRole('link',{name:'3階ホールでの特別展示',exact:true}).click();
+  await p.getByRole('link',{name:'3階ホール特別展示の記録',exact:true}).click();
   await p.locator('#exhibition img').evaluate(image=>image.decode());
   assert.match(await p.locator('#exhibition figcaption').innerText(),/2026年10月31日/);
   await p.locator('#exhibition').getByRole('link',{name:'月の企画展示を見る',exact:true}).click();
@@ -44,7 +44,9 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   for(const name of ['UltiMaker S7','Speedy 300 CO₂','Metal X']){
    await p.getByRole('heading',{name,exact:true}).waitFor();
   }
-  assert.match(await p.locator('.workshop-access').innerText(),/無料.*ご利用/);
+  const workshopAccess=p.locator('.workshop-access');
+  assert.match(await workshopAccess.innerText(),/入居企業・登録会員の方が対象.*無料でご利用/);
+  await workshopAccess.getByRole('link',{name:'見学のご案内',exact:true}).waitFor();
   await p.getByRole('link',{name:'制作物ギャラリーを見る',exact:true}).click();
   await p.getByLabel('制作方法').selectOption('金属3Dプリンター');
   let releaseGalleryIndex;
@@ -470,6 +472,32 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await lastStartIs('16:00');
   assert.match(await hint.innerText(),/工房受付は17:00まで/);
   assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
-  assert.deepEqual(errors,[]);console.log('Public program passed: sticky menu, staff, hall exhibit and 4F exhibition directions, real equipment, metal gallery filter, tenant materials, linked member records, and date-aware reservation hours.');
+  const newsPage=await b.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+  newsPage.on('pageerror',error=>errors.push(error.message));
+  await newsPage.goto(base+'/news/');
+  await newsPage.getByLabel('掲載年').selectOption('2026');
+  await newsPage.getByLabel('種別').selectOption('イベント');
+  await newsPage.getByRole('button',{name:'表示する',exact:true}).click();
+  const announcement=newsPage.getByRole('link',{name:/3階ホール特別展示/});
+  await announcement.click();
+  await newsPage.getByRole('heading',{name:'3階ホール特別展示',exact:true}).waitFor();
+  await newsPage.getByText('2026年10月31日追記　3階ホールでの特別展示は終了いたしました。',{exact:true}).waitFor();
+  await newsPage.getByRole('link',{name:'お知らせ一覧へ',exact:true}).click();
+  await newsPage.waitForURL(url=>url.hash==='#news-20261023'&&url.searchParams.get('year')==='2026'&&url.searchParams.get('kind')==='イベント');
+  await newsPage.locator('#news-20261023:focus').waitFor();
+  assert.equal(await newsPage.getByLabel('種別').inputValue(),'イベント');
+  const resultCount=newsPage.getByRole('status').filter({hasText:'2026年・イベント'});
+  assert.equal(await resultCount.innerText(),'2026年・イベント　1–3件 ／ 3件');
+  await newsPage.goto(base+'/news/');
+  await newsPage.getByRole('link',{name:'2ページ目',exact:true}).click();
+  await newsPage.getByRole('link',{name:/3階ホールの設営と搬入について/}).click();
+  await newsPage.getByRole('link',{name:'お知らせ一覧へ',exact:true}).click();
+  await newsPage.waitForURL(url=>url.hash==='#news-20260213'&&url.searchParams.get('page')==='2');
+  await newsPage.locator('#news-20260213:focus').waitFor();
+  await newsPage.goto(base+'/news/20261101/');
+  await newsPage.getByRole('link',{name:'切り込みで曲げる、木の薄板',exact:true}).click();
+  await newsPage.getByRole('heading',{level:1,name:'切り込みで曲げる、木の薄板',exact:true}).waitFor();
+  await newsPage.close();
+  assert.deepEqual(errors,[]);console.log('Public program passed: staff, hall and 4F exhibition, news filters and return position, equipment, gallery, tenant materials, member records, and reservation hours.');
  }finally{await b.close();}
 })().catch(error=>{console.error(error);process.exitCode=1;});

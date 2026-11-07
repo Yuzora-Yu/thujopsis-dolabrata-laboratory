@@ -207,18 +207,21 @@ async function newsInterface(p){
  await p.goto(main('/news/'));await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();assert.equal(await p.locator('.news-rows>a:visible').count(),12);
  await p.locator('[name=year]').selectOption('2025');await p.locator('[name=kind]').selectOption('活動報告');await p.locator('.news-filters button').click();await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();
  const rows=await p.locator('.news-rows>a:visible').evaluateAll(nodes=>nodes.map(n=>[n.dataset.newsYear,n.dataset.newsKind]));assert.ok(rows.length>0);assert.ok(rows.every(([year,kind])=>year==='2025'&&kind==='活動報告'));
- const filtered=p.url();
- await p.locator('.news-rows>a:visible').first().click();
+ const filtered=new URL(p.url());
+ const first=p.locator('.news-rows>a:visible').first();
+ filtered.hash=await first.getAttribute('id');
+ await first.click();
  await p.getByRole('link',{name:'お知らせ一覧へ',exact:true}).click();
- await p.waitForURL(filtered);
+ await p.waitForURL(filtered.href);
  assert.equal(await p.locator('[name=year]').inputValue(),'2025');
  assert.equal(await p.locator('[name=kind]').inputValue(),'活動報告');
  await p.locator('[name=kind]').selectOption('工房');await p.locator('.news-filters button').click();await p.getByText('該当するお知らせはありません。',{exact:true}).waitFor();
  await p.goto(main('/news/'));await p.locator('.news-pagination a').last().click();await p.locator('.news-result-count').filter({hasText:/件/}).waitFor();
- const lastPage=p.url();
+ const lastPage=new URL(p.url());
+ lastPage.hash='news-20120401';
  await p.locator('.news-rows a[href$="/news/20120401/"]:visible').click();
  await p.getByRole('link',{name:'お知らせ一覧へ',exact:true}).click();
- await p.waitForURL(lastPage);
+ await p.waitForURL(lastPage.href);
  assert.ok(await p.locator('.news-rows a[href$="/news/20120401/"]:visible').count());
  for(const word of ['居住環境実証','生活環境継続試験','RE-2022-006']){await p.goto(main('/search/?q='+encodeURIComponent(word)));assert.equal(await p.locator('a[href$="/news/20160520/"],a[href$="/news/20220715/"]').count(),0);}
 }

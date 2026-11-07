@@ -63,7 +63,7 @@ function seedNoteButton(path){
  return `<button type="button" class="seed-note seed-note-${note.mark}" aria-haspopup="dialog" aria-label="${esc(note.label)}">${content}</button>`;
 }
 const heading=(en,title,lead='',notePath='')=>`<div class="page-heading wrap"><div class="breadcrumb"><a href="/">HOME</a><span>/</span>${esc(title)}</div><p class="eyebrow${notePath?' seed-note-line':''}">${en}${seedNoteButton(notePath)}</p><h1>${title}</h1>${lead?`<p class="page-lead">${lead}</p>`:''}</div>`;
-const rows = items=>`<div class="news-rows">${items.map(n=>`<a href="/news/${n.id}/" data-news-year="${n.date.slice(0,4)}" data-news-kind="${esc(n.tag)}"><time datetime="${n.date.replaceAll('.','-')}">${n.date}</time><span class="tag">${n.tag}</span><span class="news-title">${n.title}</span>${arrow}</a>`).join('')}</div>`;
+const rows = items=>`<div class="news-rows">${items.map(n=>`<a id="news-${n.id}" href="/news/${n.id}/" data-news-year="${n.date.slice(0,4)}" data-news-kind="${esc(n.tag)}"><time datetime="${n.date.replaceAll('.','-')}">${n.date}</time><span class="tag">${n.tag}</span><span class="news-title">${n.title}</span>${arrow}</a>`).join('')}</div>`;
 function newsFilters(items){
  const years=[...new Set(items.map(n=>n.date.slice(0,4)))],kinds=[...new Set(items.map(n=>n.tag))];
  return `<form class="news-filters filter-form" method="get" data-news-filter><label>掲載年<select name="year"><option value="">すべての年</option>${years.map(y=>`<option value="${y}">${y}年</option>`).join('')}</select></label><label>種別<select name="kind"><option value="">すべての種別</option>${kinds.map(k=>`<option>${esc(k)}</option>`).join('')}</select></label><button type="submit">表示する</button><a class="news-filter-clear" href="/news/">条件を解除</a></form><p class="news-result-count small muted" role="status" aria-live="polite"></p>`;
@@ -192,10 +192,11 @@ function workshopPage(paused){
   <section class="wrap facility-detail workshop-overview">
    ${facilityPhoto('workshop.webp','木の作業台と右手の樹脂造形機器。','4階 工房2 ／ 入口側から撮影',[1536,1024])}
    <div class="workshop-access" aria-labelledby="workshop-access-title">
-    ${paused?`<div><h2 id="workshop-access-title">休止前の工房利用</h2><p>入居企業と登録会員は、機器と施設指定の材料を使った少量の試作を無料で行うことができました。</p>${link('/floor-map/#floor-workshop','4階案内図で工房の位置を見る')}</div>`:`<div><p class="eyebrow">ご利用の流れ</p><h2 id="workshop-access-title">入居企業・登録会員は無料でご利用いただけます。</h2>
-     <p>機器と施設指定の材料を使った少量の試作は、無料で承ります。初めてご利用になる方は、用途が分かる写真や現物をお持ちください。</p>
+    ${paused?`<div><h2 id="workshop-access-title">休止前の工房利用</h2><p>入居企業と登録会員は、機器と施設指定の材料を使った少量の試作を無料で行うことができました。</p>${link('/floor-map/#floor-workshop','4階案内図で工房の位置を見る')}</div>`:`<div><p class="eyebrow">ご利用の流れ</p><h2 id="workshop-access-title">工房の利用案内</h2>
+     <p>機器のご利用と試作のご相談は、入居企業・登録会員の方が対象です。施設指定の材料を使う少量の試作は、無料でご利用いただけます。</p>
      <p>受付は${workshopHours.start}〜${workshopHours.close}です。工房のご利用は予約制で、${workshopHours.lastStart}までに作業を始められる枠をお申し込みください。</p>
-     ${link('/floor-map/#floor-workshop','中央受付からの行き方')}</div>
+     <p>会員登録をされていない方には、施設見学の際に工房の概要をご案内しております。</p>
+     <div class="button-row">${link('/floor-map/#floor-workshop','中央受付からの行き方')}${link('/visit/','見学のご案内')}</div></div>
     ${link('/members/reservations/?space=workshop','工房利用の申請','button dark')}`}
    </div>
   </section>
@@ -409,7 +410,7 @@ function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCH
  if(path==='/floor-map/')return floorGuide(paused);
  if(path==='/news/')return layout('お知らせ',heading('INFORMATION','お知らせ')+`<section class="wrap section news-archive">${ending?`<a class="closure-notice" href="/news/${ending==='end2'?'staff-change':'closure'}/">${ending==='end2'?'工房技術相談の担当変更について':'施設の利用休止について'} </a>`:''}${newsFilters(news.filter(n=>n.listed))}${rows(news.filter(n=>n.listed))}<nav class="news-pagination" aria-label="お知らせのページ"></nav><p class="seed-note-line news-index-note">掲載順${seedNoteButton('/news/')}</p></section>`);
  const n=news.find(n=>path===`/news/${n.id}/`);
- if(n&&n.available)return layout(n.title,heading('INFORMATION',n.title)+`<article class="wrap article narrow"><div class="article-meta"><time datetime="${n.date.replaceAll('.','-')}">${n.date}</time><span class="tag">${n.tag}</span></div><div class="prose">${newsContent(n,origins)}</div><div class="article-return">${link('/news/','お知らせ一覧へ')}</div></article>`,{legacy:n.legacyAccess});
+ if(n&&n.available)return layout(n.title,heading('INFORMATION',n.title)+`<article class="wrap article narrow"><div class="article-meta"><time datetime="${n.date.replaceAll('.','-')}">${n.date}</time><span class="tag">${n.tag}</span></div><div class="prose">${newsContent(n,origins)}</div><div class="article-return"><a class="text-link" href="/news/" data-news-return="news-${n.id}">お知らせ一覧へ</a></div></article>`,{legacy:n.legacyAccess});
  if(path==='/news/closure/'||path==='/news/staff-change/'){if(path==='/news/closure/'&&!paused||path==='/news/staff-change/'&&ending!=='end2')return null;const staff=path.includes('staff-change');return layout(staff?'工房技術相談の担当変更について':'施設の利用休止について',heading('INFORMATION',staff?'工房技術相談の担当変更について':'施設の利用休止について')+`<article class="wrap article narrow prose"><time>2026.11.06</time><p>${staff?'工房の技術相談担当を変更いたしました。これまでの担当者宛てのご連絡は、運営事務局にて承ります。設備の利用時間に変更はございません。':'施設運営に関する調査のため、当面の間、一般利用を休止いたします。利用者の皆様の所在確認と支援、記録の保全を優先して進めております。再開の予定は未定です。'}</p>${ending==='end3'?'<p>共同事業および外部への資料移管についても、独立した調査を実施しております。</p>':''}${link('/','トップページへ')}</article>`);}
  if(path==='/membership/'&&paused)return layout('会員のご案内',heading('MEMBERSHIP','会員のご案内','休止前の会員区分と、登録済みの方へのご案内です。')+facilityUseNotice()+`
   <section class="wrap article narrow prose">

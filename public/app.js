@@ -153,7 +153,7 @@ function prepareGallery(){
 }
 
 function prepareNewsReturn(){
- const returnLink=document.querySelector('.article-return a[href$="/news/"]');
+ const returnLink=document.querySelector('[data-news-return]');
  const listing=referringListing(returnLink);
  if(!listing)return;
  const {previous,destination}=listing;
@@ -161,6 +161,7 @@ function prepareNewsReturn(){
   const value=previous.searchParams.get(parameter);
   if(value)destination.searchParams.set(parameter,value);
  }
+ destination.hash=returnLink.dataset.newsReturn;
  returnLink.href=destination.href;
 }
 
@@ -182,9 +183,16 @@ if(newsForm){
  const rows=[...document.querySelectorAll('.news-archive .news-rows>a')],matched=rows.filter(row=>(!year||row.dataset.newsYear===year)&&(!kind||row.dataset.newsKind===kind));
  const pageSize=12,totalPages=Math.max(1,Math.ceil(matched.length/pageSize)),current=Math.min(totalPages,Math.max(1,Math.trunc(Number(params.get('page')))||1));
  const visible=new Set(matched.slice((current-1)*pageSize,current*pageSize));rows.forEach(row=>row.hidden=!visible.has(row));
- document.querySelector('.news-result-count').textContent=matched.length?`${(current-1)*pageSize+1}–${Math.min(current*pageSize,matched.length)}件 ／ ${matched.length}件`:'該当するお知らせはありません。';
+ const filterLabel=[newsForm.elements.year.value&&`${year}年`,newsForm.elements.kind.value].filter(Boolean).join('・');
+ const range=`${(current-1)*pageSize+1}–${Math.min(current*pageSize,matched.length)}件 ／ ${matched.length}件`;
+ document.querySelector('.news-result-count').textContent=matched.length?[filterLabel,range].filter(Boolean).join('　'):'該当するお知らせはありません。';
  const pagination=document.querySelector('.news-pagination');pagination.replaceChildren();
  for(let page=1;page<=totalPages;page++){if(totalPages===1)break;const anchor=document.createElement('a'),query=new URLSearchParams(location.search);query.set('page',String(page));anchor.href=location.pathname+'?'+query;anchor.textContent=String(page);anchor.setAttribute('aria-label',page+'ページ目');if(page===current)anchor.setAttribute('aria-current','page');pagination.append(anchor);}
+ const target=document.getElementById(location.hash.slice(1));
+ if(visible.has(target))requestAnimationFrame(()=>{
+  target.focus({preventScroll:true});
+  target.scrollIntoView({block:'start'});
+ });
 }
 const habitat=document.querySelector('[data-habitat-demo]');
 if(habitat){const modes={

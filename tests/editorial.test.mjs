@@ -40,6 +40,13 @@ test('retired recruitment articles are discoverable through records, not public 
 test('current news has operational detail and later references do not appear in old recruitment copies',()=>{
  assert.ok(news.filter(n=>n.listed).length>=30);
  for(const n of news.filter(n=>n.listed)){assert.ok(n.sections?.length>=2,n.id);assert.ok(n.body.length+n.sections.flat().join('').length>180,n.id);}
+ const announcement=renderPublic('/news/20261023/');
+ const report=renderPublic('/news/20261101/');
+ assert.match(announcement,/2026年10月31日（土）11時から16時まで.*最終入場15時30分/);
+ assert.match(announcement,/10月31日追記.*特別展示は終了/);
+ assert.doesNotMatch(announcement,/\/news\/20261101\/|\/gallery\/003[34]\//);
+ assert.match(report,/\/gallery\/0033\/[\s\S]*\/gallery\/0034\/[\s\S]*\/floor-map\/#floor-exhibition/);
+ assert.doesNotMatch(announcement+report,/field-notes|居住実証/);
  for(const id of ['20160520','20220715'])assert.doesNotMatch(renderPublic(`/news/${id}/`),/EV-2022|GR-2022|QC-2026|PN-2022/);
  const exposed=documents.find(d=>d.id==='PN-2022-034');assert.doesNotMatch(exposed.sections.flat().join(' '),/2026/);
 });

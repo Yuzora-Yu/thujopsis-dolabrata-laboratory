@@ -21,7 +21,7 @@ export function programExhibit(pauseNotice=''){
    <div class="lunar-intro"><p class="eyebrow">EXHIBITION / 4F</p><h2 id="exhibit-intro">月へ持っていくもの。</h2>
     <p>道具の蓋が閉まらなくなったら。昨日と違う順序で設備を使うことになったら。月での暮らしを想像すると、ふだん何気なく使っている道具にも、違う工夫が見えてきます。</p>
     <p>${pauseNotice?`${programVenue}に、居住区の模型と工房の試作品を並べました。展示の様子を写真でご覧いただけます。`:`${programVenue}に、居住区の模型と工房の試作品を展示しております。ご見学の際は中央受付へお立ち寄りください。`}</p>
-    <div class="button-row"><a class="button dark" href="/news/20261020/">${pauseNotice?'開催時のお知らせ':'展示のご案内'}</a><a class="text-link" href="/facilities/hall/#exhibition">3階ホールでの特別展示</a></div>
+    <div class="button-row"><a class="button dark" href="/news/20261020/">${pauseNotice?'開催時のお知らせ':'展示のご案内'}</a><a class="text-link" href="/facilities/hall/#exhibition">3階ホール特別展示の記録</a></div>
    </div>
    <figure class="lunar-exhibit-view"><img src="/assets/media/f-lounge-exhibit.webp" alt="ラウンジ前の通路の左手に並ぶガラスケース。手前に月面居住区の模型がある。" width="1536" height="1024" loading="lazy" decoding="async"><figcaption><span>4階 ラウンジ前 ／ 展示の様子</span><a class="text-link" href="${programMapPath}">中央受付から展示までの行き方</a></figcaption></figure>
   </section>
