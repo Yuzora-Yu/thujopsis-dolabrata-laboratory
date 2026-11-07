@@ -246,12 +246,14 @@
   {
     "key": "g-hinge",
     "year": 2024,
-    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-f5817bfe-9948-4692-97b2-c1a6831f3803.png",
-    "prompt": "Use case: photorealistic-natural. Asset: original makerspace fabrication record photograph. An orange FDM print-in-place rectangular pocket case open with its lid connected by an actual integrated barrel hinge with small printed clearance gaps. Two halves intact and connected, plainly visible layer lines. Hand-sized on cutting mat. Landscape 3:2 framing. Real made object with credible manufacturing traces, not a CAD render or luxury product advertisement. A modest contemporary phone record photo, flat workshop light, practical framing, moderate detail, no cinematic bokeh. Use reference solely to understand practical fabrication and create a different original object and composition. Plain unbranded props, no overlays, no readable text.",
-    "references": [
+    "path": "docs/source-images/g-hinge.png",
+    "prompt": "Use case: precise-object-edit, photorealistic makerspace record. Edit target is the attached local generated photograph public/assets/media/g-hinge.webp. Preserve the composition, orange case, matching connected lid, barrel hinge geometry, camera angle, green cutting mat, lighting, believable FDM layer texture and ordinary workshop-photo character. Single targeted correction: every visible segment of the small coaxial axle between the orange hinge knuckles must be matte orange FDM-printed polymer, exactly the same orange material as the case. Show subtle printed layer texture on the exposed orange axle. Retain tiny clearance gaps and dark natural shadows between adjacent knuckles so it reads as a movable print-in-place hinge, with an integral trapped printed axle, not solidly fused. Remove the current silver-gray reflective appearance of the exposed shaft. No metal rods, screws, bolts or separate hardware in the case. Do not add any objects, hands, text, labels, brands or decorative elements. Preserve physically connected, consistent hinge alignment along one straight axis, appropriate lid-to-base dimensions and a plausible closing mechanism. This is an ordinary 2024 phone documentation photo with natural neutral color, moderate detail and slight JPEG softness, no oversharpened CGI shine, no cinematic grading. Landscape 3:2. Output one complete finished photograph.",
+    "references": [],
+    "asset": "public/assets/media/g-hinge.webp",
+    "editSource": "Original generated g-hinge photograph from public/assets/media/g-hinge.webp at commit 904c6ee4ec0ff12691f16a091c341fb8fb8958f2. Previous geometry reference retained as sourceReferences; no external photograph supplied for the current edit. Targeted correction to exposed hinge axle appearance.",
+    "sourceReferences": [
       "https://filescnc.com/models/heart-box/"
-    ],
-    "asset": "public/assets/media/g-hinge.webp"
+    ]
   },
   {
     "key": "g-cat",

@@ -1,4 +1,5 @@
 const galleryPhotos={
+ hinge:{image:'media/g-hinge.webp?v=85e2c566e4f017a2',imageAlt:'橙色の樹脂で造形した小物ケース。ふたを開くと、同じ橙色の軸と筒が並ぶ蝶番が見える。'},
  latch:{image:'media/g-latch.webp?v=71d0eb466cc37593',imageAlt:'二枚に分けた展示板。左の台座から青い細い腕と爪が伸び、右の灰色の受けから外れている。',headingParts:['工具を使わず','交換できる留め具']},
  box:{image:'media/g-box-slide.webp',imageAlt:'細長い木の箱。引き蓋を少し開けると、やすりと鉛筆が見える。'},
  map:{image:'media/g-map-reception.webp',imageAlt:'白い造形板。左手前の四角から短い線と点の列が続く。点は右端で奥へ折れ、横長の印に着く。'},
