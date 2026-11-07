@@ -70,6 +70,7 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .snapshot-notice figcaption{margin-top:.4rem;color:#58675f;font-size:.75rem}
 [data-member-record="AH-2017-009"] .record-table tbody td:first-child,
 [data-member-record="ENV-2022-031"] #record-table-2 tbody td:first-child,
+[data-member-record="TR-2026-011"] #record-table-1 tbody td:first-child,
 [data-member-record="GR-2022-009"] #record-table-1 tbody td:nth-child(2){white-space:nowrap}
 .record-revision{display:block;font-size:.75rem;color:#6a7670;margin-top:.5rem}.record-table:focus-visible{outline:2px solid #547262;outline-offset:5px}
 .reading-expand{margin:1rem 0}.reading-expand summary{cursor:pointer;color:#315a49;text-decoration:underline;text-underline-offset:.25em;width:fit-content;padding:.45rem 0}.reading-expand[open]+.reading-preview{display:none}.reading-list .reading-omission{padding:.4rem 0 .4rem 3rem;color:#8a958d;border:0}
@@ -386,6 +387,11 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .seed-note-receipt-dialog{background:#f5efe5;color:#262420;border-color:#897468}
 .seed-note-receipt-dialog .eyebrow{color:#704840}
 .seed-note-receipt-dialog #seed-note-body{white-space:pre-line;border-top:1px solid #c6b6ab;padding-top:1rem}
+@media(max-height:400px) and (orientation:landscape){
+ .seed-note-receipt-dialog{padding-block:.75rem}
+ .seed-note-receipt-dialog h2{margin:.35rem 0 .55rem}
+ .seed-note-receipt-dialog #seed-note-body{margin:.5rem 0;line-height:1.5;padding-top:.5rem}
+}
 .about-related{display:flex;flex-wrap:wrap;gap:.65rem 1.25rem}
 .reception-copy{background:#f5efe5;padding:clamp(1.3rem,5vw,3rem);border:1px solid #c6b6ab;color:#2c2723}
 .reception-copy dl>div{display:grid;grid-template-columns:4rem 1fr;gap:1rem;padding:.5rem 0;border-bottom:1px solid #d9cbbf}

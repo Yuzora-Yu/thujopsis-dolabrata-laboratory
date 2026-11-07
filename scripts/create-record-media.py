@@ -42,6 +42,7 @@ STYLES = {
     "minutes": ("Mincho", "#37342d", "#eeece6", "議事記録", "formal"),
     "memo": ("Mincho", "#484337", "#f3f0e7", "手控え", "memo"),
     "letter": ("Mincho", "#483c30", "#f0ece2", "回答書控え", "formal"),
+    "audit-letter": ("Mincho", "#303c45", "#eceff1", "東都研究監査室／照会書", "formal"),
     "ledger": ("Office", "#414c4e", "#eaeeee", "管理簿複写", "form"),
     "watch-log": ("Office", "#393c3b", "#eeeeeb", "居住実証運用室／当直連絡", "form"),
     "workshop-receipt": ("Office", "#574937", "#f1ebe2", "工房受付／預かり控え", "form"),
@@ -154,7 +155,7 @@ def render(record, style_key, target):
         flow.extend([p("署名欄の複写（右端）", sub), signature_comparison(record["signatureClips"], font)])
     for entry in record.get("entries", []):
         if entry["at"] == record.get("printFollowupFrom"):
-            flow.extend([PageBreak(), p("後日受領した書面", title)])
+            flow.extend([PageBreak(), p(record.get("printFollowupTitle", "後日受領した書面"), title)])
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):
         flow.append(p(record["signoff"], meta))

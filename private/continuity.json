@@ -2,6 +2,7 @@
   "project": "原型継承試験",
   "owner": "朝倉紬乃",
   "receiver": "災害技術記録保全センター 榎本航策",
+  "handover_record": "TR-2026-011",
   "source": "榊原惟臣の判断記録",
   "exclusions": "2021年手控えを病状による変化として除外",
   "method": "基準回答と異なる応答を再評価・再訓練へ戻す",
@@ -14,7 +15,8 @@
   "subject_transfer": {
     "subject": "P-034 瀬尾灯",
     "condition": "本人の退出希望ではなく、基準判断への一致を受渡し条件とする",
-    "source": "AS-2023-008 / P034-2026-102"
+    "source": "AS-2023-008 / P034-2026-102",
+    "arrangements": "TR-2026-011の受入場所・移動日・本人確認は未記入"
   },
   "reader_assessment": {
     "source": "AS-2026-019",

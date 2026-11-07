@@ -55,9 +55,13 @@ export function buildEvidenceArchive({pdf,records,continuity,healthComparison},{
  const documents=originalRecords();
  if(complete){
   const {receiver}=JSON.parse(Buffer.from(continuity).toString('utf8'));
+  const transferRecord=documents.find(record=>record.id==='TR-2026-011');
+  const [draft]=transferRecord.tables;
   const transferNote=[
-   'TR-2026-011',
+   transferRecord.id,
    '受領先：'+receiver,
+   draft.caption,
+   ...draft.rows.slice(1).map(([field,value])=>field+'：'+(value||'未記入')),
    '原型継承資料を含む移管計画。原型から前理事長晩年の反対意見を除外。',
    '外部調査照会 EA-2026-009 は返信保留。',
    '',

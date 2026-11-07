@@ -301,6 +301,30 @@ test('only intact evidence with matching source records qualifies as complete',a
  assert.equal(classifyEvidence(zipFiles(summary.map(({name})=>({name,data:''})))),null);
  const unrelated={name:'文書原本.json',data:JSON.stringify({documents:[{id:'TR-2026-011',entries:[]}]})};
  assert.equal(classifyEvidence(zipFiles([...summary,unrelated])),null);
+ const earlierOriginals=['TR-2026-011','EV-2022-091'].map(id=>{
+  const document=documents.find(item=>item.id===id);
+  return id==='TR-2026-011'?{id,entries:document.entries}:{id,tables:document.tables};
+ });
+ const olderExport={name:'文書原本.json',data:JSON.stringify({documents:earlierOriginals})};
+ assert.equal(classifyEvidence(zipFiles([...summary,olderExport])),'complete');
+});
+
+test('the draft separates transfer of records, closure and residents',async()=>{
+ const transfer=documents.find(document=>document.id==='TR-2026-011');
+ const fields=Object.fromEntries(transfer.tables[0].rows);
+ const continuity=JSON.parse(await readFile(new URL('../private/continuity.json',import.meta.url)));
+ assert.equal(fields['資料の受領担当'],continuity.receiver);
+ assert.equal(fields['資料の内訳'],continuity.handover.join('、'));
+ assert.equal(fields['現施設の運営停止'],'モデル受領後に手続きを開始予定');
+ for(const field of ['資料の引渡し日','資料の受領印','居住者の受入場所','居住者の移動日','居住者本人の確認']){
+  assert.equal(fields[field],'',field);
+ }
+ const center=agencyPage('hozen','/receive/',{origins});
+ const independent=agencyPage('audit','/receive/',{origins});
+ assert.match(center,/技術記録は、保全と引継ぎの可否を確認.*所在や支援に関する照会は、関係先へ取り次ぎ/);
+ assert.match(independent,/現運営から独立した立場で、原本と資料の移送先/);
+ assert.equal(renderMember('/members/records/TR-2026-011/',context('institution')),null);
+ assert.equal(renderMember('/members/records/EA-2026-009/',context('institution')),null);
 });
 
 test('production domains and project-path previews preserve cross-site and asset links',()=>{

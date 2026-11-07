@@ -44,8 +44,12 @@ async function checkMenuNotes(browser){
   assert.equal(await finalNote.evaluate(dialog=>{
    const heading=dialog.querySelector('h2');
    const number=dialog.querySelector('.seed-note-number');
+   const body=dialog.querySelector('#seed-note-body');
+   const range=document.createRange();
+   range.selectNodeContents(body);
    return dialog.scrollTop===0 && heading===document.activeElement
-    && number.getBoundingClientRect().top>=dialog.getBoundingClientRect().top;
+    && number.getBoundingClientRect().top>=dialog.getBoundingClientRect().top
+    && range.getBoundingClientRect().bottom<=dialog.getBoundingClientRect().bottom;
   }),true);
   await page.screenshot({path:'.work/qa/seed-ninth-unlocked.png'});
   const finalReward=finalNote.getByRole('link',{name:'中央受付の引継ぎ控えへ'});

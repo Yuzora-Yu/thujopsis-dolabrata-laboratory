@@ -12,6 +12,8 @@ const editions=[
  ['AS-2023-008','memo'],['FAB-2022-071','workshop-receipt'],
  ['FAB-2026-018','ledger',false,{pdf:'保全台帳と作業控え（PDF）'}],
  ['P034-2026-102','memo',false,{pdf:'受渡し控えと便箋の原文（PDF）'}],
+ ['TR-2026-011','transfer',false,{pdf:'受領案と協議の控え（PDF）'}],
+ ['EA-2026-009','audit-letter',false,{pdf:'東都研究監査室の照会書（PDF）'}],
  ['PN-2022-034','workshop-receipt',true,{pdf:'受領票と後日の書面（PDF）',image:'9月2日の預かり控え（画像）'}],
 ];
 const printLabels={
