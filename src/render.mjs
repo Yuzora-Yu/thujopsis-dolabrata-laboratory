@@ -154,13 +154,22 @@ function tenantProfile(tenant){
   ${tenantRelatedMaterials(tenant)}${link(directory,'入居者紹介へ')}
  </article>`);
 }
+function tenantCardName(name){
+ const parts=name.match(/^(株式会社|有限会社|合同会社|合名会社|合資会社)(.+)$/)
+  ||name.match(/^(.+?)(株式会社|有限会社|合同会社|合名会社|合資会社)$/);
+ const words=(parts?parts.slice(1):[name]).flatMap(part=>{
+  const boundary=part.match(/^([\p{Script=Katakana}ー]+)([\p{Script=Han}々].*)$/u);
+  return boundary?boundary.slice(1):[part];
+ });
+ return words.map(part=>`<span class="tenant-name-part">${esc(part)}</span>`).join('<wbr>');
+}
 function tenantCards(items){
  return `<div class="tenant-grid">${items.map(tenant=>`
   <a class="tenant-card" id="tenant-${tenant.page}" href="/tenants/${tenant.page}/">
    ${tenantLogo(tenant)}
    <div class="tenant-card-copy">
     <div class="tenant-card-meta"><span class="tenant-id">掲載No. ${tenant.page}</span><span class="tag">${esc(tenant.status)}</span></div>
-    <h2>${esc(tenant.name)}</h2><p>${esc(tenant.business)}</p>
+    <h2 aria-label="${esc(tenant.name)}">${tenantCardName(tenant.name)}</h2><p>${esc(tenant.business)}</p>
     <small>${esc(tenant.period)} ／ ${esc(tenant.room)}号室</small>
    </div>
   </a>`).join('')}</div>`;

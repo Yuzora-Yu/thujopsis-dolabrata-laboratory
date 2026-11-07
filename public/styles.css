@@ -433,6 +433,7 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
  text-underline-offset:.22em;
 }
 .tenant-card h2{font-size:clamp(1rem,1.75vw,1.25rem);line-height:1.55;margin:.85rem 0 .35rem}
+.tenant-name-part{display:inline-block;max-width:100%;overflow-wrap:anywhere;vertical-align:top}
 .tenant-card-copy p{margin:.2rem 0 .7rem;font-size:.86rem;color:#364940}
 .tenant-card-copy small{color:var(--muted);font-size:.76rem}
 .tenant-identity{display:grid;grid-template-columns:clamp(112px,15vw,176px) minmax(0,1fr);align-items:center;gap:clamp(.9rem,3.2vw,2rem)}
