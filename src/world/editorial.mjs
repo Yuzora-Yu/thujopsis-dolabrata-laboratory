@@ -5,6 +5,23 @@ export const visitorGuide={
  floor:4, desk:'中央受付', weekdayStart:9, weekdayEnd:17,
  edition:'見学案内 第4版', revision:'2026年10月改訂',
 };
+export const facilityStaff=[
+ {
+  area:'4F / RECEPTION',title:'中央受付スタッフ',
+  description:'見学のご案内や、会議室・工房の利用に関するご相談を承っております。はじめての方は、4階の中央受付へお越しください。',
+  pausedDescription:'見学のご案内や、会議室・工房の利用相談を担当しておりました。',
+  quote:'見学中に何を見たいか、最初に少しお聞きしています。お時間が短いときは、見たいところから回れるようご案内いたします。',
+  link:['/visit/','見学のご案内'],
+ },
+ {
+  area:'4F / WORKSHOP',title:'工房スタッフ',
+  description:'3Dプリンターやレーザーカッターを使う前に、材料の厚さ、取り付ける場所、使い方を一緒に確かめます。図面をまだお持ちでない場合もご相談いただけます。',
+  pausedDescription:'試作のご相談では、材料の厚さや、部品の取り付け方を利用者の方と一緒に確かめていました。',
+  quote:'寸法を測る前に、どこで使うものかを聞きます。壊れた部品なら、その隣に付いていたものも持ってきてください。取り付けたときの隙間が分かると、直し方が変わります。',
+  credit:'高瀬 誠弥 ／ 元工房主任・製作相談の記録から',
+  link:['/workshop/','工房のご案内'],
+ },
+];
 export function newsIsAvailable(n){const [year,...rest]=storyToday.split('-');const cutoff=[String(Number(year)-5),...rest].join('-');return n.important||n.restored||n.date.replaceAll('.','-')>=cutoff;}
 export function newsIsListed(n){return newsIsAvailable(n)&&!n.restored&&n.listed!==false;}
 

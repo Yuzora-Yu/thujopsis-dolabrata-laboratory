@@ -5,7 +5,8 @@ import {tenantMaterials} from './world/tenant-materials.mjs';
 import {expandNews} from './world/news.mjs';
 import {extraAccounts} from './world/accounts.mjs';
 import {researchRecords} from './world/records.mjs';
-import {enrichPublicPeople,humanSearchEntries} from './world/people.mjs';
+import {enrichPublicPeople,humanSearchEntries,asakuraProfile,inabaProfile,publicPersonText} from './world/people.mjs';
+import {facilityStaff} from './world/editorial.mjs';
 export const floorGuideCode='A4-09';
 
 export const facility = {
@@ -69,14 +70,14 @@ enrichPublicPeople({gallery,tenants});
 
 export const searchEntries = [
  ...humanSearchEntries,
- {title:programTitle,url:programPath,text:'月面 宇宙 工房 道具 小物入れ 企画展示'},
- {title:'施設・サービス',url:'/facilities/',text:'会議室 オフィス コワーキング 食堂 プレゼンテーションホール フロアマップ'},
- {title:'施設職員紹介',url:'/facilities/staff/',text:'中央受付 工房スタッフ 施設職員 見学 製作相談'},
- {title:'工房のご案内',url:'/workshop/',text:'3Dプリンター レーザーカッター 試作 ものづくり'},
- {title:'料金のご案内',url:'/price/',text:'利用料金 月額 会議室 工房'},
- {title:'月額会員・入会のご案内',url:'/membership/',text:'入会 会員 新規受付'},
+ {title:programTitle,url:programPath,text:'月面 宇宙 工房 道具 小物入れ 企画展示',summary:'工房で製作した小さな道具と、月で暮らす場所の構想図をご紹介いたします。'},
+ {title:'施設・サービス',url:'/facilities/',text:'会議室 オフィス コワーキング 食堂 工房 プレゼンテーションホール フロアマップ',summary:'コワーキング・ラウンジ、会議室、工房など、仕事とものづくりを支える施設をご紹介いたします。'},
+ {title:'施設職員紹介',url:'/facilities/staff/',text:['中央受付 工房スタッフ 施設職員 見学 製作相談',...facilityStaff.flatMap(staff=>[staff.title,staff.description,staff.quote,staff.credit||''])].join(' '),summary:'中央受付と工房のご案内、製作相談を担当した職員の言葉を掲載しております。'},
+ {title:'工房のご案内',url:'/workshop/',text:'3Dプリンター レーザーカッター 試作 ものづくり',summary:'身近な道具から、事業に向けた試作まで。工房の機器と製作支援をご紹介いたします。'},
+ {title:'料金のご案内',url:'/price/',text:'利用料金 月額 会議室 工房',summary:'月額会員、会議室、工房などの利用料金をご案内いたします。表示金額は税込です。'},
+ {title:'月額会員・入会のご案内',url:'/membership/',text:'入会 会員 月額 オフィス 新規受付',summary:'月額会員とオフィス会員の制度をご案内いたします。現在、新規入会の受付を休止しております。'},
  {title:'4階フロアマップ',url:'/floor-map/',text:`${floorGuideCode} フロアマップ 案内図 中央受付 会議室 ラウンジ`,summary:`4階案内図 ${floorGuideCode}。中央受付や会議室、ラウンジへの行き方をご確認いただけます。`},
- {title:'入居者紹介',url:'/tenants/',text:'入居企業 過去入居 企業紹介 活動報告'},
+ {title:'入居者紹介',url:'/tenants/',text:'入居企業 過去入居 企業紹介 活動報告',summary:'現在・過去の入居者の事業内容と、あすなろでの活動をご紹介いたします。'},
  ...tenants.filter(t=>t.listed).map(t=>({
   title:t.name,url:`/tenants/${t.page}/`,text:[`${t.room}号室`,t.person,t.business,t.description,...t.activities.flatMap(({title,body})=>[title,body])].join(' '),
   summary:`${t.room}号室 ／ ${t.status}（${t.period}）　${t.business}`,
@@ -86,6 +87,6 @@ export const searchEntries = [
   text:n.restored?(n.keywords??''):[n.body,...(n.sections||[]).flat(),...(n.facts||[]).flat()].join(' '),
  })),
  ...gallery.filter(g=>g.listed).map(g=>({title:g.title,url:`/gallery/${g.id}/`,text:g.body+' '+g.tag})),
- {title:'朝倉 紬乃｜制作と活動の記録',url:'/people/asakura-tsumugi/',text:'朝倉 紬乃 あさくら つむぎの 制作 プロフィール'},
- {title:'稲葉 澪里｜利用者インタビュー',url:'/people/inaba-mio/',text:'稲葉 澪里 いなば みおり 案内 図解 制作者 触ってわかる案内図 立体模型'},
+ {title:asakuraProfile.title,url:'/people/asakura-tsumugi/',text:'朝倉 紬乃 あさくら つむぎの 制作 プロフィール '+publicPersonText(asakuraProfile),summary:asakuraProfile.introduction.split('。').slice(1).join('。')},
+ {title:inabaProfile.title,url:'/people/inaba-mio/',text:'稲葉 澪里 いなば みおり 案内 図解 制作者 触ってわかる案内図 立体模型 '+publicPersonText(inabaProfile),summary:inabaProfile.introduction},
 ];

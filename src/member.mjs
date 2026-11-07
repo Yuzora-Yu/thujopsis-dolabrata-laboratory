@@ -177,7 +177,7 @@ function renderMemberPage(path,ctx){
   const draft = ctx.reservationDraft || {};
   const requested = draft.space || query.get('space');
   const space = reservationSpaces.some(([id])=>id===requested) ? requested : reservationSpaces[0][0];
-  const {start,lastStart} = reservationHours(space,draft.date);
+  const {start,lastStart,close} = reservationHours(space,draft.date);
   const options = reservationSpaces.map(([id,name])=>`<option value="${id}"${space===id?' selected':''}>${name}</option>`).join('');
   return memberLayout('利用申請・予約',`<h1>利用申請・予約</h1>${query.get('received')?'<div class="form-success">利用申請を受け付けました。内容を確認のうえ、施設からの連絡にて回答いたします。</div>':''}
    <form class="form-stack" method="post" data-reservation-form>
@@ -188,7 +188,10 @@ function renderMemberPage(path,ctx){
     <p class="member-note" id="reservation-date-range">${lastReservationDate.slice(0,4)}年末までのご利用を受け付けております。</p>
     <label for="time">開始時刻</label><input id="time" name="time" type="time" min="${start}"${lastStart?` max="${lastStart}"`:''} value="${esc(draft.time)}" aria-describedby="reservation-hours" required>
     <p class="member-note" id="reservation-hours" data-reservation-hours aria-live="polite">${reservationHoursHint(space,draft.date)}</p>
-    <label for="purpose">利用内容</label><textarea id="purpose" name="purpose" maxlength="2000" required>${esc(draft.purpose)}</textarea>
+    <label for="end-time">終了時刻</label><input id="end-time" name="end_time" type="time" min="${start}"${close?` max="${close}"`:''} value="${esc(draft.end_time)}" aria-describedby="reservation-end-hours" required>
+    <p class="member-note" id="reservation-end-hours" data-reservation-end-hours aria-live="polite">準備・撤収を含む利用時間をご入力ください。</p>
+    <label for="purpose">利用内容</label><textarea id="purpose" name="purpose" maxlength="2000" aria-describedby="reservation-purpose-note" required>${esc(draft.purpose)}</textarea>
+    <p class="member-note" id="reservation-purpose-note">用途、ご利用人数、ご希望の備品などをご記入ください。</p>
     <button class="button dark">申請する <span>→</span></button>
    </form>`,{...ctx,active:'reservations'});
  }

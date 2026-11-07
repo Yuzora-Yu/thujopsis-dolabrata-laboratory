@@ -30,12 +30,13 @@ function refresh(){
  for(const element of document.querySelectorAll('[data-reading-reference]'))element.textContent='照会端末 '+caseId.slice(0,8).toUpperCase();
 }
 window.asunaroReading={refresh};
-document.addEventListener('change',event=>{
+function updateReservationInput(event){
  const input=event.target;
- if(input.form?.matches('[data-reservation-form]') && ['space','date','time'].includes(input.name)){
+ if(input.form?.matches('[data-reservation-form]') && ['space','date','time','end_time'].includes(input.name)){
   updateReservationHours(input.form);
  }
-});
+}
+for(const eventName of ['input','change'])document.addEventListener(eventName,updateReservationInput);
 refresh();
 window.addEventListener('pageshow',()=>refresh());
 window.addEventListener('storage',()=>refresh());

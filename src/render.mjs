@@ -1,11 +1,12 @@
 import {programPath,programTitle,programNotesPath,programBanner,programExhibit,programBody} from './program.mjs';
 import {tenantExhibits} from './world/tenant-exhibits.mjs';
 import {fictionFooter,decoratePage} from './experience.mjs';
-import {editorialPages,facilityInfo,visitorGuide} from './world/editorial.mjs';
+import {editorialPages,facilityInfo,visitorGuide,facilityStaff} from './world/editorial.mjs';
 import {facility, floorGuideCode, gallery, tenants, news, searchEntries, tenantMaterialEntries} from './content.mjs';
 import {matchesSearch,searchExcerpt} from './search.mjs';
 import {seedNotes,seedNoteTotal,seedCollectionPath} from './seed-notes.mjs';
 import {workshopEquipment} from './world/workshop-equipment.mjs';
+import {asakuraProfile,inabaProfile} from './world/people.mjs';
 import {workshopHours} from '../public/assets/reservation-policy.js';
 import {generalUsePaused,publicOperationLabel} from './evidence.mjs';
 
@@ -217,18 +218,12 @@ function workshopPage(paused){
 function staffPage(paused){
  return layout('施設職員紹介',heading('OUR TEAM','施設職員紹介',paused?'休止前の受付と工房のご案内、職員への取材を掲載しております。':'見学や試作のご相談を、中央受付と工房で承っております。')+(paused?facilityUseNotice():'')+`
   <section class="wrap staff-profiles" aria-label="受付・工房の職員">
-   <article class="staff-profile">
-    <p class="eyebrow">4F / RECEPTION</p><h2>中央受付スタッフ</h2>
-    <p>${paused?'見学のご案内や、会議室・工房の利用相談を担当しておりました。':'見学のご案内や、会議室・工房の利用に関するご相談を承っております。はじめての方は、4階の中央受付へお越しください。'}</p>
-    <blockquote>「見学中に何を見たいか、最初に少しお聞きしています。お時間が短いときは、見たいところから回れるようご案内いたします。」</blockquote>
-    ${link('/visit/','見学のご案内')}
-   </article>
-   <article class="staff-profile">
-    <p class="eyebrow">4F / WORKSHOP</p><h2>工房スタッフ</h2>
-    <p>${paused?'試作のご相談では、材料の厚さや、部品の取り付け方を利用者の方と一緒に確かめていました。':'3Dプリンターやレーザーカッターを使う前に、材料の厚さ、取り付ける場所、使い方を一緒に確かめます。図面をまだお持ちでない場合もご相談いただけます。'}</p>
-    <blockquote>「寸法を測る前に、どこで使うものかを聞きます。壊れた部品なら、その隣に付いていたものも持ってきてください。取り付けたときの隙間が分かると、直し方が変わります。」<cite>高瀬 誠弥 ／ 元工房主任・製作相談の記録から</cite></blockquote>
-    ${link('/workshop/','工房のご案内')}
-   </article>
+   ${facilityStaff.map(staff=>`<article class="staff-profile">
+    <p class="eyebrow">${esc(staff.area)}</p><h2>${esc(staff.title)}</h2>
+    <p>${esc(paused?staff.pausedDescription:staff.description)}</p>
+    <blockquote>「${esc(staff.quote)}」${staff.credit?`<cite>${esc(staff.credit)}</cite>`:''}</blockquote>
+    ${link(...staff.link)}
+   </article>`).join('')}
   </section>`);
 }
 
@@ -363,21 +358,31 @@ function floorGuide(paused){
   </section>`);
 }
 
+function asakuraPublicProfile(){
+ const person=asakuraProfile;
+ return layout(person.title,heading('PEOPLE',person.heading)+`<article class="wrap article narrow prose">
+  <p class="profile-kicker">TSUMUGINO ASAKURA / FABRICATION</p><p>${esc(person.introduction)}</p>
+  ${img('media/p-asakura.webp','2017年、工房の取材時に撮影した朝倉紬乃')}
+  ${person.sections.map(([title,...paragraphs])=>`<h2>${esc(title)}</h2>${paragraphs.map(text=>`<p>${esc(text)}</p>`).join('')}`).join('')}
+ </article>`);
+}
+
 function inabaInterview(){
- return layout('稲葉 澪里｜利用者インタビュー',heading('PEOPLE','伝わる道具を、少しずつ。')+`
+ const person=inabaProfile;
+ return layout(person.title,heading('PEOPLE',person.heading)+`
   <article class="wrap article narrow prose editorial-story">
    <p class="article-meta"><time datetime="2016-03-25">2016.03.25</time><span>利用者インタビュー</span></p>
    <p class="profile-kicker">稲葉 澪里 ／ 図解・案内制作</p>
    <figure>${img('media/p-inaba.webp','紙の案内図に線を書き足す稲葉さんの手元。机の右奥に樹脂の部分模型。','',true,[1100,733])}
-    <figcaption>図の原稿と、線の太さや点の間隔を比べた試し刷り。2016年3月、工房にて。</figcaption></figure>
-   <p>道順や道具の使い方を図にする稲葉澪里さん。工房で試作を続けている立体案内図について伺いました。</p>
-   <h2>曲がる手前で、指を止める</h2>
-   <p>通路の角を指でたどってもらったら、曲がるところを一つ通り過ぎました。線が細いと思って太くしたら、今度は壁との区別がつかなかったんです。それで、曲がる手前に、いったん指を止められる幅を取りました。</p>
-   <blockquote>同じものを見ても、必要な案内は人それぞれ。ひとつの正解だけに揃えないで作っていきたいです。</blockquote>
-   <h2>次は、朝の通路で</h2>
-   <p>図ができたら、人の多い朝に受付から歩いてみたいです。机の上では、迷っても後ろから誰も来ませんから。どこで立ち止まれるかは、実際に歩くと気づくことがありそうです。</p>
+    <figcaption>${esc(person.caption)}</figcaption></figure>
+   <p>${esc(person.introduction)}</p>
+   <h2>${esc(person.sections[0][0])}</h2>
+   <p>${esc(person.sections[0][1])}</p>
+   <blockquote>${esc(person.quote)}</blockquote>
+   <h2>${esc(person.sections[1][0])}</h2>
+   <p>${esc(person.sections[1][1])}</p>
    <div class="editorial-related">${link('/gallery/0009/','触ってわかる案内図')}${link('/floor-map/#arrival','中央受付までの案内')}</div>
-   <aside class="news-closed-note"><small>掲載情報更新 <time datetime="2019-03-31">2019.03.31</time></small><p>2019年3月、当施設での利用登録を終了しました。</p></aside>
+   <aside class="news-closed-note"><small>掲載情報更新 <time datetime="2019-03-31">2019.03.31</time></small><p>${esc(person.updateNote)}</p></aside>
   </article>`);
 }
 
@@ -427,7 +432,7 @@ function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCH
  if(material)return tenantMaterialPage(material);
  const t=tenants.find(t=>path===`/tenants/${t.page}/`);
  if(t)return tenantProfile(t);
- if(path==='/people/asakura-tsumugi/')return layout('朝倉 紬乃｜制作と活動の記録',heading('PEOPLE','朝倉 紬乃')+`<article class="wrap article narrow prose"><p class="profile-kicker">TSUMUGINO ASAKURA / FABRICATION</p><p>1993年6月18日生まれ。2012年からあすなろの個人会員として制作を始め、2015年より工房の技術支援に従事。生活道具の製作と、過去の制作記録の保全に取り組んでいます。</p>${img('media/p-asakura.webp','2017年、工房の取材時に撮影した朝倉紬乃')}<h2>制作について</h2><p>最初の頃、治具を割ってしまって、もう来ない方がいいのかと聞いたことがあります。榊原先生は、工房の費用で交換できると説明してから、「失敗した人を追い出したら、誰も試せないでしょう」と笑いました。私も同じ説明をできる側になりたいと思いました。</p><p>使った人がいなくなった道具にも、直した跡が残っています。捨てる前に、誰がどこを変えたのか調べるのが好きです。先生の言葉を記録する仕事も、そこから続いています。</p><h2>工房で教わったこと</h2><p>2021年、初めて工房に来た瀬尾灯さんに、機械と材料の扱いをご案内しました。私と一つ違いの年齢で、設計の仕事を経て作業療法士になったと伺いました。困りごとを聞くとすぐ図面を描き始めるので、三枝律と一緒に、今日はどこまで作るかと相談したものです。</p></article>`);
+ if(path==='/people/asakura-tsumugi/')return asakuraPublicProfile();
  if(path==='/people/inaba-mio/')return inabaInterview();
  if(path==='/search/'){const keyword=q.trim();const hits=keyword?searchEntries.filter(x=>matchesSearch(x,keyword)&&(ending!=='end2'||x.url!=='/people/asakura-tsumugi/')):[];return layout('サイト内検索',heading('SITE SEARCH','サイト内検索')+`<section class="wrap article narrow"><p class="search-scope">施設サイトの公開ページを検索できます。</p><form method="get" class="search-box"><input type="search" name="q" value="${esc(keyword)}" aria-label="キーワード" placeholder="キーワード" required><button type="submit">検索</button></form><p class="small muted" role="status" aria-live="polite">${keyword?`「${esc(keyword)}」の検索結果　${hits.length}件`:''}</p><div class="search-results">${hits.map(h=>`<a href="${h.url}">${h.published?`<time class="search-result-date" datetime="${esc(h.published)}">${esc(h.published.replaceAll('-','.'))}</time>`:''}<h2>${esc(h.title)}</h2><p>${esc(searchExcerpt(h))}</p></a>`).join('')}${keyword&&!hits.length?'<p>該当するページはありません。</p>':''}</div></section>`);}
  return null;

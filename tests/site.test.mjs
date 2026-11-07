@@ -132,7 +132,7 @@ test('name search, personal account and independent submission reveal and stop s
 });
 test('state changes require CSRF verification',async()=>{const r=await fetch(base+'/members/login/',{method:'POST',body:new URLSearchParams({id:'201204010017',password:'20080519'})});assert.equal(r.status,403);});
 
-test('reservation requests respect the selected facility’s start time and keep the draft on error',async()=>{
+test('reservation requests respect the facility hours and keep the requested interval on error',async()=>{
  const c=client();
  const roomD='/members/reservations/?space=meeting-d';
  assert.match((await c.get('/facilities/meeting/')).text,/href="\/members\/reservations\/\?space=meeting-d" target="_blank"/);
@@ -152,7 +152,8 @@ test('reservation requests respect the selected facility’s start time and keep
  assert.match(form,/<option value="workshop" selected>工房/);
  assert.match(form,/<input id="time"[^>]+max="16:00"[^>]+aria-describedby="reservation-hours"/);
  assert.match(form,/工房受付は17:00までです。/);
- const draft={space:'workshop',date:'2026-11-07',time:'16:00',purpose:'試作の相談'};
+ assert.match(form,/<input id="end-time"[^>]+name="end_time"[^>]+max="17:00"/);
+ const draft={space:'workshop',date:'2026-11-07',time:'16:00',end_time:'16:45',purpose:'試作の相談'};
  const accepted=await c.post(route,draft);
  assert.equal(accepted.status,303);
  assert.equal(accepted.headers.get('location'),route+'?received=1');
@@ -161,29 +162,33 @@ test('reservation requests respect the selected facility’s start time and keep
  const error=await late.text();
  assert.match(error,/<option value="workshop" selected>工房/);
  assert.match(error,/<input id="time"[^>]+value="16:01"/);
+ assert.match(error,/<input id="end-time"[^>]+value="16:45"/);
  assert.match(error,/>試作の相談<\/textarea>/);
  for(const space of ['meeting-a','meeting-b','meeting-c','meeting-d','presentation','hall']){
-  for(const [date,lastStart,lateStart] of [
-   ['2026-11-06','20:00','20:01'],
-   ['2026-11-07','17:00','17:01'],
-   ['2026-11-08','17:00','17:01'],
-   ['2026-11-03','17:00','17:01'],
-   ['2027-03-22','17:00','17:01'],
+  for(const [date,lastStart,lateStart,close] of [
+   ['2026-11-06','20:00','20:01','21:00'],
+   ['2026-11-07','17:00','17:01','18:00'],
+   ['2026-11-08','17:00','17:01','18:00'],
+   ['2026-11-03','17:00','17:01','18:00'],
+   ['2027-03-22','17:00','17:01','18:00'],
   ]){
-   assert.equal((await c.post(route,{...draft,space,date,time:lastStart})).status,303,space+' '+date);
-   assert.equal((await c.post(route,{...draft,space,date,time:lateStart})).status,400,space+' '+date);
+   assert.equal((await c.post(route,{...draft,space,date,time:lastStart,end_time:close})).status,303,space+' '+date);
+   assert.equal((await c.post(route,{...draft,space,date,time:lateStart,end_time:close})).status,400,space+' '+date);
+   const afterClose=close.slice(0,2)+':01';
+   assert.equal((await c.post(route,{...draft,space,date,time:lastStart,end_time:afterClose})).status,400,space+' '+date+' after close');
   }
  }
- const saturdayDraft=await c.post(route,{...draft,space:'meeting-d',date:'2026-11-07',time:'20:00'});
+ const saturdayDraft=await c.post(route,{...draft,space:'meeting-d',date:'2026-11-07',time:'20:00',end_time:'21:00'});
  assert.equal(saturdayDraft.status,400);
  const saturday=await saturdayDraft.text();
  assert.match(saturday,/<option value="meeting-d" selected>会議室 D/);
  assert.match(saturday,/<input id="date"[^>]+value="2026-11-07"/);
  assert.match(saturday,/<input id="time"[^>]+max="17:00" value="20:00"/);
+ assert.match(saturday,/<input id="end-time"[^>]+max="18:00" value="21:00"/);
  assert.match(saturday,/施設のご利用は18:00までです。/);
  assert.match(saturday,/>試作の相談<\/textarea>/);
  assert.equal((await c.post(route,{...draft,date:'2027-12-31'})).status,303);
- for(const change of [{space:'unlisted'}, {date:'2026-11-01'}, {date:'2026-11-31'}, {date:'2028-01-01'}, {time:'08:59'}, {time:'12:65'}]){
+ for(const change of [{space:'unlisted'}, {date:'2026-11-01'}, {date:'2026-11-31'}, {date:'2028-01-01'}, {time:'08:59'}, {time:'12:65'}, {end_time:''}, {end_time:'16:00'}, {end_time:'15:59'}, {end_time:'17:01'}, {end_time:'25:00'}]){
   assert.equal((await c.post(route,{...draft,...change})).status,400);
  }
 });
@@ -207,6 +212,16 @@ test('publication numbers form tight sequences independent of account registrati
 
 test('public search tolerates spacing, width and full publication dates; member links open a separate tab',async()=>{
  const c=client();for(const q of ['朝倉紬乃','朝倉 紬乃','朝倉　紬乃','朝 倉  紬'])assert.match((await c.get('/search/?q='+encodeURIComponent(q))).text,/href="\/people\/asakura-tsumugi\//,q);
+ for(const q of ['高瀬','高瀬誠弥','高 瀬 誠 弥','元工房主任','取り付けたときの隙間']){
+  const result=(await c.get('/search/?q='+encodeURIComponent(q))).text;
+  assert.match(result,/href="\/facilities\/staff\/"[\s\S]*?製作相談を担当した職員の言葉/,q);
+ }
+ assert.match((await c.get('/search/?q='+encodeURIComponent('焼き芋'))).text,/href="\/people\/saegusa-ritsu\//);
+ const personalResult=(await c.get('/search/?q='+encodeURIComponent('朝倉 紬乃'))).text;
+ assert.match(personalResult,/href="\/people\/asakura-tsumugi\/"[\s\S]*?2012年からあすなろの個人会員/);
+ assert.doesNotMatch(personalResult,/あさくら つむぎの 制作 プロフィール/);
+ for(const q of ['失敗した人','治具'])assert.match((await c.get('/search/?q='+encodeURIComponent(q))).text,/href="\/people\/asakura-tsumugi\//,q);
+ assert.match((await c.get('/search/?q='+encodeURIComponent('曲がる手前'))).text,/href="\/people\/inaba-mio\//);
  assert.match((await c.get('/search/?q='+encodeURIComponent('３Ｄプリンター'))).text,/工房のご案内/);
  assert.match((await c.get('/search/?q='+encodeURIComponent('４１１ 号室'))).text,/href="\/tenants\/0008\/[\s\S]*?過去入居（2014–2019）/);
  for(const [query,expected,other] of [

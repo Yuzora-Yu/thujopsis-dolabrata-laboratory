@@ -45,17 +45,18 @@ export function reservationHoursHint(space,date){
  return `申請できる開始時刻は ${start}〜${lastStart} です。${desk}は${close}までです。`;
 }
 
-export function isValidReservation({space,date,time,purpose}){
+export function isValidReservation({space,date,time,end_time:finish,purpose}){
  if(!reservationSpaces.some(([id])=>id===space) || typeof purpose!=='string' || !purpose.trim())return false;
  if(!bookingDate(date))return false;
- if(!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time || ''))return false;
- const {start,lastStart} = reservationHours(space,date);
- return time>=start && time<=lastStart;
+ const timeFormat=/^(?:[01]\d|2[0-3]):[0-5]\d$/;
+ if(!timeFormat.test(time || '') || !timeFormat.test(finish || ''))return false;
+ const {start,lastStart,close} = reservationHours(space,date);
+ return time>=start && time<=lastStart && finish>time && finish<=close;
 }
 
 export function updateReservationHours(form){
  const {space,date,time} = form.elements;
- const {start,lastStart} = reservationHours(space.value,date.value);
+ const {start,lastStart,close} = reservationHours(space.value,date.value);
  time.min = start;
  if(lastStart) time.max = lastStart;
  else time.removeAttribute('max');
@@ -66,4 +67,20 @@ export function updateReservationHours(form){
  const correction = outsideHours ? ' 入力した開始時刻を変更してください。' : '';
  const text = reservationHoursHint(space.value,date.value)+correction;
  if(hint.textContent!==text)hint.textContent=text;
+ const finish=form.elements.namedItem('end_time');
+ if(finish){
+  const timeFormat=/^(?:[01]\d|2[0-3]):[0-5]\d$/;
+  // A late start must not turn the native time range into an overnight range.
+  finish.min=timeFormat.test(time.value)&&!outsideHours?time.value:start;
+  if(close)finish.max=close;
+  else finish.removeAttribute('max');
+  const beforeStart=timeFormat.test(time.value)&&timeFormat.test(finish.value)&&finish.value<=time.value;
+  finish.setCustomValidity(beforeStart?'終了時刻は開始時刻より後にしてください。':'');
+  const invalidFinish=beforeStart||finish.validity.rangeUnderflow||finish.validity.rangeOverflow;
+  if(invalidFinish)finish.setAttribute('aria-invalid','true');
+  else finish.removeAttribute('aria-invalid');
+  const endHint=form.querySelector('[data-reservation-end-hours]');
+  const endText='準備・撤収を含む利用時間をご入力ください。'+(invalidFinish?' 入力した終了時刻を変更してください。':'');
+  if(endHint&&endHint.textContent!==endText)endHint.textContent=endText;
+ }
 }
