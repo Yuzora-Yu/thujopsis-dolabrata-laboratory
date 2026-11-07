@@ -695,6 +695,10 @@ export const researchRecords = [
   {
     "id": "AS-2024-002",
     "title": "原型継承試験・個人研究記録",
+    "printMetadata": {
+      "creator": "あすなろ会員サイト／個人保存資料",
+      "producer": "あすなろ会員サイト"
+    },
     "date": "2024年7月12日",
     "owner": "朝倉 紬乃",
     "roles": [

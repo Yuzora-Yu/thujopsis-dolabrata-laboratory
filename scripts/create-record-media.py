@@ -173,6 +173,11 @@ def render(record, style_key, target):
 
     def stationery(c, doc):
         c.setDateFormatter(lambda *_: "D:" + issue_date)
+        if record.get("printMetadata"):
+            metadata = record["printMetadata"]
+            c.setCreator(metadata["creator"])
+            c.setProducer(metadata["producer"])
+            c.setSubject(record.get("kindLabel", register))
         recipient_copy = participant_sheet and doc.page == 1
         c.setFillColor(accent)
         c.setStrokeColor(accent)
