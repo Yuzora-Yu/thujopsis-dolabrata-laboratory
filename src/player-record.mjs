@@ -10,7 +10,7 @@ export function renderPlayerRecord() {
   <div class="pr-intro"><p class="pr-eyebrow">PLAYER RECORD</p><h1>探索記録</h1><p>このページは物語の外にある、あなたの探索の控えです。<br>訪れたページと、見届けた結末を振り返れます。</p></div>
   <div class="pr-loading"><p class="pr-status" data-player-status role="status" aria-live="polite">記録を読み込んでいます。</p><button class="pr-button pr-button-quiet" type="button" data-player-reload hidden>もう一度読み込む</button></div>
   <div data-player-record-content hidden>
-   <section class="pr-section pr-endings-section" aria-labelledby="pr-endings-title"><div class="pr-section-heading"><h2 id="pr-endings-title">見届けた結末</h2><p>共有する記録を選べます。</p></div><div data-player-endings></div></section>
+   <section class="pr-section pr-endings-section" aria-labelledby="pr-endings-title"><div class="pr-section-heading"><h2 id="pr-endings-title">見届けた結末</h2><p>共有する記録を選べます。</p></div><p class="pr-current-ending" data-player-current-ending hidden></p><div data-player-endings></div></section>
    <details class="pr-section pr-restart-section" data-player-restart-section hidden><summary>現在の結末から、探索を続け直す</summary><div class="pr-restart-body"><p>現在の結末と提出状況を戻し、訪れたページから探索を続けられるようにします。</p><p>探索や到達済みENDの記録は残ります。</p><button class="pr-button pr-button-quiet" type="button" data-player-restart-open>戻す内容を確認</button></div></details>
    <section class="pr-section pr-share-section" aria-labelledby="pr-share-title"><h2 id="pr-share-title">探索の記録を共有</h2><p class="pr-muted">共有するのは閲覧件数と選んだEND番号、施設トップのURLだけです。</p>
     <label class="pr-field-label" for="pr-share-text">共有する本文</label><textarea id="pr-share-text" class="pr-share-text" data-player-share-text rows="4" readonly></textarea>

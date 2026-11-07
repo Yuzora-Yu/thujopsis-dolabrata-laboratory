@@ -300,6 +300,11 @@ function renderRecord() {
  host.replaceChildren();
  const description = activeRoot.querySelector('.pr-endings-section .pr-section-heading>p');
  description.hidden = !current.endings.length;
+ const currentEnding = rootNode('[data-player-current-ending]');
+ if (currentEnding) {
+  currentEnding.hidden = !current.ending;
+  currentEnding.textContent = current.ending ? '現在の結末：' + endLabels[current.ending] : '';
+ }
  if (!current.endings.length) host.append(element('p', 'pr-empty', '見届けた結末の記録は、ここに残ります。'));
  for (const row of current.endings) {
   const label = element('label', 'pr-ending-choice');

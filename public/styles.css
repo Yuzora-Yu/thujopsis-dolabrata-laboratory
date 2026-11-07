@@ -526,3 +526,5 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .material-pdf-link>span:not(.sr-only){font-size:.75rem;font-weight:400;color:var(--muted)}
 .image-viewport[data-can-pan="true"]{cursor:grab}
 .image-viewport.is-photo-panning{cursor:grabbing;user-select:none}
+.prose>.news-photo{margin:2.5rem 0}
+.news-photo img{display:block;width:100%;height:auto}

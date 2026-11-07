@@ -1,4 +1,8 @@
 // Public interviews retain the speaker's own register and time of publication.
+export const akariWorkshopPhoto={
+  image:'media/p-akari-work.webp',
+  caption:'鉛筆用グリップの形を確かめる瀬尾灯さん／2022年7月',
+};
 export const seoFamily={
   "akari": {
     "birthDate": "1994-03-14",
@@ -56,8 +60,7 @@ export const humanPages={
     "title": "母の字で、また手紙を。瀬尾灯さんの道具づくり",
     "en": "PEOPLE & MAKING",
     "date": "2022.07.08",
-    "image": "media/p-akari-work.webp",
-    "caption": "鉛筆用グリップの形を確かめる瀬尾灯さん／2022年7月",
+    ...akariWorkshopPhoto,
     "sections": [
       [
         "設計の仕事から、作業療法へ",
