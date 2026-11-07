@@ -528,3 +528,4 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .image-viewport.is-photo-panning{cursor:grabbing;user-select:none}
 .prose>.news-photo{margin:2.5rem 0}
 .news-photo img{display:block;width:100%;height:auto}
+.record-table .record-decision{white-space:nowrap}

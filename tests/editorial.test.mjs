@@ -11,7 +11,7 @@ import {pageRegistry,pagePosition,experienceSettings,growthStages} from '../src/
 import {hintPlan} from '../docs/hint-plan.mjs';
 import {playerRecordPath} from '../src/player-record.mjs';
 import {seoFamily} from '../src/world/people.mjs';
-import {recordText} from '../src/world/records.mjs';
+import {recordText,researchRecords} from '../src/world/records.mjs';
 import {siteQueries,catalogQueries} from '../docs/critical-queries.mjs';
 import {archiveItems,archiveNotes,noticeCapture,pressClippings} from '../src/world/archive-data.mjs';
 import {normalizeSearch,matchesSearch} from '../src/search.mjs';
@@ -21,6 +21,13 @@ import {makeArchive,zipFiles} from '../src/archive.mjs';
 import {startServers} from '../server.mjs';
 const origins=hostingOrigins('https://asunaro.example');
 const context=role=>({account:Object.values(accounts).find(a=>a.role===role),csrf:'test',caseId:'case',caseState:{contact:false,ending:''},query:new URLSearchParams(),origins});
+
+test('the source-selection comparison quotes the actual founding transcript',()=>{
+ const original=researchRecords.find(record=>record.id==='BR-2012-001');
+ const comparison=researchRecords.find(record=>record.id==='AS-2026-021');
+ const text=recordText(original);
+ for(const [quote]of comparison.tables[0].rows)assert.ok(text.includes(quote),'BR-2012-001 does not contain the quoted passage: '+quote);
+});
 
 test('retired recruitment articles are discoverable through records, not public lists or search',()=>{
  for(const id of ['20160520','20220715']){

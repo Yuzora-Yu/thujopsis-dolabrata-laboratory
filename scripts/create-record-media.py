@@ -45,6 +45,7 @@ STYLES = {
     "letter": ("Mincho", "#483c30", "#f0ece2", "回答書控え", "formal"),
     "audit-letter": ("Mincho", "#303c45", "#eceff1", "東都研究監査室／照会書", "formal"),
     "audit-checklist": ("Office", "#303c45", "#eceff1", "東都研究監査室／原本確認票", "form"),
+    "model-source": ("Office", "#3e4650", "#eef0f2", "原型継承試験／資料採否", "form"),
     "ledger": ("Office", "#414c4e", "#eaeeee", "管理簿複写", "form"),
     "watch-log": ("Office", "#393c3b", "#eeeeeb", "居住実証運用室／当直連絡", "form"),
     "workshop-receipt": ("Office", "#574937", "#f1ebe2", "工房受付／預かり控え", "form"),
@@ -154,8 +155,9 @@ def render(record, style_key, target):
         if t.get("printPageTitle"):
             flow.extend([PageBreak(), p(t["printPageTitle"], title)])
         flow.append(p(t["caption"] + ("　" + t["date"] if t.get("date") else ""), sub))
-        widths = [BODY * weight for weight in (.33, .32, .35)] if style_key == "group-review" else (
-            [BODY * weight for weight in (.31, .44, .25)] if style_key == "audit-checklist" else None)
+        ratios = {"group-review": (.33, .32, .35), "audit-checklist": (.31, .44, .25),
+                  "model-source": (.38, .16, .46)}.get(style_key)
+        widths = [BODY * weight for weight in ratios] if ratios else None
         table(t["head"], t["rows"], widths)
     if record.get("signatureClips"):
         flow.extend([p("署名欄の複写（右端）", sub), signature_comparison(record["signatureClips"], font)])

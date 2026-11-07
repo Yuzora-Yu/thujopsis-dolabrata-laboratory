@@ -1307,6 +1307,10 @@ export const researchRecords = [
   {
     "id": "AS-2026-014",
     "title": "原型資料・採否対照表",
+    "printMetadata": {
+      "creator": "原型資料管理／イデア規格工学",
+      "producer": "イデア規格工学"
+    },
     "date": "2026年8月21日",
     "owner": "朝倉紬乃／イデア規格工学",
     "roles": [
