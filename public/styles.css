@@ -516,3 +516,5 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
  .tenant-material-list a{grid-template-columns:minmax(0,1fr) auto;align-items:start}
  .tenant-material-list strong{grid-row:2;grid-column:1/-1}
 }
+
+.heading-phrase{white-space:nowrap}
