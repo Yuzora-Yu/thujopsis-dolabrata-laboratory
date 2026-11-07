@@ -77,4 +77,7 @@ function renderLegacyPage(path,ctx){
  return null;
 }
 
-export function renderLegacy(path,ctx){return decoratePage(renderLegacyPage(path,ctx),{kind:'archive',path});}
+export function renderLegacy(path,ctx){
+ const html=renderLegacyPage(path,ctx);
+ return decoratePage(html,{kind:'archive',path,track:!html?.includes('class="form-stack legacy-login"')})?.replace('href="/player-record/"',`href="${esc(ctx.origins.main)}/player-record/"`);
+}

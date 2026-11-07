@@ -17,6 +17,7 @@ import {isValidReservation} from './public/assets/reservation-policy.js';
 import {sendVideo} from './src/http-video.mjs';
 import {readFileSync} from 'node:fs';
 import {writeFile,rename,mkdir} from 'node:fs/promises';
+import {PlayerStateError,normalizePlayerState,playerSnapshot,addPlayerVisit,recordEnding,restartPlayerState,requirePlayerRevision} from './src/player-state.mjs';
 
 const root=import.meta.url?path.dirname(fileURLToPath(import.meta.url)):'/';
 const publicRoot=path.join(root,'public');
@@ -45,11 +46,11 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
  if(stateFile){try{const data=JSON.parse(readFileSync(stateFile,'utf8'));for(const [id,s] of data.sessions||[])sessions.set(id,s);for(const [id,c] of data.cases||[])cases.set(id,c);}catch(e){if(e.code!=='ENOENT')throw e;}}
  let persistence=Promise.resolve();
  function persist(){if(stateFile){const data=JSON.stringify({sessions:[...sessions],cases:[...cases]});persistence=persistence.then(async()=>{await mkdir(path.dirname(stateFile),{recursive:true});await writeFile(stateFile+'.tmp',data);await rename(stateFile+'.tmp',stateFile);}).catch(e=>console.error('State persistence failed:',e.message));}}
- function send(res,status,body,type='text/html; charset=utf-8'){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','Content-Security-Policy':"default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"});res.end(body);}
+ function send(res,status,body,type='text/html; charset=utf-8'){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin','Content-Security-Policy':"default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"});res.end(body);}
  function redirect(res,url){res.writeHead(303,{'Location':url,'Cache-Control':'no-store'});res.end();}
- function sessionFor(req,res){
+ function sessionFor(req,res,linkedCaseId=''){
   const cookie=req.headers.cookie?.split(';').map(s=>s.trim()).find(s=>s.startsWith('asunaro_session='))?.split('=')[1];let session=cookie&&sessions.get(cookie);
-  if(!session){const id=token(),caseId=caseIdFactory();session={id,csrf:token(),caseId,accountId:null,created:Date.now()};sessions.set(id,session);if(!cases.has(caseId))cases.set(caseId,{contact:false,downloaded:false,ending:'',truth:false});}
+  if(!session||(cases.has(linkedCaseId)&&session.caseId!==linkedCaseId)){const id=token(),caseId=cases.has(linkedCaseId)?linkedCaseId:caseIdFactory();session={id,csrf:token(),caseId,accountId:null,created:Date.now()};sessions.set(id,session);if(!cases.has(caseId))cases.set(caseId,{contact:false,downloaded:false,ending:'',truth:false});}
   res.setHeader('Set-Cookie',`asunaro_session=${session.id}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000${process.env.COOKIE_SECURE==='1'?'; Secure':''}`);
   persist();return session;
  }
@@ -57,10 +58,27 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
   try{
    const url=new URL(req.url,'http://127.0.0.1');let pathname=decodeURIComponent(url.pathname);
    if(pathname.includes('\0')||pathname.includes('\\'))return send(res,400,'Bad request','text/plain; charset=utf-8');
+   if(pathname==='/player-record/api/'){
+    const session=sessionFor(req,res),state=cases.get(session.caseId);
+    const json=(status,value)=>send(res,status,JSON.stringify(value),'application/json; charset=utf-8');
+    normalizePlayerState(state);
+    if(req.method==='GET'){persist();return json(200,playerSnapshot(state,{csrf:session.csrf,origins}));}
+    if(req.method!=='POST')return json(405,{error:'受付方法をご確認ください。'});
+    const {fields}=await readBody(req);
+    if(!safeEqual(fields.csrf,session.csrf))return json(403,{error:'閲覧情報を更新して再度お試しください。'});
+    try{
+     if(fields.action==='visit')addPlayerVisit(state,fields);
+     else if(fields.action==='restart'){
+      restartPlayerState(state,fields.revision);
+      for(const item of sessions.values())if(item.caseId===session.caseId)item.csrf=token();
+     }else throw new PlayerStateError('記録の操作を確認できませんでした。');
+     persist();return json(200,playerSnapshot(state,{csrf:session.csrf,origins}));
+    }catch(error){if(error instanceof PlayerStateError)return json(error.status,{error:error.message});throw error;}
+   }
    // Only this directory is a static root. Server sources and protected records are never served.
    if(['GET','HEAD'].includes(req.method)&&(pathname.startsWith('/assets/')||pathname==='/styles.css'||pathname==='/app.js'||pathname==='/photo-pan.js'||pathname==='/seed-drift.js'||pathname==='/member-reading.js'||pathname==='/reading-state.js'||pathname==='/lab-core.js'||pathname==='/lab-console.js')){
     const target=path.resolve(publicRoot,'.'+pathname);if(!target.startsWith(publicRoot+path.sep))return send(res,404,notFound());
-    try{const info=await stat(target);if(!info.isFile())throw new Error('not a file');const data=await readFile(target);if(path.extname(target)==='.mp4')return sendVideo(req,res,data,'public, max-age=3600');res.writeHead(200,{'Content-Type':mime[path.extname(target)]||'application/octet-stream','Cache-Control':'public, max-age=3600','X-Content-Type-Options':'nosniff'});return res.end(req.method==='HEAD'?undefined:data);}catch{return send(res,404,notFound());}
+    try{const info=await stat(target);if(!info.isFile())throw new Error('not a file');const data=await readFile(target);if(path.extname(target)==='.mp4')return sendVideo(req,res,data,'public, max-age=3600');res.writeHead(200,{'Content-Type':mime[path.extname(target)]||'application/octet-stream','Cache-Control':/^\/assets\/player-record\.(?:js|css)$/.test(pathname)?'no-store':'public, max-age=3600','X-Content-Type-Options':'nosniff'});return res.end(req.method==='HEAD'?undefined:data);}catch{return send(res,404,notFound());}
    }
    if(req.method==='GET'&&pathname==='/favicon.ico'){res.writeHead(302,{Location:'/assets/logo.png'});return res.end();}
    if(req.method==='GET'&&!path.extname(pathname)&&!pathname.endsWith('/')){res.writeHead(308,{Location:pathname+'/'+url.search});return res.end();}
@@ -88,19 +106,25 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
    if(kind!=='main'){
     if(!['GET','POST'].includes(req.method))return send(res,405,'Method not allowed');
     if(!['/','/receive/','/received/'].includes(pathname))return send(res,404,agencyPage(kind,'/',{origins,error:'ページが見つかりません。'}));
+    const linkedCase=req.method==='GET'?url.searchParams.get('case')||'':'';
+    const session=sessionFor(req,res,linkedCase);
     if(req.method==='POST'){
-     const {fields,files}=await readBody(req);const state=cases.get(fields.case),evidence=evidenceZip(files.archive);
-     const receipt=agencyReceipt(kind,state),form={caseId:fields.case||'',origins,additional:receipt==='pending'};
+     const {fields,files}=await readBody(req);const state=fields.case===session.caseId?cases.get(fields.case):null,evidence=evidenceZip(files.archive);
+     if(state)normalizePlayerState(state);
+     const receipt=agencyReceipt(kind,state),form={caseId:fields.case||'',origins,csrf:session.csrf,revision:state?.revision||0,additional:receipt==='pending'};
+     if(!state||!safeEqual(fields.csrf,session.csrf))return send(res,403,agencyPage(kind,pathname,{...form,error:'閲覧情報を確認できませんでした。照会画面から開き直してください。'}));
+     try{requirePlayerRevision(state,fields.revision);}catch(error){return send(res,error.status||400,agencyPage(kind,pathname,{...form,error:error.message}));}
      if(state?.ending==='end2')return send(res,409,agencyPage(kind,pathname,{...form,receipt:receipt==='transferred'?receipt:'',error:'提供元との連絡と原本の追加確認を継続できないため、本件の資料受付は終了しました。'}));
      if(!state||!String(fields.title||'').trim()||!String(fields.statement||'').trim())return send(res,400,agencyPage(kind,pathname,{...form,error:'受付情報と提出内容をご確認ください。'}));
      if(!evidence)return send(res,400,agencyPage(kind,pathname,{...form,error:'添付資料を確認できませんでした。受領したZIPファイルをそのまま添付してください。'}));
      if(kind==='audit'&&evidence!=='complete'){state.auditPending=true;persist();return redirect(res,`/received/?case=${fields.case}`);}
-     state.ending=nextEnding(state.ending,kind==='audit'?'end3':'end1');persist();return redirect(res,(state.ending==='end3'?origins.audit:'')+`/received/?case=${fields.case}`);
+     recordEnding(state,nextEnding(state.ending,kind==='audit'?'end3':'end1'));persist();return redirect(res,(state.ending==='end3'?origins.audit:'')+`/received/?case=${fields.case}`);
     }
     const caseId=url.searchParams.get('case')||'',state=cases.get(caseId),receipt=agencyReceipt(kind,state);
+    if(state)normalizePlayerState(state);persist();
     if(pathname==='/received/'&&kind==='hozen'&&state?.ending==='end3')return redirect(res,origins.audit+'/received/?case='+caseId);
     if(pathname==='/receive/'&&receipt==='transferred')return redirect(res,'/received/?case='+caseId);
-    return send(res,200,agencyPage(kind,pathname,{caseId,origins,receipt:pathname==='/received/'?receipt:'',additional:pathname==='/receive/'&&receipt==='pending',consoleTrial:state?.consoleTrial}));
+    return send(res,200,agencyPage(kind,pathname,{caseId,origins,csrf:session.csrf,revision:state?.revision||0,receipt:pathname==='/received/'?receipt:'',additional:pathname==='/receive/'&&receipt==='pending',consoleTrial:state?.consoleTrial}));
    }
    const session=sessionFor(req,res),caseState=cases.get(session.caseId),account=Date.now()-(session.authenticatedAt||session.created)<28800000?accounts[session.accountId]:null;const ctx={account,csrf:session.csrf,caseState,caseId:session.caseId,query:url.searchParams,origins};
    if(req.method==='POST'){
@@ -127,7 +151,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
     }
     if(pathname==='/members/contact/'){
      if(!String(fields.subject||'').trim()||!String(fields.message||'').trim())return send(res,400,renderMember(pathname,{...ctx,error:'件名と内容をご記入ください。'}));
-     if(evidenceZip(files.attachment))caseState.ending=nextEnding(caseState.ending,'end2');
+     if(evidenceZip(files.attachment))recordEnding(caseState,nextEnding(caseState.ending,'end2'));
      caseState.officeReceipt=true;persist();
      return redirect(res,'/members/contact/received/');
     }
@@ -137,7 +161,7 @@ export function createApplication({port=4173,hozenPort=port+1,auditPort=port+2,a
    if(pathname.startsWith('/members/')){
     if(pathname==='/members/login/')return send(res,200,loginPage(session.csrf,{next:safeNext(url.searchParams.get('next'))}));
     if(!account)return redirect(res,'/members/login/?next='+encodeURIComponent(pathname+url.search));
-    if(account.role==='asakura'&&caseState.ending==='end2')return send(res,403,memberLayout('登録終了','<h1>この登録は終了しました。</h1><p>運営事務局にお問い合わせください。</p>',ctx));
+    if(account.role==='asakura'&&caseState.ending==='end2'&&!(pathname==='/members/contact/received/'&&hasOfficeReceipt(caseState)))return send(res,403,memberLayout('登録終了','<h1>この登録は終了しました。</h1><p>運営事務局にお問い合わせください。</p>',ctx));
     if(pathname==='/members/contact/received/'&&!hasOfficeReceipt(caseState))return redirect(res,'/members/contact/');
     if(account.role==='asakura'&&pathname==='/members/personal/')caseState.truth=true;
     if(pathname.startsWith('/members/download/')){

@@ -3,6 +3,17 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises');
 const base=(process.env.BASE_URL||'http://127.0.0.1:4417').replace(/\/$/,''),at=path=>base+path;
 let browser;
 const noteRoutes=['/','/about/','/facilities/','/workshop/','/gallery/','/news/','/price/','/membership/'];
+async function savedProgress(page){
+ return page.evaluate(()=>JSON.stringify(Object.entries(localStorage).filter(([key])=>!key.includes('seed-signal')).map(([key,value])=>{
+  if(key==='asunaro-preview-v1:'+(document.querySelector('meta[name="asunaro-base"]')?.content||'')){
+   const state=JSON.parse(value);
+   // Visiting the next page now updates the optional journal. Story state,
+   // authentication and discoveries must still remain byte-for-byte equal.
+   delete state.visits;delete state.playerStoreCommit;value=JSON.stringify(state);
+  }
+  return [key,value];
+ }).sort(([left],[right])=>left.localeCompare(right))));
+}
 async function checkMenuNotes(browser){
  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
  try {
@@ -254,12 +265,12 @@ async function followPublicLinks(browser){
  await page.goto(at('/gallery/'));assert.equal(await page.locator('.seed-drift-link,.seed-corrupted').count(),0);
  assert.equal(Number((await context.cookies()).find(cookie=>cookie.name===seed.name).value),1);
  await page.goto(at('/members/login/'));await page.locator('#member-id').fill('201204010017');await page.locator('#member-password').fill('20080519');await page.getByRole('button',{name:/ログイン/}).click();await page.getByRole('heading',{name:'会員トップ',exact:true}).waitFor();
- await page.goto(at('/gallery/'));const progress=await page.evaluate(()=>JSON.stringify(Object.entries(localStorage).filter(([key])=>!key.includes('seed-signal'))));
+ await page.goto(at('/gallery/'));const progress=await savedProgress(page);
  const auth=(await context.cookies()).find(cookie=>cookie.name==='asunaro_session')?.value;
  seed=(await context.cookies()).find(cookie=>cookie.name.startsWith('asunaro_seed_'));await context.addCookies([{...seed,value:'14'}]);await page.reload();await page.locator('body.seed-drift-active').waitFor();
  const other=await context.newPage();other.on('pageerror',error=>errors.push(error.message));await other.goto(at('/gallery/0022/'));
  await page.waitForFunction(()=>!document.body.classList.contains('seed-drift-active'));assert.equal(await page.locator('.seed-drift-link,.seed-corrupted').count(),0);
- assert.equal(await page.evaluate(()=>JSON.stringify(Object.entries(localStorage).filter(([key])=>!key.includes('seed-signal')))),progress);
+ assert.equal(await savedProgress(page),progress);
  if(auth)assert.equal((await context.cookies()).find(cookie=>cookie.name==='asunaro_session').value,auth);
  await page.goto(at('/members/'));await page.getByRole('heading',{name:'会員トップ',exact:true}).waitFor();
  await context.close();

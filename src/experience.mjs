@@ -42,16 +42,26 @@ export function pagePosition(kind,path,role){
  const entry=byKey.get(kind+':'+canonical);if(!entry)return null;
  return {...entry,total:pageRegistry.length,level:entry.accountScoped&&canonical!=='/members/login/'?Math.max(entry.level,roleLevels[role]||0):entry.level};
 }
-export function fictionFooter(){return `<div class="fiction-footer">${experienceSettings.showDisclaimer?'<p>このWebサイトの内容は考察コンテンツのために作られたフィクションであり、実在の人物・団体とは一切関係がありません。</p>':''}<div class="fiction-footer-meta"><small>${experienceSettings.copyright}</small><!--PAGE_INDEX--></div></div>`;}
-export function decoratePage(html,{kind='main',path='/',role}={}){
+export function fictionFooter(){return `<div class="fiction-footer">${experienceSettings.showDisclaimer?'<p>このWebサイトの内容は考察コンテンツのために作られたフィクションであり、実在の人物・団体とは一切関係がありません。</p>':''}<div class="fiction-footer-meta"><small>${experienceSettings.copyright}</small><!--PAGE_INDEX--><a class="player-record-link" href="/player-record/">探索記録</a></div></div>`;}
+export function withPlayerAssets(html){
+ if(!html||html.includes('/assets/player-record.js'))return html;
+ return html.replace('</head>','<link rel="stylesheet" href="/assets/player-record.css"><script type="module" src="/assets/player-record.js"></script></head>');
+}
+export function decoratePage(html,{kind='main',path='/',role,ending='',track=true}={}){
  if(!html)return html;const position=pagePosition(kind,path,role);
  const growth=growthStages[position?.level]||growthStages[0];
  const counter=experienceSettings.showPageIndex&&position?`<span class="page-index" data-page-number="${position.number}" data-page-total="${position.total}" data-growth-stage="${growth.name.toLowerCase()}" aria-label="ページ${position.number}、全${position.total}ページ${experienceSettings.showGrowthStage?'、探索段階 '+growth.name+'（'+growth.label+'）':''}">${experienceSettings.showGrowthStage?`<span class="index-growth">${growth.name}</span>`:''}<span class="index-number">${String(position.number).padStart(3,'0')} <span>/</span> ${position.total}</span></span>`:'';
  const note = kind==='main' && position?.level===0 ? seedNoteData(path) : '';
  const seedNotes = note ? `<script type="application/json" data-seed-notes>${note}</script>` : '';
  const noIndex=kind==='main'&&(position?.noIndex||path===programNotesPath||path===seedCollectionPath||/^\/tenants\/\d+\/materials\//.test(path))?'<meta name="robots" content="noindex,nofollow">':'';
- return html.replace('<!--PAGE_INDEX-->',counter)
-  .replace(/<body\b([^>]*)>/,`<body$1 data-asunaro-stage="${growth.name.toLowerCase()}" data-seed-drift-enabled="${experienceSettings.seedDrift.enabled}" data-seed-drift-threshold="${experienceSettings.seedDrift.threshold}">`)
+ const tracking=track&&position?` data-exploration-kind="${kind}" data-exploration-path="${canonicalPlayerPath(kind,path)}"`:'';
+ const outcome=['end1','end2','end3'].includes(ending)?` data-exploration-ending="${ending}"`:'';
+ return withPlayerAssets(html).replace('<!--PAGE_INDEX-->',counter)
+  .replace(/<body\b([^>]*)>/,(_,attributes)=>`<body${attributes.replace(/\sdata-(?:asunaro-stage|seed-drift-enabled|seed-drift-threshold|exploration-kind|exploration-path|exploration-ending)="[^"]*"/g,'')} data-asunaro-stage="${growth.name.toLowerCase()}" data-seed-drift-enabled="${experienceSettings.seedDrift.enabled}" data-seed-drift-threshold="${experienceSettings.seedDrift.threshold}"${tracking}${outcome}>`)
   .replace('</body>',seedNotes+'</body>')
   .replace('</head>',noIndex+'<script defer src="/seed-drift.js"></script></head>');
+}
+
+function canonicalPlayerPath(kind,path){
+ return (kind==='hozen'||kind==='audit')&&path==='/'?'/receive/':path;
 }

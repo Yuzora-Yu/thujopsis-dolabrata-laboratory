@@ -88,7 +88,17 @@ test('source files, private data and traversal cannot be downloaded',async()=>{
 });
 
 async function evidence(c){await c.login('201204010000','20100615');await c.post('/members/inquiry/',{record:'CH-2021-003',request:'原本確認',note:'原本の照合をお願いします。'});const message=(await c.get('/members/messages/')).text;assert.match(message,/保全資料_20261102.zip/);const caseId=message.match(/receive\/\?case=([a-f0-9]+)/)[1];const r=await c.binary('/members/download/hozen.zip');assert.equal(r.status,200);const zip=Buffer.from(await r.arrayBuffer());assert.equal(zip.readUInt32LE(0),0x04034b50);assert.ok(zip.includes(Buffer.from('告発書.pdf')));return {caseId,zip};}
-async function submitAgency(kind,caseId,zip){const fd=new FormData();fd.set('case',caseId);fd.set('title','資料の保全について');fd.set('statement','関係資料を提出いたします。');fd.set('archive',new Blob([zip]),'保全資料.zip');return fetch(`http://127.0.0.1:${port+(kind==='audit'?2:1)}/receive/`,{method:'POST',body:fd,redirect:'manual'});}
+async function submitAgency(kind,caseId,zip){
+ const origin=`http://127.0.0.1:${port+(kind==='audit'?2:1)}`;
+ const entry=await fetch(origin+'/receive/?case='+caseId,{redirect:'manual'});
+ const cookie=entry.headers.get('set-cookie')?.split(';')[0]||'';
+ await entry.text();
+ const context=await fetch(origin+'/player-record/api/',{headers:{cookie}}).then(response=>response.json());
+ const fd=new FormData();fd.set('case',caseId);fd.set('csrf',context.csrf);fd.set('revision',context.revision);
+ fd.set('title','資料の保全について');fd.set('statement','関係資料を提出いたします。');
+ fd.set('archive',new Blob([zip]),'保全資料.zip');
+ return fetch(origin+'/receive/',{method:'POST',headers:{cookie},body:fd,redirect:'manual'});
+}
 
 async function pausedGuides(c){
  for(const route of ['/','/visit/','/news/closure/',...pausedFacilityPaths,'/gallery/0021/','/news/20120416/','/guide/access/']){

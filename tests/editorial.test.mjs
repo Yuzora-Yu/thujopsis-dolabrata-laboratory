@@ -9,6 +9,7 @@ import {renderLegacy} from '../src/legacy.mjs';
 import {newsIsAvailable,newsIsListed,storyToday} from '../src/world/editorial.mjs';
 import {pageRegistry,pagePosition,experienceSettings,growthStages} from '../src/experience.mjs';
 import {hintPlan} from '../docs/hint-plan.mjs';
+import {playerRecordPath} from '../src/player-record.mjs';
 import {seoFamily} from '../src/world/people.mjs';
 import {recordText} from '../src/world/records.mjs';
 import {siteQueries,catalogQueries} from '../docs/critical-queries.mjs';
@@ -260,11 +261,12 @@ test('unlisted discoveries stay off external indexes while direct and internal d
  assert.ok(!searchEntries.some(entry=>entry.url==='/tenants/0003/'));
 });
 
-test('page numbering and growth stages share a registry and sit beside the copyright',()=>{
+test('story page numbering and growth stages share a registry and sit beside the copyright',()=>{
  assert.equal(new Set(pageRegistry.map(p=>p.kind+':'+p.path)).size,pageRegistry.length);
  assert.deepEqual(pageRegistry.map(p=>p.number),Array.from({length:pageRegistry.length},(_,i)=>i+1));
  assert.ok(pageRegistry.every(p=>Number.isInteger(p.level)&&p.level>=0));
- for(const p of publicPaths)assert.ok(pagePosition('main',p),p);
+ for(const p of publicPaths.filter(p=>p!==playerRecordPath))assert.ok(pagePosition('main',p),p);
+ assert.equal(pagePosition('main',playerRecordPath),null);
  for(const html of [renderPublic('/'),renderMember('/members/',context('institution')),renderLegacy('/collections/',{origins,session:{}}),agencyPage('hozen','/receive/',{origins})]){
   assert.match(html,new RegExp('data-page-total="'+pageRegistry.length+'"'));assert.match(html,/このWebサイトの内容は考察コンテンツ/);assert.match(html,/ⓒYU-ZORA/);
   assert.match(html,/ⓒYU-ZORA<\/small><span class="page-index"/);assert.doesNotMatch(html,/\(LV\d|情報秘匿レベル/);

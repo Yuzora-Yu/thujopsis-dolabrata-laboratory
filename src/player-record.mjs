@@ -1,0 +1,27 @@
+export const playerRecordPath = '/player-record/';
+
+// This page belongs to the player, outside the facility's fictional website.
+export function renderPlayerRecord() {
+ return `<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#f6f3e9"><title>探索記録 | あすなろ</title><link rel="icon" href="/assets/logo.png"><link rel="stylesheet" href="/assets/player-record.css"><script defer src="/seed-drift.js"></script><script type="module" src="/assets/player-record.js"></script></head>
+<body class="player-record-page" data-asunaro-stage="player"><a class="pr-skip" href="#player-record-main">記録へ移動</a>
+ <header class="pr-header"><a class="pr-brand" href="/" data-player-home><img src="/assets/logo.png" width="42" height="42" alt=""><span>あすなろ<small>探索の控え</small></span></a><a class="pr-return" href="/" data-player-home>施設サイトへ</a></header>
+ <main id="player-record-main" class="pr-main" data-player-record-root>
+  <div class="pr-intro"><p class="pr-eyebrow">PLAYER RECORD</p><h1>探索記録</h1><p>このページは物語の外にある、あなたの探索の控えです。<br>訪れたページと、見届けた結末を振り返れます。</p></div>
+  <div class="pr-loading"><p class="pr-status" data-player-status role="status" aria-live="polite">記録を読み込んでいます。</p><button class="pr-button pr-button-quiet" type="button" data-player-reload hidden>もう一度読み込む</button></div>
+  <div data-player-record-content hidden>
+   <section class="pr-section pr-endings-section" aria-labelledby="pr-endings-title"><div class="pr-section-heading"><h2 id="pr-endings-title">見届けた結末</h2><p>共有する記録を選べます。</p></div><div data-player-endings></div></section>
+   <section class="pr-section pr-share-section" aria-labelledby="pr-share-title"><h2 id="pr-share-title">探索の記録を共有</h2><p class="pr-muted">共有するのは閲覧件数と選んだEND番号、施設トップのURLだけです。</p>
+    <label class="pr-field-label" for="pr-share-text">共有する本文</label><textarea id="pr-share-text" class="pr-share-text" data-player-share-text rows="4" readonly></textarea>
+    <div class="pr-actions"><a class="pr-button" data-player-x target="_blank" rel="noopener noreferrer" aria-label="Xで共有（別タブで開きます）">Xで共有</a><button class="pr-button" type="button" data-player-native-share hidden>端末で共有</button><button class="pr-button pr-button-quiet" type="button" data-player-copy>本文をコピー</button></div>
+    <details class="pr-image-tools"><summary>共有用の画像をつくる</summary><div class="pr-image-body"><p>本文と同じ内容を、1枚の画像にまとめます。</p><button class="pr-button" type="button" data-player-image-create>画像を作成</button><figure class="pr-image-preview" data-player-image-preview hidden><img data-player-image alt="共有用の探索記録画像"><figcaption>作成した時点の探索記録</figcaption></figure><div class="pr-actions" data-player-image-actions hidden><a class="pr-button" data-player-image-download download="asunaro-record.png">PNGを保存</a><button class="pr-button" type="button" data-player-image-share hidden>画像を端末で共有</button><a class="pr-button pr-button-quiet" data-player-image-open target="_blank" rel="noopener">画像を開く</a></div><p class="pr-muted pr-small" data-player-image-help hidden>保存できない場合は「画像を開く」から、画像を長押しして保存できます。</p></div></details>
+    <p class="pr-action-status" data-player-share-status role="status" aria-live="polite"></p>
+   </section>
+   <section class="pr-section pr-visits-section" aria-labelledby="pr-visits-title"><div class="pr-section-heading"><h2 id="pr-visits-title">訪れたページ</h2><p class="pr-visit-count" data-player-visit-count></p></div><div class="pr-filters"><div><label class="pr-field-label" for="pr-visit-search">タイトルから探す</label><input id="pr-visit-search" type="search" data-player-visit-search autocomplete="off" placeholder="ページのタイトル"></div><div><label class="pr-field-label" for="pr-visit-group">表示する範囲</label><select id="pr-visit-group" data-player-visit-group><option value="all">すべて</option></select></div></div><p class="pr-small pr-muted" data-player-filter-status role="status" aria-live="polite"></p><p class="pr-small pr-muted">リンク先は現在の探索状況で開きます。会員ページは、現在のログイン名義で表示されます。</p><div data-player-visits></div></section>
+   <details class="pr-section pr-restart-section" data-player-restart-section hidden><summary>現在の結末から、探索を続け直す</summary><div class="pr-restart-body"><p>現在の結末と提出状況を戻し、訪れたページから探索を続けられるようにします。</p><p>探索や到達済みENDの記録は残ります。</p><button class="pr-button pr-button-quiet" type="button" data-player-restart-open>戻す内容を確認</button></div></details>
+  </div>
+ </main>
+ <footer class="pr-footer"><p>このWebサイトの内容は考察コンテンツのために作られたフィクションであり、実在の人物・団体とは一切関係がありません。</p><small>ⓒYU-ZORA</small></footer>
+ <dialog class="pr-dialog" data-player-restart-dialog aria-labelledby="pr-restart-title"><form method="dialog"><p class="pr-eyebrow">探索の続け方</p><h2 id="pr-restart-title">結末を戻しますか。</h2><p data-player-restart-current></p><dl class="pr-reset-list"><div><dt>残るもの</dt><dd>訪れたページ、発見、受領した資料、原本の照会、測定、ログイン状態、到達済みENDの記録</dd></div><div><dt>戻すもの</dt><dd>現在の結末、通報や資料提出の状況</dd></div></dl><p class="pr-small pr-muted">訪れたページから、探索を続け直せます。</p><p class="pr-dialog-status" data-player-restart-status role="alert"></p><div class="pr-actions"><button class="pr-button pr-button-quiet" type="button" data-player-restart-cancel>キャンセル</button><button class="pr-button" type="button" data-player-restart-confirm>結末と提出状況を戻す</button></div></form></dialog>
+</body></html>`;
+}

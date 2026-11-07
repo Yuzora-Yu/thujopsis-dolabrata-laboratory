@@ -2,6 +2,7 @@ import {matchesSearch,searchExcerpt,normalizeDocumentId,documentLookupMessages} 
 import {isValidReservation,updateReservationHours} from './assets/reservation-policy.js';
 import {agencyReceipt,classifyEvidence,generalUsePaused,hasOfficeReceipt,inquiryClosed,nextEnding,publicOperationLabel} from './evidence.js';
 import {advanceTrial,trialView} from './lab-core.js';
+import {normalizePlayerState,playerSnapshot,addPlayerVisit,recordEnding,restartPlayerState,requirePlayerRevision,PlayerStateError} from './assets/player-state.js';
 
 const base=document.querySelector('meta[name="asunaro-base"]')?.content||'';
 const storageKey='asunaro-preview-v1:'+base,authKey=storageKey+':auth',archiveKey=storageKey+':archive';
@@ -9,8 +10,98 @@ const bytes=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 const b64=data=>btoa(String.fromCharCode(...new Uint8Array(data)));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function stored(key,fallback=null){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch{return fallback;}}
-let state=stored(storageKey);if(!state){state={id:Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,'0')).join(''),contact:false,ending:'',truth:false};localStorage.setItem(storageKey,JSON.stringify(state));}
-function save(){localStorage.setItem(storageKey,JSON.stringify(state));}
+const playerToken=()=>Array.from(crypto.getRandomValues(new Uint8Array(24)),b=>b.toString(16).padStart(2,'0')).join('');
+let state,stateDatabase,playerStorageFailure;
+const storageFailure=()=>new PlayerStateError('進行記録の保存・確認に失敗しました。保存済みの記録は保持しております。ページを開き直してご確認ください。',503);
+const legacyConflict=(recovered=false)=>new PlayerStateError(recovered?'古い画面の保存内容を別に退避し、現在の進行記録と同期しました。ページを開き直してください。':'別の画面の保存内容を確認する必要があります。記録は保持しております。ページを開き直してください。',409);
+// These fingerprints detect incompatible legacy writes, not permissions or identity.
+function mirrorFingerprint(text){
+ let a=2166136261,b=2246822507;
+ for(let i=0;i<text.length;i++){a=Math.imul(a^text.charCodeAt(i),16777619);b=Math.imul(b^text.charCodeAt(i),3266489909);}
+ return text.length+':'+(a>>>0).toString(16)+':'+(b>>>0).toString(16);
+}
+function openStateDatabase(){
+ return stateDatabase ||= new Promise((resolve,reject)=>{
+  try{
+   const open=indexedDB.open('asunaro-player-state-v1',1);
+   open.onupgradeneeded=()=>{
+    if(!open.result.objectStoreNames.contains('cases'))open.result.createObjectStore('cases');
+    if(!open.result.objectStoreNames.contains('recoveries'))open.result.createObjectStore('recoveries',{autoIncrement:true});
+   };
+   open.onsuccess=()=>{open.result.onversionchange=()=>open.result.close();resolve(open.result);};
+   open.onerror=open.onblocked=()=>reject(storageFailure());
+  }catch{reject(storageFailure());}
+ });
+}
+async function changeState(update){
+ if(playerStorageFailure)throw playerStorageFailure;
+ const db=await openStateDatabase();
+ return new Promise((resolve,reject)=>{
+  let transaction;
+  try{transaction=db.transaction(['cases','recoveries'],'readwrite');}catch{reject(storageFailure());return;}
+  const store=transaction.objectStore('cases');let result,current,serialized,failed,knownMirrors,recoveryError,commit=0;
+  store.get(storageKey).onsuccess=event=>{
+   try{
+    const mirror=localStorage.getItem(storageKey),existing=event.target.result;
+    if(existing&&(existing.format!==1||!existing.state?.id||!Number.isSafeInteger(existing.commit)||existing.commit<0||!Array.isArray(existing.mirrors)))throw storageFailure();
+    const mirrors=existing?[...existing.mirrors]:[];
+    if(existing&&mirror&&!mirrors.includes(mirrorFingerprint(mirror))){
+     transaction.objectStore('recoveries').add({key:storageKey,caseId:existing.state.id,at:new Date().toISOString(),raw:mirror});
+     current=existing.state;commit=existing.commit;serialized=JSON.stringify(current);
+     mirrors.push(mirrorFingerprint(mirror),mirrorFingerprint(serialized));knownMirrors=[...new Set(mirrors)].slice(-1000);
+     store.put({...existing,mirrors:knownMirrors},storageKey);recoveryError=legacyConflict(true);return;
+    }
+    if(existing){current=existing.state;commit=existing.commit;}
+    else{
+     if(mirror){try{current=JSON.parse(mirror);}catch{throw storageFailure();}if(!current?.id)throw storageFailure();mirrors.push(mirrorFingerprint(mirror));}
+     else current={id:playerToken(),contact:false,downloaded:false,ending:'',truth:false};
+    }
+    const before=JSON.stringify(current);
+    normalizePlayerState(current);current.playerCsrf ||= playerToken();
+    result=update?.(current);
+    if(!existing||JSON.stringify(current)!==before)commit++;
+    current.playerStoreVersion=1;current.playerStoreCommit=commit;
+    serialized=JSON.stringify(current);const fingerprint=mirrorFingerprint(serialized);
+    if(!mirrors.includes(fingerprint))mirrors.push(fingerprint);
+    knownMirrors=mirrors.slice(-1000);
+    store.put({format:1,state:current,commit,mirrors:knownMirrors},storageKey);
+   }catch(error){failed=error instanceof PlayerStateError?error:storageFailure();transaction.abort();}
+  };
+  transaction.oncomplete=()=>{
+   state=current;
+   try{
+    const mirrorText=localStorage.getItem(storageKey),mirror=stored(storageKey);
+    const newerMirror=mirror?.id===current.id&&mirror.playerStoreVersion===1&&mirror.playerStoreCommit>commit;
+    if(mirrorText&&!knownMirrors.includes(mirrorFingerprint(mirrorText))&&!newerMirror)throw legacyConflict();
+    // A later committed tab may already have sent its mirror notification.
+    if(!newerMirror)localStorage.setItem(storageKey,serialized);
+    if(recoveryError)reject(recoveryError);else resolve(result);
+   }catch(error){reject(error instanceof PlayerStateError?error:storageFailure());}
+  };
+  transaction.onabort=transaction.onerror=()=>reject(failed||storageFailure());
+ });
+}
+try{await changeState();}catch(error){
+ playerStorageFailure=error instanceof PlayerStateError?error:storageFailure();
+ state=stored(storageKey)||{id:'',contact:false,downloaded:false,ending:'',truth:false};
+}
+const formVersions=new WeakMap();
+let renderedEnding='';
+function stampForms(){
+ for(const form of document.querySelectorAll('form')){
+  if((form.getAttribute('method')||'get').toLowerCase()!=='post'||formVersions.has(form))continue;
+  formVersions.set(form,{revision:state.revision,csrf:state.playerCsrf});
+  const revision=form.querySelector('input[name=revision]');if(revision)revision.value=String(state.revision);
+ }
+}
+function pageReady(){
+ stampForms();delete document.body.dataset.playerPending;
+ document.dispatchEvent(new Event('asunaro:page-ready'));
+}
+function requireSubmissionVersion(current,version){
+ if(!version||version.csrf!==current.playerCsrf)throw new PlayerStateError('別の画面で結末の状態が変更されました。ページを開き直してください。',409);
+ requirePlayerRevision(current,version.revision);
+}
 let site,bundle,roomBundle,rendering=false,refreshOutcomeAfterBoot=false;
 async function loadSiteIndex(){
  const response = await fetch(base+'/assets/site-index.json',{cache:'no-store'});
@@ -25,7 +116,7 @@ function route(){
 }
 const urlFor=(path,kind='main')=>base+({archive:'/historical-records',hozen:'/records-center',audit:'/independent-review'}[kind]||'')+path;
 function go(path,kind='main'){location.assign(urlFor(path,kind));}
-function fillTokens(html){return html.replaceAll('@@CASE@@',state.id).replaceAll('@@CSRF@@','preview-session');}
+function fillTokens(html){return html.replaceAll('@@CASE@@',state.id).replaceAll('@@CSRF@@',state.playerCsrf);}
 function reflectPublicOperation(){
  const status=document.querySelector('.site-header .utility>span');
  if(!status)return;
@@ -35,13 +126,14 @@ function reflectPublicOperation(){
 }
 function display(html){
  const doc=new DOMParser().parseFromString(fillTokens(html),'text/html');document.title=doc.title;document.body.className=doc.body.className;document.body.innerHTML=doc.body.innerHTML;
- for(const key of ['asunaroStage','seedDriftEnabled','seedDriftThreshold','publicOutcome','memberRole','memberLabel','memberCase','memberRecord','memberRecordTitle'])document.body.dataset[key]=doc.body.dataset[key]||'';
+  for(const key of ['asunaroStage','seedDriftEnabled','seedDriftThreshold','publicOutcome','memberRole','memberLabel','memberCase','memberRecord','memberRecordTitle','explorationKind','explorationPath','explorationEnding'])document.body.dataset[key]=doc.body.dataset[key]||'';
  document.body.dataset.memberInquiry=state.inquiryRecord||'';
  reflectPublicOperation();
  window.asunaroInit?.();
  window.asunaroDrift?.refresh();
  window.asunaroReading?.refresh();
  if(document.querySelector('[data-lab-root], [data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({bridge:window.asunaroLabBridge,trial:trialView(state.consoleTrial),ending:state.ending})).catch(()=>showError('測定端末を読み込めませんでした。再読み込みしてご確認ください。'));
+  renderedEnding=state.ending||'';pageReady();
 }
 async function packedBundle(namespace,id,edition=site.edition){
  const identifier=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(namespace+':'+id))),b=>b.toString(16).padStart(2,'0')).join('');
@@ -127,10 +219,27 @@ async function documentResults(account,id){
 }
 window.asunaroLabBridge=async(action,input={})=>{
  if(!roomBundle)throw new Error('資料照会室の閲覧票をご確認ください。');
- state=stored(storageKey,state);
- if(action!=='context'){state.consoleTrial=advanceTrial(state.consoleTrial,action,input);save();}
- const trial=trialView(state.consoleTrial);return {trial,csrf:'preview-session',ending:state.ending||'',subjects:trial?.complete?roomBundle.labSubjects[state.ending==='end3'?'end3':state.contact||state.truth||state.ending?'current':'initial']:null};
+ return changeState(current=>{
+  if(action!=='context')current.consoleTrial=advanceTrial(current.consoleTrial,action,input);
+  const trial=trialView(current.consoleTrial);return {trial,csrf:current.playerCsrf,ending:current.ending||'',subjects:trial?.complete?roomBundle.labSubjects[current.ending==='end3'?'end3':current.contact||current.truth||current.ending?'current':'initial']:null};
+ });
 };
+const playerMain=location.origin+base;
+const playerOrigins={main:playerMain,archive:playerMain+'/historical-records',hozen:playerMain+'/records-center',audit:playerMain+'/independent-review'};
+window.asunaroPlayerBridge=async(action='context',input={})=>{
+ const snapshot=await changeState(current=>{
+  if(action!=='context'&&action!=='get'){
+   if(input.csrf!==current.playerCsrf)throw new PlayerStateError('閲覧情報を更新して再度お試しください。',403);
+   if(action==='visit')addPlayerVisit(current,input);
+   else if(action==='restart'){restartPlayerState(current,input.revision);current.playerCsrf=playerToken();}
+   else throw new PlayerStateError('記録の操作を確認できませんでした。');
+  }
+  return playerSnapshot(current,{csrf:current.playerCsrf,origins:playerOrigins});
+ });
+ if(action==='restart'){reflectPublicOperation();if(rendering)refreshOutcomeAfterBoot=true;else void boot();}
+ return snapshot;
+};
+document.dispatchEvent(new Event('asunaro:player-ready'));
 function filterArchiveCatalogue(params){
  const field=document.querySelector('#collection-query');
  const summary=document.querySelector('[data-collection-count]');
@@ -148,6 +257,7 @@ function filterArchiveCatalogue(params){
 }
 async function boot({restoreFragment=false}={}){
  if(rendering)return;rendering=true;
+ document.body.dataset.playerPending='true';
  try{
   const current=route(),params=new URLSearchParams(location.search);
   const publicSearch=current.kind==='main'&&current.path==='/search/';
@@ -163,7 +273,7 @@ async function boot({restoreFragment=false}={}){
   if(current.kind==='main'&&current.path.startsWith('/members/')){
    if(current.path==='/members/login/'){display(site.login);const next=params.get('next');if(next)document.querySelector('input[name=next]').value=next;return;}
    const account=await currentBundle();if(!account){display(site.login);document.querySelector('input[name=next]').value=current.path+location.search;return;}
-   if(state.ending==='end2'&&account.account.role==='asakura'){display(account.ended);return;}
+    if(state.ending==='end2'&&account.account.role==='asakura'&&!(current.path==='/members/contact/received/'&&hasOfficeReceipt(state))){display(account.ended);return;}
    if(current.path==='/members/contact/received/'&&!hasOfficeReceipt(state)){go('/members/contact/');return;}
    const documentMatch=current.path.match(/^\/members\/records\/([A-Z0-9-]+)\/$/);
    if(documentMatch){display(account.docs.find(d=>d.id===documentMatch[1])?.html||site.notFound);return;}
@@ -226,6 +336,11 @@ async function boot({restoreFragment=false}={}){
    }
    return;
   }
+   if(current.kind==='main'&&!state.ending&&renderedEnding){
+    const response=await fetch(location.pathname+location.search,{cache:'no-store'});
+    if(!response.ok&&response.status!==404)throw new Error('Public page unavailable');
+    display(await response.text());
+   }
   if(current.kind==='main'&&state.ending){
    let ending=state.ending,capable=await outcomeBundle(ending);
    if(!capable&&ending==='end3'){ending='end1';capable=await outcomeBundle();}
@@ -253,6 +368,7 @@ async function boot({restoreFragment=false}={}){
     summary.previousElementSibling.textContent=keyword?'「'+keyword+'」の検索結果　'+results.length+'件':'';
    }
   }
+  pageReady();
  }catch{
   document.querySelector('[data-archive-loading]')?.remove();
   document.querySelector('[data-public-notice-loading]')?.remove();
@@ -262,7 +378,7 @@ async function boot({restoreFragment=false}={}){
   rendering=false;
   if(refreshOutcomeAfterBoot){
    refreshOutcomeAfterBoot=false;
-   refreshOutcomeViews();
+    void boot();
   }
  }
 }
@@ -270,22 +386,22 @@ async function boot({restoreFragment=false}={}){
 document.addEventListener('submit',async event=>{
  const form=event.target;if(!(form instanceof HTMLFormElement)||(form.getAttribute('method')||'get').toLowerCase()!=='post')return;
  event.preventDefault();if(!form.reportValidity())return;
- const current=route(),values=new FormData(form),submit=form.querySelector('button[type=submit],button:not([type])');if(submit)submit.disabled=true;
+  const current=route(),values=new FormData(form),formVersion=formVersions.get(form),submit=form.querySelector('button[type=submit],button:not([type])');if(submit)submit.disabled=true;
  try{
   await sitePromise;
   const action=new URL(form.action,location.href).pathname.slice(base.length);
   if(current.kind==='main'&&action==='/members/login/'){
    try{
     const result=await authenticate('member',String(values.get('id')||'').trim(),String(values.get('password')||''));
-    state=stored(storageKey,state);
-    if(state.ending==='end2'&&result.value.account.role==='asakura')throw new Error('Ended account');
+    await changeState(current=>{
+     if(current.ending==='end2'&&result.value.account.role==='asakura')throw new Error('Ended account');
+     if(result.value.outcomes.end3){current.auditCapability=result.credential;current.truth=true;}
+     else if(current.ending==='end3'&&!current.auditCapability)current.auditCapability=current.capability;
+     if(result.value.outcomes.end1)current.capability=result.credential;
+    });
     localStorage.setItem(authKey,JSON.stringify(result.credential));
-    if(result.value.outcomes.end3){state.auditCapability=result.credential;state.truth=true;}
-    else if(state.ending==='end3'&&!state.auditCapability)state.auditCapability=state.capability;
-    if(result.value.outcomes.end1)state.capability=result.credential;
-    save();
     let next=String(values.get('next')||'/members/');if(next.startsWith(base+'/'))next=next.slice(base.length);go(/^\/members\/(?!\/)/.test(next)?next:'/members/');
-   }catch{display(site.loginError);}
+    }catch(error){if(error instanceof PlayerStateError)showError(error.message);else display(site.loginError);}
    return;
   }
   if(current.kind==='archive'&&action.endsWith('/room/login/')){
@@ -298,9 +414,13 @@ document.addEventListener('submit',async event=>{
    const file=values.get('archive'),kind=file instanceof File&&/\.zip$/i.test(file.name)?classifyEvidence(await file.arrayBuffer()):null;
    if(!String(values.get('title')||'').trim()||!String(values.get('statement')||'').trim()){showError('受付情報と提出内容をご確認ください。');return;}
    if(!kind){showError('添付資料を確認できませんでした。受領したZIPファイルをそのまま添付してください。');return;}
-   state=stored(storageKey,state);
-   if(state.ending==='end2'){showError('提供元との連絡と原本の追加確認を継続できないため、本件の資料受付は終了しました。');return;}
-   if(current.kind==='audit'&&kind!=='complete')state.auditPending=true;else state.ending=nextEnding(state.ending,current.kind==='audit'?'end3':'end1');save();go('/received/?case='+state.id,state.ending==='end3'?'audit':current.kind);return;
+    await changeState(currentState=>{
+     requireSubmissionVersion(currentState,formVersion);
+     if(currentState.ending==='end2')throw new PlayerStateError('提供元との連絡と原本の追加確認を継続できないため、本件の資料受付は終了しました。',409);
+     if(current.kind==='audit'&&kind!=='complete')currentState.auditPending=true;
+     else recordEnding(currentState,nextEnding(currentState.ending,current.kind==='audit'?'end3':'end1'));
+    });
+    go('/received/?case='+state.id,state.ending==='end3'?'audit':current.kind);return;
   }
   const account=await currentBundle();if(!account){go('/members/login/');return;}
   state=stored(storageKey,state);
@@ -308,7 +428,7 @@ document.addEventListener('submit',async event=>{
   if(current.path==='/members/inquiry/'){
    if(inquiryClosed(state.ending)){await boot();return;}
    const id=normalizeDocumentId(values.get('record')||'');if(!account.docs.some(d=>d.id===id&&d.inquiry)){showError('文書IDと照会先をご確認ください。');return;}
-   state.contact=true;state.inquiryRecord=id;save();go('/members/messages/');return;
+    await changeState(current=>{current.contact=true;current.inquiryRecord=id;});go('/members/messages/');return;
   }
   if(current.path==='/members/reservations/'){
    if(generalUsePaused(state.ending)){await boot();return;}
@@ -325,11 +445,14 @@ document.addEventListener('submit',async event=>{
   if(current.path==='/members/contact/'){
    if(!String(values.get('subject')||'').trim()||!String(values.get('message')||'').trim()){showError('件名と内容をご記入ください。');return;}
    const file=values.get('attachment'),valid=file instanceof File&&/\.zip$/i.test(file.name)&&classifyEvidence(await file.arrayBuffer());
-   state=stored(storageKey,state);
-   if(valid)state.ending=nextEnding(state.ending,'end2');
-   state.officeReceipt=true;save();go('/members/contact/received/');return;
+    await changeState(current=>{
+     requireSubmissionVersion(current,formVersion);
+     if(valid)recordEnding(current,nextEnding(current.ending,'end2'));
+     current.officeReceipt=true;
+    });
+    go('/members/contact/received/');return;
   }
- }catch{showError('お手続きを完了できませんでした。ページを再読み込みしてご確認ください。');}
+  }catch(error){showError(error instanceof PlayerStateError?error.message:'お手続きを完了できませんでした。ページを再読み込みしてご確認ください。');}
  finally{if(submit)submit.disabled=false;}
 });
 
@@ -405,8 +528,10 @@ document.addEventListener('click',async event=>{
   download.click();
   setTimeout(()=>URL.revokeObjectURL(href),1000);
   if (message) message.textContent='';
- } catch {
-  if (message) message.textContent='資料を取得できませんでした。ページを開き直してご確認ください。';
+   if(filename==='hozen.zip')await changeState(current=>{current.downloaded=true;});
+  } catch (error) {
+   if (message) message.textContent=error instanceof PlayerStateError?error.message:'資料を取得できませんでした。ページを開き直してご確認ください。';
+   else if(error instanceof PlayerStateError)showError(error.message);
  } finally {
   anchor.removeAttribute('aria-busy');
  }
@@ -427,11 +552,13 @@ window.addEventListener('storage',event=>{
  if(event.key!==storageKey)return;
  const previousEnding=state.ending;
  state=stored(storageKey,state);
- if(previousEnding!==state.ending){
+  if(previousEnding!==state.ending){
   reflectPublicOperation();
-  refreshOutcomeViews();
+   if(previousEnding&&!state.ending){if(rendering)refreshOutcomeAfterBoot=true;else void boot();}
+   else refreshOutcomeViews();
  }
  if(!document.querySelector('[data-lab-root]')&&document.querySelector('[data-lab-thanks], [data-lab-assessment]'))void import('./lab-console.js').then(module=>module.initConsole({trial:trialView(state.consoleTrial),ending:state.ending}));
 });
 window.addEventListener('pageshow',event=>{if(event.persisted&&!rendering&&site)void boot();});
 await boot({restoreFragment:true});
+if(playerStorageFailure)showError(playerStorageFailure.message);

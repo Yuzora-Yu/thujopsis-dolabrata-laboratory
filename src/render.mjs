@@ -9,6 +9,7 @@ import {workshopEquipment} from './world/workshop-equipment.mjs';
 import {asakuraProfile,inabaProfile} from './world/people.mjs';
 import {workshopHours} from '../public/assets/reservation-policy.js';
 import {generalUsePaused,publicOperationLabel} from './evidence.mjs';
+import {playerRecordPath,renderPlayerRecord} from './player-record.mjs';
 
 export const esc = (v='') => String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function renderPressClipping(clipping,headingId){
@@ -406,7 +407,7 @@ function inabaInterview(){
 export const pausedFacilityPaths=['/facilities/','/facilities/staff/','/workshop/','/floor-map/','/price/','/membership/',programPath,...facilityCards.map(f=>'/facilities/'+f[0]+'/')];
 export const endingNoticePaths=['/','/visit/','/news/','/news/closure/','/news/staff-change/'];
 const livePublicPaths=new Set([...endingNoticePaths,...pausedFacilityPaths,'/people/asakura-tsumugi/']);
-export const publicPaths=[...Object.keys(editorialPages),'/','/about/',programPath,programNotesPath,'/facilities/','/facilities/staff/','/workshop/','/gallery/','/news/','/floor-map/','/price/','/membership/','/visit/',seedCollectionPath,'/privacy/','/tenants/','/people/asakura-tsumugi/','/people/inaba-mio/','/404/',...facilityCards.map(f=>`/facilities/${f[0]}/`),...news.filter(n=>n.available).map(n=>`/news/${n.id}/`),...tenants.map(t=>`/tenants/${t.page}/`),...gallery.map(g=>`/gallery/${g.id}/`),...tenantMaterialEntries.map(material=>material.path)];
+export const publicPaths=[...Object.keys(editorialPages),'/','/about/',programPath,programNotesPath,'/facilities/','/facilities/staff/','/workshop/','/gallery/','/news/','/floor-map/','/price/','/membership/','/visit/',seedCollectionPath,'/privacy/','/tenants/','/people/asakura-tsumugi/','/people/inaba-mio/','/404/',playerRecordPath,...facilityCards.map(f=>`/facilities/${f[0]}/`),...news.filter(n=>n.available).map(n=>`/news/${n.id}/`),...tenants.map(t=>`/tenants/${t.page}/`),...gallery.map(g=>`/gallery/${g.id}/`),...tenantMaterialEntries.map(material=>material.path)];
 
 function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCHIVE_ORIGIN||'http://127.0.0.1:4176'}}={}){
  const paused=generalUsePaused(ending);
@@ -458,9 +459,10 @@ function renderPublicPage(path,{q='',ending='',origins={archive:process.env.ARCH
 function decoratePublicPage(html,path,ending){
  if(generalUsePaused(ending))html=html?.replace(siteOperation(),siteOperation(ending));
  if(livePublicPaths.has(path)||path==='/404/')html=html?.replace('<body ','<body data-public-outcome="true" ');
- return decoratePage(html,{kind:'main',path});
+ const outcome=(path==='/news/closure/'&&(ending==='end1'||ending==='end3'))||(path==='/news/staff-change/'&&ending==='end2')?ending:'';
+ return decoratePage(html,{kind:'main',path,ending:outcome});
 }
 
 export function notFound(ending=''){return decoratePublicPage(layout('ページが見つかりません',`<section class="wrap error-content"><p class="error-code">404</p><h1>ページが見つかりません。</h1><p>お探しのページは移動、または削除された可能性があります。<br>URLをご確認のうえ、再度お試しください。</p>${link('/','トップページへ','button dark')}</section>`,{kind:'error-page'}),'/404/',ending);}
 
-export function renderPublic(path,options={}){return decoratePublicPage(renderPublicPage(path,options),path,options.ending);}
+export function renderPublic(path,options={}){return path===playerRecordPath?renderPlayerRecord():decoratePublicPage(renderPublicPage(path,options),path,options.ending);}

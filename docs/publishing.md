@@ -25,11 +25,13 @@ mainへのPushで.github/workflows/pages.ymlが動く。テスト、公開HTML�
 
 最低限の公開にはCloudflare Pages Freeへ静的版を置く。`npm run build:cloudflare-pages`で、ドメイン直下用のdist/pagesをローカル生成する。作成処理はCloudflareへ接続せず、DNSや契約を変更しない。Cloudflare側のGit連携を使う場合も、出力ディレクトリはdist/pages、ビルドコマンドは同じものを指定できる。
 
-候補はasunaro.yu-zora.com。既存ドメインのサブドメインを使い、別のドメインを購入しない。最小構成では資料室、保全窓口、監査室を/historical-records/、/records-center/、/independent-review/へ配置する。別オリジンにはlocalStorageが共有されないため、静的版を単純に複数のサブドメインへ分ける設定にはしない。
+候補はasunaro.yu-zora.com。既存ドメインのサブドメインを使い、別のドメインを購入しない。最小構成では資料室、保全窓口、監査室を/historical-records/、/records-center/、/independent-review/へ配置する。別オリジンではIndexedDB・localStorageの保存領域が共有されないため、静的版を単純に複数のサブドメインへ分ける設定にはしない。
 
 後日用途を分ける場合の候補はasunaro-archive.yu-zora.com、hozen.yu-zora.com、asunaro-guide.yu-zora.com。いずれも未設定。複数サイト間で進行を連携する方式は、公開構成を決めてから選ぶ。
 
 静的版はログイン、資料照会、ZIPの受領と提出、三つの結末をブラウザーで処理する。Functions、Workers、R2、外部データベースを追加しない。端末間の進行共有は行わず、ブラウザーデータを消すと進行も失われる。実際の個人情報を預かるサービスではない。
+
+ケースの進行はIndexedDBへ保存し、既存localStorageから初回に同じケースを引き継ぐ。localStorageは通知用のミラーとしても維持する。探索記録とエンド後の任意再開は[作者用の仕様](player-record.md)を参照。結末だけを戻す操作はプレイヤーが確認して選び、デプロイや初回移行で実行しない。
 
 Cloudflare Pagesの静的ファイルへのリクエストは無料・無制限。Freeプランは月500ビルド、20,000ファイル、1ファイル25MiB、1プロジェクト100カスタムドメインまで。今回の配布物はこれらの範囲内。既存ドメインの維持費に加えるホスティング費は0円にできる。[静的配信の料金](https://developers.cloudflare.com/pages/functions/pricing/)、[無料枠の上限](https://developers.cloudflare.com/pages/platform/limits/)、[独自ドメイン設定](https://developers.cloudflare.com/pages/configuration/custom-domains/)。
 

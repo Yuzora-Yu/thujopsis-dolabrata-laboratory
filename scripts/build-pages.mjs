@@ -4,7 +4,7 @@ import {createHash,createCipheriv,pbkdf2Sync,randomBytes} from 'node:crypto';
 import path from 'node:path';
 import {accounts,documents,searchEntries} from '../src/content.mjs';
 import {publicPaths,pausedFacilityPaths,endingNoticePaths,renderPublic,notFound,layout} from '../src/render.mjs';
-import {decoratePage} from '../src/experience.mjs';
+import {decoratePage,withPlayerAssets} from '../src/experience.mjs';
 import {renderMember,loginPage,memberLayout,agencyPage} from '../src/member.mjs';
 import {archivePublicPaths,renderLegacy,legacyLayout,legacyLogin} from '../src/legacy.mjs';
 import {archiveTicket,archiveNotes} from '../src/world/archive-data.mjs';
@@ -21,6 +21,7 @@ await mkdir(path.join(out,'assets/portal'),{recursive:true});
 await cp('public/assets',path.join(out,'assets'),{recursive:true});
 for(const name of ['styles.css','app.js','photo-pan.js','seed-drift.js','member-reading.js','reading-state.js','lab-core.js','lab-console.js'])await cp('public/'+name,path.join(out,name));
 await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));
+await cp('src/player-state.mjs',path.join(out,'assets/player-state.js'));
 const labVersion=createHash('sha256').update((await readFile('public/lab-console.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 if(labConsoleAsset!==`/lab-console.js?v=${labVersion}`)throw new Error('Update labConsoleAsset to match public/lab-console.js');
 const runtimeSource=(await readFile('scripts/static-runtime.js','utf8')).replaceAll("import('./lab-console.js')",`import('.${labConsoleAsset}')`);
@@ -29,14 +30,19 @@ const runtimeVersion=createHash('sha256').update(runtimeSource.replaceAll('\r\n'
 const photoPanVersion=createHash('sha256').update((await readFile('public/photo-pan.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const seedDriftVersion=createHash('sha256').update((await readFile('public/seed-drift.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const styleVersion=createHash('sha256').update((await readFile('public/styles.css','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
+const playerScriptVersion=createHash('sha256').update((await readFile('public/assets/player-record.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
+const playerStyleVersion=createHash('sha256').update((await readFile('public/assets/player-record.css','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 function hosted(html,kind='main'){
- const result=rewriteHostedHtml(html,{kind,origins,basePath:base}).replaceAll(`src="${base}/seed-drift.js"`,`src="${base}/seed-drift.js?v=${seedDriftVersion}"`).replaceAll(`href="${base}/styles.css"`,`href="${base}/styles.css?v=${styleVersion}"`).replaceAll(`src="${base}/photo-pan.js"`,`src="${base}/photo-pan.js?v=${photoPanVersion}"`);
- return result.replace('</head>',`<meta name="asunaro-base" content="${base}"><script type="module" src="${base}/static-runtime.js?v=${runtimeVersion}"></script></head>`);
+ // Portal and private-room loading shells intentionally carry no story marker,
+ // but their head must load the player module before decrypted body views arrive.
+ html=withPlayerAssets(html);
+ const result=rewriteHostedHtml(html,{kind,origins,basePath:base}).replaceAll(`src="${base}/seed-drift.js"`,`src="${base}/seed-drift.js?v=${seedDriftVersion}"`).replaceAll(`href="${base}/styles.css"`,`href="${base}/styles.css?v=${styleVersion}"`).replaceAll(`src="${base}/photo-pan.js"`,`src="${base}/photo-pan.js?v=${photoPanVersion}"`).replaceAll(`src="${base}/assets/player-record.js"`,`src="${base}/assets/player-record.js?v=${playerScriptVersion}"`).replaceAll(`href="${base}/assets/player-record.css"`,`href="${base}/assets/player-record.css?v=${playerStyleVersion}"`);
+ return result.replace('</head>',`<meta name="asunaro-base" content="${base}"><meta name="asunaro-static" content="true"><script type="module" src="${base}/static-runtime.js?v=${runtimeVersion}"></script></head>`);
 }
 function initialShell(html){
  // The static login shell is replaced after its data has loaded. Keep it inert
  // until then so a slow connection cannot submit GitHub Pages' fallback form.
- return html.replace(/<form\b([^>]*\bmethod="post"[^>]*)>([\s\S]*?)<\/form>/gi,(_,attributes,body)=>
+ return html.replace('<body ','<body data-player-pending="true" ').replace(/<form\b([^>]*\bmethod="post"[^>]*)>([\s\S]*?)<\/form>/gi,(_,attributes,body)=>
   `<form${attributes} aria-busy="true">${body.replace(/<(input|button|select|textarea)\b/gi,'<$1 disabled')}</form>`);
 }
 const generated=[];

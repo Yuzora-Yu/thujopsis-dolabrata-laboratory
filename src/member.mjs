@@ -237,7 +237,7 @@ const independentUpdates=`
   </blockquote>
  </section>`;
 
-function agencyPageContent(kind,path,{caseId='',error='',receipt='',additional=false,consoleTrial=null,origins}){
+function agencyPageContent(kind,path,{caseId='',error='',receipt='',additional=false,consoleTrial=null,csrf='',revision=0,origins}){
  const audit=kind==='audit',name=audit?'東都研究監査室':'災害技術記録保全センター',base=audit?origins.audit:origins.hozen;
  let content='';
  const receiptNumber=`<div class="receipt-number">受付番号：${audit?'EA':'DR'}-2026-1102</div>`;
@@ -252,9 +252,16 @@ function agencyPageContent(kind,path,{caseId='',error='',receipt='',additional=f
   <p>${audit?'ご提出いただいた原本を保全しました。受領後に確認できた事項を、日付順に掲載します。':'ご提出いただいた資料を保全し、関係先への照会と事実確認を進めます。'}</p>${receiptNumber}
   <div class="agency-news"><p class="eyebrow">受領後の経過</p>${audit?independentUpdates:continuityUpdates}</div>
   ${audit?labThanks(consoleTrial):''}<p><a class="text-link" href="${esc(origins.main)}/news/closure/">施設のお知らせ</a></p>`;
- else content=`<p class="eyebrow">${audit?'INDEPENDENT REVIEW':'RECORDS & CONTINUITY'}</p><h1>${audit?'記録保全受付':'資料保全・匿名通報受付'}</h1><p>${audit?'研究事業に関する記録の提供を受け付けています。現運営から独立した立場で、原本と資料の移送先を含めて確認します。':'研究や施設運営に関する資料の提供を受け付けています。お預かりした技術記録は、保全と引継ぎの可否を確認いたします。対象者の所在や支援に関する照会は、関係先へ取り次ぎます。お名前の記入は任意です。'}</p>${additional?receiptNumber+'<p>以下の資料をこの受付番号に追加します。</p>':''}${error?`<p class="form-error">${esc(error)}</p>`:''}<form class="form-stack" method="post" action="/receive/" enctype="multipart/form-data"><input type="hidden" name="case" value="${esc(caseId)}"><label for="title">件名</label><input id="title" name="title" required maxlength="150"><label for="statement">内容</label><textarea id="statement" name="statement" required maxlength="5000"></textarea><label for="archive">資料</label><input type="file" id="archive" name="archive" accept=".zip" required><label for="sender">お名前（任意）</label><input id="sender" name="sender" maxlength="100" value="${audit&&consoleTrial?.completedAt?esc(consoleTrial.handle):''}"><button class="button" type="submit">資料を提出する <span>→</span></button></form>`;
+ else content=`<p class="eyebrow">${audit?'INDEPENDENT REVIEW':'RECORDS & CONTINUITY'}</p><h1>${audit?'記録保全受付':'資料保全・匿名通報受付'}</h1><p>${audit?'研究事業に関する記録の提供を受け付けています。現運営から独立した立場で、原本と資料の移送先を含めて確認します。':'研究や施設運営に関する資料の提供を受け付けています。お預かりした技術記録は、保全と引継ぎの可否を確認いたします。対象者の所在や支援に関する照会は、関係先へ取り次ぎます。お名前の記入は任意です。'}</p>${additional?receiptNumber+'<p>以下の資料をこの受付番号に追加します。</p>':''}${error?`<p class="form-error">${esc(error)}</p>`:''}<form class="form-stack" method="post" action="/receive/" enctype="multipart/form-data"><input type="hidden" name="csrf" value="${esc(csrf)}"><input type="hidden" name="revision" value="${esc(revision)}"><input type="hidden" name="case" value="${esc(caseId)}"><label for="title">件名</label><input id="title" name="title" required maxlength="150"><label for="statement">内容</label><textarea id="statement" name="statement" required maxlength="5000"></textarea><label for="archive">資料</label><input type="file" id="archive" name="archive" accept=".zip" required><label for="sender">お名前（任意）</label><input id="sender" name="sender" maxlength="100" value="${audit&&consoleTrial?.completedAt?esc(consoleTrial.handle):''}"><button class="button" type="submit">資料を提出する <span>→</span></button></form>`;
  return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>${name} | 記録保全受付</title><link rel="stylesheet" href="/styles.css">${audit&&receipt==='received'?`<script type="module" src="${labConsoleAsset}"></script>`:''}</head><body class="agency-body"><header class="agency-header"><a href="${base}/?case=${esc(caseId)}">${name}</a><span>${audit?'INDEPENDENT RESEARCH REVIEW':'DISASTER TECHNOLOGY RECORDS'}</span></header><main class="agency-main">${content}</main><footer class="agency-footer"><p>${audit?'調査担当：倉橋 真紀乃':'一般社団法人 災害技術記録保全センター／代表理事 榎本 航策'}</p><p>© ${audit?'TOTO RESEARCH REVIEW':'DISASTER TECHNOLOGY RECORDS CENTER'}</p></footer>${fictionFooter()}</body></html>`;
 }
 
-export function renderMember(path,ctx){return decoratePage(renderMemberPage(path,ctx),{kind:'main',path,role:ctx.account?.role});}
-export function agencyPage(kind,path,ctx){return decoratePage(agencyPageContent(kind,path,ctx),{kind,path});}
+export function renderMember(path,ctx){
+ const html=renderMemberPage(path,ctx);
+ const recordPath=path.startsWith('/members/records/')&&path!=='/members/records/';
+ const readable=(!recordPath||html?.includes('data-member-record="'))&&!(ctx.account?.role==='asakura'&&ctx.caseState?.ending==='end2'&&path!=='/members/contact/received/');
+ return decoratePage(html,{kind:'main',path,role:ctx.account?.role,track:readable,ending:path==='/members/contact/received/'&&ctx.caseState?.ending==='end2'?'end2':''});
+}
+export function agencyPage(kind,path,ctx){
+ return decoratePage(agencyPageContent(kind,path,ctx),{kind,path,ending:path==='/received/'&&ctx.receipt==='received'?(kind==='audit'?'end3':'end1'):''}).replace('href="/player-record/"',`href="${esc(ctx.origins.main)}/player-record/"`);
+}

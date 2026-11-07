@@ -43,6 +43,8 @@
 
 古い写真は撮影年代の光・ノイズに加え、当時の掲載を想定した解像度とJPEG圧縮を経てWebPへ書き出す。書き出し元はscripts/prepare-media.cjs。
 
+0034の薄板は、現写真で両側の縁を残した平行スリットを確認し、原稿の切り込み方をその見た目へ揃えた。直線の切り込みによる曲げ加工は[Trotecの技法解説](https://www.troteclaser.com/en/helpcenter/materials/application-techniques/bending-technique)も参照。これは写真にない板厚・曲率・強度や、その試作品を実製造した事実を保証するものではない。
+
 ## 作中の史料
 
 夕凪日報の記事、継舟計画の研究概要は架空の史料。正確な日本語の手がかりを保持するため、PDFは画像生成文字ではなくReportLabで組版。生成元はscripts/create-history-documents.py、採用先はpublic/assets/archive/。実在の新聞社・研究機関の史料を加工したものではない。
