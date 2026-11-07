@@ -22,9 +22,21 @@ async function company(p,number){
 }
 async function download(p,selector,name){const waiting=p.waitForEvent('download');await p.locator(selector).click();const file=await waiting;const target='.work/qa/'+mode+'-'+name;await file.saveAs(target);return {file:target,data:await fs.readFile(target)};}
 async function verifyPausedGuide(p,path,content){
- await p.goto(main(path));
  const status=p.locator('[data-site-operation="paused"]');
- await status.waitFor();
+ const failedRequests=[];
+ const failedRequest=request=>failedRequests.push({url:request.url(),error:request.failure()?.errorText});
+ p.on('requestfailed',failedRequest);
+ let response;
+ try{
+  response=await p.goto(main(path));
+  await status.waitFor();
+ }catch(error){
+  const view=await p.evaluate(()=>({title:document.title,main:document.querySelector('main')?.innerText?.slice(0,1000),operation:document.querySelector('.site-header .utility>span')?.textContent,modules:[...document.querySelectorAll('script[type="module"][src]')].map(script=>script.src)}));
+  console.error('Paused guide load:',JSON.stringify({path,url:p.url(),response:response?.status(),...view,failedRequests,pageErrors:errors.slice(-5)}));
+  await p.screenshot({path:'.work/qa/'+mode+'-paused-guide-failure.png',fullPage:true}).catch(()=>{});
+  await p.context().storageState({path:'.work/qa/'+mode+'-paused-guide-failure-state.json'}).catch(()=>{});
+  throw error;
+ }finally{p.off('requestfailed',failedRequest);}
  assert.equal(await status.innerText(),'一般利用休止中');
  await p.locator('.facility-use-pause').getByRole('link',{name:'休止のお知らせ',exact:true}).waitFor();
  assert.match(await body(p),content);
