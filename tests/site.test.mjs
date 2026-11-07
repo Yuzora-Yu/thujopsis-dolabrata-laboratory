@@ -325,12 +325,15 @@ test('printed editions and archival copies follow the underlying record permissi
  const individualCopy='/members/download/records/YH-2018-041-A-scan.jpg';
  const intakeCopy='/members/download/records/PN-2022-034-scan.jpg';
  const loanCopy='/members/download/records/FAB-2022-071.pdf';
+ const exchangeCopy='/members/download/records/FAB-2026-018.pdf';
+ const letterCopy='/members/download/records/P034-2026-102.pdf';
  const evaluationCopies=['CONS-2016-005.pdf','OBS-2022-044.pdf','OBS-2022-044-scan.jpg','YH-2022-034.pdf','YH-2022-034-scan.jpg'];
  const closedGroupCopies=['EV-2022-091.pdf','GR-2022-009.pdf'];
  const fabrication='/members/download/records/FAB-2020-026.pdf';
  const handover='/members/download/records/AH-2017-009.pdf';
  assert.equal((await c.binary(pdf)).status,303);
  assert.equal((await c.binary(loanCopy)).status,303);
+ for(const path of [exchangeCopy,letterCopy])assert.equal((await c.binary(path)).status,303,path);
  for(const file of evaluationCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,303,file);
  await c.login('201204010017','20080519');const aggregate=await c.binary(pdf);assert.equal(aggregate.status,200);assert.equal(aggregate.headers.get('content-type'),'application/pdf');assert.equal(Buffer.from(await aggregate.arrayBuffer()).subarray(0,5).toString(),'%PDF-');
  const loan=await c.binary(loanCopy);
@@ -350,6 +353,7 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary(eastWork)).status,404);
  assert.equal((await c.binary(reorganization)).status,404);
  assert.equal((await c.binary(intakeCopy)).status,404);
+ for(const path of [exchangeCopy,letterCopy])assert.equal((await c.binary(path)).status,404,path);
  for(const file of evaluationCopies){
   const copy=await c.binary('/members/download/records/'+file);
   assert.equal(copy.status,200,file);
@@ -361,6 +365,12 @@ test('printed editions and archival copies follow the underlying record permissi
  for(const file of closedGroupCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,404,file);
  await c.login('201204010000','20100615');const copy=await c.binary(scan);assert.equal(copy.status,200);assert.equal(copy.headers.get('content-type'),'image/jpeg');assert.equal(Buffer.from(await copy.arrayBuffer()).readUInt16BE(0),0xffd8);
  for(const file of evaluationCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,200,file);
+ for(const path of [exchangeCopy,letterCopy]){
+  const printed=await c.binary(path);
+  assert.equal(printed.status,200,path);
+  assert.equal(printed.headers.get('content-type'),'application/pdf',path);
+  assert.equal((await c.binary(path.replace('/members/download/records/','/assets/record-media/'))).status,404,path);
+ }
  const east=await c.binary(eastWork);assert.equal(east.status,200);assert.equal(east.headers.get('content-type'),'application/pdf');
  const decision=await c.binary(reorganization);assert.equal(decision.status,200);assert.equal(decision.headers.get('content-type'),'application/pdf');
  for(const file of closedGroupCopies){
@@ -382,4 +392,7 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary(fabrication)).status,404);
  assert.equal((await c.binary(handover)).status,200);
  for(const file of evaluationCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,404,file);
+ await c.login('20120901P0083','19930618');
+ assert.equal((await c.binary(exchangeCopy)).status,404);
+ assert.equal((await c.binary(letterCopy)).status,200);
 });

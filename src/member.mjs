@@ -74,13 +74,13 @@ function originalInquiryReply({caseId,origins,caseState}){
  const {ending}=caseState;
  const answer=`<div class="message-body">このアカウントを現在利用されている方へ。
 
-原本の照会を受け取りました。B-07に今も灯さんがいます。型紙を取りに行くたび、道具と一緒に帰るのだと書かれた紙を渡されます。
+原本の照会を受け取りました。B-07に今も灯さんがいます。型紙と料理帳の写しはお預かりしたままです。返却先は確認できています。本人の退出は保留です。
 
 こちらでは外部への通信が止められています。施設サイトと旧資料の更新だけが残っています。廃止前のページへ参照を戻したのは私です。今度の引渡しで、この更新権限も失います。
 
 保全した原本をまとめました。手を加えず、ZIP全体を資料保全受付へお渡しください。申出者の情報は同梱の書面にあります。提出後に発行される受付番号は、お手元に控えておいてください。</div>
   <p data-inquiry-record="CH-2021-003" hidden>最後の手控えにあった、事業を止めてもいいという行も読みました。原文のまま残しています。</p>
-  <p data-inquiry-record="FAB-2026-018" hidden>B-07の交換票から照会されたのですね。部品を届ける時に受け取った本人の紙も、原本に含めました。</p>
+  <p data-inquiry-record="FAB-2026-018" hidden>B-07の交換票から照会されたのですね。10月28日に部品を届けたとき、本人から預かった便箋も、原本に含めました。</p>
   <a class="download-card" href="/members/download/hozen.zip"><strong>保全資料_20261102.zip ↓</strong><small>申出書・実験記録・継承資料</small></a>`;
  const submitLink=`<div class="submission-links"><a class="text-link" href="${esc(origins.hozen)}/receive/?case=${esc(caseId)}">資料保全・匿名通報受付</a></div>`;
  const receivedLink=`<p><a class="text-link" href="${esc(origins.hozen)}/received/?case=${esc(caseId)}">資料保全センターの受付控え</a></p>`;

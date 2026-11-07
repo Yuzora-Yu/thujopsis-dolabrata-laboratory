@@ -118,6 +118,29 @@ test('the evaluation summary can be traced to the joint request and the duty log
  assert.match(calls.find(([time])=>time==='21:14')[1],/人を呼んで/);
 });
 
+test('the maintenance request, in-person check and paper custody have distinct dates',()=>{
+ const byId=id=>documents.find(document=>document.id===id);
+ const log=byId('FAB-2026-018');
+ assert.match(log.tables[0].rows.find(([item])=>item==='支持部交換の依頼')[1],/B-07/);
+ assert.doesNotMatch(log.tables[0].rows.flat().join(' '),/P-034|瀬尾灯/);
+ const [work]=log.entries;
+ assert.equal(work.at,'2026年10月28日 14:20');
+ assert.match(work.text,/B1・B-07.*瀬尾灯（対象票P-034）.*対面.*便箋一枚.*P034-2026-102/);
+ const letter=byId('P034-2026-102');
+ assert.equal(letter.date,'2026年10月28日');
+ assert.match(letter.sections[0][1],/便箋一枚.*FAB-2026-018/);
+ assert.doesNotMatch(letter.sections[0][1],/型紙|料理帳/);
+ assert.match(letter.sections[1][1],/紙袋.*AS-2023-008.*FAB-2022-071.*引渡し日は空欄/);
+ assert.match(recordText(byId('AS-2023-008')),/律が紙袋の口を二回折って、私の机に置いた/);
+ const [transcription]=letter.addenda;
+ assert.equal(transcription.date,'2026年10月30日');
+ assert.match(transcription.sections.flat().join(' '),/便箋の複写.*開封/);
+ const family=byId('FAM-2022-009');
+ assert.match(family.entries.find(entry=>entry.at==='2022年11月30日').text,/汐見分室の郵送先を文乃氏へ通知/);
+ assert.match(family.entries.find(entry=>entry.at==='2022年12月6日').text,/書留が戻りました/);
+ assert.match(recordText(family),/10月26日の当直引継ぎ.*10月28日の交換作業控えFAB-2026-018/);
+});
+
 test('public facility routes do not announce the old archive and the first clipping is a direct PDF',()=>{
  for(const route of publicPaths){const html=renderPublic(route)||'';assert.doesNotMatch(html,/href="[^"]*(?:historical-records|127\.0\.0\.1:4176|\/snapshots\/)/,route);}
  assert.doesNotMatch(renderPublic('/about/history/'),/準備期の公開記録/);

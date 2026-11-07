@@ -10,6 +10,8 @@ const editions=[
  ['CONS-2016-005','consent'],['YH-2022-034','trial-intake',true],['OBS-2022-044','daily-check',true],
  ['ENV-2022-031','transfer'],['EV-2022-091','watch-log'],['GR-2022-009','group-review'],['YH-2022-017','decision'],['AP-2022-028','evaluation'],['OPS-2026-084','operations'],
  ['AS-2023-008','memo'],['FAB-2022-071','workshop-receipt'],
+ ['FAB-2026-018','ledger',false,{pdf:'保全台帳と作業控え（PDF）'}],
+ ['P034-2026-102','memo',false,{pdf:'受渡し控えと便箋の原文（PDF）'}],
  ['PN-2022-034','workshop-receipt',true,{pdf:'受領票と後日の書面（PDF）',image:'9月2日の預かり控え（画像）'}],
 ];
 const printLabels={
