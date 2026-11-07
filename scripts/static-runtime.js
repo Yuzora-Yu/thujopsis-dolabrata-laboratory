@@ -232,7 +232,10 @@ async function boot({restoreFragment=false}={}){
     summary.previousElementSibling.textContent=keyword?'「'+keyword+'」の検索結果　'+results.length+'件':'';
    }
   }
- }catch{showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');}
+ }catch{
+  document.querySelector('[data-archive-loading]')?.remove();
+  showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');
+ }
  finally{
   rendering=false;
   if(refreshOutcomeAfterBoot){

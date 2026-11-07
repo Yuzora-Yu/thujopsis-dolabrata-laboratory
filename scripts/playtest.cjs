@@ -499,6 +499,13 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  await traceArchivedPublicNotices(archive);
  await traceHistoricalRegisters(archive);
  const healthId=await traceNewspaper(p,archive);
+ if(mode==='pages'){
+  const response=await archive.request.get(provider('archive','/room/records/0005/'));
+  assert.equal(response.status(),200);
+  const shell=await response.text();
+  assert.match(shell,/data-archive-loading role="status"/);
+  assert.doesNotMatch(shell,/id="ticket"|端末と資料更新の整理/);
+ }
  await archive.goto(provider('archive','/room/records/0005/'));await until(archive,'端末と資料更新の整理');
  const terminalNotice=await body(archive);
  assert.match(terminalNotice,/外部への送信を止める[\s\S]*2021年1月22日追記/);

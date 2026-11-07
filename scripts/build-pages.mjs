@@ -5,7 +5,7 @@ import path from 'node:path';
 import {accounts,documents,searchEntries} from '../src/content.mjs';
 import {publicPaths,pausedFacilityPaths,endingNoticePaths,renderPublic,notFound} from '../src/render.mjs';
 import {renderMember,loginPage,memberLayout,agencyPage} from '../src/member.mjs';
-import {archivePublicPaths,renderLegacy,legacyLogin} from '../src/legacy.mjs';
+import {archivePublicPaths,renderLegacy,legacyLayout,legacyLogin} from '../src/legacy.mjs';
 import {archiveTicket,archiveNotes} from '../src/world/archive-data.mjs';
 import {projects} from '../src/world/projects.mjs';
 import {subjectViews} from '../src/world/lab-data.mjs';
@@ -48,9 +48,10 @@ for (const route of portalPaths) {
  await page(route,html);
 }
 for(const route of archivePublicPaths)await page(route,renderLegacy(route,{...ctxBase,session:{}}),'archive');
-await page('/room/',legacyLogin('@@CSRF@@'),'archive');
-for(const route of ['/room/console/','/room/console/subjects/'])await page(route,legacyLogin('@@CSRF@@'),'archive');
-for(const n of archiveNotes)await page(`/room/records/${n.id}/`,legacyLogin('@@CSRF@@'),'archive');
+const archiveLoading=legacyLayout('資料照会室','<p data-archive-loading role="status">資料を読み込んでいます。</p>');
+for(const route of ['/room/','/room/console/','/room/console/subjects/',...archiveNotes.map(n=>`/room/records/${n.id}/`)]){
+ await page(route,archiveLoading,'archive');
+}
 for(const kind of ['hozen','audit'])for(const route of ['/','/receive/','/received/'])await page(route,agencyPage(kind,route,{caseId:'@@CASE@@',origins,receipt:route==='/'?'':'loading'}),kind);
 for(const route of ['/news/closure/','/news/staff-change/'])await page(route,notFound());
 
