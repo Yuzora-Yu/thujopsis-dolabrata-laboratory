@@ -16,7 +16,7 @@ export function consoleContent(path,ctx){
 }
 export function labThanks(trial){
  const complete=trialView(trial)?.complete;
- return `<section class="lab-thanks" data-lab-thanks${complete?'':' hidden'}><h2><span data-lab-thanks-name>${complete?esc(trial.handle):''}</span>さんへ</h2><blockquote>私たちが自分の名前で施設を離れるために、資料を届けてくださってありがとうございました。数字だけの欄に戻らずに済みました。<br><br>瀬尾 灯</blockquote></section>`;
+ return `<section class="lab-thanks" data-lab-thanks${complete?'':' hidden'}><h2><span data-lab-thanks-name>${complete?esc(trial.handle):''}</span>さんへ</h2><blockquote>資料を届けてくださって、ありがとうございました。私も一緒に帰りたい、と書いたところまで届いたと、倉橋さんから聞きました。今は母と、作りかけの道具の続きを相談しています。<br><br>瀬尾 灯</blockquote></section>`;
 }
 
 export function labAssessment(saved,ending=''){

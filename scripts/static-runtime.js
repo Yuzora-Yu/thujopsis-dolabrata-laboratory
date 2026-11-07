@@ -277,7 +277,7 @@ document.addEventListener('submit',async event=>{
    if(!String(values.get('title')||'').trim()||!String(values.get('statement')||'').trim()){showError('受付情報と提出内容をご確認ください。');return;}
    if(!kind){showError('添付資料を確認できませんでした。受領したZIPファイルをそのまま添付してください。');return;}
    state=stored(storageKey,state);
-   if(state.ending==='end2'){showError('この照会に関する記録は、施設運営側の管理へ移管されています。');return;}
+   if(state.ending==='end2'){showError('提供元との連絡と原本の追加確認を継続できないため、本件の資料受付は終了しました。');return;}
    if(current.kind==='audit'&&kind!=='complete')state.auditPending=true;else state.ending=nextEnding(state.ending,current.kind==='audit'?'end3':'end1');save();go('/received/?case='+state.id,state.ending==='end3'?'audit':current.kind);return;
   }
   const account=await currentBundle();if(!account){go('/members/login/');return;}

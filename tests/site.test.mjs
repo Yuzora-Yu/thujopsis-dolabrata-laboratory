@@ -118,7 +118,9 @@ test('name search, personal account and independent submission reveal and stop s
  const r=await c.binary('/members/download/complete.zip');const zip=Buffer.from(await r.arrayBuffer());assert.ok(zip.includes(Buffer.from('継承計画.json')));
  const submitted=await submitAgency('audit',caseId,zip);assert.equal(submitted.status,303);
  const receipt=await (await fetch(new URL(submitted.headers.get('location'),`http://127.0.0.1:${port+2}`))).text();
- assert.match(receipt,/2026\.11\.06[\s\S]*B1・B-07[\s\S]*同日、施設を出ました[\s\S]*2026\.11\.12[\s\S]*原型継承試験の実施手続きを停止[\s\S]*P-032<\/span>の所在は、引き続き照会[\s\S]*2026\.11\.20[\s\S]*母と確かめながら続きを作ります/);
+ assert.match(receipt,/2026\.11\.06[\s\S]*B1・B-07[\s\S]*同日、施設を出ました[\s\S]*2026\.11\.12[\s\S]*原型継承試験の実施手続きを停止[\s\S]*2026\.11\.20[\s\S]*母と確かめながら続きを作ります/);
+ assert.match(receipt,/P-032<\/span>・安積透さんの所在は、引き続き照会/);
+ assert.match(receipt,/2022年9月11日に死亡が確認された吉野夏帆さん/);
  const publicNotice=(await c.get('/news/closure/')).text;
  assert.match(publicNotice,/外部への資料移管/);
  assert.doesNotMatch(publicNotice,/瀬尾灯|吉野夏帆|B1・B-07/);
@@ -319,6 +321,8 @@ test('office transfer preserves the audit receipt and ends additional submission
  await c.upload('/members/contact/',{subject:'資料の確認',message:'添付資料をご確認ください。'},'資料.zip',zip);
  const receipt=await fetch(app.origins.audit+'/receive/?case='+caseId).then(r=>r.text());
  assert.match(receipt,/EA-2026-1102[\s\S]*追加受付は終了しました/);
+ assert.match(receipt,/資料は引き続き保全しています/);
+ assert.doesNotMatch(receipt,/施設運営側の管理へ移管/);
  assert.doesNotMatch(receipt,/所在と、施設内の事業について確認を進めます/);
  assert.doesNotMatch(receipt,/追加資料を提出する|name="archive"/);
  assert.equal((await submitAgency('audit',caseId,zip)).status,409);

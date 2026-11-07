@@ -763,7 +763,7 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.deepEqual(await p.locator('.agency-news>section time').allTextContents(),['2026.11.06','2026.11.12','2026.11.20']);
  assert.match(await body(p),/B1・B-07で確認[\s\S]*ご本人からの連絡/);
  assert.match(await body(p),/原型継承試験の実施手続きを停止/);
- assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
+ assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');assert.match(await p.locator('[data-lab-thanks]').innerText(),/私も一緒に帰りたい/);}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
  if(process.env.PLAYTEST_LAB==='1'){
   const savedTrial=await p.context().newPage();
   try{
@@ -779,7 +779,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  await login(p,institution.id,institution.password);
  await p.goto(auditReceipt);await until(p,'資料を受領しました');
  assert.match(await body(p),/自宅に戻ることを希望し、同日、施設を出ました/);
- assert.match(await body(p),/B1・B-04で所在を確認した方にも/);
+ assert.match(await body(p),/B1・B-04の稲葉澪里さんにも/);
+ assert.match(await body(p),/P-032・安積透さんの所在は、引き続き照会/);
+ assert.match(await body(p),/2022年9月11日に死亡が確認された吉野夏帆さん/);
  assert.match(await body(p),/吉野夏帆さんの青い布表紙の地図帳[\s\S]*ご家族に返却先を確認/);
  await p.setViewportSize({width:390,height:844});
  assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);

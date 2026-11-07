@@ -209,12 +209,14 @@ const independentUpdates=`
  <section>
   <time datetime="2026-11-06">2026.11.06</time><h2>一般利用の休止と所在確認</h2>
   <p>あすなろ産業支援交流施設は一般利用を休止しました。当室の担当者が地下1階に入り、当直引継ぎに記載された3区画でご本人を確認しました。</p>
-  <p><span class="case-ref">P-034</span>・瀬尾灯さんを<span class="case-ref">B1・B-07</span>で確認しました。瀬尾さんは自宅に戻ることを希望し、同日、施設を出ました。<span class="case-ref">B1・B-06</span>の青井真澄さんと、<span class="case-ref">B1・B-04</span>で所在を確認した方にも、それぞれ今後の行き先を伺い、施設外で保護しました。</p>
+  <p><span class="case-ref">P-034</span>・瀬尾灯さんを<span class="case-ref">B1・B-07</span>で確認しました。瀬尾さんは自宅に戻ることを希望し、同日、施設を出ました。<span class="case-ref">B1・B-06</span>の青井真澄さんと、<span class="case-ref">B1・B-04</span>の稲葉澪里さんにも、それぞれ今後の行き先を伺い、施設外で保護しました。</p>
+  <p>当直記録にある<span class="case-ref">P-032</span>・安積透さんの所在は、引き続き照会しています。</p>
  </section>
  <section>
   <time datetime="2026-11-12">2026.11.12</time><h2>引渡しの停止と原本の保全</h2>
   <p>災害技術記録保全センターへの引渡しと、原型継承試験の実施手続きを停止しました。引渡し一覧にあった装置図面と評価モデルは、当室で調査資料として保全しています。</p>
-  <p>募集時の説明票と日次検査の薬剤記録、9月11日の死亡事案と救護要請を照合しています。三枝律氏が送れなかった申出についても原本を保全し、ご遺族への説明を進めています。当直記録にある<span class="case-ref">P-032</span>の所在は、引き続き照会しています。</p>
+  <p>募集時の説明票と日次検査の薬剤記録、2022年9月11日に死亡が確認された吉野夏帆さんの事案と救護要請を照合しています。</p>
+  <p>三枝律氏が送れなかった申出と、2023年6月14日の死亡確認を記した当直記録も保全しました。ご遺族への説明を進めています。</p>
   <p>工房で預かっていた吉野夏帆さんの青い布表紙の地図帳は、別包みのまま受領しました。ご家族に返却先を確認しております。</p>
  </section>
  <section>
@@ -222,7 +224,7 @@ const independentUpdates=`
   <p>ご本人のご了承を得て、返却資料の受領連絡を掲載します。</p>
   <blockquote>
    <p>道具と、母の料理帳の写しを返していただきました。家に帰って最初にしたのは、母とお昼ご飯を作ることでした。料理帳を開く前に、母が「まず一緒に食べよう」と言いました。</p>
-   <p>三枝さんの紙袋に、途中の型紙が入っていました。完成を見せることはできません。でも、いつも空けてくれていた机の場所を、覚えています。</p>
+   <p>三枝さんの紙袋に、途中の型紙が入っていました。三枝さんに完成を見せることはできません。でも、いつも空けてくれていた机の場所を、覚えています。</p>
    <p>本の道具は、まだ途中です。今度は、母と確かめながら続きを作ります。</p>
    <footer>瀬尾 灯</footer>
   </blockquote>
@@ -234,9 +236,9 @@ function agencyPageContent(kind,path,{caseId='',error='',receipt='',additional=f
  const receiptNumber=`<div class="receipt-number">受付番号：${audit?'EA':'DR'}-2026-1102</div>`;
  if(receipt==='loading')content='<p role="status">受付情報を確認しています。</p>';
  else if(receipt==='pending'||receipt==='transferred'){
-  content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1>${receiptNumber}<p>${receipt==='transferred'?'当室でお預かりした資料の受付控えです。':'対象者の所在と、施設内の事業について確認を進めます。現時点では、外部への移送指示と、その対象となる原本を照合できていません。'}</p>
+  content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1>${receiptNumber}<p>${receipt==='transferred'?'当室で受領した資料の受付控えです。資料は引き続き保全しています。':'対象者の所在と、施設内の事業について確認を進めます。現時点では、外部への移送指示と、その対象となる原本を照合できていません。'}</p>
    <div class="agency-additional">${receipt==='transferred'
-    ?'<h2>追加受付は終了しました</h2><p>この照会に関する記録は、施設運営側の管理へ移管されました。</p>'
+    ?'<h2>追加受付は終了しました</h2><p>提供元との連絡と原本の追加確認を継続できないため、この受付番号での追加提出を終了しました。</p>'
     :`<h2>追加資料の受け付け</h2><p>移送先、原本の採否、事業の承継に関する記録がございましたら、同じ受付番号へご提出ください。</p><a class="text-link" href="${esc(base)}/receive/?case=${esc(caseId)}">追加資料を提出する</a>`}</div>`;
  }
  else if(receipt==='received')content=`<p class="eyebrow">RECEIPT</p><h1>資料を受領しました。</h1>
