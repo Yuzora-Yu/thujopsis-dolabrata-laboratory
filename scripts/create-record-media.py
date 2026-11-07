@@ -37,6 +37,7 @@ STYLES = {
     "group-review": ("Gothic", "#263f62", "#e9eef6", "評価統括／結果提出", "strip"),
     "individual": ("Office", "#414948", "#edf0eb", "評価統括／個票再録", "form"),
     "consent": ("Mincho", "#423c36", "#f1eee8", "居住環境実証部会", "form"),
+    "implementation-plan": ("Mincho", "#353d35", "#efefea", "居住環境実証部会", "formal"),
     "trial-intake": ("Office", "#3d4c55", "#eaf0f1", "居住実証運用室／評価個票", "form"),
     "daily-check": ("Office", "#3d4949", "#edf1ef", "評価統括／検査記録保管", "form"),
     "minutes": ("Mincho", "#37342d", "#eeece6", "議事記録", "formal"),
@@ -135,7 +136,7 @@ def render(record, style_key, target):
         flow.append(PageBreak())
     flow.extend([p(record.get("kindLabel", register), meta), p(record["title"], title)])
     info = [["作成", record["date"]], ["管理・作成者", record["owner"]]]
-    if record.get("updated"):
+    if record.get("updated") and style_key != "implementation-plan":
         info.append(["最終更新", record["updated"]])
     if frame == "form":
         table(["管理欄", "記載"], info)
@@ -160,7 +161,7 @@ def render(record, style_key, target):
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):
         flow.append(p(record["signoff"], meta))
-    addendum_title = record.get("printAddendumTitle") or {"decision": "決裁後の追記", "watch-log": "保存時の照合注記", "shop-change": "納入後の訂正・保全"}.get(style_key)
+    addendum_title = record.get("printAddendumTitle") or {"decision": "決裁後の追記", "watch-log": "保存時の照合注記", "shop-change": "納入後の訂正・保全", "implementation-plan": "実施計画に添えた追記"}.get(style_key)
     if addendum_title and record.get("addenda"):
         flow.extend([PageBreak(), p(addendum_title, title)])
     for note in record.get("addenda", []):

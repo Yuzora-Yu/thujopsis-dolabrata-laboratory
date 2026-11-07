@@ -327,6 +327,7 @@ test('office transfer preserves the audit receipt and ends additional submission
 
 test('printed editions and archival copies follow the underlying record permissions',async()=>{
  const c=client(),pdf='/members/download/records/YH-2018-041.pdf',annex='/members/download/records/YH-2018-041-A.pdf',scan='/members/download/records/RG-2007-011-scan.jpg';
+ const plan='/members/download/records/YH-2016-032.pdf';
  const westCopy='/members/download/records/MX-2019-410-scan.jpg',eastWork='/members/download/records/PUB-2023-014.pdf';
  const reorganization='/members/download/records/YH-2022-017.pdf';
  const individualCopy='/members/download/records/YH-2018-041-A-scan.jpg';
@@ -340,12 +341,14 @@ test('printed editions and archival copies follow the underlying record permissi
  const fabrication='/members/download/records/FAB-2020-026.pdf';
  const handover='/members/download/records/AH-2017-009.pdf';
  assert.equal((await c.binary(pdf)).status,303);
+ assert.equal((await c.binary(plan)).status,303);
  assert.equal((await c.binary(loanCopy)).status,303);
  for(const path of [exchangeCopy,letterCopy])assert.equal((await c.binary(path)).status,303,path);
  for(const file of personalCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,303,file);
  for(const file of evaluationCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,303,file);
  for(const file of institutionCopies)assert.equal((await c.binary('/members/download/records/'+file)).status,303,file);
  await c.login('201204010017','20080519');const aggregate=await c.binary(pdf);assert.equal(aggregate.status,200);assert.equal(aggregate.headers.get('content-type'),'application/pdf');assert.equal(Buffer.from(await aggregate.arrayBuffer()).subarray(0,5).toString(),'%PDF-');
+ assert.equal((await c.binary(plan)).status,200);
  const loan=await c.binary(loanCopy);
  assert.equal(loan.status,200);
  assert.equal(loan.headers.get('content-type'),'application/pdf');
@@ -400,6 +403,7 @@ test('printed editions and archival copies follow the underlying record permissi
  assert.equal((await c.binary('/assets/record-media/PN-2022-034-scan.jpg')).status,404);
  assert.equal((await c.binary('/assets/record-media/OBS-2022-044-scan.jpg')).status,404);
  await c.login('201704010038','20161204');
+ assert.equal((await c.binary(plan)).status,404);
  assert.equal((await c.binary(loanCopy)).status,404);
  assert.equal((await c.binary(fabrication)).status,404);
  assert.equal((await c.binary(handover)).status,200);

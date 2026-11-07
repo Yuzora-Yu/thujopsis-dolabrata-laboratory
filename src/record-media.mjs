@@ -4,6 +4,7 @@ import {researchRecords} from './world/records.mjs';
 // that record, not the URL, filename, or the player's progress counter.
 const editions=[
  ['YH-2013-014','spec'],['FLOW-2013-007','bench'],['AH-2017-009','transfer'],
+ ['YH-2016-032','implementation-plan',false,{pdf:'実施計画と後年の追記（PDF）'}],
  ['YH-2018-041','evaluation'],['YH-2018-041-A','individual',true],['RM-2020-019','minutes'],
  ['YH-2019-026','watch-log',false,{pdf:'当直記録の抜粋と保管時の追記（PDF）'}],
  ['MX-2019-410','ledger',true],['FAB-2020-026','shop-change'],['PUB-2023-014','maintenance'],
