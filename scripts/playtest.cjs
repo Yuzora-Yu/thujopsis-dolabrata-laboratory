@@ -395,9 +395,15 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.deepEqual(inabaScan.data,await fs.readFile('private/record-media/YH-2018-041-A-scan.jpg'));
  const report=await document(p,'YH-2018-041');
  assert.equal(report.match(/管理責任者\s+([^\n]+)/)[1].trim(),evaluationManager);
- const observation=await document(p,inaba.match(/YH-2019-\d{3}/)[0]);
+ const observationId=inaba.match(/YH-2019-\d{3}/)[0];
+ const observation=await document(p,observationId);
  assert.match(observation,/『現在地』から線を指でたどると、この扉です/);
  assert.doesNotMatch(observation,/410・411・412を一括表示|研究・隔離区画/);
+ const requests=p.getByRole('region',{name:'退出申出の受付控え'});
+ assert.deepEqual(await requests.locator('tbody td:last-child').allInnerTexts(),['','']);
+ assert.match(await requests.innerText(),/2020年2月[\s\S]*18日 18:10[\s\S]*運用室へ回付[\s\S]*19日 09:12[\s\S]*同件で追送/);
+ const watchCopy=await download(p,'a[href$="'+observationId+'.pdf"]','inaba-observation.pdf');
+ assert.deepEqual(watchCopy.data,await fs.readFile('private/record-media/'+observationId+'.pdf'));
  const westId=observation.match(/MX-\d{4}-\d{3}/)[0];
  const westLedger=await document(p,westId);
  assert.match(westLedger,/受付表示「410」/);
@@ -436,6 +442,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(await p.locator('#activities').innerText(),/2019\.09\.20[\s\S]*名札を受付へ返しました/);
  await p.goto(main('/news/'));assert.equal(await p.locator('.news-rows a[href*="20120416"]').count(),0);assert.equal(await p.locator('.news-rows a[href*="20120903"]').count(),0);
  const fabricationId=observation.match(/FAB-2020-\d{3}/)[0];
+ await p.goto(main('/gallery/0015/'));
+ assert.equal(await p.locator('article time').getAttribute('datetime'),'2019-06-03');
+ assert.match(await body(p),/腕を置く位置を確かめるための試作[\s\S]*参照欄の更新：2020\.02\.21/);
  await p.goto(main('/gallery/0019/'));
  assert.equal(await p.locator('.article-meta time').innerText(),'掲載 2021.03.12');
  assert.match(await body(p),/2020年の製作時/);

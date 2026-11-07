@@ -5,6 +5,7 @@ import {researchRecords} from './world/records.mjs';
 const editions=[
  ['YH-2013-014','spec'],['FLOW-2013-007','bench'],['AH-2017-009','transfer'],
  ['YH-2018-041','evaluation'],['YH-2018-041-A','individual',true],['RM-2020-019','minutes'],
+ ['YH-2019-026','watch-log',false,{pdf:'当直記録の抜粋と保管時の追記（PDF）'}],
  ['MX-2019-410','ledger',true],['FAB-2020-026','shop-change'],['PUB-2023-014','maintenance'],
  ['OR-2006-004','memo',true],['RG-2007-011','letter',true],['AH-2021-006','ledger'],['HC-2021-031-R','ledger',true],
  ['CONS-2016-005','consent'],['YH-2022-034','trial-intake',true],['OBS-2022-044','daily-check',true],

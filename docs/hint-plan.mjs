@@ -799,6 +799,8 @@ export const hintPlan = [
         "kind": "member",
         "path": "/members/records/YH-2019-026/",
         "words": [
+          "退出申出の受付控え",
+          "本人への回答日",
           "現在地",
           "MX-2019-410"
         ],
@@ -917,6 +919,7 @@ export const hintPlan = [
         "kind": "member",
         "path": "/members/records/FAB-2020-026/",
         "words": [
+          "立ち上がり側の穴",
           "0038",
           "AH-2017-009",
           "別封 F20-0713-04"

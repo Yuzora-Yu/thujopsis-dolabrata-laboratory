@@ -328,7 +328,7 @@ test('printed editions and archival copies follow the underlying record permissi
  const exchangeCopy='/members/download/records/FAB-2026-018.pdf';
  const letterCopy='/members/download/records/P034-2026-102.pdf';
  const personalCopies=['TR-2026-011.pdf','EA-2026-009.pdf'];
- const evaluationCopies=['CONS-2016-005.pdf','OBS-2022-044.pdf','OBS-2022-044-scan.jpg','YH-2022-034.pdf','YH-2022-034-scan.jpg'];
+ const evaluationCopies=['CONS-2016-005.pdf','YH-2019-026.pdf','OBS-2022-044.pdf','OBS-2022-044-scan.jpg','YH-2022-034.pdf','YH-2022-034-scan.jpg'];
  const closedGroupCopies=['EV-2022-091.pdf','GR-2022-009.pdf'];
  const fabrication='/members/download/records/FAB-2020-026.pdf';
  const handover='/members/download/records/AH-2017-009.pdf';
