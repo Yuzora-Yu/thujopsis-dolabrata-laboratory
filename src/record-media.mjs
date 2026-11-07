@@ -8,6 +8,8 @@ const editions=[
  ['YH-2019-026','watch-log',false,{pdf:'当直記録の抜粋と保管時の追記（PDF）'}],
  ['MX-2019-410','ledger',true],['FAB-2020-026','shop-change'],['PUB-2023-014','maintenance'],
  ['OR-2006-004','memo',true],['RG-2007-011','letter',true],['AH-2021-006','ledger'],['HC-2021-031-R','ledger',true],
+ ['CH-2021-003','memo',false,{pdf:'手控えの保存写し（PDF）'}],
+ ['NET-2021-004','network-change',false,{pdf:'構成変更票と例外申請の受付控え（PDF）'}],
  ['CONS-2016-005','consent'],['YH-2022-034','trial-intake',true],['OBS-2022-044','daily-check',true],
  ['ENV-2022-031','transfer'],['EV-2022-091','watch-log'],['GR-2022-009','group-review'],['YH-2022-017','decision'],['AP-2022-028','evaluation'],['OPS-2026-084','operations'],
  ['AS-2023-008','memo'],['FAB-2022-071','workshop-receipt'],

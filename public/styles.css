@@ -71,6 +71,7 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 [data-member-record="AH-2017-009"] .record-table tbody td:first-child,
 [data-member-record="ENV-2022-031"] #record-table-2 tbody td:first-child,
 [data-member-record="TR-2026-011"] #record-table-1 tbody td:first-child,
+[data-member-record="NET-2021-004"] #record-table-1 tbody td:nth-child(-n+2),
 [data-member-record="GR-2022-009"] #record-table-1 tbody td:nth-child(2){white-space:nowrap}
 @media(max-width:360px){
  [data-member-record="YH-2019-026"] .record-table :is(th,td){padding-inline:5px}

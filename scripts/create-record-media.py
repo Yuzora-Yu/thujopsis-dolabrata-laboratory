@@ -47,6 +47,7 @@ STYLES = {
     "watch-log": ("Office", "#393c3b", "#eeeeeb", "居住実証運用室／当直連絡", "form"),
     "workshop-receipt": ("Office", "#574937", "#f1ebe2", "工房受付／預かり控え", "form"),
     "shop-change": ("Office", "#554a37", "#f1ece3", "工房／製作変更控え", "form"),
+    "network-change": ("Office", "#344952", "#e9eef0", "逓路設備管理／構成変更票", "form"),
     "maintenance": ("Gothic", "#3f5861", "#e8eff0", "施設保守・作業完了", "strip"),
     "operations": ("Gothic", "#1f4a44", "#e3ece7", "区画運用報告", "strip"),
     "decision": ("Gothic", "#313c52", "#eceef2", "事業再編／決裁原議", "strip"),
@@ -159,7 +160,7 @@ def render(record, style_key, target):
         flow.extend([p(entry["at"] + "　" + entry.get("by", ""), sub), p(entry["text"])])
     if record.get("signoff"):
         flow.append(p(record["signoff"], meta))
-    addendum_title = {"decision": "決裁後の追記", "watch-log": "保存時の照合注記", "shop-change": "納入後の訂正・保全"}.get(style_key)
+    addendum_title = record.get("printAddendumTitle") or {"decision": "決裁後の追記", "watch-log": "保存時の照合注記", "shop-change": "納入後の訂正・保全"}.get(style_key)
     if addendum_title and record.get("addenda"):
         flow.extend([PageBreak(), p(addendum_title, title)])
     for note in record.get("addenda", []):
