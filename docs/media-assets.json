@@ -292,9 +292,11 @@
   {
     "key": "c-0011",
     "year": 2014,
-    "prompt": "Use case: photorealistic-natural. Asset: varied tenant corporate website activity image. Close ordinary record photograph of a pair of hands comparing differently shaped unpainted polymer adaptive handles at a welfare-design worktable. Only hands and sleeves visible, ruler, foam samples and graph paper. A modest Japanese design studio, everyday fluorescent light. A single original landscape 3:2 photograph plausibly taken in 2014, with an ordinary compact camera or early phone, restrained saturation, flat mixed fluorescent/window lighting, deep focus, slight high-ISO noise, imperfect white balance and modest JPEG softness. Believable late-Heisei to Reiwa-1 quality, not modern cinematic commercial photography. Authentic scale and functioning mechanisms, plain unbranded equipment, no overlays or readable text.",
-    "references": [],
-    "path": "C:\\Users\\ship2\\.codex\\generated_images\\01a18b44-efea-75a3-a872-2f78fc077219\\exec-042aba10-aa20-4100-bf01-ec1364a3d083.png",
+    "prompt": "Use case: photorealistic-natural. Asset: a fictional Japanese assistive-device company's June 2014 activity-report photograph, landscape 3:2. Input image is a product-design reference ONLY: preserve the exact buildable concept of the blue one-piece 3D-printed adaptive cup holder (large oval open grip, integral top-rim hook, integral bottom cradle supporting a plain white handleless cup); make a NEW candid documentary photograph, not a crop or restyling of the reference. Photograph the holder and cup from a slightly higher, wider front-right angle at a modest design consultation table, with the blue grip at left and the cup at center. Beside the cup, one small gray 3D-printed curved handle-dimension test piece lies flat, and one unbranded steel ruler and a plain squared-paper notebook with sparse faint unrecognizable pencil measurement marks. The cup is EMPTY, and the underside of the cradle rests fully on the desk. Show the rim hook actually engaging the ceramic rim and the bottom cradle supporting the ceramic base, all physically coherent. No people, no body parts. No cup logos, no readable words, no hardware fasteners. Restrained lightly warm, ordinary flat mixed office fluorescent and window illumination, deep focus, very modest 2014 compact-camera detail and mild JPEG softness; not cinematic, no artificial bokeh, no glossy advertisement, no crowded background. The scene should look like a routine record taken after a user consultation, with only these few useful objects and comfortable clear desk space.",
+    "references": [
+      "public/assets/media/g-cup.webp"
+    ],
+    "path": "docs/source-images/c-0011.png",
     "asset": "public/assets/media/c-0011.webp"
   },
   {

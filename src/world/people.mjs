@@ -338,5 +338,4 @@ export function enrichPublicPeople({gallery,tenants}){
  const pencil=gallery.find(g=>g.key==='pencil');pencil.body+=' 製作者は瀬尾灯さん。お母様が手紙を書くために始めた道具づくりと、次の試作について、お話を伺いました。';
  pencil.links=[{path:'/workshop/stories/seo-akari/',text:'瀬尾灯さんに聞く、道具づくりの話'}];
  gallery.find(g=>g.key==='cup').body+=' 持ち方の確認には、利用者の瀬尾文乃さんも参加されています。';
- tenants.find(t=>t.id==='0011').activities[0].body+=' 利用者の瀬尾文乃さんにも、持ち帰ってからの使いにくさを伺いました。';
 }
