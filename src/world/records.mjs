@@ -209,7 +209,7 @@ export const researchRecords = [
     "sections": [
       [
         "対象者 P-026",
-        "稲葉 澪。案内図・図解制作。会員台帳の利用終了日：2019年3月31日。集計区分：標準条件外。"
+        "稲葉 澪里。案内図・図解制作。会員台帳の利用終了日：2019年3月31日。集計区分：標準条件外。"
       ],
       [
         "終了届",
@@ -592,7 +592,7 @@ export const researchRecords = [
         ],
         "rows": [
           [
-            "P-026 稲葉澪",
+            "P-026 稲葉澪里",
             "B1・B-04",
             "支持部交換",
             "測定継続"
@@ -1439,7 +1439,7 @@ export const researchRecords = [
         "rows": [
           [
             "参加者",
-            "P-026 稲葉澪"
+            "P-026 稲葉澪里"
           ],
           [
             "本人へ渡したもの",
@@ -1557,7 +1557,7 @@ export const researchRecords = [
     "id": "VR-2020-008",
     "title": "面談・講演原本の利用範囲",
     "date": "2020年11月20日",
-    "owner": "白波記録保存 白井波子",
+    "owner": "白波記録保存 白井紗千代",
     "roles": [
       "ashita",
       "institution"
@@ -1577,7 +1577,7 @@ export const researchRecords = [
       ]
     ],
     "kindLabel": "録音利用／引渡し確認",
-    "signoff": "白波記録保存　白井波子／2020年11月20日",
+    "signoff": "白波記録保存　白井紗千代／2020年11月20日",
     "updated": "2026年8月21日",
     "addenda": [
       {

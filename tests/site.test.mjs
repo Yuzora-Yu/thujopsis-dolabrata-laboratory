@@ -39,12 +39,12 @@ test('document visibility is enforced by account, including direct document URLs
  assert.equal((await c.login('201204010017','wrong')).status,401);assert.equal((await c.login('201204010017','20080519')).status,303);
  assert.match((await c.get('/members/records/?document_id=YH-2018-041')).text,/検索結果　1件/);
  const denied=(await c.get('/members/records/?document_id=YH-2018-041-A')).text;
- assert.match(denied,/該当する資料は閲覧できません。/);assert.doesNotMatch(denied,/稲葉 澪|class="document-result"/);
+ assert.match(denied,/該当する資料は閲覧できません。/);assert.doesNotMatch(denied,/稲葉 澪里|class="document-result"/);
  const absent=(await c.get('/members/records/?document_id=ZZ-2099-999')).text;
  assert.match(absent,/該当する資料はありません。/);
  assert.equal((await c.get('/members/records/YH-2018-041-A/')).response.status,404);
  assert.equal((await c.login('201804010046','20151112')).status,303);
- assert.match((await c.get('/members/records/YH-2018-041-A/')).text,/稲葉 澪/);
+ assert.match((await c.get('/members/records/YH-2018-041-A/')).text,/稲葉 澪里/);
  assert.equal((await c.get('/members/records/RM-2020-019/')).response.status,404);
  assert.equal((await c.login('201204010000','20100615')).status,303);
  assert.match((await c.get('/members/records/?document_id=RM-2020-019')).text,/検索結果　1件/);
@@ -232,6 +232,13 @@ test('public search tolerates spacing, width and full publication dates; member 
  for(const day of ['2016-05-20','2022-07-15','2026-10-27']){
   const result=(await c.get('/search/?q='+day)).text;
   assert.ok(!result.includes(`/news/${day.replaceAll('-','')}/`),day);
+ }
+ for(const [name,page] of [['有村 智景','/tenants/0015/'],['白井 紗千代','/tenants/0011/'],['稲葉 澪里','/people/inaba-mio/']]){
+  for(const q of [name,name.replace(' ','')]){
+   const result=(await c.get('/search/?q='+encodeURIComponent(q))).text;
+   assert.ok(result.includes(`href="${page}"`),q);
+  }
+  assert.ok((await c.get(page)).text.includes(name),page);
  }
  assert.match((await c.get('/membership/')).text,/href="\/members\/" target="_blank" rel="noopener"/);
  assert.doesNotMatch((await c.get('/')).text,/↗/);

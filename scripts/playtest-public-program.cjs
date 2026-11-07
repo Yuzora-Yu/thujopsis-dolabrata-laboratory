@@ -103,7 +103,7 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   assert.equal(await print.evaluate(image=>image.naturalWidth),1100);
   await p.keyboard.press('Escape');
   await p.screenshot({path:'.work/qa/gallery-reception-model-mobile.png',fullPage:true});
-  await p.getByRole('link',{name:'稲葉澪さんに聞く、案内図づくり',exact:true}).click();
+  await p.getByRole('link',{name:'稲葉澪里さんに聞く、案内図づくり',exact:true}).click();
   await p.getByRole('link',{name:'中央受付までの案内',exact:true}).click();
   await p.waitForURL(base+'/floor-map/#arrival');
   await p.locator('#floor-arrival-title').waitFor();

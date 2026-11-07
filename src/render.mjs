@@ -363,13 +363,13 @@ function floorGuide(paused){
 }
 
 function inabaInterview(){
- return layout('稲葉 澪｜利用者インタビュー',heading('PEOPLE','伝わる道具を、少しずつ。')+`
+ return layout('稲葉 澪里｜利用者インタビュー',heading('PEOPLE','伝わる道具を、少しずつ。')+`
   <article class="wrap article narrow prose editorial-story">
    <p class="article-meta"><time datetime="2016-03-25">2016.03.25</time><span>利用者インタビュー</span></p>
-   <p class="profile-kicker">稲葉 澪 ／ 図解・案内制作</p>
+   <p class="profile-kicker">稲葉 澪里 ／ 図解・案内制作</p>
    <figure>${img('media/p-inaba.webp','紙の案内図に線を書き足す稲葉さんの手元。机の右奥に樹脂の部分模型。','',true,[1100,733])}
     <figcaption>図の原稿と、線の太さや点の間隔を比べた試し刷り。2016年3月、工房にて。</figcaption></figure>
-   <p>道順や道具の使い方を図にする稲葉澪さん。工房で試作を続けている立体案内図について伺いました。</p>
+   <p>道順や道具の使い方を図にする稲葉澪里さん。工房で試作を続けている立体案内図について伺いました。</p>
    <h2>曲がる手前で、指を止める</h2>
    <p>通路の角を指でたどってもらったら、曲がるところを一つ通り過ぎました。線が細いと思って太くしたら、今度は壁との区別がつかなかったんです。それで、曲がる手前に、いったん指を止められる幅を取りました。</p>
    <blockquote>同じものを見ても、必要な案内は人それぞれ。ひとつの正解だけに揃えないで作っていきたいです。</blockquote>

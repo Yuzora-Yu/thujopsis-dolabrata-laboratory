@@ -261,7 +261,7 @@ async function newsInterface(p){
  assert.match(await body(p),/一般制作活動/);
  await p.goto(main('/gallery/0009/'));
  assert.match(await body(p),/中央エレベーターから受付まで[\s\S]*左に曲がる/);
- await p.getByRole('link',{name:'稲葉澪さんに聞く、案内図づくり',exact:true}).click();
+ await p.getByRole('link',{name:'稲葉澪里さんに聞く、案内図づくり',exact:true}).click();
  assert.match(await body(p),/線の太さや点の間隔を比べた試し刷り/);
  assert.match(await body(p),/2019年3月、当施設での利用登録を終了/);
  assert.doesNotMatch(await body(p),/B1・B-04|YH-2018-041-A/);
@@ -387,7 +387,7 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(await group.getByRole('row').filter({hasText:'P-034'}).innerText(),/9月9日[\s\S]*同じ説明/);
  await p.setViewportSize({width:1440,height:1000});
  const inaba=await document(p,'YH-2018-041-A');
- assert.match(inaba,/稲葉 澪/);
+ assert.match(inaba,/稲葉 澪里/);
  assert.match(inaba,/今は、出る道だけ教えてください/);
  const inabaPrint=await download(p,'a[href$="YH-2018-041-A.pdf"]','inaba-individual.pdf');
  const inabaScan=await download(p,'a[href$="YH-2018-041-A-scan.jpg"]','inaba-individual.jpg');

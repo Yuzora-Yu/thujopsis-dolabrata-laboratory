@@ -78,7 +78,7 @@ export const searchEntries = [
  {title:'4階フロアマップ',url:'/floor-map/',text:`${floorGuideCode} フロアマップ 案内図 中央受付 会議室 ラウンジ`,summary:`4階案内図 ${floorGuideCode}。中央受付や会議室、ラウンジへの行き方をご確認いただけます。`},
  {title:'入居者紹介',url:'/tenants/',text:'入居企業 過去入居 企業紹介 活動報告'},
  ...tenants.filter(t=>t.listed).map(t=>({
-  title:t.name,url:`/tenants/${t.page}/`,text:[`${t.room}号室`,t.business,t.description,...t.activities.flatMap(({title,body})=>[title,body])].join(' '),
+  title:t.name,url:`/tenants/${t.page}/`,text:[`${t.room}号室`,t.person,t.business,t.description,...t.activities.flatMap(({title,body})=>[title,body])].join(' '),
   summary:`${t.room}号室 ／ ${t.status}（${t.period}）　${t.business}`,
  })),
  ...news.filter(n=>n.listed||n.searchable).map(n=>({
@@ -87,5 +87,5 @@ export const searchEntries = [
  })),
  ...gallery.filter(g=>g.listed).map(g=>({title:g.title,url:`/gallery/${g.id}/`,text:g.body+' '+g.tag})),
  {title:'朝倉 紬乃｜制作と活動の記録',url:'/people/asakura-tsumugi/',text:'朝倉 紬乃 あさくら つむぎの 制作 プロフィール'},
- {title:'稲葉 澪｜利用者インタビュー',url:'/people/inaba-mio/',text:'稲葉 澪 いなば みお 案内 図解 制作者 触ってわかる案内図 立体模型'},
+ {title:'稲葉 澪里｜利用者インタビュー',url:'/people/inaba-mio/',text:'稲葉 澪里 いなば みおり 案内 図解 制作者 触ってわかる案内図 立体模型'},
 ];
