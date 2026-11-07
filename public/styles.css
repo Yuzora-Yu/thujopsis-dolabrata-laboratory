@@ -81,6 +81,11 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
  [data-member-record="YH-2019-026"] .record-table tbody td:nth-child(2){white-space:nowrap}
 }
 [data-member-record="PN-2022-034"] #record-table-1 table{min-width:540px}
+[data-member-record="OBS-2022-044"] #record-table-2 table{min-width:540px}
+@media(max-width:360px){
+ [data-member-record="FAB-2022-071"] #record-table-1 table,
+ [data-member-record="PUB-2026-006"] #record-table-1 table{min-width:420px}
+}
 .record-revision{display:block;font-size:.75rem;color:#6a7670;margin-top:.5rem}.record-table:focus-visible{outline:2px solid #547262;outline-offset:5px}
 .reading-expand{margin:1rem 0}.reading-expand summary{cursor:pointer;color:#315a49;text-decoration:underline;text-underline-offset:.25em;width:fit-content;padding:.45rem 0}.reading-expand[open]+.reading-preview{display:none}.reading-list .reading-omission{padding:.4rem 0 .4rem 3rem;color:#8a958d;border:0}
 .portal-loading{max-width:40rem;margin:5rem auto;padding:2rem;color:#68766e;min-height:35vh}

@@ -254,7 +254,7 @@ function receptionCopyPage(){
         <div><dt>17:32</dt><dd>翌日分の見学証を確認。12番は棚にありました。</dd></div>
         <div><dt>17:41</dt><dd>呼出履歴を確認。17:14の放送は中央受付の操作記録にありません。</dd></div>
        </dl>
-       <p class="reception-copy-note">回収した方は封筒に入れ、名簿の下に置きました。朝番の方へ。西側から内線が入ったら、どの部屋か聞いておいてください。</p>
+       <p class="reception-copy-note">回収した見学証は封筒に入れ、名簿の下に置きました。朝番の方へ。西側から内線が入ったら、どの部屋か聞いておいてください。</p>
       </article>
      </div>
     </div>
