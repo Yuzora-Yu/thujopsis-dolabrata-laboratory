@@ -34,6 +34,29 @@ test('public pages and their referenced local assets exist',async()=>{
  const c=client();for(const p of publicPaths){const {response,text}=await c.get(p);assert.equal(response.status,p==='/404/'?404:200,p);for(const match of text.matchAll(/(?:src|href)="(\/assets\/[^"?#]+)/g)){const r=await fetch(base+match[1]);assert.equal(r.status,200,`${p}: ${match[1]}`);}}
 });
 
+test('facility film can be played and sought through byte ranges',async()=>{
+ const route=base+'/assets/video/asunaro-facility-pv.mp4';
+ const file=await readFile(new URL('../public/assets/video/asunaro-facility-pv.mp4',import.meta.url));
+ const head=await fetch(route,{method:'HEAD'});
+ assert.equal(head.status,200);
+ assert.equal(head.headers.get('content-type'),'video/mp4');
+ assert.equal(Number(head.headers.get('content-length')),file.length);
+ assert.equal((await head.arrayBuffer()).byteLength,0);
+ for(const [range,start,end] of [['bytes=0-63',0,63],['bytes=-16',file.length-16,file.length-1],[`bytes=${file.length-1024}-`,file.length-1024,file.length-1]]){
+  const response=await fetch(route,{headers:{Range:range}});
+  assert.equal(response.status,206);
+  assert.equal(response.headers.get('content-range'),`bytes ${start}-${end}/${file.length}`);
+  assert.deepEqual(Buffer.from(await response.arrayBuffer()),file.subarray(start,end+1));
+ }
+ const outside=await fetch(route,{headers:{Range:`bytes=${file.length}-`}});
+ assert.equal(outside.status,416);
+ assert.equal(outside.headers.get('content-range'),`bytes */${file.length}`);
+ assert.equal((await outside.arrayBuffer()).byteLength,0);
+ const article=(await client().get('/news/20261030-film/')).text;
+ assert.match(article,/<video controls playsinline preload="none"/);
+ assert.doesNotMatch(article,/<video[^>]*autoplay/);
+});
+
 test('document visibility is enforced by account, including direct document URLs',async()=>{
  const c=client();assert.equal((await c.get('/members/records/CH-2021-003/')).response.status,303);
  assert.equal((await c.login('201204010017','wrong')).status,401);assert.equal((await c.login('201204010017','20080519')).status,303);

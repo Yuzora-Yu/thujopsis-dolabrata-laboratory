@@ -22,8 +22,9 @@ for(const name of ['styles.css','app.js','seed-drift.js','member-reading.js','re
 await cp('src/search.mjs',path.join(out,'search-engine.js'));await cp('src/evidence.mjs',path.join(out,'evidence.js'));await cp('scripts/static-runtime.js',path.join(out,'static-runtime.js'));
 const runtimeVersion=createHash('sha256').update((await readFile('scripts/static-runtime.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 const seedDriftVersion=createHash('sha256').update((await readFile('public/seed-drift.js','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
+const styleVersion=createHash('sha256').update((await readFile('public/styles.css','utf8')).replaceAll('\r\n','\n')).digest('hex').slice(0,16);
 function hosted(html,kind='main'){
- const result=rewriteHostedHtml(html,{kind,origins,basePath:base}).replaceAll(`src="${base}/seed-drift.js"`,`src="${base}/seed-drift.js?v=${seedDriftVersion}"`);
+ const result=rewriteHostedHtml(html,{kind,origins,basePath:base}).replaceAll(`src="${base}/seed-drift.js"`,`src="${base}/seed-drift.js?v=${seedDriftVersion}"`).replaceAll(`href="${base}/styles.css"`,`href="${base}/styles.css?v=${styleVersion}"`);
  return result.replace('</head>',`<meta name="asunaro-base" content="${base}"><script type="module" src="${base}/static-runtime.js?v=${runtimeVersion}"></script></head>`);
 }
 function initialShell(html){

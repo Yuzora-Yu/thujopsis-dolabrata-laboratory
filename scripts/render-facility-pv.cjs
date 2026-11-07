@@ -1,4 +1,4 @@
-// Offline author preview. The video is not an asset of the public website.
+// Render the source master for local review; package-facility-pv.cjs creates the web asset.
 const {chromium}=require(process.env.ASUNARO_NODE_MODULES?process.env.ASUNARO_NODE_MODULES+'/playwright':'playwright');
 const fs=require('node:fs/promises'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),out=path.join(root,'.work','qa','pv');
@@ -72,11 +72,11 @@ const source={
     g.drawImage(img,(W-img.width*scale)*x,(H-img.height*scale)*y,img.width*scale,img.height*scale);
    }
    function shade(){
-    const grad=g.createLinearGradient(0,H,0,H*.46);
+    const grad=g.createLinearGradient(0,H*.70,0,H*.32);
     grad.addColorStop(0,'rgba(12,20,21,.94)');grad.addColorStop(1,'rgba(12,20,21,0)');g.fillStyle=grad;g.fillRect(0,0,W,H);
    }
    function lower(label,title){
-    shade();text(label,72,558,30,{color:'#dbe5b8'});text(title,72,631,44);
+    shade();text(label,72,392,30,{color:'#dbe5b8'});text(title,72,470,44);
    }
    function opening(t){
     cover('east',t,.55,.52);
@@ -85,30 +85,31 @@ const source={
     text(guide.name,72,227,32,{color:'#f0e9d6'});
     text('ともに、',72,325,56);
     text('明日をつくる。',72,402,56);
-    text('仕事とものづくりの拠点',72,493,35,{color:'#f0e9d6'});
-    g.fillStyle='#211711c9';g.fillRect(958,619,268,47);
-    text('4階 食堂・カフェ',974,652,30,{color:'#f0e9d6'});
+    text('仕事とものづくりの拠点',72,470,35,{color:'#f0e9d6'});
+    g.fillStyle='#211711c9';g.fillRect(958,439,268,47);
+    text('4階 食堂・カフェ',974,472,30,{color:'#f0e9d6'});
    }
    function visitorBoard(t){
     const ink='#263c34',muted='#4c6658';
     g.fillStyle='#f3f3ea';g.fillRect(0,0,W,H);
-    g.fillStyle='#dce4d0';g.fillRect(846,76,340,458);
-    g.drawImage(images.logo,92,83,48,48);
-    text(guide.name,158,116,25,{color:ink});
-    text('見学のご案内',92,252,62,{color:ink});
+    g.fillStyle='#dce4d0';g.fillRect(846,60,340,338);
+    g.drawImage(images.logo,92,54,48,48);
+    text(guide.name,158,87,25,{color:ink});
+    text('見学のご案内',92,178,58,{color:ink});
     g.strokeStyle='#98aa98';g.lineWidth=1;
-    g.beginPath();g.moveTo(92,286);g.lineTo(790,286);g.stroke();
-    text('受付場所',94,374,26,{color:muted});
-    text(guide.floor+'階 '+guide.desk,284,374,36,{color:ink});
-    text('受付時間',94,447,26,{color:muted});
-    text('平日 '+guide.weekdayStart+':00–'+guide.weekdayEnd+':00',284,447,36,{color:ink});
-    text('ラウンジと共用エリアをご案内いたします。',94,531,25,{color:ink});
-    text(guide.floor+'F',914,331,125,{color:'#3a5949'});
-    text(guide.desk,925,403,31,{color:ink});
-    g.beginPath();g.moveTo(92,585);g.lineTo(1186,585);g.stroke();
-    text(guide.edition,94,630,29,{color:muted});
-    text(guide.revision,737,630,29,{color:muted});
-    text(t>=cueStart&&t<cueEnd?'17:14 呼出':guide.stamp,1186,630,29,{color:muted,align:'right'});
+    g.beginPath();g.moveTo(92,211);g.lineTo(790,211);g.stroke();
+    text('受付場所',94,279,26,{color:muted});
+    text(guide.floor+'階 '+guide.desk,284,279,36,{color:ink});
+    text('受付時間',94,345,26,{color:muted});
+    text('平日 '+guide.weekdayStart+':00–'+guide.weekdayEnd+':00',284,345,36,{color:ink});
+    text('ラウンジと共用エリアをご案内いたします。',94,405,25,{color:ink});
+    text(guide.floor+'F',914,253,125,{color:'#3a5949'});
+    text(guide.desk,925,326,31,{color:ink});
+    g.beginPath();g.moveTo(92,438);g.lineTo(1186,438);g.stroke();
+    // Keep all three annotations above native controls even at a 350px video width.
+    text(guide.edition,94,481,29,{color:muted});
+    text(guide.revision,737,481,29,{color:muted});
+    text(t>=cueStart&&t<cueEnd?'17:14 呼出':guide.stamp,1186,481,29,{color:muted,align:'right'});
    }
    function frame(t){
     if(t<cuts.exterior){
@@ -144,8 +145,8 @@ const source={
      g.drawImage(images.logo,100,227,104,104);
      text(guide.name,228,296,49,{color:'#21382f'});
      text('ともに、明日をつくる。',229,362,29,{color:'#4f6858'});
-     text('この映像は、架空の施設を紹介する作品です。',100,650,29,{color:'#354e40'});
-     text('© YU-ZORA',1015,650,22,{color:'#4f6858'});
+     text('この映像は、架空の施設を紹介する作品です。',100,481,29,{color:'#354e40'});
+     text('© YU-ZORA',1015,481,22,{color:'#4f6858'});
     }
    }
    const samples=[2.4,4.8,7.3,10,12.6,15.1,17.4,19.65,21.9,24.3,24.95,25.7,28.8].map(t=>{frame(t);return {t,jpeg:canvas.toDataURL('image/jpeg',.91).split(',')[1]};});
