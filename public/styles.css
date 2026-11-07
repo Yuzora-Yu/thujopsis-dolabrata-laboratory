@@ -172,6 +172,8 @@ article.paper-transcript .clipping-subhead{margin-bottom:1.1rem;font-weight:600}
 .floor-destinations dt{font-weight:700}
 .floor-destinations .text-link{font-size:inherit}
 .floor-destinations dd{margin:0;font-size:.93rem;line-height:1.8}
+.floor-destination-map{display:none;background:none;border:0;padding:0;min-height:44px;color:#315e52;font:inherit;font-size:.85rem;font-weight:600;text-decoration:underline;text-underline-offset:.25em;cursor:pointer}
+.floor-destinations :target .floor-destination-map:not([hidden]){display:flex;align-items:center}
 #floor-plan{scroll-margin-top:8.5rem}
 @media(max-width:720px){.floor-arrival{grid-template-columns:1fr}}
 @media(max-width:580px){.floor-destinations dl>div{grid-template-columns:1fr}}

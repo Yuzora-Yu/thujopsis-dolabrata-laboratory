@@ -46,5 +46,5 @@ export const facilityInfo={
  office:{hours:'オフィス会員は24時間利用可',method:'現在、新規募集を休止しております。',notes:'郵便物の受け取りと共用設備の利用は会員規約に基づき承ります。',space:'',price:'区画別に設定／月'},
  cafe:{hours:'平日 11:00–17:00（ラストオーダー16:30）',method:'施設をご利用の方が対象です。',notes:'土・日・祝日は営業を休止しております。交流スペースの利用時間とは異なります。',space:'',price:'メニューごとに表示'},
  presentation:{hours:venueOpeningHours,method:'会員サイトにて事前申請を承っております。',notes:'定員60名。机と椅子の配置、音響の利用は申請時にご相談ください。',space:'presentation',price:'3,300円／時間'},
- hall:{hours:venueOpeningHours,method:'会員サイトにて利用申請を承っております。',notes:'写真は講演会形式の設営例です。椅子を並べた場合は最大500名までご利用いただけます。展示や机を使う催事については、準備・撤収の時間も含めてご相談ください。',space:'hall',price:'11,000円／時間'},
+ hall:{hours:venueOpeningHours,method:'会員サイトにて利用申請を承っております。',notes:'講演会形式の定員は500名です。展示や机を使う催事については、準備・撤収の時間も含めてご相談ください。',space:'hall',price:'11,000円／時間'},
 };

@@ -307,6 +307,7 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.screenshot({path:'.work/qa/exhibit-focus-mobile.png'});
   await mobile.keyboard.press('Escape');
   await mobile.goto(base+'/floor-map/');
+  assert.equal(await mobile.getByRole('button',{name:'図面で位置を確認',exact:true}).count(),0);
   assert.match(await mobile.locator('.floor-arrival').innerText(),/右へ進んでください。通路を左に曲がると、正面に中央受付/);
   await mobile.getByRole('button',{name:'フロアマップを拡大',exact:true}).click();
   const currentPlan=mobile.getByRole('dialog',{name:'フロアマップを拡大'});
@@ -329,6 +330,30 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
   await mobile.getByText('4階 工房2 ／ 入口側から撮影',{exact:true}).waitFor();
   await mobile.getByRole('link',{name:'中央受付からの行き方',exact:true}).click();
   await mobile.waitForURL(base+'/floor-map/#floor-workshop');
+  for(const [id,facility,left,right] of [
+   ['workshop',null,480,702],
+   ['presentation','プレゼンテーションホール',718,1078],
+   ['office','個室オフィス',85,601],
+  ]){
+   const row=mobile.locator('#floor-'+id);
+   if(facility){
+    await row.getByRole('link',{name:facility,exact:true}).click();
+    await mobile.getByRole('link',{name:'中央受付からの行き方',exact:true}).click();
+    await mobile.waitForURL(base+'/floor-map/#floor-'+id);
+   }
+   const detail=mobile.getByRole('button',{name:'図面で位置を確認',exact:true});
+   assert.equal(await detail.count(),1);
+   assert.ok(await row.evaluate(node=>node.matches(':target')));
+   await detail.click();
+   await currentPlan.getByRole('img',{name:/A4-09/}).waitFor();
+   assert.ok(await currentViewport.evaluate((node,[min,max])=>{
+    const scale=node.querySelector('img').clientWidth/1200;
+    return node.scrollLeft/scale<=min&&(node.scrollLeft+node.clientWidth)/scale>=max;
+   },[left,right]),id+' should open with the relevant rooms in view');
+   await mobile.keyboard.press('Escape');
+   assert.equal(mobile.url(),base+'/floor-map/#floor-'+id);
+   assert.ok(await detail.evaluate(node=>node===document.activeElement));
+  }
   const meetingDirections=mobile.locator('#floor-meeting');
   assert.match(await meetingDirections.innerText(),/会議室の手前で右に曲がって[\s\S]*A室・B室・C室[\s\S]*C室の角を左に曲がった先、左手に入口/);
   await meetingDirections.getByRole('link',{name:'会議室 A・B・C・D',exact:true}).click();
@@ -363,6 +388,11 @@ const base=(process.env.BASE_URL||'http://127.0.0.1:4817/thujopsis-dolabrata-lab
    const destination=document.querySelector('#floor-meeting').getBoundingClientRect();
    return destination.top>=document.querySelector('.site-header').getBoundingClientRect().bottom-1&&destination.bottom<innerHeight;
   });
+  await mobile.goto(base+'/facilities/hall/');
+  await mobile.getByRole('heading',{name:'ホールへの行き方',exact:true}).waitFor();
+  await mobile.getByText(/3階で中央エレベーターを降り、右手のホール入口.*主催者の案内.*4階中央受付/).waitFor();
+  await mobile.getByRole('link',{name:'4階中央受付の位置',exact:true}).click();
+  await mobile.waitForURL(base+'/floor-map/#arrival');
   assert.equal(await mobile.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
   await mobile.locator('.floor-arrival img').evaluate(image=>image.decode());
   await mobile.screenshot({path:'.work/qa/visitor-floor-mobile.png',fullPage:true});

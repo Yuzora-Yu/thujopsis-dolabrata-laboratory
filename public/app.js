@@ -208,7 +208,8 @@ if(photoViewport&&photoButtons.length){
   '#floor-exhibition':{x:.63,y:.57},
   '#floor-meeting':{x:.66,y:.42},
   '#floor-cafe':{x:.83,y:.42},
-  '#floor-presentation':{x:.82,y:.52},
+  '#floor-presentation':{x:.748,y:.52,zoom:3.15},
+  '#floor-office':{x:.286,y:.37,zoom:2.2},
  };
  let zoom=1,angle=0,fitWidth=0,fitHeight=0,openingCenter=middle;
 
@@ -255,25 +256,32 @@ if(photoViewport&&photoButtons.length){
  }
  photo.addEventListener('load',()=>fitPhoto(openingCenter));
  photoDialog.addEventListener('close',()=>window.removeEventListener('resize',refitPhoto));
+ function openPhoto(button,destination){
+  const source=button.dataset.imageOpen;
+  const focusArrival=button.hasAttribute('data-plan-arrival')&&matchMedia('(max-width: 580px)').matches;
+  zoom=focusArrival?(destination?(destination.zoom??4):2.6):1;
+  openingCenter=focusArrival?(destination??mapOverview):middle;
+  angle=0;
+  photo.hidden=true;
+  stage.style.removeProperty('width');
+  stage.style.removeProperty('height');
+  photo.alt=button.querySelector('img')?.alt||'';
+  photoDialog.setAttribute('aria-label',button.getAttribute('aria-label')||'画像');
+  photoDialog.querySelector('a').href=source;
+  photoDialog.showModal();
+  window.addEventListener('resize',refitPhoto);
+  photo.src=source;
+  if(photo.complete)fitPhoto(openingCenter);
+ }
  for(const button of photoButtons){
-  button.addEventListener('click',()=>{
-   const source=button.dataset.imageOpen;
-   const focusArrival=button.hasAttribute('data-plan-arrival')&&matchMedia('(max-width: 580px)').matches;
-   const destination=mapFocus[location.hash];
-   zoom=focusArrival?(destination?4:2.6):1;
-   openingCenter=focusArrival?(destination??mapOverview):middle;
-   angle=0;
-   photo.hidden=true;
-   stage.style.removeProperty('width');
-   stage.style.removeProperty('height');
-   photo.alt=button.querySelector('img')?.alt||'';
-   photoDialog.setAttribute('aria-label',button.getAttribute('aria-label')||'画像');
-   photoDialog.querySelector('a').href=source;
-   photoDialog.showModal();
-   window.addEventListener('resize',refitPhoto);
-   photo.src=source;
-   if(photo.complete)fitPhoto(openingCenter);
-  });
+  button.addEventListener('click',()=>openPhoto(button,mapFocus[location.hash]));
+ }
+ const floorPlan=document.querySelector('[data-plan-arrival]');
+ if(floorPlan){
+  for(const button of document.querySelectorAll('[data-open-floor-detail]')){
+   button.addEventListener('click',()=>openPhoto(floorPlan,mapFocus[location.hash]));
+   button.hidden=false;
+  }
  }
  for(const button of photoDialog.querySelectorAll('[data-photo-action]')){
   button.addEventListener('click',()=>{
