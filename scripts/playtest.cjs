@@ -49,6 +49,94 @@ async function verifyPausedGuide(p,path,content){
   assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);
  }
 }
+async function verifyStaticNotice(p,noticePath,{label,heading='',failure=''}={}){
+ if(mode!=='pages')return;
+ const notice=await p.context().newPage();
+ notice.on('pageerror',error=>errors.push(error.message));
+ const indexPattern='**/assets/site-index.json',portalPattern='**/assets/portal/*.json';
+ let releaseIndex,releasePortal,portalRequests=0;
+ const indexHold=new Promise(resolve=>{releaseIndex=resolve;}),portalHold=new Promise(resolve=>{releasePortal=resolve;});
+ const pendingRoutes=[];
+ const delayPortal=!!heading&&!failure;
+ const indexHandler=route=>{
+  const pending=(async()=>{
+   await indexHold;
+   if(failure==='index')await route.fulfill({status:503,body:'Unavailable'});
+   else await route.continue();
+  })();
+  pendingRoutes.push(pending);return pending;
+ };
+ const portalHandler=route=>{
+  portalRequests++;
+  const pending=(async()=>{
+   if(delayPortal)await portalHold;
+   if(failure==='portal')await route.fulfill({status:503,body:'Unavailable'});
+   else await route.continue();
+  })();
+  pendingRoutes.push(pending);return pending;
+ };
+ const assertLoading=async()=>{
+  const loading=notice.locator('[data-public-notice-loading]');
+  await loading.waitFor({timeout:8000});
+  assert.equal(await loading.innerText(),'お知らせを確認しております。');
+  assert.equal(await loading.getAttribute('role'),'status');
+  assert.equal(await notice.locator('body').getAttribute('data-public-outcome'),'true');
+  assert.equal(await notice.locator('.site-header').count(),1);
+  assert.doesNotMatch(await body(notice),/404|ページが見つかりません/);
+  assert.equal(await notice.getByRole('navigation',{name:'メインナビゲーション'}).getByRole('link',{name:'入居者紹介',exact:true}).count(),0);
+  assert.equal(await notice.locator('.footer-links').getByRole('link',{name:'入居者紹介',exact:true}).count(),0);
+ };
+ await notice.route(indexPattern,indexHandler);
+ if(delayPortal||failure==='portal')await notice.route(portalPattern,portalHandler);
+ try{
+  await Promise.all([
+   notice.goto(main(noticePath),{waitUntil:'commit'}),
+   notice.waitForRequest(indexPattern,{timeout:8000})
+  ]);
+  await assertLoading();
+  await notice.screenshot({path:'.work/qa/pages-notice-'+label+'-'+(noticePath.includes('staff-change')?'staff-change':'closure')+'-loading.png',fullPage:true});
+  const portalRequested=delayPortal?notice.waitForRequest(portalPattern,{timeout:8000}):null;
+  releaseIndex();
+  if(portalRequested){
+   await portalRequested;
+   await assertLoading();
+   releasePortal();
+  }
+  if(failure){
+   const message=failure==='index'?'ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。':'お知らせを表示できませんでした。ページを再読み込みしてご確認ください。';
+   await notice.locator('main').getByRole('alert').filter({hasText:message}).waitFor();
+   assert.doesNotMatch(await body(notice),/404|ページが見つかりません|お知らせを確認しております。/);
+   if(failure==='portal')assert.ok(portalRequests>0,'the outcome request must actually fail');
+  }else{
+   await until(notice,heading||'ページが見つかりません');
+   if(heading)assert.doesNotMatch(await body(notice),/404|ページが見つかりません/);
+  }
+  assert.equal(await notice.locator('[data-public-notice-loading]').count(),0);
+ }catch(error){
+  console.error('Public notice:',label,noticePath,failure||'normal');
+  await notice.screenshot({path:'.work/qa/pages-notice-failure.png',fullPage:true}).catch(()=>{});
+  throw error;
+ }finally{
+  releaseIndex();releasePortal();
+  await Promise.allSettled(pendingRoutes);
+  await notice.unroute(indexPattern,indexHandler);
+  if(delayPortal||failure==='portal')await notice.unroute(portalPattern,portalHandler);
+  await notice.close();
+ }
+}
+async function verifyArchiveHomeAfterEnding(p){
+ if(mode!=='pages')return;
+ const archive=await p.context().newPage();
+ archive.on('pageerror',error=>errors.push(error.message));
+ try{
+  await archive.goto(provider('archive','/'),{waitUntil:'networkidle'});
+  await until(archive,'資料の保存について');
+  assert.equal(archive.url(),provider('archive','/'));
+  assert.equal(await archive.locator('.legacy-header').count(),1);
+  assert.equal(await archive.locator('.site-header').count(),0);
+  assert.match(await archive.locator('body').getAttribute('class'),/\blegacy-body\b/);
+ }finally{await archive.close();}
+}
 async function checkArchivePdf(archive,filename,label){
  const pdf=archive.getByRole('link',{name:label});
  assert.ok((await pdf.getAttribute('href')).endsWith('/'+filename));
@@ -236,6 +324,8 @@ async function newsInterface(p){
   assert.equal(await p.locator('#member-id').isDisabled(),true);resume();await navigation;
   await p.locator('#member-id:enabled').waitFor();await p.unroute('**/assets/site-index.json');
  }
+ await verifyStaticNotice(p,'/news/closure/',{label:'unreached'});
+ await verifyStaticNotice(p,'/news/staff-change/',{label:'unreached'});
  await newsInterface(p);
  await p.goto(main('/news/20120401/'));assert.equal(await p.locator('a[href*="20120903"]').count(),0);await p.getByRole('link',{name:'施設名に込めた願い',exact:true}).click();assert.match(await body(p),/アスナロは、アスナロとして育つ/);await p.screenshot({path:'.work/qa/'+mode+'-identity.png',fullPage:true});
  await p.goto(main('/'));assert.equal(await p.locator('a[href*="floor-4f-2012"],img[src*="floor-4f-2012"]').count(),0);
@@ -764,6 +854,9 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
  assert.match(await body(p),/B1・B-07で確認[\s\S]*ご本人からの連絡/);
  assert.match(await body(p),/原型継承試験の実施手続きを停止/);
  assert.match(await body(p),/母と確かめながら続きを作ります/);if(process.env.PLAYTEST_LAB==='1'){await p.locator('[data-lab-thanks]:visible').waitFor();assert.equal(await p.locator('[data-lab-thanks-name]').innerText(),'星をみる灯');assert.match(await p.locator('[data-lab-thanks]').innerText(),/私も一緒に帰りたい/);}else assert.equal(await p.locator('[data-lab-thanks]:visible').count(),0);await p.screenshot({path:'.work/qa/'+mode+'-end3.png',fullPage:true});
+ await verifyStaticNotice(p,'/news/closure/',{label:'end3',heading:'施設の利用休止について'});
+ await verifyStaticNotice(p,'/news/staff-change/',{label:'end3'});
+ await verifyArchiveHomeAfterEnding(p);
  if(process.env.PLAYTEST_LAB==='1'){
   const savedTrial=await p.context().newPage();
   try{
@@ -833,6 +926,12 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
    const centerReceipt=q.url();
    assert.match(await body(q),/所在と支援の引継ぎ[\s\S]*新たな研究支援事業/);
    assert.doesNotMatch(await body(q),/B1・B-07|引渡しの停止と原本の保全/);
+   assert.match(await q.getByRole('link',{name:'施設のお知らせ',exact:true}).getAttribute('href'),/\/news\/closure\/$/);
+   await verifyStaticNotice(q,'/news/closure/',{label:'end1',heading:'施設の利用休止について'});
+   await verifyStaticNotice(q,'/news/staff-change/',{label:'end1'});
+   await verifyStaticNotice(q,'/news/closure/',{label:'end1-portal-failure',failure:'portal'});
+   await verifyStaticNotice(q,'/news/closure/',{label:'end1-index-failure',failure:'index'});
+   await verifyArchiveHomeAfterEnding(q);
    if(inbox){
     await inbox.getByRole('heading',{name:'一般利用の受付休止',exact:true}).waitFor();
     await inbox.getByRole('heading',{name:'原本照会への回答（保存分）',exact:true}).waitFor();
@@ -867,6 +966,8 @@ await p.getByRole('link',{name:'共同事業・連絡記録',exact:true}).click(
    await submit(q,received.file);const pending=q.url();
    await q.goto(main('/members/contact/received/'));
    await until(q,'運営事務局へのお問い合わせ');await q.locator('#subject').fill('資料の確認について');await q.locator('#message').fill('原本をご確認ください。');await q.locator('#attachment').setInputFiles(received.file);await q.getByRole('button',{name:/送信する/}).click();await until(q,'お問い合わせを受け付けました');
+   await verifyStaticNotice(q,'/news/staff-change/',{label:'end2',heading:'工房技術相談の担当変更について'});
+   await verifyStaticNotice(q,'/news/closure/',{label:'end2'});
    await q.goto(pending);await until(q,'資料を受領しました');
    assert.match(await body(q),/追加受付は終了しました/);
    assert.equal(await q.getByRole('link',{name:'追加資料を提出する',exact:true}).count(),0);

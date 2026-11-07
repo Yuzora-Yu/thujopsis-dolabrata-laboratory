@@ -90,7 +90,10 @@ async function outcomeBundle(ending='end1'){
 }
 function stage(){return state.ending|| (state.contact?'contact':'initial');}
 function showError(message){
- let element=document.querySelector('.form-error');if(!element){element=document.createElement('p');element.className='form-error';element.setAttribute('role','alert');(document.querySelector('form')||document.querySelector('main')).prepend(element);}element.textContent=message;
+ const main=document.querySelector('main');
+ let element=(main||document).querySelector('.form-error');
+ if(!element){element=document.createElement('p');element.className='form-error';element.setAttribute('role','alert');(main?.querySelector('form')||main||document.body).prepend(element);}
+ element.textContent=message;
 }
 async function documentResults(account,id){
  const form = document.querySelector('.record-form');
@@ -205,7 +208,25 @@ async function boot({restoreFragment=false}={}){
    const sender=document.querySelector('#sender');if(current.kind==='audit'&&sender&&trialView(state.consoleTrial)?.complete)sender.value=state.consoleTrial.handle;
    return;
   }
-  if(state.ending){
+  const conditionalNotice=current.kind==='main'&&['/news/closure/','/news/staff-change/'].includes(current.path);
+  if(conditionalNotice){
+   const available=current.path==='/news/closure/'?generalUsePaused(state.ending):state.ending==='end2';
+   if(!available){
+    display(site.notFound);
+    // The same open tab may become available after another tab submits evidence.
+    document.body.dataset.publicOutcome='true';
+    return;
+   }
+   const capable=await outcomeBundle(state.ending);
+   const html=capable?.outcomes[state.ending]?.['main:'+current.path];
+   if(html)display(html);
+   else{
+    document.querySelector('[data-public-notice-loading]')?.remove();
+    showError('お知らせを表示できませんでした。ページを再読み込みしてご確認ください。');
+   }
+   return;
+  }
+  if(current.kind==='main'&&state.ending){
    let ending=state.ending,capable=await outcomeBundle(ending);
    if(!capable&&ending==='end3'){ending='end1';capable=await outcomeBundle();}
    const html=capable?.outcomes[ending]?.['main:'+current.path]||(generalUsePaused(ending)?capable?.pausedPublic?.[current.path]:null);
@@ -234,6 +255,7 @@ async function boot({restoreFragment=false}={}){
   }
  }catch{
   document.querySelector('[data-archive-loading]')?.remove();
+  document.querySelector('[data-public-notice-loading]')?.remove();
   showError('ページを取得できませんでした。通信状況をご確認のうえ、再読み込みしてください。');
  }
  finally{

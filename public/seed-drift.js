@@ -15,7 +15,7 @@
  function changePhoto(container,number){
   const photo=container.querySelector('img');if(!photo)return;
   if(!photo.dataset.seedOriginalSrc){photo.dataset.seedOriginalSrc=photo.getAttribute('src');photo.dataset.seedOriginalAlt=photo.alt;}
-  photo.src=base+'/assets/effects/seed-'+number+'.webp';photo.alt=number==='0021'?'暗い廊下の奥に写る人影':'灯りのない待合室の記録写真';
+  photo.src=base+'/assets/effects/seed-'+number+'.webp';photo.alt=number==='0021'?'暗い廊下の奥に写る人影':'薄暗い待合室の記録写真';
   const button=photo.closest('[data-image-open]');if(button){if(!button.dataset.seedOriginalOpen)button.dataset.seedOriginalOpen=button.dataset.imageOpen;button.dataset.imageOpen=photo.src;}
   container.classList.add('seed-corrupted');altered.add(container);
  }

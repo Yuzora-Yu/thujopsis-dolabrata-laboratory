@@ -3,7 +3,8 @@ import {readFile,writeFile,mkdir,cp,unlink} from 'node:fs/promises';
 import {createHash,createCipheriv,pbkdf2Sync,randomBytes} from 'node:crypto';
 import path from 'node:path';
 import {accounts,documents,searchEntries} from '../src/content.mjs';
-import {publicPaths,pausedFacilityPaths,endingNoticePaths,renderPublic,notFound} from '../src/render.mjs';
+import {publicPaths,pausedFacilityPaths,endingNoticePaths,renderPublic,notFound,layout} from '../src/render.mjs';
+import {decoratePage} from '../src/experience.mjs';
 import {renderMember,loginPage,memberLayout,agencyPage} from '../src/member.mjs';
 import {archivePublicPaths,renderLegacy,legacyLayout,legacyLogin} from '../src/legacy.mjs';
 import {archiveTicket,archiveNotes} from '../src/world/archive-data.mjs';
@@ -53,7 +54,10 @@ for(const route of ['/room/','/room/console/','/room/console/subjects/',...archi
  await page(route,archiveLoading,'archive');
 }
 for(const kind of ['hozen','audit'])for(const route of ['/','/receive/','/received/'])await page(route,agencyPage(kind,route,{caseId:'@@CASE@@',origins,receipt:route==='/'?'':'loading'}),kind);
-for(const route of ['/news/closure/','/news/staff-change/'])await page(route,notFound());
+// The notice is conditional, so its first paint must not assert that it is missing.
+// Keep the ordinary unresolved-page index until the saved outcome is checked.
+const noticeLoading=decoratePage(layout('お知らせ','<section class="wrap article narrow prose"><h1>お知らせ</h1><p data-public-notice-loading role="status">お知らせを確認しております。</p></section>'),{kind:'main',path:'/404/'}).replace('<body ','<body data-public-outcome="true" ');
+for(const route of ['/news/closure/','/news/staff-change/'])await page(route,noticeLoading);
 
 const baseZip=(await makeArchive(new URL('../src/archive.mjs',import.meta.url))).toString('base64');
 const completeZip=(await makeArchive(new URL('../src/archive.mjs',import.meta.url),{complete:true})).toString('base64');
