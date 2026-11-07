@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
- <title id="brand">青庭種苗研究室 — AONIWA SEED LAB</title>
- <rect width="360" height="192" fill="#eff3e0"/>
- <g transform="translate(154 24) scale(1.08)" color="#41603b" style="--accent:#82a854"><path d="M24 44V17M24 26c-9-1-15-5-15-14 9 0 15 4 15 14zm0-5c7-1 12-5 13-13-8 0-13 5-13 13z" fill="none" stroke="currentColor" stroke-width="2.2"/><ellipse cx="14" cy="39" rx="4" ry="2.2" fill="var(--accent)"/><ellipse cx="34" cy="36" rx="3.6" ry="2" fill="var(--accent)"/></g>
- <g text-anchor="middle" fill="#41603b">
-  <text x="180" y="119" font-family="Yu Mincho, YuMincho, Georgia, serif" font-size="24" font-weight="650" letter-spacing="0.9">青庭種苗研究室</text>
-  <text x="180" y="143" font-family="Arial, Yu Gothic, sans-serif" font-size="10.8" font-weight="600" letter-spacing="1.65">AONIWA SEED LAB</text>
+ <title id="brand">青庭種苗研究室</title>
+ <rect width="360" height="192" fill="#fff"/>
+ <circle cx="72" cy="96" r="32" fill="#f5f5ea" stroke="#526b39" stroke-width="1.2"/>
+ <g transform="translate(48 72)" fill="none" stroke="#526b39" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M24 44V17M24 26c-9-1-15-5-15-14 9 0 15 4 15 14zm0-5c7-1 12-5 13-13-8 0-13 5-13 13z"/>
+  <path d="M9 44h30" stroke-width="1"/>
  </g>
+ <text x="121" y="105" fill="#3f5734" font-family="Yu Mincho, YuMincho, serif" font-size="52" font-weight="600">青庭</text>
+ <text x="125" y="133" fill="#3f5734" font-family="Yu Gothic, YuGothic, sans-serif" font-size="16" font-weight="500" letter-spacing="1">種苗研究室</text>
 </svg>

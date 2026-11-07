@@ -1,9 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 192" role="img" aria-labelledby="brand">
- <title id="brand">TRIM — PARTS DESIGN</title>
- <rect width="360" height="192" fill="#fbf1da"/>
- <g transform="translate(43 67) scale(1.08)" color="#49331a" style="--accent:#bd8028"><path d="M4 12h25v7H12v14h11v7H4z" fill="currentColor"/><path d="M25 10h19v29H29v-7h7V17H25z" fill="var(--accent)"/><path d="M19 25h14" stroke="currentColor" stroke-width="2"/></g>
- <g text-anchor="start" fill="#49331a">
-  <text x="111" y="100" font-family="Arial, Yu Gothic, sans-serif" font-size="27" font-weight="800" letter-spacing="2.4">TRIM</text>
-  <text x="113" y="121" font-family="Arial, Yu Gothic, sans-serif" font-size="9.7" font-weight="600" letter-spacing="1.1">PARTS DESIGN</text>
+ <title id="brand">TRIM トリム部品設計</title>
+ <rect width="360" height="192" fill="#f4f5f5"/>
+ <g transform="translate(38 71) scale(1.07)">
+  <path d="M4 12h25v7H12v14h11v7H4z" fill="#252a2c"/>
+  <path d="M25 10h19v29H29v-7h7V17H25z" fill="#d27221"/>
+  <path d="M19 25h14" stroke="#252a2c" stroke-width="2"/>
  </g>
+ <text x="109" y="115" fill="#252a2c" font-family="Arial Black, Arial, sans-serif" font-size="54" font-weight="900" font-style="italic" letter-spacing="-.8">TRIM</text>
+ <path d="M110 127h170" stroke="#d27221" stroke-width="4"/>
+ <text x="112" y="148" fill="#41484c" font-family="Yu Gothic, YuGothic, sans-serif" font-size="12" font-weight="700">トリム部品設計</text>
 </svg>

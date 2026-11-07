@@ -96,7 +96,8 @@ function galleryPage(query){
   </section>`);
 }
 function tenantLogo(tenant,alt=''){
- return img(`tenant-logos/${tenant.page}.svg`,alt,'tenant-logo',false,[360,192]);
+ const revision=tenant.logoRevision?`?v=${tenant.logoRevision}`:'';
+ return img(`tenant-logos/${tenant.page}.svg${revision}`,alt,'tenant-logo',false,[360,192]);
 }
 function materialDate({date,articleId}){
  const label=articleId?'掲載日':'発行日';
@@ -129,7 +130,7 @@ function tenantHeading(tenant,directory){
   <div class="breadcrumb"><a href="/">HOME</a><span>/</span><a href="${directory}">入居者紹介</a><span>/</span>${esc(tenant.name)}</div>
   <div class="tenant-identity">
    ${tenantLogo(tenant,`${tenant.name}のロゴ`)}
-   <div class="tenant-identity-copy"><p class="eyebrow">TENANT PROFILE</p><h1>${esc(tenant.name)}</h1><p class="profile-index">掲載No. ${tenant.page} ／ ${esc(tenant.period)}</p></div>
+   <div class="tenant-identity-copy"><p class="eyebrow">TENANT PROFILE</p><h1>${tenantCardName(tenant.name,'heading-phrase')}</h1><p class="profile-index">掲載No. ${tenant.page} ／ ${esc(tenant.period)}</p></div>
   </div>
  </div>`;
 }
@@ -155,14 +156,14 @@ function tenantProfile(tenant){
   ${tenantRelatedMaterials(tenant)}${link(directory,'入居者紹介へ')}
  </article>`);
 }
-function tenantCardName(name){
+function tenantCardName(name,partClass='tenant-name-part'){
  const parts=name.match(/^(株式会社|有限会社|合同会社|合名会社|合資会社)(.+)$/)
   ||name.match(/^(.+?)(株式会社|有限会社|合同会社|合名会社|合資会社)$/);
  const words=(parts?parts.slice(1):[name]).flatMap(part=>{
   const boundary=part.match(/^([\p{Script=Katakana}ー]+)([\p{Script=Han}々].*)$/u);
   return boundary?boundary.slice(1):[part];
  });
- return words.map(part=>`<span class="tenant-name-part">${esc(part)}</span>`).join('<wbr>');
+ return words.map(part=>`<span class="${esc(partClass)}">${esc(part)}</span>`).join('<wbr>');
 }
 function tenantCards(items){
  return `<div class="tenant-grid">${items.map(tenant=>`
