@@ -1,5 +1,6 @@
 from pathlib import Path
 from subprocess import check_output
+from datetime import date
 import json
 import sys
 from reportlab.pdfgen import canvas
@@ -132,24 +133,17 @@ if not {'--missing-only', '--corrections-only', '--akari-only'}.intersection(sys
     historical_registers()
     historical_outline()
 
-def newspaper(name,issue,headline,subhead,paragraphs,code):
- c=paper(name,'夕凪日報 '+issue,code)
- c.setFont('Mincho',34);c.drawString(40,H-90,'夕 凪 日 報')
- c.setFont('Mincho',10);c.drawRightString(W-40,H-72,issue+'　地域面')
- c.setFont('JP',8);c.drawRightString(W-40,H-92,'社会・暮らし　｜　保存切抜')
- c.setLineWidth(2);c.line(40,H-110,W-40,H-110)
- c.setFont('Mincho',23);c.drawString(44,H-153,headline)
- c.setFont('Mincho',17);c.drawString(44,H-183,subhead)
- c.setLineWidth(.5);c.line(44,H-202,W-44,H-202)
- y=H-230
- for text in paragraphs:y=para(c,'　'+text,50,y,W-100,12,23)-16
- c.setFont('JP',8);c.drawString(50,70,'複写元：地域版保存紙面　／　原本の改変なし')
- c.save()
-
-def regional_clipping(name, issue, headline, subhead, paragraphs, code, *, correction=False):
+def regional_clipping(name, issue, headline, subhead, paragraphs, code, *, received, correction=False):
     height = 405
+    columns = (paragraphs[:2], paragraphs[2:])
+    width = W / 2 - 55
+    if not correction:
+        body_style = ParagraphStyle('measure', fontName='Mincho', fontSize=11, leading=17, wordWrap='CJK')
+        lengths = [sum(Paragraph('　' + text, body_style).wrap(width, 10000)[1] + 8 for text in column) for column in columns]
+        height = max(height, 179 + max(lengths) + 65)
     c = paper(name, '夕凪日報 ' + issue, '収蔵番号 ' + code, height=height)
-    c.setDateFormatter(lambda *_: 'D:20211112000000')
+    received_date = date.fromisoformat(received)
+    c.setDateFormatter(lambda *_: 'D:' + received_date.strftime('%Y%m%d') + '000000')
     c.setFont('Mincho', 34)
     c.drawString(40, height - 87, '夕 凪 日 報')
     c.setFont('Mincho', 10)
@@ -176,9 +170,8 @@ def regional_clipping(name, issue, headline, subhead, paragraphs, code, *, corre
         c.setFont('Mincho', 15)
         c.drawString(44, height - 163, subhead)
         top, left, right = height - 179, 45, W / 2 + 10
-        width = W / 2 - 55
         bottoms = []
-        for x, column in zip((left, right), (paragraphs[:2], paragraphs[2:])):
+        for x, column in zip((left, right), columns):
             y = top
             for paragraph in column:
                 y = para(c, '　' + paragraph, x, y, width, 11, 17) - 8
@@ -188,7 +181,7 @@ def regional_clipping(name, issue, headline, subhead, paragraphs, code, *, corre
         c.line(W / 2, top + 2, W / 2, y)
 
     c.setFont('JP', 8)
-    c.drawString(46, y - 31, '2021年11月12日 受領　／　夕凪日報 地域面の切抜')
+    c.drawString(46, y - 31, f'{received_date.year}年{received_date.month}月{received_date.day}日 受領　／　夕凪日報 地域面の切抜')
     c.save()
 
 
@@ -202,19 +195,16 @@ if not {'--missing-only', '--akari-only'}.intersection(sys.argv):
     for key in ('NK-2021-1104', 'NK-2021-1104-late', 'NK-2021-1105'):
         article = clippings[key]
         regional_clipping(article['file'], article['issue'], article['headline'], article['subhead'],
-                          article['paragraphs'], article['code'], correction=(key == 'NK-2021-1105'))
+                          article['paragraphs'], article['code'], received=article['received'], correction=(key == 'NK-2021-1105'))
 
 
 if '--corrections-only' not in sys.argv:
     article = clippings['NK-2022-0908']
-    newspaper(article['file'], article['issue'], article['headline'], article['subhead'],
-              article['paragraphs'], '収蔵番号 ' + article['code'])
+    regional_clipping(article['file'], article['issue'], article['headline'], article['subhead'],
+                      article['paragraphs'], article['code'], received=article['received'])
 
 if not {'--corrections-only', '--akari-only'}.intersection(sys.argv):
- newspaper('younagi-20230622.pdf','2023年6月22日（木）','退出支援の元職員とも連絡途絶','工房の三枝律さん（36）',[
-  '昨年八月から家族が本人と話せていない作業療法士・瀬尾灯さんの所在について、家族と連絡を取り合っていた工房職員の三枝律さん（36）とも連絡が取れなくなった。',
-  '家族らによると、三枝さんは六月八日、本人の道具と書面を返却できるよう、施設側へ説明する予定だと話していた。翌日以降、本人からの返答がなく、予定されていた取材も行えていない。',
-  '施設は、三枝さんが十五日付で工房の業務を終了したと回答。退職の経緯と本人への取次については、個別の事情として回答していない。本紙は退職が本人の意思によるものか、現在どこにいるかを確認できていない。',
-  '灯さんの母・文乃さんは「道具を返してほしいのも、二人の声を聞きたいのも、まだ同じです」と話す。家族と支援者による照会が続いている。',
- ],'収蔵番号 NK-2023-0622')
+ article = clippings['NK-2023-0622']
+ regional_clipping(article['file'], article['issue'], article['headline'], article['subhead'],
+                   article['paragraphs'], article['code'], received=article['received'])
 print('Updated archival newspaper PDFs.')

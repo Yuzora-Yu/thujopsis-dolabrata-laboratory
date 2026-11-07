@@ -6,13 +6,13 @@ import {accounts,documents,news,gallery,searchEntries} from '../src/content.mjs'
 import {publicPaths,renderPublic,notFound} from '../src/render.mjs';
 import {renderMember,agencyPage} from '../src/member.mjs';
 import {renderLegacy} from '../src/legacy.mjs';
-import {newsIsAvailable,newsIsListed} from '../src/world/editorial.mjs';
+import {newsIsAvailable,newsIsListed,storyToday} from '../src/world/editorial.mjs';
 import {pageRegistry,pagePosition,experienceSettings,growthStages} from '../src/experience.mjs';
 import {hintPlan} from '../docs/hint-plan.mjs';
 import {seoFamily} from '../src/world/people.mjs';
 import {recordText} from '../src/world/records.mjs';
 import {siteQueries,catalogQueries} from '../docs/critical-queries.mjs';
-import {archiveItems,archiveNotes,noticeCapture} from '../src/world/archive-data.mjs';
+import {archiveItems,archiveNotes,noticeCapture,pressClippings} from '../src/world/archive-data.mjs';
 import {normalizeSearch,matchesSearch} from '../src/search.mjs';
 import {hostingOrigins,providerRoute,rewriteHostedHtml} from '../src/hosting.mjs';
 import {classifyEvidence} from '../src/evidence.mjs';
@@ -35,6 +35,23 @@ test('retired recruitment articles are discoverable through records, not public 
  for(const id of ['ENV-2022-031','EV-2022-091','GR-2022-009'])assert.ok(renderMember(`/members/records/${id}/`,context('institution')));
  assert.match(renderMember('/members/records/GR-2022-009/',context('institution')),/自発的淘汰/);
  assert.match(renderMember('/members/records/PN-2022-034/',context('asakura')),/夏帆さんの本/);
+});
+
+test('newspaper editions preserve publication dates and agree with the receipt and transcript',async()=>{
+ for(const clipping of Object.values(pressClippings)){
+  assert.ok(clipping.received>=clipping.published&&clipping.received<=storyToday,clipping.file);
+  const bytes=(await readFile(new URL('../public/assets/archive/'+clipping.file,import.meta.url))).toString('latin1');
+  for(const field of ['CreationDate','ModDate'])assert.equal(bytes.match(new RegExp('/'+field+' \\(D:(\\d+)'))?.[1],clipping.received.replaceAll('-','')+'000000',clipping.file+' '+field);
+ }
+ const receipt=documents.find(record=>record.id==='FAM-2022-009').addenda.find(note=>note.sections.some(([,text])=>text.includes('NK-2022-0908、NK-2023-0622')));
+ const date=receipt.date.match(/(\d{4})年(\d+)月(\d+)日/).slice(1).map((part,index)=>index?part.padStart(2,'0'):part).join('-');
+ for(const id of ['NK-2022-0908','NK-2023-0622']){
+  const clipping=pressClippings[id],item=archiveItems.find(item=>item.code===id);
+  assert.equal(clipping.received,date,id);
+  assert.equal(item.clipping,id);assert.ok(item.text.startsWith(clipping.headline+'\n'));
+  const html=renderLegacy('/collections/items/'+item.id+'/',{origins});
+  for(const text of clipping.paragraphs)assert.ok(html.includes(text),id);
+ }
 });
 
 test('identity notices stay in the inbox and do not reach unrelated or closed accounts',()=>{

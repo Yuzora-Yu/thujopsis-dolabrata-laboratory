@@ -46,7 +46,7 @@
    if(archive){const rows=document.createElement('div'),link=document.createElement('a');rows.className='news-rows seed-drift-news';link.href=base+'/news/20250501-residential/';link.innerHTML='<time datetime="2025-05-01">2025.05.01</time><span class="tag">募集</span><span class="news-title">第5次居住実証 参加者募集について</span>';rows.append(link);archive.before(rows);}
   }
   const fragments={
-   '/workshop/':{text:'引取期限を過ぎた試作品について',href:'/gallery/0021/'},
+   '/workshop/':{text:'鉛筆を持ちやすくするグリップ',href:'/gallery/0021/'},
    '/floor-map/':{text:'個室オフィスの利用事業者',href:'/tenants/'},
    '/membership/':{text:'入居事業者一覧',href:'/tenants/'},
    '/facilities/cafe/':{text:'工房利用者への取材記録',href:'/workshop/stories/seo-akari/'}

@@ -241,6 +241,13 @@ async function followPublicLinks(browser){
  const response=await Promise.all([page.waitForNavigation(),red.click()]);assert.equal(response[0].status(),404);
  await page.getByRole('heading',{name:'ページが見つかりません。'}).waitFor();await page.locator('#main-navigation a[href$="/tenants/"]').waitFor();
  for(const route of ['/floor-map/','/workshop/','/membership/','/facilities/cafe/']){await page.goto(at(route));await page.locator('.seed-fragment a').waitFor();assert.equal(await page.locator('.seed-fragment a').count(),1,route);assert.equal(await page.locator('.seed-note').count(),noteRoutes.includes(route)?1:0,route);}
+ await page.goto(at('/workshop/'));
+ const workshopClue=page.locator('.seed-fragment a');await workshopClue.waitFor();
+ const workTitle=await workshopClue.innerText();await workshopClue.click();
+ await page.locator('article.seed-corrupted').waitFor();
+ assert.equal(await page.getByRole('heading',{level:1}).innerText(),workTitle,'workshop clue describes its destination');
+ await page.goto(at('/search/?q='+encodeURIComponent(workTitle)));
+ await page.locator('main a[href$="/gallery/0021/"]').waitFor();
  await page.goto(at('/gallery/0021/'));await page.locator('article.seed-corrupted').waitFor();
  await page.goto(at('/gallery/0022/'));assert.equal(await page.locator('body').getAttribute('data-asunaro-stage'),'root');
  assert.equal((await context.cookies()).some(cookie=>cookie.name===seed.name),false);
